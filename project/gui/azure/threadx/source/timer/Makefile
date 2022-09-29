@@ -1,0 +1,22 @@
+obj-y += tx_timer_activate.o
+obj-y += tx_timer_change.o
+obj-y += tx_timer_create.o
+obj-y += tx_timer_deactivate.o
+obj-y += tx_timer_delete.o
+obj-y += tx_timer_expiration_process.o
+obj-y += tx_timer_info_get.o
+obj-y += tx_timer_initialize.o
+obj-y += tx_timer_performance_info_get.o
+obj-y += tx_timer_performance_system_info_get.o
+obj-y += tx_timer_system_activate.o
+obj-y += tx_timer_system_deactivate.o
+obj-y += tx_timer_thread_entry.o
+obj-y += tx_timer_smp_core_exclude.o
+obj-y += tx_timer_smp_core_exclude_get.o
+
+obj-y += txe_timer_activate.o
+obj-y += txe_timer_change.o
+obj-y += txe_timer_create.o
+obj-y += txe_timer_deactivate.o
+obj-y += txe_timer_delete.o
+obj-y += txe_timer_info_get.o

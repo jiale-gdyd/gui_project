@@ -1,0 +1,19 @@
+#
+# Entry Kconfig
+#
+
+menu "Application Entry Process"
+
+config CHILD_PROCESS
+    bool "Child Process"
+    default n
+    help
+        This option enables the child process.
+
+config PARENT_PROCESS
+    bool "Parent Process"
+    default y
+    help
+        This option enables the parent process.
+
+endmenu

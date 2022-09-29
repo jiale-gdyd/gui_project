@@ -1,0 +1,17 @@
+obj-y += gx_slider_create.o
+obj-y += gx_slider_draw.o
+obj-y += gx_slider_event_process.o
+obj-y += gx_slider_info_set.o
+obj-y += gx_slider_needle_draw.o
+obj-y += gx_slider_needle_position_get.o
+obj-y += gx_slider_tickmarks_draw.o
+obj-y += gx_slider_travel_get.o
+obj-y += gx_slider_value_calculate.o
+obj-y += gx_slider_value_set.o
+obj-y += gxe_slider_create.o
+obj-y += gxe_slider_event_process.o
+obj-y += gxe_slider_info_set.o
+obj-y += gxe_slider_needle_position_get.o
+obj-y += gxe_slider_travel_get.o
+obj-y += gxe_slider_value_calculate.o
+obj-y += gxe_slider_value_set.o

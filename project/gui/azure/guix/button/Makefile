@@ -1,0 +1,11 @@
+obj-y += gx_button_background_draw.o
+obj-y += gx_button_create.o
+obj-y += gx_button_deselect.o
+obj-y += gx_button_draw.o
+obj-y += gx_button_event_process.o
+obj-y += gx_button_select.o
+obj-y += gx_button_siblings_deselect.o
+obj-y += gxe_button_create.o
+obj-y += gxe_button_deselect.o
+obj-y += gxe_button_event_process.o
+obj-y += gxe_button_select.o

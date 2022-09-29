@@ -1,0 +1,13 @@
+obj-y += gx_menu_create.o
+obj-y += gx_menu_draw.o
+obj-y += gx_menu_event_process.o
+obj-y += gx_menu_insert.o
+obj-y += gx_menu_position.o
+obj-y += gx_menu_remove.o
+obj-y += gx_menu_text_draw.o
+obj-y += gx_menu_text_offset_set.o
+obj-y += gxe_menu_create.o
+obj-y += gxe_menu_event_process.o
+obj-y += gxe_menu_insert.o
+obj-y += gxe_menu_remove.o
+obj-y += gxe_menu_text_offset_set.o

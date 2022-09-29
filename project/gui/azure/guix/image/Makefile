@@ -1,0 +1,14 @@
+obj-y += gx_image_reader_colorspace_convert.o
+obj-y += gx_image_reader_create.o
+obj-y += gx_image_reader_image_decode.o
+obj-y += gx_image_reader_jpeg_decode.o
+obj-y += gx_image_reader_nearest_palette_color_get.o
+obj-y += gx_image_reader_palette_set.o
+obj-y += gx_image_reader_pixel_read_callback_set.o
+obj-y += gx_image_reader_pixel_write_callback_set.o
+obj-y += gx_image_reader_png_decode.o
+obj-y += gx_image_reader_rle_encode.o
+obj-y += gx_image_reader_start.o
+obj-y += gxe_image_reader_create.o
+obj-y += gxe_image_reader_palette_set.o
+obj-y += gxe_image_reader_start.o

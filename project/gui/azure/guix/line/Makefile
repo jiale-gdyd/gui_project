@@ -1,0 +1,9 @@
+obj-y += gx_line_chart_axis_draw.o
+obj-y += gx_line_chart_create.o
+obj-y += gx_line_chart_data_draw.o
+obj-y += gx_line_chart_draw.o
+obj-y += gx_line_chart_update.o
+obj-y += gx_line_chart_y_scale_calculate.o
+obj-y += gxe_line_chart_create.o
+obj-y += gxe_line_chart_update.o
+obj-y += gxe_line_chart_y_scale_calculate.o

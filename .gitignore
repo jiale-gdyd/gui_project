@@ -1,0 +1,7 @@
+.vscode/
+.dist/
+.history/
+.vscode-ctags
+*.o
+*.d
+*.cmd*

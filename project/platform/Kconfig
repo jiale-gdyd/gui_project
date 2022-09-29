@@ -1,0 +1,59 @@
+#
+# Project Kconfig
+#
+
+menu "Hardware platform"
+
+choice
+    prompt "System Architecture"
+    default LINUX_GNU
+
+    config CORTEX_A7
+        bool "ARM Cortex A7"
+
+    config LINUX_GNU
+        bool "Linux GNU (eg. ubuntu)"
+
+endchoice
+
+choice
+    prompt "Architecture system bits"
+    default ARCH_32BIT
+
+    config ARCH_32BIT
+        bool "32-bit"
+
+    config ARCH_64BIT
+        bool "64-bit"
+
+endchoice
+
+choice
+    prompt "Hardware platforms choice"
+    default X86_64
+
+    config ROCKCHIP
+        bool "rockchip platform"
+
+    config X86_64
+        bool "x86_64 platform"
+        select ARCH_64BIT
+
+endchoice
+
+choice
+    prompt "Rockchip soc choice"
+    depends on ROCKCHIP
+    default RV11XX
+
+    config RV11XX
+        bool "rv1126 or rv1109"
+        select ARCH_32BIT
+
+    config RK3588
+        bool "rockchip 3588 chip"
+        select ARCH_64BIT
+
+endchoice
+
+endmenu

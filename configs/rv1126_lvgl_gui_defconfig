@@ -1,0 +1,21 @@
+#
+# Automatically generated file; DO NOT EDIT.
+# Application Configuration
+#
+
+#
+# GUI
+#
+CONFIG_GUI=y
+CONFIG_LVGL=y
+# CONFIG_LVGL_V7 is not set
+CONFIG_LVGL_V8=y
+# CONFIG_AZURE_THREADX is not set
+# CONFIG_AZURE_GUIX is not set
+
+#
+# hardware platform
+#
+CONFIG_RV11XX=y
+CONFIG_CORTEX_A7=y
+CONFIG_ARCH_32BIT=y

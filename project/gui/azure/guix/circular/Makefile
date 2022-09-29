@@ -1,0 +1,16 @@
+obj-y += gx_circular_gauge_angle_get.o
+obj-y += gx_circular_gauge_angle_increment_calculate.o
+obj-y += gx_circular_gauge_angle_set.o
+obj-y += gx_circular_gauge_animation_set.o
+obj-y += gx_circular_gauge_background_draw.o
+obj-y += gx_circular_gauge_create.o
+obj-y += gx_circular_gauge_draw.o
+obj-y += gx_circular_gauge_event_process.o
+obj-y += gx_circular_gauge_needle_dirty_mark.o
+obj-y += gx_circular_gauge_needle_rectangle_calculate.o
+obj-y += gx_circular_gauge_needle_rotate.o
+obj-y += gxe_circular_gauge_angle_get.o
+obj-y += gxe_circular_gauge_angle_set.o
+obj-y += gxe_circular_gauge_animation_set.o
+obj-y += gxe_circular_gauge_create.o
+obj-y += gxe_circular_gauge_event_process.o

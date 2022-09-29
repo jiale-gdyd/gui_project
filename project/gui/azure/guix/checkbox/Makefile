@@ -1,0 +1,9 @@
+obj-y += gx_checkbox_create.o
+obj-y += gx_checkbox_draw.o
+obj-y += gx_checkbox_event_process.o
+obj-y += gx_checkbox_pixelmap_set.o
+obj-y += gx_checkbox_select.o
+obj-y += gxe_checkbox_create.o
+obj-y += gxe_checkbox_event_process.o
+obj-y += gxe_checkbox_pixelmap_set.o
+obj-y += gxe_checkbox_select.o

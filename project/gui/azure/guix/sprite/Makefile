@@ -1,0 +1,13 @@
+obj-y += gx_sprite_create.o
+obj-y += gx_sprite_current_frame_set.o
+obj-y += gx_sprite_draw.o
+obj-y += gx_sprite_event_process.o
+obj-y += gx_sprite_frame_list_set.o
+obj-y += gx_sprite_start.o
+obj-y += gx_sprite_stop.o
+obj-y += gx_sprite_update.o
+obj-y += gxe_sprite_create.o
+obj-y += gxe_sprite_current_frame_set.o
+obj-y += gxe_sprite_frame_list_set.o
+obj-y += gxe_sprite_start.o
+obj-y += gxe_sprite_stop.o

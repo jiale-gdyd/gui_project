@@ -1,0 +1,9 @@
+obj-y += gx_string_scroll_wheel_create.o
+obj-y += gx_string_scroll_wheel_event_process.o
+obj-y += gx_string_scroll_wheel_string_id_list_set.o
+obj-y += gx_string_scroll_wheel_string_list_set.o
+obj-y += gx_string_scroll_wheel_text_get.o
+obj-y += gxe_string_scroll_wheel_create.o
+obj-y += gxe_string_scroll_wheel_event_process.o
+obj-y += gxe_string_scroll_wheel_string_id_list_set.o
+obj-y += gxe_string_scroll_wheel_string_list_set.o

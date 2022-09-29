@@ -1,0 +1,9 @@
+obj-y += drm.o
+obj-y += fbdev.o
+obj-y += GC9A01.o
+obj-y += R61581.o
+obj-y += ST7565.o
+obj-y += UC1610.o
+obj-y += ILI9341.o
+obj-y += SSD1963.o
+obj-y += SHARP_MIP.o

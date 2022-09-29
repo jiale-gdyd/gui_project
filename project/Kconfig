@@ -1,0 +1,7 @@
+#
+# Project Kconfig
+#
+
+source "project/gui/Kconfig"
+source "project/entry/Kconfig"
+source "project/platform/Kconfig"

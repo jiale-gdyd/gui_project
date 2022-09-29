@@ -1,0 +1,27 @@
+#
+# Azure-rtos Kconfig
+#
+
+menu "Azure RTOS THREADX and GUIX"
+
+config AZURE_THREADX
+    bool "Azure RTOS ThreadX"
+    depends on GUI
+    default n
+    help
+      This advanced real-time operating system (RTOS) is designed specifically for deeply embedded applications.
+      Among the multiple benefits it provides are advanced scheduling facilities, message passing, interrupt management,
+      and messaging services. Azure RTOS ThreadX has many advanced features, including picokernel architecture,
+      preemption threshold, event chaining, and a rich set of system services.
+
+config AZURE_GUIX
+    bool "Azure RTOS GUIX"
+    select AZURE_THREADX
+    default n
+    help
+      Azure RTOS GUIX is a professional-quality package, created to meet the needs of embedded systems developers.
+      Unlike alternative GUI solutions Azure RTOS GUIX is small, fast, and easily ported to virtually any hardware
+      configuration that’s capable of supporting graphical output. Azure RTOS GUIX also delivers exceptional visual
+      appeal and an intuitive and powerful API for application-level user interface development.
+
+endmenu

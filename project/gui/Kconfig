@@ -1,0 +1,16 @@
+#
+# GUI Kconfig
+#
+
+menu "embedded gui"
+
+config GUI
+    bool "use embedded gui"
+    default n
+    help
+      gui
+
+source "project/gui/lvgl/Kconfig"
+source "project/gui/azure/Kconfig"
+
+endmenu

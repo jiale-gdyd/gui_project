@@ -1,0 +1,14 @@
+obj-y += gx_drop_list_background_draw.o
+obj-y += gx_drop_list_close.o
+obj-y += gx_drop_list_create.o
+obj-y += gx_drop_list_draw.o
+obj-y += gx_drop_list_event_process.o
+obj-y += gx_drop_list_open.o
+obj-y += gx_drop_list_pixelmap_set.o
+obj-y += gx_drop_list_popup_get.o
+obj-y += gxe_drop_list_close.o
+obj-y += gxe_drop_list_create.o
+obj-y += gxe_drop_list_event_process.o
+obj-y += gxe_drop_list_open.o
+obj-y += gxe_drop_list_pixelmap_set.o
+obj-y += gxe_drop_list_popup_get.o

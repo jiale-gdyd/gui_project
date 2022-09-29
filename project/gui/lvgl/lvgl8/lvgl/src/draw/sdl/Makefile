@@ -1,0 +1,14 @@
+obj-y += lv_draw_sdl.o
+obj-y += lv_draw_sdl_bg.o
+obj-y += lv_draw_sdl_arc.o
+obj-y += lv_draw_sdl_img.o
+obj-y += lv_draw_sdl_mask.o
+obj-y += lv_draw_sdl_rect.o
+obj-y += lv_draw_sdl_line.o
+obj-y += lv_draw_sdl_utils.o
+obj-y += lv_draw_sdl_label.o
+obj-y += lv_draw_sdl_layer.o
+obj-y += lv_draw_sdl_polygon.o
+obj-y += lv_draw_sdl_composite.o
+obj-y += lv_draw_sdl_stack_blur.o
+obj-y += lv_draw_sdl_texture_cache.o

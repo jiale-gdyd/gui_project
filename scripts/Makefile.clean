@@ -1,0 +1,99 @@
+# ==========================================================================
+# 清理
+# ==========================================================================
+
+src := $(obj)
+
+PHONY := __clean
+__clean:
+
+# 速记 $(Q)$(MAKE) scripts/Makefile.clean obj=dir
+# 用法:
+# $(Q)$(MAKE) $(clean)=dir
+clean := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.clean obj
+
+# 文件名kbuild优先于Makefile
+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
+include $(if $(wildcard $(kbuild-dir)/Kbuild), $(kbuild-dir)/Kbuild, $(kbuild-dir)/Makefile)
+
+# 从各种变量中找出我们需要构建什么
+# ==========================================================================
+
+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+subdir-y	+= $(__subdir-y)
+__subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
+subdir-m	+= $(__subdir-m)
+__subdir-n	:= $(patsubst %/,%,$(filter %/, $(obj-n)))
+subdir-n	+= $(__subdir-n)
+__subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
+subdir-		+= $(__subdir-)
+
+# 需要下放到的子目录
+
+subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+subdir-ymn      := $(sort $(subdir-ym) $(subdir-n) $(subdir-))
+
+# 添加子路径
+
+subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
+
+# 生成要删除的文件列表，通常相对于当前目录
+
+__clean-files	:= $(extra-y) $(always)                  \
+		   $(targets) $(clean-files)             \
+		   $(host-progs)                         \
+		   $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
+
+__clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
+
+# 由于clean-files是相对于当前目录给出的，因此除了绝对路径之外，这将添加$(obj)前缀
+
+__clean-files   := $(wildcard                                               \
+                   $(addprefix $(obj)/, $(filter-out /%, $(__clean-files))) \
+		   $(filter /%, $(__clean-files)))
+
+# 由于clean-dirs是相对于当前目录给出的，所以除了绝对路径之外，这会添加$(obj)前缀
+
+__clean-dirs    := $(wildcard                                               \
+                   $(addprefix $(obj)/, $(filter-out /%, $(clean-dirs)))    \
+		   $(filter /%, $(clean-dirs)))
+
+# ==========================================================================
+
+quiet_cmd_clean    = CLEAN   $(obj)
+      cmd_clean    = rm -f $(__clean-files)
+quiet_cmd_cleandir = CLEAN   $(__clean-dirs)
+      cmd_cleandir = rm -rf $(__clean-dirs)
+
+
+__clean: $(subdir-ymn)
+ifneq ($(strip $(__clean-files)),)
+	+$(call cmd,clean)
+endif
+ifneq ($(strip $(__clean-dirs)),)
+	+$(call cmd,cleandir)
+endif
+ifneq ($(strip $(clean-rule)),)
+	+$(clean-rule)
+endif
+	@:
+
+
+# ===========================================================================
+# 一般性
+# ===========================================================================
+
+# 下行
+# ---------------------------------------------------------------------------
+
+PHONY += $(subdir-ymn)
+$(subdir-ymn):
+	$(Q)$(MAKE) $(clean)=$@
+
+# 如果设置了quiet，则只打印命令的简短版本
+
+cmd = @$(if $($(quiet)cmd_$(1)),echo '  $($(quiet)cmd_$(1))' &&) $(cmd_$(1))
+
+# 将.PHONY变量的内容声明为PHONY。我们将这些信息保存在一个变量中，如果你和朋友改变了，我们可以使用它
+
+.PHONY: $(PHONY)

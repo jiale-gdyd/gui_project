@@ -1,0 +1,313 @@
+####
+# kbuild: 通用定义
+
+# 便捷变量
+comma   := ,
+squote  := '
+empty   :=
+space   := $(empty) $(empty)
+
+###
+# 以'.'作为文件名前缀的目标名称。foo/bar.o=>foo/.bar.o
+dot-target = $(dir $@).$(notdir $@)
+
+###
+# 保存gcc -MD生成的依赖项的临时文件不能包含逗号
+depfile = $(subst $(comma),_,$(dot-target).d)
+
+###
+# 删除目录和扩展名的目标文件名
+basetarget = $(basename $(notdir $@))
+
+###
+# 在echo语句中使用的转义单引号
+escsq = $(subst $(squote),'\$(squote)',$1)
+
+###
+# 执行状态消息的简单方法
+       kecho := :
+ quiet_kecho := echo
+silent_kecho := :
+kecho := $($(quiet)kecho)
+
+###
+# 如果生成文件的内容被更新，则使用filechk检查
+# 简单用法:
+# define filechk_sample
+#	echo $KERNELRELEASE
+# endef
+# version.h : Makefile
+#	$(call filechk,sample)
+# 定义的规则应写入stdout新文件的内容
+# 现有文件将与新文件进行比较.
+# - 如果不存在文件，则创建该文件
+# - 如果内容不同，则使用新文件
+# - 如果它们相等，则没有更改，也没有时间戳更新
+# - stdin是从第一个先决条件($<)导入的，因此必须指定一个有效的文件作为第一个先决条件(通常是kbuild文件)
+define filechk
+	$(Q)set -e;				\
+	$(kecho) '  CHK     $@';		\
+	mkdir -p $(dir $@);			\
+	$(filechk_$(1)) < $< > $@.tmp;		\
+	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
+		rm -f $@.tmp;			\
+	else					\
+		$(kecho) '  UPD     $@';	\
+		mv -f $@.tmp $@;		\
+	fi
+endef
+
+######
+# GCC支持功能
+
+# cc-cross-prefix
+# 用法: CROSS_COMPILE := $(call cc-cross-prefix, m68k-linux-gnu- m68k-linux-)
+# 返回在PATH中找到前缀$(CC)的第一个前缀
+# 如果在带有所列前缀的路径中找不到$(CC)，则不返回任何内容
+cc-cross-prefix =  \
+	$(word 1, $(foreach c,$(1),                                   \
+		$(shell set -e;                                       \
+		if (which $(strip $(c))$(CC)) > /dev/null 2>&1 ; then \
+			echo $(c);                                    \
+		fi)))
+
+# cxx-cross-prefix
+# 用法: CROSS_COMPILE := $(call cxx-cross-prefix, m68k-linux-gnu- m68k-linux-)
+# 返回在PATH中找到前缀$(CXX)的第一个前缀
+# 如果在带有所列前缀的路径中找不到$(CXX)，则不返回任何内容
+cxx-cross-prefix =  \
+	$(word 1, $(foreach cpp,$(1),                                   \
+		$(shell set -e;                                       \
+		if (which $(strip $(cpp))$(CXX)) > /dev/null 2>&1 ; then \
+			echo $(cpp);                                    \
+		fi)))
+
+# 下面测试的输出目录
+TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
+
+# try-run
+# 用法: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
+# 退出代码选择选项。"$$TMP"可用作临时文件并自动清除
+try-run = $(shell set -e;		\
+	TMP="$(TMPOUT).$$$$.tmp";	\
+	TMPO="$(TMPOUT).$$$$.o";	\
+	if ($(1)) >/dev/null 2>&1;	\
+	then echo "$(2)";		\
+	else echo "$(3)";		\
+	fi;				\
+	rm -f "$$TMP" "$$TMPO")
+
+# as-option
+# 用法: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+
+as-option = $(call try-run,\
+	$(CC) $(KBUILD_CFLAGS) $(1) -c -xassembler /dev/null -o "$$TMP",$(1),$(2))
+
+# as-instr
+# 用法: cflags-y += $(call as-instr,instr,option1,option2)
+
+as-instr = $(call try-run,\
+	/bin/echo -e "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" -,$(2),$(3))
+
+# cc-option
+# 用法: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+
+cc-option = $(call try-run,\
+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
+
+# cxx-option
+# 用法: cxxflags-y += $(call cxx-option,-march=winchip-c6,-march=i586)
+
+cxx-option = $(call try-run,\
+	$(CXX) $(KBUILD_CXXFLAGS) $(KBUILD_CPPFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
+
+# cxx-option-yn
+# 用法: flag := $(call cxx-option-yn,-march=winchip-c6)
+cxx-option-yn = $(call try-run,\
+	$(CXX) $(KBUILD_CXXFLAGS) $(KBUILD_CPPFLAGS) $(1) -c -xc /dev/null -o "$$TMP",y,n)
+
+# cc-option-align
+# 前缀与-falgin或-malign对齐
+cc-option-align = $(subst -functions=0,,\
+	$(call cc-option,-falign-functions=0,-malign-functions=0))
+
+# cxx-option-align
+# 前缀与-falgin或-malign对齐
+cxx-option-align = $(subst -functions=0,,\
+	$(call cxx-option,-falign-functions=0,-malign-functions=0))
+
+# cc-disable-warning
+# 用法: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
+cc-disable-warning = $(call try-run,\
+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -W$(strip $(1)) -c -xc /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+
+# cxx-disable-warning
+# 用法: cxxflags-y += $(call cxx-disable-warning,unused-but-set-variable)
+cxx-disable-warning = $(call try-run,\
+	$(CXX) $(KBUILD_CXXFLAGS) $(KBUILD_CPPFLAGS) -W$(strip $(1)) -c -xc /dev/null -o "$$TMP",-Wno-$(strip $(1)))
+
+# cc-version
+# 用法: gcc-ver := $(call cc-version)
+cc-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-version.sh $(CC))
+
+# cxx-version
+# 用法: g++-ver := $(call cxx-version)
+cxx-version = $(shell $(CONFIG_SHELL) $(srctree)/scripts/g++-version.sh $(CXX))
+
+# cc-fullversion
+# 用法: gcc-ver := $(call cc-fullversion)
+cc-fullversion = $(shell $(CONFIG_SHELL) \
+	$(srctree)/scripts/gcc-version.sh -p $(CC))
+
+# cxx-fullversion
+# 用法: g++-ver := $(call cxx-fullversion)
+cxx-fullversion = $(shell $(CONFIG_SHELL) \
+	$(srctree)/scripts/g++-version.sh -p $(CXX))
+
+# cc-ifversion
+# 用法:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+cc-ifversion = $(shell [ $(call cc-version, $(CC)) $(1) $(2) ] && echo $(3))
+
+# cxx-ifversion
+# 用法:  EXTRA_CXXFLAGS += $(call cxx-ifversion, -lt, 0402, -O1)
+cxx-ifversion = $(shell [ $(call cxx-version, $(CXX)) $(1) $(2) ] && echo $(3))
+
+# cc-ldoption
+# 用法: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+cc-ldoption = $(call try-run,\
+	$(CC) $(1) -nostdlib -xc /dev/null -o "$$TMP",$(1),$(2))
+
+# cxx-ldoption
+# 用法: ldflags += $(call cxx-ldoption, -Wl$(comma)--hash-style=both)
+cxx-ldoption = $(call try-run,\
+	$(CXX) $(1) -nostdlib -xc /dev/null -o "$$TMP",$(1),$(2))
+
+# ld-option
+# 用法: LDFLAGS += $(call ld-option, -X)
+#ld-option = $(call try-run,\
+	$(CC) /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+
+# ld-option
+# 用法: LDFLAGS += $(call ld-option, -X)
+ld-option = $(call try-run,\
+	$(CXX) /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+
+# ar-option
+# 用法: KBUILD_ARFLAGS := $(call ar-option,D)
+# 重要: 周围没有空选项
+ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
+
+######
+
+###
+# 速记 $(Q)$(MAKE) -f scripts/Makefile.build obj=
+# 用法:
+# $(Q)$(MAKE) $(build)=dir
+build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
+
+###
+# 速记 $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
+# 用法:
+# $(Q)$(MAKE) $(modbuiltin)=dir
+modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
+
+# 如果不是绝对路径，请在-I前面加$(srctree)
+# 如果-I没有参数，则跳过
+addtree = $(if $(patsubst -I%,%,$(1)), \
+$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
+
+# 找到所有-I选项并调用addtree
+flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+
+# 回显命令
+# 如果$(quiet)等于`quiet_'，则使用短版本，否则使用全版本
+echo-cmd = $(if $($(quiet)cmd_$(1)),\
+	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
+
+# 打印命令
+cmd = @$(echo-cmd) $(cmd_$(1))
+
+# 为非绝对路径添加$(obj)/
+objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+
+###
+# if_changed      - 如果任何先决条件比目标更新或命令行已更改，则执行命令
+# if_changed_dep  - 就像if_changed，但使用fixdep显示依赖项，包括已使用的配置符号
+# if_changed_rule - 就像if_changed，但是改为执行规则
+
+ifneq ($(KBUILD_NOCMDDEP),1)
+# 检查两个参数是否具有相同的参数。如果相等，则结果为空字符串
+# 用户可以使用make KBUILD_NOCMDDEP=1覆盖此检查
+arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+                    $(filter-out $(cmd_$@),   $(cmd_$(1))) )
+else
+arg-check = $(if $(strip $(cmd_$@)),,1)
+endif
+
+# >'<替换是为了让echo工作, >$<重新加载.cmd文件时保留$的替换
+# 注意: 使用内联Perl脚本时[perl -e '...$$t=1;...']
+# 在$(cmd_xxx)中$$您的perl变量
+make-cmd = $(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1)))))
+
+# 查找任何比目标更新或不存在的先决条件
+# 两种情况下都跳过了伪目标
+any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+
+# 如果命令已更改或先决条件已更新，则执行命令
+#
+if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+	@set -e;                                                             \
+	$(echo-cmd) $(cmd_$(1));                                             \
+	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
+
+# 执行该命令并对生成的.d依赖项文件进行后处理
+if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+	@set -e;                                                             \
+	$(echo-cmd) $(cmd_$(1));                                             \
+	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+	rm -f $(depfile);                                                    \
+	mv -f $(dot-target).tmp $(dot-target).cmd)
+
+# 用法: $(call if_changed_rule,foo)
+# 将检查$(cmd_foo)或任何先决条件是否更改，如果更改，将执行$(rule_foo)
+if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
+	@set -e;                                                             \
+	$(rule_$(1)))
+
+###
+# 为什么 - 告诉你为什么一个目标被构造了
+#       通过make V=2使能
+#       输出(按检查顺序列出):
+#          (1) - 因为是伪目标
+#          (2) - 由于目标丢失
+#          (3) - 由于头文件发生更改
+#          (4) - 由于命令行更改
+#          (5) - 由于缺少.cmd文件
+#          (6) - 由于目标不在$(targets)中
+# (1) 伪目标总是建立
+# (2) 没有目标，所以我们最好建造它
+# (3) 先决条件比目标更新
+# (4) 名为dir/.target.cmd的文件中存储的命令行与实际的命令行不同。当编译器选项更改时会发生这种情况
+# (5) 没有dir/.target.cmd文件(用于存储命令行)
+# (6) 没有dir/.target.cmd文件，目标没有列在$(targets)中
+#     这是一个很好的提示，说明kbuild文件中有一个bug
+ifeq ($(KBUILD_VERBOSE),2)
+why =                                                                        \
+    $(if $(filter $@, $(PHONY)),- due to target is PHONY,                    \
+        $(if $(wildcard $@),                                                 \
+            $(if $(strip $(any-prereq)),- due to: $(any-prereq),             \
+                $(if $(arg-check),                                           \
+                    $(if $(cmd_$@),- due to command line change,             \
+                        $(if $(filter $@, $(targets)),                       \
+                            - due to missing .cmd file,                      \
+                            - due to $(notdir $@) not in $$(targets)         \
+                         )                                                   \
+                     )                                                       \
+                 )                                                           \
+             ),                                                              \
+             - due to target missing                                         \
+         )                                                                   \
+     )
+
+echo-why = $(call escsq, $(strip $(why)))
+endif

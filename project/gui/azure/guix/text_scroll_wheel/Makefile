@@ -1,0 +1,12 @@
+obj-y += gx_text_scroll_wheel_callback_set.o
+obj-y += gx_text_scroll_wheel_create.o
+obj-y += gx_text_scroll_wheel_dynamic_bidi_text_delete.o
+obj-y += gx_text_scroll_wheel_event_process.o
+obj-y += gx_text_scroll_wheel_draw.o
+obj-y += gx_text_scroll_wheel_font_set.o
+obj-y += gx_text_scroll_wheel_text_color_set.o
+obj-y += gxe_text_scroll_wheel_callback_set.o
+obj-y += gxe_text_scroll_wheel_create.o
+obj-y += gxe_text_scroll_wheel_event_process.o
+obj-y += gxe_text_scroll_wheel_font_set.o
+obj-y += gxe_text_scroll_wheel_text_color_set.o

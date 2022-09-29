@@ -1,0 +1,21 @@
+obj-y += tx_semaphore_ceiling_put.o
+obj-y += tx_semaphore_cleanup.o
+obj-y += tx_semaphore_create.o
+obj-y += tx_semaphore_delete.o
+obj-y += tx_semaphore_get.o
+obj-y += tx_semaphore_info_get.o
+obj-y += tx_semaphore_initialize.o
+obj-y += tx_semaphore_performance_info_get.o
+obj-y += tx_semaphore_performance_system_info_get.o
+obj-y += tx_semaphore_prioritize.o
+obj-y += tx_semaphore_put.o
+obj-y += tx_semaphore_put_notify.o
+
+obj-y += txe_semaphore_ceiling_put.o
+obj-y += txe_semaphore_create.o
+obj-y += txe_semaphore_delete.o
+obj-y += txe_semaphore_get.o
+obj-y += txe_semaphore_info_get.o
+obj-y += txe_semaphore_prioritize.o
+obj-y += txe_semaphore_put.o
+obj-y += txe_semaphore_put_notify.o

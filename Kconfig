@@ -1,0 +1,12 @@
+#
+# For a description of the syntax of this configuration file
+#
+
+mainmenu "Application $APPVERSION Configuration"
+
+config APPVERSION
+    string
+    option env="APPVERSION"
+
+# source "lib/Kconfig"
+source "project/Kconfig"

@@ -1,0 +1,16 @@
+obj-y += gx_prompt_create.o
+obj-y += gx_prompt_draw.o
+obj-y += gx_prompt_event_process.o
+obj-y += gx_prompt_font_set.o
+obj-y += gx_prompt_text_color_set.o
+obj-y += gx_prompt_text_draw.o
+obj-y += gx_prompt_text_get.o
+obj-y += gx_prompt_text_id_set.o
+obj-y += gx_prompt_text_set.o
+obj-y += gxe_prompt_create.o
+obj-y += gxe_prompt_event_process.o
+obj-y += gxe_prompt_font_set.o
+obj-y += gxe_prompt_text_color_set.o
+obj-y += gxe_prompt_text_get.o
+obj-y += gxe_prompt_text_id_set.o
+obj-y += gxe_prompt_text_set.o

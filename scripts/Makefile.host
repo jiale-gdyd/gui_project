@@ -1,0 +1,165 @@
+# ==========================================================================
+# 在主机系统上构建二进制文件
+# 二进制文件用于编译内核，例如预处理数据文件
+#
+# C和C++都支持，但首选语言是C这样的实用程序
+#
+# 简单语法
+# hostprogs-y := bin2hex
+# 将编译bin2hex.c并创建一个名为bin2hex的可执行文件
+#
+# hostprogs-y    := lxdialog
+# lxdialog-objs := checklist.o lxdialog.o
+# 将编译lxdialog.c和checklist.c，然后基于checklist.o和lxdialog.o链接可执行的lxdialog
+#
+# hostprogs-y      := qconf
+# qconf-cxxobjs   := qconf.o
+# qconf-objs      := menu.o
+# 将qconf编译为C++程序，并将菜单作为C程序
+# 它们作为c++代码链接到可执行的qconf
+
+# hostprogs-y := conf
+# conf-objs  := conf.o libkconfig.so
+# libkconfig-objs := expr.o type.o
+# 将创建一个名为libkconfig.so的共享库，该库由expr.o和type.o组成(它们都编译为C代码，而对象文件则作为独立于位置的代码)
+# conf.c作为一个c程序编译，conf.o与libkconfig.so作为可执行的conf
+# 注意: 不支持由C++文件组成的共享库
+
+__hostprogs := $(sort $(hostprogs-y))
+
+# C代码
+# 可从单个C文件中执行
+host-csingle	:= $(foreach m,$(__hostprogs),$(if $($(m)-objs),,$(m)))
+
+# 基于多个.o文件链接的C可执行文件
+host-cmulti	:= $(foreach m,$(__hostprogs),\
+		   $(if $($(m)-cxxobjs),,$(if $($(m)-objs),$(m))))
+
+# 从.c文件编译的对象(.o)文件
+host-cobjs	:= $(sort $(foreach m,$(__hostprogs),$($(m)-objs)))
+
+# C++代码
+# C++可执行文件编译至少从.cc文件和零或更多.c文件
+host-cxxmulti	:= $(foreach m,$(__hostprogs),$(if $($(m)-cxxobjs),$(m)))
+
+# 从.cc文件编译的对象(.o)文件
+host-cxxobjs	:= $(sort $(foreach m,$(host-cxxmulti),$($(m)-cxxobjs)))
+
+# 共享库(仅支持.c)
+# Shared libraries (.so) - all .so files referenced in "xxx-objs"
+# 共享库(.so) - "xxx-objs"中引用的所有.so文件
+host-cshlib	:= $(sort $(filter %.so, $(host-cobjs)))
+# 从"xxx-objs"中删除.so文件
+host-cobjs	:= $(filter-out %.so,$(host-cobjs))
+
+# 共享库使用的对象(.o)文件
+host-cshobjs	:= $(sort $(foreach m,$(host-cshlib),$($(m:.so=-objs))))
+
+# programs/.o文件的输出目录
+# hostprogs-y:= tools/build可能已指定。检索目录
+host-objdirs := $(foreach f,$(__hostprogs), $(if $(dir $(f)),$(dir $(f))))
+# prog-objs表示法中的.o文件目录
+host-objdirs += $(foreach f,$(host-cmulti),                  \
+                    $(foreach m,$($(f)-objs),                \
+                        $(if $(dir $(m)),$(dir $(m)))))
+# prog-cxxobjs表示法中的.o文件目录
+host-objdirs += $(foreach f,$(host-cxxmulti),                  \
+                    $(foreach m,$($(f)-cxxobjs),                \
+                        $(if $(dir $(m)),$(dir $(m)))))
+
+host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
+
+
+__hostprogs     := $(addprefix $(obj)/,$(__hostprogs))
+host-csingle	:= $(addprefix $(obj)/,$(host-csingle))
+host-cmulti	:= $(addprefix $(obj)/,$(host-cmulti))
+host-cobjs	:= $(addprefix $(obj)/,$(host-cobjs))
+host-cxxmulti	:= $(addprefix $(obj)/,$(host-cxxmulti))
+host-cxxobjs	:= $(addprefix $(obj)/,$(host-cxxobjs))
+host-cshlib	:= $(addprefix $(obj)/,$(host-cshlib))
+host-cshobjs	:= $(addprefix $(obj)/,$(host-cshobjs))
+host-objdirs    := $(addprefix $(obj)/,$(host-objdirs))
+
+obj-dirs += $(host-objdirs)
+
+#####
+# 处理gcc的选项。支持用单独的输出目录构建
+
+_hostc_flags   = $(HOSTCFLAGS)   $(HOST_EXTRACFLAGS)   \
+                 $(HOSTCFLAGS_$(basetarget).o)
+_hostcxx_flags = $(HOSTCXXFLAGS) $(HOST_EXTRACXXFLAGS) \
+                 $(HOSTCXXFLAGS_$(basetarget).o)
+
+ifeq ($(KBUILD_SRC),)
+__hostc_flags	= $(_hostc_flags)
+__hostcxx_flags	= $(_hostcxx_flags)
+else
+__hostc_flags	= -I$(obj) $(call flags,_hostc_flags)
+__hostcxx_flags	= -I$(obj) $(call flags,_hostcxx_flags)
+endif
+
+hostc_flags    = -Wp,-MD,$(depfile) $(__hostc_flags)
+hostcxx_flags  = -Wp,-MD,$(depfile) $(__hostcxx_flags)
+
+#####
+# 在主机上编译程序
+
+# 从单个.c文件创建可执行文件
+# host-csingle -> Executable
+quiet_cmd_host-csingle 	= HOSTCC  $@
+      cmd_host-csingle	= $(HOSTCC) $(hostc_flags) -o $@ $< \
+	  	$(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+$(host-csingle): $(obj)/%: $(src)/%.c FORCE
+	$(call if_changed_dep,host-csingle)
+
+# 基于.o文件列表链接可执行文件，所有文件都是纯c
+# host-cmulti -> executable
+quiet_cmd_host-cmulti	= HOSTLD  $@
+      cmd_host-cmulti	= $(HOSTCC) $(HOSTLDFLAGS) -o $@ \
+			  $(addprefix $(obj)/,$($(@F)-objs)) \
+			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+$(host-cmulti): $(obj)/%: $(host-cobjs) $(host-cshlib) FORCE
+	$(call if_changed,host-cmulti)
+
+# 从单个.c文件创建.o文件
+# host-cobjs -> .o
+quiet_cmd_host-cobjs	= HOSTCC  $@
+      cmd_host-cobjs	= $(HOSTCC) $(hostc_flags) -c -o $@ $<
+$(host-cobjs): $(obj)/%.o: $(src)/%.c FORCE
+	$(call if_changed_dep,host-cobjs)
+
+# 基于.o文件列表链接可执行文件，.c和.cc的混合
+# host-cxxmulti -> executable
+quiet_cmd_host-cxxmulti	= HOSTLD  $@
+      cmd_host-cxxmulti	= $(HOSTCXX) $(HOSTLDFLAGS) -o $@ \
+			  $(foreach o,objs cxxobjs,\
+			  $(addprefix $(obj)/,$($(@F)-$(o)))) \
+			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+$(host-cxxmulti): $(obj)/%: $(host-cobjs) $(host-cxxobjs) $(host-cshlib) FORCE
+	$(call if_changed,host-cxxmulti)
+
+# C从一个.cc(C++)文件创建.o文件
+quiet_cmd_host-cxxobjs	= HOSTCXX $@
+      cmd_host-cxxobjs	= $(HOSTCXX) $(hostcxx_flags) -c -o $@ $<
+$(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
+	$(call if_changed_dep,host-cxxobjs)
+
+# 编译.c文件，创建独立于位置的.o文件
+# host-cshobjs -> .o
+quiet_cmd_host-cshobjs	= HOSTCC  -fPIC $@
+      cmd_host-cshobjs	= $(HOSTCC) $(hostc_flags) -fPIC -c -o $@ $<
+$(host-cshobjs): $(obj)/%.o: $(src)/%.c FORCE
+	$(call if_changed_dep,host-cshobjs)
+
+# 基于位置无关的.o文件链接共享库
+# *.o -> .so shared library (host-cshlib)
+quiet_cmd_host-cshlib	= HOSTLLD -shared $@
+      cmd_host-cshlib	= $(HOSTCC) $(HOSTLDFLAGS) -shared -o $@ \
+			  $(addprefix $(obj)/,$($(@F:.so=-objs))) \
+			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+$(host-cshlib): $(obj)/%: $(host-cshobjs) FORCE
+	$(call if_changed,host-cshlib)
+
+targets += $(host-csingle)  $(host-cmulti) $(host-cobjs)\
+	   $(host-cxxmulti) $(host-cxxobjs) $(host-cshlib) $(host-cshobjs) 
+

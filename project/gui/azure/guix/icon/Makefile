@@ -1,0 +1,14 @@
+obj-y += gx_icon_background_draw.o
+obj-y += gx_icon_button_create.o
+obj-y += gx_icon_button_draw.o
+obj-y += gx_icon_button_pixelmap_set.o
+obj-y += gx_icon_create.o
+obj-y += gx_icon_draw.o
+obj-y += gx_icon_event_process.o
+obj-y += gx_icon_pixelmap_set.o
+obj-y += gx_icon_pixelmap_update.o
+obj-y += gxe_icon_button_create.o
+obj-y += gxe_icon_button_pixelmap_set.o
+obj-y += gxe_icon_create.o
+obj-y += gxe_icon_event_process.o
+obj-y += gxe_icon_pixelmap_set.o

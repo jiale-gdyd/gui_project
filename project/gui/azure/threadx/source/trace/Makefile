@@ -1,0 +1,12 @@
+obj-y += tx_trace_enable.o
+obj-y += tx_trace_disable.o
+obj-y += tx_trace_initialize.o
+obj-y += tx_trace_interrupt_control.o
+obj-y += tx_trace_isr_enter_insert.o
+obj-y += tx_trace_isr_exit_insert.o
+obj-y += tx_trace_object_register.o
+obj-y += tx_trace_object_unregister.o
+obj-y += tx_trace_user_event_insert.o
+obj-y += tx_trace_buffer_full_notify.o
+obj-y += tx_trace_event_filter.o
+obj-y += tx_trace_event_unfilter.o

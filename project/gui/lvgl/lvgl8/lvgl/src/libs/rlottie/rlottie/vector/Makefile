@@ -1,0 +1,25 @@
+obj-y += stb/
+obj-y += pixman/
+obj-y += freetype/
+
+obj-y += vrle.o
+obj-y += vpath.o
+obj-y += vrect.o
+obj-y += vbrush.o
+obj-y += vdebug.o
+obj-y += vdasher.o
+obj-y += vbezier.o
+obj-y += vbitmap.o
+obj-y += vraster.o
+obj-y += vmatrix.o
+obj-y += vpainter.o
+obj-y += vdrawable.o
+obj-y += varenaalloc.o
+obj-y += vdrawhelper.o
+obj-y += vpathmesure.o
+obj-y += vimageloader.o
+obj-y += velapsedtimer.o
+obj-y += vinterpolator.o
+obj-y += vdrawhelper_neon.o
+obj-y += vdrawhelper_sse2.o
+obj-y += vdrawhelper_common.o

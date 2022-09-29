@@ -1,0 +1,16 @@
+obj-y += gx_text_button_create.o
+obj-y += gx_text_button_draw.o
+obj-y += gx_text_button_event_process.o
+obj-y += gx_text_button_font_set.o
+obj-y += gx_text_button_text_color_set.o
+obj-y += gx_text_button_text_draw.o
+obj-y += gx_text_button_text_get.o
+obj-y += gx_text_button_text_id_set.o
+obj-y += gx_text_button_text_set.o
+obj-y += gxe_text_button_create.o
+obj-y += gxe_text_button_event_process.o
+obj-y += gxe_text_button_font_set.o
+obj-y += gxe_text_button_text_color_set.o
+obj-y += gxe_text_button_text_get.o
+obj-y += gxe_text_button_text_id_set.o
+obj-y += gxe_text_button_text_set.o

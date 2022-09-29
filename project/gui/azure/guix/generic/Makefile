@@ -1,0 +1,15 @@
+obj-y += gx_generic_scroll_wheel_children_position.o
+obj-y += gx_generic_scroll_wheel_create.o
+obj-y += gx_generic_scroll_wheel_down_wrap.o
+obj-y += gx_generic_scroll_wheel_draw.o
+obj-y += gx_generic_scroll_wheel_event_process.o
+obj-y += gx_generic_scroll_wheel_row_height_set.o
+obj-y += gx_generic_scroll_wheel_scroll.o
+obj-y += gx_generic_scroll_wheel_total_rows_set.o
+obj-y += gx_generic_scroll_wheel_up_wrap.o
+obj-y += gx_generic_scroll_wheel_wrap_style_check.o
+obj-y += gxe_generic_scroll_wheel_children_position.o
+obj-y += gxe_generic_scroll_wheel_create.o
+obj-y += gxe_generic_scroll_wheel_event_process.o
+obj-y += gxe_generic_scroll_wheel_row_height_set.o
+obj-y += gxe_generic_scroll_wheel_total_rows_set.o

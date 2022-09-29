@@ -1,0 +1,23 @@
+obj-y += tx_queue_cleanup.o
+obj-y += tx_queue_create.o
+obj-y += tx_queue_delete.o
+obj-y += tx_queue_flush.o
+obj-y += tx_queue_front_send.o
+obj-y += tx_queue_info_get.o
+obj-y += tx_queue_initialize.o
+obj-y += tx_queue_performance_info_get.o
+obj-y += tx_queue_performance_system_info_get.o
+obj-y += tx_queue_prioritize.o
+obj-y += tx_queue_receive.o
+obj-y += tx_queue_send.o
+obj-y += tx_queue_send_notify.o
+
+obj-y += txe_queue_create.o
+obj-y += txe_queue_delete.o
+obj-y += txe_queue_flush.o
+obj-y += txe_queue_front_send.o
+obj-y += txe_queue_info_get.o
+obj-y += txe_queue_prioritize.o
+obj-y += txe_queue_receive.o
+obj-y += txe_queue_send.o
+obj-y += txe_queue_send_notify.o

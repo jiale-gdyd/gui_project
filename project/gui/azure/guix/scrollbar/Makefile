@@ -1,0 +1,12 @@
+obj-y += gx_scrollbar_draw.o
+obj-y += gx_scrollbar_event_process.o
+obj-y += gx_scrollbar_limit_check.o
+obj-y += gx_scrollbar_reset.o
+obj-y += gx_scrollbar_size_update.o
+obj-y += gx_scrollbar_thumb_position_calculate.o
+obj-y += gx_scrollbar_value_calculate.o
+obj-y += gx_scrollbar_value_set.o
+obj-y += gxe_scrollbar_event_process.o
+obj-y += gxe_scrollbar_limit_check.o
+obj-y += gxe_scrollbar_reset.o
+obj-y += gxe_scrollbar_value_set.o
