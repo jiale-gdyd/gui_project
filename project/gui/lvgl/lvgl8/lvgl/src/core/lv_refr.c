@@ -330,7 +330,7 @@ void _lv_disp_refr_timer(lv_timer_t *tmr)
         perf_monitor.fps_sum_cnt++;
 
         uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS\n%"LV_PRIu32"%% CPU", fps, cpu);
+        lv_label_set_text_fmt(perf_label, "%" LV_PRIu32 " FPS\n%" LV_PRIu32 "%% CPU", fps, cpu);
     }
 #endif
 

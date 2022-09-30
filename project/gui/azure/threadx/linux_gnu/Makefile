@@ -1,0 +1,17 @@
+obj-y += tx_initialize_low_level.o
+obj-y += tx_thread_context_restore.o
+obj-y += tx_thread_context_save.o
+obj-y += tx_thread_interrupt_control.o
+obj-y += tx_thread_schedule.o
+obj-y += tx_thread_smp_core_get.o
+obj-y += tx_thread_smp_core_preempt.o
+obj-y += tx_thread_smp_current_state_get.o
+obj-y += tx_thread_smp_current_thread_get.o
+obj-y += tx_thread_smp_initialize_wait.o
+obj-y += tx_thread_smp_low_level_initialize.o
+obj-y += tx_thread_smp_protect.o
+obj-y += tx_thread_smp_time_get.o
+obj-y += tx_thread_smp_unprotect.o
+obj-y += tx_thread_stack_build.o
+obj-y += tx_thread_system_return.o
+obj-y += tx_timer_interrupt.o

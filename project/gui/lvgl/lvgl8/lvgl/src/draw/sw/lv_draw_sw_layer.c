@@ -53,7 +53,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         if(layer_sw_ctx->buf_size_bytes > full_size) layer_sw_ctx->buf_size_bytes = full_size;
         layer_sw_ctx->base_draw.buf = lv_malloc(layer_sw_ctx->buf_size_bytes);
         if(layer_sw_ctx->base_draw.buf == NULL) {
-            LV_LOG_WARN("Cannot allocate %"LV_PRIu32" bytes for layer buffer. Allocating %"LV_PRIu32" bytes instead. (Reduced performance)",
+            LV_LOG_WARN("Cannot allocate %" LV_PRIu32 " bytes for layer buffer. Allocating %" LV_PRIu32 " bytes instead. (Reduced performance)",
                         (uint32_t)layer_sw_ctx->buf_size_bytes, (uint32_t)LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE * px_size);
             layer_sw_ctx->buf_size_bytes = LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE;
             layer_sw_ctx->base_draw.buf = lv_malloc(layer_sw_ctx->buf_size_bytes);

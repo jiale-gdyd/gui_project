@@ -579,8 +579,8 @@ UINT aux_stride;
         }
     }
 
-    (*data_size) = (UINT)image_reader -> gx_image_reader_putdata;
-    (*aux_size) = (UINT)image_reader -> gx_image_reader_putauxdata;
+    (*data_size) = (UINT)(image_reader -> gx_image_reader_putdata);
+    (*aux_size) = (UINT)(image_reader -> gx_image_reader_putauxdata);
 
     return status;
 }

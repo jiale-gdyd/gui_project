@@ -729,11 +729,11 @@ static void show_scene_report(void)
     }
 
     if (scene_with_opa) {
-        lv_label_set_text_fmt(subtitle, "Result: %"LV_PRId32" FPS", scenes[scene_act].fps_opa);
-        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS\n", scenes[scene_act].name, scenes[scene_act].fps_opa);
+        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRId32 " FPS", scenes[scene_act].fps_opa);
+        LV_LOG("Result of \"%s + opa\": %" LV_PRId32 " FPS\n", scenes[scene_act].name, scenes[scene_act].fps_opa);
     } else {
-        lv_label_set_text_fmt(subtitle, "Result: %"LV_PRId32" FPS", scenes[scene_act].fps_normal);
-        LV_LOG("Result of \"%s\": %"LV_PRId32" FPS\n", scenes[scene_act].name, scenes[scene_act].fps_normal);
+        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRId32 " FPS", scenes[scene_act].fps_normal);
+        LV_LOG("Result of \"%s\": %" LV_PRId32 " FPS\n", scenes[scene_act].name, scenes[scene_act].fps_normal);
     }
 }
 
@@ -912,10 +912,10 @@ static void generate_report(void)
     lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
 
     title = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
+    lv_label_set_text_fmt(title, "Weighted FPS: %" LV_PRIu32, fps_weighted);
 
     subtitle = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
+    lv_label_set_text_fmt(subtitle, "Opa. speed: %" LV_PRIu32 "%%", opa_speed_pct);
 
     lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
     lv_obj_t *table = lv_table_create(lv_scr_act());
@@ -929,9 +929,9 @@ static void generate_report(void)
     lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, row, 0, "Slow but common cases");
 
-    LV_LOG("\r\nLVGL v%d.%d.%d " LVGL_VERSION_INFO" Benchmark (in csv format)\r\n", LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
-    LV_LOG("Weighted FPS: %"LV_PRIu32"\n", fps_weighted);
-    LV_LOG("Opa. speed: %"LV_PRIu32"%%\n", opa_speed_pct);
+    LV_LOG("\r\nLVGL v%d.%d.%d " LVGL_VERSION_INFO " Benchmark (in csv format)\r\n", LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+    LV_LOG("Weighted FPS: %" LV_PRIu32 "\n", fps_weighted);
+    LV_LOG("Opa. speed: %" LV_PRIu32 "%%\n", opa_speed_pct);
 
     row++;
     char buf[256];
@@ -939,7 +939,7 @@ static void generate_report(void)
         if ((scenes[i].fps_normal < 20) && (scenes[i].weight >= 10)) {
             lv_table_set_cell_value(table, row, 0, scenes[i].name);
 
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
+            lv_snprintf(buf, sizeof(buf), "%" LV_PRIu32, scenes[i].fps_normal);
             lv_table_set_cell_value(table, row, 1, buf);
 
             // LV_LOG("%s,%s\r\n", scenes[i].name, buf);
@@ -952,7 +952,7 @@ static void generate_report(void)
 
             // LV_LOG("%s,", buf);
 
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
+            lv_snprintf(buf, sizeof(buf), "%" LV_PRIu32, scenes[i].fps_opa);
             lv_table_set_cell_value(table, row, 1, buf);
 
             // LV_LOG("%s\r\n", buf);
@@ -973,7 +973,7 @@ static void generate_report(void)
     for (i = 0; scenes[i].create_cb; i++) {
         lv_table_set_cell_value(table, row, 0, scenes[i].name);
 
-        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
+        lv_snprintf(buf, sizeof(buf), "%" LV_PRIu32, scenes[i].fps_normal);
         lv_table_set_cell_value(table, row, 1, buf);
 
         if (scenes[i].fps_normal < 10) {
@@ -990,7 +990,7 @@ static void generate_report(void)
 
         LV_LOG("%s,", buf);
 
-        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
+        lv_snprintf(buf, sizeof(buf), "%" LV_PRIu32, scenes[i].fps_opa);
         lv_table_set_cell_value(table, row, 1, buf);
 
         if (scenes[i].fps_opa < 10) {

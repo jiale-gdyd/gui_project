@@ -188,33 +188,10 @@ LINUXINCLUDE     := -Iinclude \
 				   -I$(PROJECT_ROOT)/entry \
 				   -I$(PROJECT_ROOT)/platform \
 				   -I$(PROJECT_ROOT)/3rdparty/include \
-				   -I$(PROJECT_ROOT)/3rdparty/include/asio2 \
-				   -I$(PROJECT_ROOT)/3rdparty/include/asio2/asio \
 				   $(USER_LIB_INCLUDE_FLAG)
 
 KBUILD_AFLAGS_KERNEL 	:=
 KBUILD_AFLAGS   		:= -D__ASSEMBLY__
-
-# ifeq ($(ARCH),arm)
-# KBUILD_CFLAGS += -D_GNU_SOURCE -D__ARM_NEON__ -DBLUEZ_USE -Wno-psabi -fdata-sections -ffunction-sections
-# KBUILD_CFLAGS += -mfloat-abi=hard -mcpu=cortex-a7 -mfpu=neon-vfpv4
-
-# KBUILD_CPPFLAGS += -D_GNU_SOURCE -Wno-psabi -Wno-write-strings -Wno-pointer-arith -fdata-sections -ffunction-sections
-# KBUILD_CXXFLAGS += -D_GNU_SOURCE -Wno-psabi -Wno-pointer-arith -fdata-sections -ffunction-sections
-# KBUILD_CXXFLAGS += -mfloat-abi=hard -mcpu=cortex-a7 -mfpu=neon-vfpv4
-# else ifeq ($(ARCH),arm64)
-# KBUILD_CFLAGS   += -D_GNU_SOURCE -D__ARM_NEON__ -Wno-psabi -fdata-sections -ffunction-sections
-# KBUILD_CPPFLAGS += -D_GNU_SOURCE -Wno-psabi -Wno-write-strings -Wno-pointer-arith  -fdata-sections -ffunction-sections
-# KBUILD_CXXFLAGS += -D_GNU_SOURCE -Wno-psabi -Wno-pointer-arith -fdata-sections -ffunction-sections
-# endif
-
-# ifeq ($(ARCH),arm)
-# KBUILD_CFLAGS_KERNEL   += -D__STDC_CONSTANT_MACROS -D__OPTIMIZE__ -fdata-sections -ffunction-sections
-# KBUILD_CXXFLAGS_KERNEL += -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
-# else ifeq ($(ARCH),arm64)
-# KBUILD_CFLAGS_KERNEL   += -D__STDC_CONSTANT_MACROS -D__OPTIMIZE__ -fdata-sections -ffunction-sections
-# KBUILD_CXXFLAGS_KERNEL += -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
-# endif
 
 # 从include/config/app.release(如果存在)读取APPRELEASE
 APPRELEASE = $(shell cat include/config/app.release 2> /dev/null)
@@ -367,7 +344,6 @@ $(TARGET): $($(TARGET)-all) FORCE
 #	$(Q)$(STRIP) $@
 	$(Q)$(SIZE) $@
 	$(Q)du -sh $@
-#	@-valgrind --tool=memcheck --leak-check=full $@
 
 # 实际对象是在降序时生成的，请确保没有隐式规则进入
 $(sort $($(TARGET)-all)): $($(TARGET)-dirs) ;

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source ${TOPSHELL}/shell/make_host.sh
 source ${TOPSHELL}/shell/make_rv1126.sh
 
 function clean()
@@ -21,6 +22,7 @@ function clean()
     print_info "Starting distclean"
     print_info "distclean ${PROJECT_NAME} project start"
 
+    host_clean
     rv1126_clean
 
     make distclean -j$[$(nproc)-1]

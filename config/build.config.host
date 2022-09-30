@@ -1,0 +1,103 @@
+USER_LIB_INCLUDE :=
+USER_LD_LIB      :=
+USER_LINK_LIB    :=
+USER_PTH_RT_LIB  :=
+
+GUI_ROOT         := $(shell pwd)/project
+HOST_ROOT        := /usr/include
+
+USER_LIB_INCLUDE += $(HOST_ROOT) \
+                    /usr/local/include \
+                    $(HOST_ROOT)/libdrm \
+                    $(HOST_ROOT)/opencv4 \
+                    $(HOST_ROOT)/glib-2.0 \
+                    $(HOST_ROOT)/freetype2 \
+                    /usr/local/include/opencv4 \
+                    $(HOST_ROOT)/gstreamer-1.0 \
+                    /usr/lib/x86_64-linux-gnu/glib-2.0/include \
+                    $(GUI_ROOT)/gui \
+                    $(GUI_ROOT)/gui/azure \
+                    $(GUI_ROOT)/gui/azure/guix \
+                    $(GUI_ROOT)/gui/azure/threadx
+
+USER_LINK_LIB    := -L/usr/local/lib \
+                    -L/usr/libx86_64-linux-gnu
+
+USER_LD_LIB      := drm
+
+USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})
+USER_PTH_RT_LIB       += -lpthread -lrt -lm -ldl $(USE_STDCPP_VERSION)
+USER_LIB_INCLUDE_FLAG := $(addprefix -I,${USER_LIB_INCLUDE})
+
+export USER_LIB_INCLUDE_FLAG USER_LINK_LIB USER_PTH_RT_LIB
+
+KBUILD_CPPFLAGS := -DRAPIDJSON_HAS_STDSTRING
+KBUILD_CXXFLAGS := -DRAPIDJSON_HAS_STDSTRING
+
+KBUILD_CFLAGS_KERNEL   := -D__OPTIMIZE__ -fdata-sections -ffunction-sections
+KBUILD_CXXFLAGS_KERNEL := -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
+
+KBUILD_CXXFLAGS += -Wall -O2 \
+                -fno-strict-aliasing \
+                -fno-common \
+                -Wno-return-type \
+                -Wno-sign-compare \
+                -Wno-write-strings \
+                -Wno-conversion-null \
+                -Wno-literal-suffix \
+                -Wno-deprecated-declarations \
+                -Wno-unused-but-set-variable \
+                -Wno-unused-function \
+                -Wno-unused-result \
+                -Wno-unused-label \
+                -Wno-unused-variable \
+                -Wno-memset-elt-size \
+                -Wno-reorder \
+                -Wno-delete-incomplete \
+                -Wno-delete-non-virtual-dtor \
+                -Wno-stringop-truncation \
+                -Wno-format-truncation \
+                -Wno-stringop-overflow \
+                -Wno-class-memaccess \
+                -Wno-catch-value \
+                -Wno-maybe-uninitialized \
+                -Wno-narrowing \
+                -Wno-unused-value \
+                -Wno-pessimizing-move \
+                -Wno-sizeof-pointer-memaccess \
+                -Wno-class-conversion
+
+KBUILD_CFLAGS := -Wall -O2 \
+            -Wno-trigraphs \
+            -fno-strict-aliasing -fno-common \
+            -Wno-format-security \
+            -Wno-deprecated-declarations \
+            -Wno-unused-but-set-variable \
+            -fno-delete-null-pointer-checks \
+            -Wno-write-strings \
+            -Wno-pointer-arith \
+            -Wno-unused-function \
+            -Wno-unused-variable \
+            -Wno-int-to-pointer-cast \
+            -Wno-unused-result \
+            -Wno-tautological-compare \
+            -Wno-multichar \
+            -Wno-unused-label \
+            -Wno-memset-elt-size \
+            -Wno-format-overflow \
+            -Wno-format-truncation \
+            -Wno-stringop-truncation \
+            -Wno-stringop-overflow \
+            -Wno-sequence-point \
+            -Wno-char-subscripts \
+            -Wno-sign-compare \
+            -Wno-uninitialized \
+            -Wno-unused-value \
+            -Wno-maybe-uninitialized \
+            -Wno-narrowing \
+            -Wno-array-bounds \
+            -Wno-int-in-bool-context \
+            -Wno-pointer-to-int-cast \
+            -Wno-restrict
+
+export KBUILD_CPPFLAGS KBUILD_CXXFLAGS KBUILD_CFLAGS  KBUILD_CFLAGS_KERNEL KBUILD_CXXFLAGS_KERNEL

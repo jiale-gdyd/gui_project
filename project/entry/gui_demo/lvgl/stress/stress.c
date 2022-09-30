@@ -61,7 +61,7 @@ static void obj_test_task_cb(lv_timer_t *tmr)
             obj = lv_btn_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             obj = lv_label_create(obj);
-            lv_label_set_text(obj, "Multi line\n"LV_SYMBOL_OK LV_SYMBOL_CLOSE LV_SYMBOL_WIFI);
+            lv_label_set_text(obj, "Multi line\n" LV_SYMBOL_OK LV_SYMBOL_CLOSE LV_SYMBOL_WIFI);
             break;
 
         case 1: {
