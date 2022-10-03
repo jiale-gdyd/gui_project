@@ -99,6 +99,7 @@ KBUILD_CFLAGS += -Wall -O2 \
             -Wno-maybe-uninitialized \
             -Wno-narrowing \
             -Wno-array-bounds \
-            -Wno-int-in-bool-context
+            -Wno-int-in-bool-context \
+            -Wno-restrict
 
 export KBUILD_CPPFLAGS KBUILD_CXXFLAGS KBUILD_CFLAGS KBUILD_CFLAGS_KERNEL KBUILD_CXXFLAGS_KERNEL

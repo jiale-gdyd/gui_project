@@ -125,6 +125,8 @@
 #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+#define LV_USE_GPU_GD32_IPA                         0
+
 // 使用NXP的PXP GPU iMX RTxxx平台
 #define LV_USE_GPU_NXP_PXP                          0
 

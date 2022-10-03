@@ -36,6 +36,10 @@
 #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
 #endif
 
+#if LV_USE_GPU_GD32_IPA
+#include "../draw/gd32_ipa/lv_gpu_gd32_ipa.h"
+#endif
+
 #if LV_USE_GPU_SWM341_DMA2D
 #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
 #endif
@@ -108,6 +112,10 @@ void lv_init(void)
 
 #if LV_USE_GPU_STM32_DMA2D
     lv_draw_stm32_dma2d_init();
+#endif
+
+#if LV_USE_GPU_GD32_IPA
+    lv_draw_gd32_ipa_init();
 #endif
 
 #if LV_USE_GPU_SWM341_DMA2D
