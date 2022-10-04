@@ -330,21 +330,21 @@ $(TARGET)-objs	:= $(patsubst %,%/built-in.o, $(objs-y))
 $(TARGET)-libs	:= $(patsubst %,%/lib.a, $(libs-y))
 $(TARGET)-all	:= $($(TARGET)-objs) $($(TARGET)-libs)
 
-ifeq ($(APP_NAME),rv1126_azure_gui)
-AZURE_THREADX_LDS=$(PROJECT_ROOT)/gui/azure/threadx/cortex_a7/asm/sample_threadx.ld
+# ifeq ($(APP_NAME),rv1126_azure_gui)
+# AZURE_THREADX_LDS=$(PROJECT_ROOT)/gui/azure/threadx/cortex_a7/asm/sample_threadx.ld
 
-# 在预先链接的$(TARGET)上执行modpost。最终链接的$(TARGET)根据链接器脚本重命名了相关部分
-quiet_cmd_$(TARGET) = LD $@
-      cmd_$(TARGET) = $(CXX) $(LDFLAGS) -o $@ -T $(AZURE_THREADX_LDS) -e Vectors \
-      -Wl,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
-#      -Wl,-wrap,malloc,-wrap,free,-wrap,realloc,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
-else
+# # 在预先链接的$(TARGET)上执行modpost。最终链接的$(TARGET)根据链接器脚本重命名了相关部分
+# quiet_cmd_$(TARGET) = LD $@
+#       cmd_$(TARGET) = $(CXX) $(LDFLAGS) -o $@ -T $(AZURE_THREADX_LDS) -e Vectors \
+#       -Wl,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
+# #      -Wl,-wrap,malloc,-wrap,free,-wrap,realloc,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
+# else
 # 在预先链接的$(TARGET)上执行modpost。最终链接的$(TARGET)根据链接器脚本重命名了相关部分
 quiet_cmd_$(TARGET) = LD $@
       cmd_$(TARGET) = $(CXX) $(LDFLAGS) -o $@ \
       -Wl,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
 #      -Wl,-wrap,malloc,-wrap,free,-wrap,realloc,--start-group $($(TARGET)-libs) $($(TARGET)-objs) $(USER_LINK_LIB) $(USER_PTH_RT_LIB) -Wl,--end-group
-endif
+# endif
 
 # 最终生成目标文件
 $(TARGET): $($(TARGET)-all) FORCE
