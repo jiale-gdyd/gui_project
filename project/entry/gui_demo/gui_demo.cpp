@@ -9,10 +9,19 @@
 int gui_demo_main(int argc, char *argv[])
 {
 #if defined(CONFIG_LVGL)
-    return lvgl_demo_main(argc, argv);
+    return lvgl_demo_init(argc, argv);
 #elif defined(CONFIG_AZURE_GUIX)
-    return azure_threadx_guix_demo_main(argc, argv);
+    return azure_threadx_guix_demo_init(argc, argv);
 #endif
 
     return -1;
+}
+
+int gui_demo_exit(void)
+{
+#if defined(CONFIG_LVGL)
+    return lvgl_demo_exit();
+#elif defined(CONFIG_AZURE_GUIX)
+    return azure_threadx_guix_demo_exit();
+#endif
 }

@@ -23,7 +23,7 @@ USER_LIB_INCLUDE += $(HOST_ROOT) \
 USER_LINK_LIB    := -L/usr/local/lib \
                     -L/usr/libx86_64-linux-gnu
 
-USER_LD_LIB      := drm
+USER_LD_LIB      := drm X11
 
 USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})
 USER_PTH_RT_LIB       += -lpthread -lrt -lm -ldl $(USE_STDCPP_VERSION)

@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
     app_version_header();
 
 #if defined(CONFIG_GUI)
-    return gui_demo_main(argc, argv);
+    gui_demo_main(argc, argv);
+    gui_demo_exit();
 #endif
 
     return 0;

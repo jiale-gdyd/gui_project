@@ -36,7 +36,7 @@ uint32_t custom_tick_get(void)
     return time_ms;
 }
 
-int lvgl_demo_main(int argc, char *argv[])
+int lvgl_demo_init(int argc, char *argv[])
 {
     lv_init();
 
@@ -103,4 +103,10 @@ int lvgl_demo_main(int argc, char *argv[])
     }
 
     return 0;
+}
+
+int lvgl_demo_exit(void)
+{
+    drm_exit();
+    lv_deinit();
 }

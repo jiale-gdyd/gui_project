@@ -10,13 +10,24 @@
 
 #include "azure_demo.h"
 
-int azure_threadx_guix_demo_main(int argc, char *argv[])
+int azure_threadx_guix_demo_init(int argc, char *argv[])
 {
 #if defined(CONFIG_CORTEX_A7)
-    return azure_cortex_a7_threadx_guix_demo_main(argc, argv);
+    return azure_cortex_a7_threadx_guix_demo_init(argc, argv);
 #elif defined(CONFIG_LINUX_GNU)
-    return azure_linux_gnu_threadx_guix_demo_main(argc, argv);
+    return azure_linux_gnu_threadx_guix_demo_init(argc, argv);
 #endif
 
     return -1;
+}
+
+int azure_threadx_guix_demo_exit(void)
+{
+#if defined(CONFIG_CORTEX_A7)
+    return azure_cortex_a7_threadx_guix_demo_exit();
+#elif defined(CONFIG_LINUX_GNU)
+    return azure_linux_gnu_threadx_guix_demo_exit();
+#endif
+
+    return 0;
 }
