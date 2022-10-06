@@ -1,5 +1,5 @@
 /* This is a small demo of the high-performance GUIX graphics framework. */
-
+#include <signal.h>
 #include "guix_industrial.h"
 #include "demo_guix_industrial.h"
 #include "../xwindow_display_driver.h"
@@ -40,6 +40,8 @@ GX_PIXELMAP main_screen_bg;
 /******************************************************************************************/
 int azure_linux_gnu_guix_industrial_demo_init(int argc, char ** argv)
 {
+    signal(SIGUSR1, SIG_IGN);
+
     tx_kernel_enter();
     return(0);
 }
