@@ -3,6 +3,8 @@
 
 #include <gx_api.h>
 
+// #define CONFIG_X11_SERVER
+
 #ifdef __cplusplus
 extern "C" {
 #endif

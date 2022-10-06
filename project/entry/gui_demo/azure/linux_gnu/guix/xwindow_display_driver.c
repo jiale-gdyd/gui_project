@@ -8,8 +8,6 @@
 
 #include "xwindow_display_driver.h"
 
-//#define CONFIG_X11_SERVER
-
 #ifdef CONFIG_X11_SERVER
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
