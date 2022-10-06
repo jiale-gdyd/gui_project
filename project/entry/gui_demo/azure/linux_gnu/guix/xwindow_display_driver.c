@@ -37,13 +37,13 @@ static GX_BOOL gx_x11_get_preferred_visual(int depth, int class_filter, XVisualI
 
     pVIList = XGetVisualInfo(gx_x11_display, VisualScreenMask|VisualDepthMask|VisualClassMask, &viTemplate, &iVIListNum);
     if (pVIList) {
-        debug("found preferred visual");
+        printf("found preferred visual\n");
         // the X server supports the color depth and class asked for
         memcpy(pVisual, pVIList, sizeof(XVisualInfo)); /* Use case of memcpy is verified. */
         RetVal = GX_TRUE;
         XFree(pVIList);
     } else {
-        debug("did not find preferred visual");
+        printf("did not find preferred visual\n");
         // send back the default color depth visual
         viTemplate.depth = DefaultDepth(gx_x11_display, gx_x11_screen);
         pVIList = XGetVisualInfo(gx_x11_display, VisualDepthMask, &viTemplate, &iVIListNum);
@@ -65,12 +65,12 @@ static GX_BOOL gx_allocate_x_canvas(GX_VALUE width, GX_VALUE height)
     }
 
     if (!gx_x11_get_preferred_visual(24, TrueColor, &gx_x11_visual)) {
-        debug("Failed to get preferred visual");
+        printf("Failed to get preferred visual\n");
         return GX_FALSE;
     }
     
     if ((width > GX_MAX_DISPLAY_RESOLUTION) || (height > GX_MAX_DISPLAY_RESOLUTION)) {
-        debug("Invalid canvas size");
+        printf("Invalid canvas size\n");
     }
 
     printf("depth: %d\n", gx_x11_visual.depth);
@@ -84,14 +84,14 @@ static GX_BOOL gx_allocate_x_canvas(GX_VALUE width, GX_VALUE height)
     // canvas width and height are limited to 8192, overflow cannot occur
     gx_canvas_memory = malloc(wHorzQuant * height);
     if (!gx_canvas_memory) {
-        debug("could not allocate gx_canvas_memory");
+        printf("could not allocate gx_canvas_memory\n");
         return GX_FALSE;
     }
     
     // the quantum will always be 32 since we fixed up the width and height before hand.
     gx_x11_image = XCreateImage(gx_x11_display, gx_x11_visual.visual, gx_x11_visual.depth, ZPixmap, 0, gx_canvas_memory, width, height, 32, wHorzQuant);
     if (!gx_x11_image) {
-        debug("Could not create gx_x11_image.\n");
+        printf("Could not create gx_x11_image.\n");
         return GX_FALSE;
     }
 
