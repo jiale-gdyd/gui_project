@@ -97,7 +97,7 @@ static GX_BOOL gx_allocate_x_canvas(GX_VALUE width, GX_VALUE height)
     return GX_TRUE;
 }
 
-static linux_display_driver_8bit_palette_set(GX_DISPLAY *display, GX_COLOR *palette, INT count)
+static void linux_display_driver_8bit_palette_set(GX_DISPLAY *display, GX_COLOR *palette, INT count)
 {
     display->gx_display_palette = palette;
     display->gx_display_palette_size = count;
