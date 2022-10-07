@@ -1,3 +1,4 @@
+#include <linux/kconfig.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +9,7 @@
 
 #include "xwindow_display_driver.h"
 
-#ifdef CONFIG_X11_SERVER
+#if defined(CONFIG_X11_DISP_DRIVER)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -94,6 +95,12 @@ static GX_BOOL gx_allocate_x_canvas(GX_VALUE width, GX_VALUE height)
     }
 
     return GX_TRUE;
+}
+
+static linux_display_driver_8bit_palette_set(GX_DISPLAY *display, GX_COLOR *palette, INT count)
+{
+    display->gx_display_palette = palette;
+    display->gx_display_palette_size = count;
 }
 
 static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
@@ -672,8 +679,81 @@ static void gx_x11_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
 
 UINT gx_x11_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
 {
-#ifdef CONFIG_X11_SERVER
+#if defined(CONFIG_X11_DISP_DRIVER)
     _gx_display_driver_24xrgb_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_565rgb(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_565rgb_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_332rgb(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_332rgb_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_4444argb(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_4444argb_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_monochrome(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_monochrome_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_8bit_palette(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_8bit_palette_setup(display, GX_NULL, gx_x11_buffer_toggle);
+    display->gx_display_driver_palette_set = linux_display_driver_8bit_palette_set;
+
+    _gx_x11_graphics_driver_setup(display);
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_x11_graphics_driver_setup_4bpp_grayscale(GX_DISPLAY *display)
+{
+#if defined(CONFIG_X11_DISP_DRIVER)
+    _gx_display_driver_4bpp_grayscale_setup(display, GX_NULL, gx_x11_buffer_toggle);
     _gx_x11_graphics_driver_setup(display);
 
     return GX_SUCCESS;

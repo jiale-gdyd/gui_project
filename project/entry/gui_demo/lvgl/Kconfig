@@ -1,0 +1,19 @@
+#
+# LVGL GUI Demo Kconfig
+#
+
+menu "LVGL GUI Demo Menu"
+
+choice
+    depends on LVGL_V8
+    prompt "LittlevGL demo choice"
+    default LVGL_BENCHMARK_TEST
+
+    config LVGL_BENCHMARK_TEST
+        bool "LittlevGL benchmark test"
+
+    config LVGL_STRESS_TEST
+        bool "LittlevGL stress test"
+endchoice
+
+endmenu

@@ -92,8 +92,11 @@ int lvgl_demo_init(int argc, char *argv[])
     indev_drv.read_cb = evdev_read;
     static lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
 
+#if defined(CONFIG_LVGL_STRESS_TEST)
+    lvgl_demo_stress(argc, argv);
+#elif defined(CONFIG_LVGL_BENCHMARK_TEST)
     lvgl_demo_benchmark(argc, argv);
-    // lvgl_demo_stress(argc, argv);
+#endif
 #endif
 
     while (1) {

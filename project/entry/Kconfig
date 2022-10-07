@@ -17,3 +17,5 @@ config PARENT_PROCESS
         This option enables the parent process.
 
 endmenu
+
+source "project/entry/gui_demo/Kconfig"

@@ -1,0 +1,10 @@
+obj-y += base.o
+obj-y += audio.o
+obj-y += video.o
+obj-y += phone.o
+obj-y += vehicle.o
+obj-y += climate.o
+obj-y += volume_screen_base.o
+obj-y += guix_car_infotainment.o
+obj-y += demo_guix_car_infotainment_resources.o
+obj-y += demo_guix_car_infotainment_specifications.o

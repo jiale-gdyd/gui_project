@@ -1,0 +1,66 @@
+#
+# azure-rtos GUIX Demo Kconfig
+#
+
+menu "AZURE-RTOS GUIX Demo Menu"
+
+config DRM_DISP_DRIVER
+    bool "Direct Rendering Manger display driver"
+    depends on AZURE_GUIX && CORTEX_A7
+    default n
+    help
+      DRM display driver
+
+config X11_DISP_DRIVER
+    bool "x11 window display driver"
+    depends on AZURE_GUIX && LINUX_GNU
+    default n
+    help
+      x11 window display driver
+
+choice
+    depends on AZURE_GUIX
+    prompt "azure-rtos guix demo choice"
+    default AZURE_GUIX_SIMPLE
+
+    config AZURE_GUIX_SIMPLE
+        bool "azure-rtos guix simple test"
+
+    config AZURE_GUIX_INDUSTRIAL
+        bool "azure-rtos guix industrial test"
+
+    config AZURE_GUIX_CALCULATOR
+        bool "azure-rtos guix calculator test"
+
+    config AZURE_GUIX_WIDGET_TYPES
+        bool "azure-rtos guix widget types test"
+
+    config AZURE_GUIX_WASHING_MACHINE
+        bool "azure-rtos guix washing machine test"
+
+    config AZURE_GUIX_THERMOSTAT
+        bool "azure-rtos guix thermostat test"
+
+    config AZURE_GUIX_SPRITE
+        bool "azure-rtos guix sprites test"
+
+    config AZURE_GUIX_SMART_WATCH
+        bool "azure-rtos guix smart watch test"
+
+    config AZURE_GUIX_SHAPES
+        bool "azure-rtos guix shapes test"
+
+    config AZURE_GUIX_MEDICAL
+        bool "azure-rtos guix medical test"
+
+    config AZURE_GUIX_KEYBOARD
+        bool "azure-rtos guix keyboard test"
+
+    config AZURE_GUIX_HOME_AUTOMATION
+        bool "azure-rtos guix home automation test"
+
+    config AZURE_GUIX_CAR_INFOTAINMENT
+        bool "azure-rtos guix infotainment test"
+endchoice
+
+endmenu
