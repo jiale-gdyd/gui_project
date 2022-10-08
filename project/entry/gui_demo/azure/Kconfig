@@ -6,7 +6,7 @@ menu "AZURE-RTOS GUIX Demo Menu"
 
 config DRM_DISP_DRIVER
     bool "Direct Rendering Manger display driver"
-    depends on AZURE_GUIX && CORTEX_A7
+    depends on AZURE_GUIX
     default n
     help
       DRM display driver

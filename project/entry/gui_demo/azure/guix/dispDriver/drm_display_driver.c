@@ -287,6 +287,7 @@ static int drm_dmabuf_set_plane(struct drm_buffer *buf)
     drm_add_plane_property("CRTC_W", g_drmDev.width);
     drm_add_plane_property("CRTC_H", g_drmDev.height);
 
+    // 提交数据进行显示
     ret = drmModeAtomicCommit(g_drmDev.fd, g_drmDev.req, flags, NULL);
     if (ret) {
         printf("[DRM] drmModeAtomicCommit failed: errstr:[%s]\n", strerror(errno));
@@ -661,7 +662,7 @@ static int drm_allocate_dumb(struct drm_buffer *buf)
     offsets[0] = 0;
     ret = drmModeAddFB2(g_drmDev.fd, g_drmDev.width, g_drmDev.height, g_drmDev.fourcc, handles, pitches, offsets, &buf->fb_handle, 0);
     if (ret) {
-        printf("[DRM] drmModeAddFB failed\n");
+        printf("[DRM] drmModeAddFB failed, errstr:[%s]\n", strerror(errno));
         return -1;
     }
 
@@ -754,6 +755,9 @@ static int drm_init(unsigned int fourcc)
 
 static void drm_exit(void)
 {
+    unmap(g_drmDev.drm_bufs[0].map);
+    unmap(g_drmDev.drm_bufs[1].map);
+
     close(g_drmDev.fd);
     g_drmDev.fd = -1;
 }
