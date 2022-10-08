@@ -755,8 +755,8 @@ static int drm_init(unsigned int fourcc)
 
 static void drm_exit(void)
 {
-    unmap(g_drmDev.drm_bufs[0].map);
-    unmap(g_drmDev.drm_bufs[1].map);
+    munmap(g_drmDev.drm_bufs[0].map, g_drmDev.drm_bufs[0].size);
+    munmap(g_drmDev.drm_bufs[1].map, g_drmDev.drm_bufs[1].size);
 
     close(g_drmDev.fd);
     g_drmDev.fd = -1;

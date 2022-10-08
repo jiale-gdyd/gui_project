@@ -141,6 +141,7 @@ static int fbdev_init(void)
 
 static void fbdev_exit(void)
 {
+    munmap(fbp, finfo.smem_len);
     close(fbfd);
 }
 
@@ -191,16 +192,16 @@ static void fbdev_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *c
     int16_t w = (act_x2 - act_x1 + 1);
 
     if (vinfo.bits_per_pixel == 32) {                                   // 每像素32位
-        // int32_t y;
-        // uint32_t *fbp32 = (uint32_t *)fbp;
+        int32_t y;
+        uint32_t *fbp32 = (uint32_t *)fbp;
 
-        // for (y = act_y1; y <= act_y2; y++) {
-        //     location = (act_x1 + vinfo.xoffset) + (y + vinfo.yoffset) * finfo.line_length / 4;
-        //     memcpy(&fbp32[location], (uint32_t *)gx_canvas_memory, (act_x2 - act_x1 + 1) * 4);
-        //     gx_canvas_memory += w;
-        // }
-        UINT wHorzQuant = width * sizeof(GX_COLOR);
-        memcpy(fbp, gx_canvas_memory, wHorzQuant * height);
+        for (y = act_y1; y <= act_y2; y++) {
+            location = (act_x1 + vinfo.xoffset) + (y + vinfo.yoffset) * finfo.line_length / 4;
+            memcpy(&fbp32[location], (uint32_t *)gx_canvas_memory, (act_x2 - act_x1 + 1) * 4);
+            gx_canvas_memory += w;
+        }
+        // UINT wHorzQuant = width * sizeof(GX_COLOR);
+        // memcpy(fbp, gx_canvas_memory, wHorzQuant * height);
     } else if ((vinfo.bits_per_pixel == 24) && (g_colorSize == 32)) {   // 每像素24位
         int16_t x;
         int32_t y;
@@ -247,7 +248,7 @@ static void fbdev_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *c
                 byte_location = location / 8;       // 找到我们需要更改的字节
                 bit_location = location % 8;        // 在找到的字节中，找到我们需要更改的位
                 fbp8[byte_location] &= ~(((uint8_t)(1)) << bit_location);
-                // fbp8[byte_location] |= ((uint8_t)(gx_canvas_memory->full)) << bit_location;
+                fbp8[byte_location] |= ((uint8_t)(*gx_canvas_memory)) << bit_location;
                 gx_canvas_memory++;
             }
 
