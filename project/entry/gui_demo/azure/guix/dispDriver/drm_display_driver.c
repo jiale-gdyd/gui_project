@@ -967,13 +967,13 @@ static void _gx_copy_canvas_to_buffer_4444argb(char *dest, GX_CANVAS *canvas, GX
         read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = ((*read) & 0x0f00) >> 4;
+            red = ((*read_ptr) & 0x0F00) >> 4;
             red |= red >> 4;
 
-            green = (*read) & 0xF0;
+            green = (*read_ptr) & 0xF0;
             green |= green >> 4;
 
-            blue = ((*read) & 0x0F);
+            blue = ((*read_ptr) & 0x0F);
             blue |= blue << 4;
 
             *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
@@ -1010,17 +1010,17 @@ static void _gx_copy_canvas_to_buffer_1555xrgb(char *dest, GX_CANVAS *canvas, GX
         read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = ((*read) & 0x7c00) >> 7;
+            red = ((*read_ptr) & 0x7c00) >> 7;
             if (red & 0x08) {
                 red |= 0x07;
             }
 
-            green = ((*read) & 0x03e0) >> 2;
+            green = ((*read_ptr) & 0x03e0) >> 2;
             if (green & 0x08) {
                 green |= 0x03;
             }
 
-            blue = ((*read) & 0x1f) << 3;
+            blue = ((*read_ptr) & 0x1f) << 3;
             if (blue & 0x08) {
                 blue |= 0x07;
             }
