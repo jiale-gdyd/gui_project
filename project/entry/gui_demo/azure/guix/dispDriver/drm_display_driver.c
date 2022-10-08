@@ -87,13 +87,13 @@ static uint32_t drm_get_plane_property_id(const char *name)
 {
     uint32_t index = 0;
 
-    printf("[DRM]: Find plane property:[%s]\n", name);
+    printf("[DRM] Find plane property:[%s]\n", name);
     for (index = 0; index < g_drmDev.count_conn_props; ++index) {
         if (!strcmp(g_drmDev.plane_props[index]->name, name)) {
             return g_drmDev.plane_props[index]->prop_id;
         }
     }
-    printf("[DRM]: Unknown plane property:[%s]\n", name);
+    printf("[DRM] Unknown plane property:[%s]\n", name);
 
     return 0;
 }
@@ -102,13 +102,13 @@ static uint32_t drm_get_crtc_property_id(const char *name)
 {
     uint32_t index = 0;
 
-    printf("[DRM]: Find crtc property:[%s]\n", name);
+    printf("[DRM] Find crtc property:[%s]\n", name);
     for (index = 0; index < g_drmDev.count_conn_props; ++index) {
         if (!strcmp(g_drmDev.crtc_props[index]->name, name)) {
             return g_drmDev.crtc_props[index]->prop_id;
         }
     }
-    printf("[DRM]: Unknown crtc property:[%s]\n", name);
+    printf("[DRM] Unknown crtc property:[%s]\n", name);
 
     return 0;
 }
@@ -117,13 +117,13 @@ static uint32_t drm_get_conn_property_id(const char *name)
 {
     uint32_t index = 0;
 
-    printf("[DRM]: Find conn property:[%s]\n", name);
+    printf("[DRM] Find conn property:[%s]\n", name);
     for (index = 0; index < g_drmDev.count_conn_props; ++index) {
         if (!strcmp(g_drmDev.conn_props[index]->name, name)) {
             return g_drmDev.conn_props[index]->prop_id;
         }
     }
-    printf("[DRM]: Unknow conn property:[%s]\n", name);
+    printf("[DRM] Unknow conn property:[%s]\n", name);
 
     return 0;
 }
@@ -139,11 +139,11 @@ static int drm_get_plane_props(void)
 
     drmModeObjectPropertiesPtr props = drmModeObjectGetProperties(g_drmDev.fd, g_drmDev.plane_id, DRM_MODE_OBJECT_PLANE);
     if (!props) {
-        printf("[DRM]: drmModeObjectGetProperties failed\n");
+        printf("[DRM] drmModeObjectGetProperties failed\n");
         return -1;
     }
 
-    printf("[DRM]: Found %u plane props\n", props->count_props);
+    printf("[DRM] Found %u plane props\n", props->count_props);
 
     g_drmDev.count_plane_props = props->count_props;
     for (index = 0; index < props->count_props; ++index) {
@@ -760,15 +760,20 @@ static void drm_exit(void)
 
 static void drm_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *canvas)
 {
+    int i, y;
     struct drm_buffer *fbuf = g_drmDev.cur_bufs[1];
     uint32_t width = canvas->gx_canvas_x_resolution;
     uint32_t height = canvas->gx_canvas_y_resolution;
+    int y1 = canvas->gx_canvas_dirty_area.gx_rectangle_top;
+    int x1 = canvas->gx_canvas_dirty_area.gx_rectangle_left;
+    int x2 = canvas->gx_canvas_dirty_area.gx_rectangle_right;
+    int y2 = canvas->gx_canvas_dirty_area.gx_rectangle_bottom;
 
     if (gx_canvas_memory == NULL) {
         return;
     }
 
-    printf("[DRM] left:[%d], top:[%d], right:[%d], bottom:[%d], w:[%d], h:[%d]\n",
+    printf("[DRM] left:[%d], top:[%d], right:[%d], bottom:[%d], width:[%d], height:[%d]\n",
         canvas->gx_canvas_dirty_area.gx_rectangle_left, canvas->gx_canvas_dirty_area.gx_rectangle_top,
         canvas->gx_canvas_dirty_area.gx_rectangle_right, canvas->gx_canvas_dirty_area.gx_rectangle_bottom,
         width, height);
@@ -778,8 +783,9 @@ static void drm_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *can
         memcpy(fbuf->map, g_drmDev.cur_bufs[0]->map, fbuf->size);
     }
 
-    UINT wHorzQuant = width * sizeof(GX_COLOR);
-    memcpy((uint8_t *)fbuf->map, gx_canvas_memory, wHorzQuant * height);
+    for (y = 0, i = y1 ; i <= y2 ; ++i, ++y) {
+        memcpy((uint8_t *)fbuf->map + (x1 * (g_colorSize / 8)) + (fbuf->pitch * i), (uint8_t *)gx_canvas_memory + (width * (g_colorSize / 8) * y), width * (g_colorSize / 8));
+    }
 
     if (g_drmDev.req) {
         drm_wait_vsync();
@@ -963,7 +969,7 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
             break;
 
         default:
-            printf("[DRM]: Unknown color format:[%d]\n", format);
+            printf("[DRM] Unknown color format:[%d]\n", format);
             return;
     }
 

@@ -2,16 +2,13 @@
 #include <gx_api.h>
 
 #include "guix_thermostat.h"
+#include "../display_driver.h"
 #include "guix_thermostat_resources.h"
 #include "guix_thermostat_specifications.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 #define            SCRATCHPAD_PIXELS (MAIN_DISPLAY_X_RESOLUTION * MAIN_DISPLAY_Y_RESOLUTION)
 GX_COLOR           scratchpad[SCRATCHPAD_PIXELS];
 TX_BYTE_POOL       memory_pool;
-
 
 GX_WINDOW_ROOT    *root;
 GX_CHAR           plus_text[] = "+";
@@ -73,6 +70,8 @@ VOID  start_guix(VOID)
     gx_studio_display_configure(MAIN_DISPLAY, gx_drm_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_DEFAULT_THEME, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(MAIN_DISPLAY, gx_x11_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_DEFAULT_THEME, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(MAIN_DISPLAY, gx_fbdev_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_DEFAULT_THEME, &root);
 #else
     return;
 #endif

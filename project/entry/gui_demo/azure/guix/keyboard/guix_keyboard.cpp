@@ -2,11 +2,9 @@
 #include <gx_api.h>
 
 #include "guix_keyboard.h"
+#include "../display_driver.h"
 #include "guix_keyboard_resources.h"
 #include "guix_keyboard_specifications.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 /* Define prototypes. */
 UINT string_length_get(GX_CONST GX_CHAR* input_string, UINT max_string_length);
@@ -112,6 +110,8 @@ VOID  start_guix(VOID)
     gx_studio_display_configure(DISPLAY_1, gx_drm_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_DEFAULT_THEME, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(DISPLAY_1, gx_x11_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_DEFAULT_THEME, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(DISPLAY_1, gx_fbdev_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_DEFAULT_THEME, &root);
 #else
     return;
 #endif

@@ -3,11 +3,9 @@
 
 #include "evaluate.h"
 #include "guix_calculator.h"
+#include "../display_driver.h"
 #include "guix_calculator_resources.h"
 #include "guix_calculator_specifications.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 #define TYPE_OPERAND                1
 #define TYPE_OPERATION              2
@@ -107,6 +105,8 @@ VOID tx_application_define(void *first_unused_memory)
     gx_studio_display_configure(MAIN_SCREEN, gx_drm_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_SCREEN_DEFAULT_THEME, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(MAIN_SCREEN, gx_x11_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_SCREEN_DEFAULT_THEME, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(MAIN_SCREEN, gx_fbdev_graphics_driver_setup_565rgb, LANGUAGE_ENGLISH, MAIN_SCREEN_DEFAULT_THEME, &root);
 #else
     return;
 #endif

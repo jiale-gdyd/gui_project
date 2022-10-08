@@ -1,8 +1,6 @@
 #include "guix_smart_watch.h"
+#include "../display_driver.h"
 #include "demo_guix_smart_watch.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 #define MEMORY_POOL_BUFFER_SIZE  DISPLAY_1_X_RESOLUTION * DISPLAY_1_Y_RESOLUTION * 8
 #define ANIMATION_MIN_SLIDING_DIST 5
@@ -142,6 +140,8 @@ GX_RECTANGLE size;
     gx_studio_display_configure(DISPLAY_1, gx_drm_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_THEME_1, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(DISPLAY_1, gx_x11_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_THEME_1, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(DISPLAY_1, gx_fbdev_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, DISPLAY_1_THEME_1, &root);
 #else
     return;
 #endif

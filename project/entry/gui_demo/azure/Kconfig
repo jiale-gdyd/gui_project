@@ -11,6 +11,13 @@ config DRM_DISP_DRIVER
     help
       DRM display driver
 
+config FBDEV_DISP_DRIVER
+    bool "framebuffer display driver"
+    depends on AZURE_GUIX
+    default n
+    help
+      framebuffer display driver
+
 config X11_DISP_DRIVER
     bool "x11 window display driver"
     depends on AZURE_GUIX && LINUX_GNU

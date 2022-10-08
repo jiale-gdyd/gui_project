@@ -2,11 +2,9 @@
 #include <gx_api.h>
 
 #include "guix_widget_types.h"
+#include "../display_driver.h"
 #include "guix_widget_types_resources.h"
 #include "guix_widget_types_specifications.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 #define SCRATCHPAD_PIXELS (PRIMARY_X_RESOLUTION * PRIMARY_Y_RESOLUTION)
 #define DROP_LIST_VISIBLE_ROWS  4
@@ -129,6 +127,8 @@ VOID start_guix(void)
     gx_studio_display_configure(PRIMARY, gx_drm_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, PRIMARY_THEME_1, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(PRIMARY, gx_x11_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, PRIMARY_THEME_1, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(PRIMARY, gx_fbdev_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, PRIMARY_THEME_1, &root);
 #else
     return;
 #endif

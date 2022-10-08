@@ -2,11 +2,9 @@
 #include <gx_api.h>
 
 #include "guix_simple.h"
+#include "../display_driver.h"
 #include "guix_simple_resources.h"
 #include "guix_simple_specifications.h"
-
-#include "../drm_display_driver.h"
-#include "../xwindow_display_driver.h"
 
 static GX_WINDOW_ROOT *root;
 static GX_WINDOW *pHelloScreen;
@@ -38,6 +36,8 @@ void start_guix(void)
     gx_studio_display_configure(MAIN_DISPLAY, gx_drm_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_THEME_1, &root);
 #elif defined(CONFIG_X11_DISP_DRIVER)
     gx_studio_display_configure(MAIN_DISPLAY, gx_x11_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_THEME_1, &root);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    gx_studio_display_configure(MAIN_DISPLAY, gx_fbdev_graphics_driver_setup_24xrgb, LANGUAGE_ENGLISH, MAIN_DISPLAY_THEME_1, &root);
 #else
     return;
 #endif
