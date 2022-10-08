@@ -942,6 +942,98 @@ static void _gx_copy_canvas_to_buffer_24xrgb(char *dest, GX_CANVAS *canvas, GX_R
     }
 }
 
+static void _gx_copy_canvas_to_buffer_4444argb(char *dest, GX_CANVAS *canvas, GX_RECTANGLE *dirty_area)
+{
+    GX_VALUE x, y;
+    GX_VALUE width, height;
+    GX_UBYTE red, green, blue;
+    GX_COLOR *put_ptr, *put_row;
+    USHORT *read_ptr, *read_row;
+
+    width = canvas->gx_canvas_x_resolution;
+    height = canvas->gx_canvas_y_resolution;
+
+    // 计算目标起始地址
+    put_row = (GX_COLOR *)dest;
+    put_row += dirty_area->gx_rectangle_top * width;
+    put_row += dirty_area->gx_rectangle_left;
+
+    // 计算源起始地址
+    read_row = (USHORT *)canvas->gx_canvas_memory;
+    read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
+
+    for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
+        put_ptr = put_row;
+        read_ptr = read_row;
+
+        for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
+            red = ((*read) & 0x0f00) >> 4;
+            red |= red >> 4;
+
+            green = (*read) & 0xF0;
+            green |= green >> 4;
+
+            blue = ((*read) & 0x0F);
+            blue |= blue << 4;
+
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
+        }
+
+        put_row += width;
+        read_row += width;
+    }
+}
+
+static void _gx_copy_canvas_to_buffer_1555xrgb(char *dest, GX_CANVAS *canvas, GX_RECTANGLE *dirty_area)
+{
+    GX_VALUE x, y;
+    GX_VALUE width, height;
+    GX_UBYTE red, green, blue;
+    GX_COLOR *put_ptr, *put_row;
+    USHORT *read_ptr, *read_row;
+
+    width = canvas->gx_canvas_x_resolution;
+    height = canvas->gx_canvas_y_resolution;
+
+    // 计算目标起始地址
+    put_row = (GX_COLOR *)dest;
+    put_row += dirty_area->gx_rectangle_top * width;
+    put_row += dirty_area->gx_rectangle_left;
+
+    //  计算源起始地址
+    read_row = (USHORT *)canvas->gx_canvas_memory;
+    read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
+
+    for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
+        put_ptr = put_row;
+        read_ptr = read_row;
+
+        for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
+            red = ((*read) & 0x7c00) >> 7;
+            if (red & 0x08) {
+                red |= 0x07;
+            }
+
+            green = ((*read) & 0x03e0) >> 2;
+            if (green & 0x08) {
+                green |= 0x03;
+            }
+
+            blue = ((*read) & 0x1f) << 3;
+            if (blue & 0x08) {
+                blue |= 0x07;
+            }
+
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
+        }
+
+        put_row += width;
+        read_row += width;
+    }
+}
+
 static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area)
 {
     GX_VALUE format;
@@ -970,6 +1062,14 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
         case GX_COLOR_FORMAT_24XRGB:
         case GX_COLOR_FORMAT_32ARGB:
             _gx_copy_canvas_to_buffer_24xrgb(gx_canvas_memory, canvas, &overLapArea);
+            break;
+
+        case GX_COLOR_FORMAT_4444ARGB:
+            _gx_copy_canvas_to_buffer_4444argb(gx_canvas_memory, canvas, &overLapArea);
+            break;
+
+        case GX_COLOR_FORMAT_1555XRGB:
+            _gx_copy_canvas_to_buffer_1555xrgb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
         default:
@@ -1067,6 +1167,50 @@ UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_332rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
+{
+#if defined(CONFIG_DRM_DISP_DRIVER)
+    static int drm_init_flags = 0;
+
+    if (drm_init_flags == 0) {
+        g_colorSize = 16;
+        int ret = drm_init(DRM_FORMAT_ARGB4444);
+        if (ret == 0) {
+            drm_init_flags = 1;
+        }
+    }
+
+    _gx_display_driver_4444argb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+#else
+    return GX_FAILURE;
+#endif
+}
+
+UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
+{
+#if defined(CONFIG_DRM_DISP_DRIVER)
+    static int drm_init_flags = 0;
+
+    if (drm_init_flags == 0) {
+        g_colorSize = 16;
+        int ret = drm_init(DRM_FORMAT_XRGB1555);
+        if (ret == 0) {
+            drm_init_flags = 1;
+        }
+    }
+
+    _gx_display_driver_1555xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
     _gx_x11_graphics_driver_setup(display);
 
     return GX_SUCCESS;

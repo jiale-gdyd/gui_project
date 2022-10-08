@@ -10,6 +10,8 @@ extern "C" {
 UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display);
 UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display);
 UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display);
+UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display);
+UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display);
 
 #ifdef __cplusplus
 }
