@@ -1,4 +1,7 @@
-obj-$(CONFIG_CORTEX_A7) += cortex_a7/
-obj-$(CONFIG_LINUX_GNU) += linux_gnu/
+ifeq ($(CONFIG_AZURE_GUIX),y)
+obj-y += guix/
+else
+obj-y += threadx/
+endif
 
 obj-y += azure_demo.o

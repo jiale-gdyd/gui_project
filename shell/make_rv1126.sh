@@ -14,8 +14,9 @@ fi
 
 function rv1126_clean()
 {
-    rm -rf rv1126_lvgl_gui
-    rm -rf rv1126_azure_gui
+    rm -rf lvgl_gui
+    rm -rf azure_gui
+    remove_gitcommit
 }
 
 function rv1126_lvgl_gui()
@@ -37,9 +38,10 @@ function rv1126_lvgl_gui()
     print_info "build ${PROJECT_NAME} project start"
 
     export SOC=rv11xx
-    export APP_NAME=rv1126_lvgl_gui
     export Platform=rockchip
+    export APP_NAME=lvgl_gui
     export USE_STDCPP_VERSION=-std=c++14
+    generate_gitcommit
 
     make ${RV11XX_LVGL_GUI_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
     if [ $? -ne 0 ]; then
@@ -76,9 +78,10 @@ function rv1126_azure_gui()
     print_info "build ${PROJECT_NAME} project start"
 
     export SOC=rv11xx
-    export APP_NAME=rv1126_azure_gui
     export Platform=rockchip
+    export APP_NAME=azure_gui
     export USE_STDCPP_VERSION=-std=c++11
+    generate_gitcommit
 
     make ${RV11XX_AZURE_GUI_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
     if [ $? -ne 0 ]; then

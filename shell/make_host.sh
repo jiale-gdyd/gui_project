@@ -7,8 +7,8 @@ HOST_AZURE_GUI_CONFIG=host_azure_gui_defconfig
 
 function host_clean()
 {
-    rm -rf host_lvgl_gui
-    rm -rf host_azure_gui
+    rm -rf azure_gui
+    remove_gitcommit
 }
 
 function host_azure_gui()
@@ -31,8 +31,9 @@ function host_azure_gui()
 
     export SOC=x86_64
     export Platform=host
-    export APP_NAME=host_azure_gui
+    export APP_NAME=azure_gui
     export USE_STDCPP_VERSION=-std=c++11
+    generate_gitcommit
 
     make ${HOST_AZURE_GUI_CONFIG} && make ARCH=x86_64 -j$[$(nproc)-1]
     if [ $? -ne 0 ]; then

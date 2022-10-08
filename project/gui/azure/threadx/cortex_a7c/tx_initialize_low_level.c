@@ -295,7 +295,7 @@ cpu_set_t mask;
     sem_init(&_tx_linux_isr_semaphore, 0, 0);
 
     /* Setup periodic timer interrupt.  */
-    if(pthread_create(&_tx_linux_timer_id, NULL, _tx_linux_timer_interrupt, /*(void *)&_tx_linux_timer_id)*/NULL)
+    if(pthread_create(&_tx_linux_timer_id, NULL, _tx_linux_timer_interrupt, /*(void *)&_tx_linux_timer_id*/NULL))
     {
 
         /* Error creating the timer interrupt.  */
