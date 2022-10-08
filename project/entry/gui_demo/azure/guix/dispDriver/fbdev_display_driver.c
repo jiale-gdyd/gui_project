@@ -9,9 +9,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stddef.h>
-#include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+
+#if USE_BSD_FBDEV
+#include <sys/fcntl.h>
+#include <sys/time.h>
+#include <sys/consio.h>
+#include <sys/fbio.h>
+#else
+#include <linux/fb.h>
+#endif
 
 #include <gx_api.h>
 #include <gx_display.h>
@@ -90,8 +98,13 @@ static long int screensize = 0;
 static unsigned int g_colorSize = 32;
 static char *gx_canvas_memory = NULL;
 
+#if USE_BSD_FBDEV
+static struct bsd_fb_var_info vinfo;
+static struct bsd_fb_fix_info finfo;
+#else
 static struct fb_var_screeninfo vinfo;
 static struct fb_fix_screeninfo finfo;
+#endif
 
 static int fbdev_init(void)
 {
@@ -103,6 +116,30 @@ static int fbdev_init(void)
 
     printf("[FBDEV] The framebuffer device was opened successfully\n");
 
+#if USE_BSD_FBDEV
+    struct fbtype fb;
+    unsigned line_length;
+
+    // 获取fb类型
+    if (ioctl(fbfd, FBIOGTYPE, &fb) != 0) {
+        printf("[FBDEV] ioctl(FBIOGTYPE), errstr:[%s]\n", strerror(errno));
+        return -1;
+    }
+
+    // 获取屏幕宽度
+    if (ioctl(fbfd, FBIO_GETLINEWIDTH, &line_length) != 0) {
+        printf("[FBDEV] ioctl(FBIO_GETLINEWIDTH), errstr:[%s]\n", strerror(errno));
+        return -1;
+    }
+
+    vinfo.xres = (unsigned)fb.fb_width;
+    vinfo.yres = (unsigned)fb.fb_height;
+    vinfo.bits_per_pixel = fb.fb_depth + 8;
+    vinfo.xoffset = 0;
+    vinfo.yoffset = 0;
+    finfo.line_length = line_length;
+    finfo.smem_len = finfo.line_length * vinfo.yres;
+#else
     // 确保显示器开着
     if (ioctl(fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
         printf("[FBDEV] ioctl(FBIOBLANK) failed\n");
@@ -120,6 +157,7 @@ static int fbdev_init(void)
         printf("[FBDEV] reading variable information failed\n");
         return -1;
     }
+#endif
 
     printf("[FBDEV] xres:[%d], yres:[%d], bits_per_pixel:[%d]bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
 
@@ -232,7 +270,7 @@ static void fbdev_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *c
         int32_t y;
         uint8_t *fbp8 = (uint8_t *)fbp;
 
-        for(y = act_y1; y <= act_y2; y++) {
+        for (y = act_y1; y <= act_y2; y++) {
             location = (act_x1 + vinfo.xoffset) + (y + vinfo.yoffset) * finfo.line_length;
             memcpy(&fbp8[location], (uint32_t *)gx_canvas_memory, (act_x2 - act_x1 + 1));
             gx_canvas_memory += w;
