@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stddef.h>
+#include <stdarg.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
@@ -38,6 +39,22 @@
 #define FBDEV_CONCAT3(x, y, z)          _FBDEV_CONCAT3(x, y, z)
 
 #define FBDEV_COLOR_DEPTH               32
+
+#ifndef fbdev_print
+#define fbdev_print(msg, ...)           fprintf(stderr, msg, ##__VA_ARGS__);
+#endif
+
+#ifndef fbdev_error
+#define fbdev_error(msg, ...)           fbdev_print("[FBDEV][E]: " msg "\n", ##__VA_ARGS__)
+#endif
+
+#ifndef fbdev_info
+#define fbdev_info(msg, ...)            fbdev_print("[FBDEV][I]: " msg "\n", ##__VA_ARGS__)
+#endif
+
+#ifndef fbdev_debug
+#define fbdev_debug(msg, ...)           {}
+#endif
 
 #if defined(CONFIG_FBDEV_DISP_DRIVER)
 struct bsd_fb_var_info {
@@ -110,11 +127,11 @@ static int fbdev_init(void)
 {
     fbfd = open(FBDEV_PATH, O_RDWR);
     if (fbfd == -1) {
-        printf("[FBDEV] cannot open framebuffer device, errstr:[%s]\n", strerror(errno));
+        fbdev_error("cannot open framebuffer device, errstr:[%s]", strerror(errno));
         return -1;
     }
 
-    printf("[FBDEV] The framebuffer device was opened successfully\n");
+    fbdev_info("The framebuffer device was opened successfully");
 
 #if USE_BSD_FBDEV
     struct fbtype fb;
@@ -122,13 +139,13 @@ static int fbdev_init(void)
 
     // 获取fb类型
     if (ioctl(fbfd, FBIOGTYPE, &fb) != 0) {
-        printf("[FBDEV] ioctl(FBIOGTYPE), errstr:[%s]\n", strerror(errno));
+        fbdev_error("ioctl(FBIOGTYPE), errstr:[%s]", strerror(errno));
         return -1;
     }
 
     // 获取屏幕宽度
     if (ioctl(fbfd, FBIO_GETLINEWIDTH, &line_length) != 0) {
-        printf("[FBDEV] ioctl(FBIO_GETLINEWIDTH), errstr:[%s]\n", strerror(errno));
+        fbdev_error("ioctl(FBIO_GETLINEWIDTH), errstr:[%s]", strerror(errno));
         return -1;
     }
 
@@ -142,24 +159,24 @@ static int fbdev_init(void)
 #else
     // 确保显示器开着
     if (ioctl(fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
-        printf("[FBDEV] ioctl(FBIOBLANK) failed\n");
+        fbdev_error("ioctl(FBIOBLANK) failed, errstr:[%s]", strerror(errno));
         // 不要返回。一些像efifb或simplefb这样的帧缓冲驱动程序不实现FBIOBLANK
     }
 
     // 获取固定屏幕信息
     if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        printf("[FBDEV] reading fixed information failed\n");
+        fbdev_error("reading fixed information failed, errstr:[%s]", strerror(errno));
         return -1;
     }
 
     // 获取可变屏幕信息
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        printf("[FBDEV] reading variable information failed\n");
+        fbdev_error("reading variable information failed, errstr:[%s]", strerror(errno));
         return -1;
     }
 #endif
 
-    printf("[FBDEV] xres:[%d], yres:[%d], bits_per_pixel:[%d]bpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+    fbdev_info("xres:[%d], yres:[%d], bits_per_pixel:[%d]bpp", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
 
     // 用字节计算屏幕的大小
     screensize = finfo.smem_len;
@@ -167,13 +184,13 @@ static int fbdev_init(void)
     // 将设备映射到内存
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if (fbp == MAP_FAILED) {
-        printf("[FBDEV] failed to map framebuffer device to memory, errstr:[%s]\n", strerror(errno));
+        fbdev_error("failed to map framebuffer device to memory, errstr:[%s]", strerror(errno));
         return -1;
     }
 
     // 不要初始化内存以保留当前显示的内容/避免清除屏幕。这对于只提取整个帧缓冲区的一部分的应用程序非常重要
 
-    printf("[FBDEV] The framebuffer device was mapped to memory successfully\n");
+    fbdev_info("The framebuffer device was mapped to memory successfully");
     return 0;
 }
 
@@ -214,7 +231,7 @@ static void fbdev_flush(const char *gx_canvas_memory, struct GX_CANVAS_STRUCT *c
     int y2 = canvas->gx_canvas_dirty_area.gx_rectangle_bottom;
 
     if ((fbp == NULL) || (x2 < 0) || (y2 < 0) || (x1 > ((uint32_t)vinfo.xres - 1)) || (y1 > ((uint32_t)vinfo.yres - 1))) {
-        printf("[FBDEV] Invalid parameter\n");
+        fbdev_error("Invalid parameter");
         return;
     }
 

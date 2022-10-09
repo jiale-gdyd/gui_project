@@ -4,4 +4,5 @@
 
 source "project/gui/Kconfig"
 source "project/entry/Kconfig"
+source "project/3rdparty/Kconfig"
 source "project/platform/Kconfig"

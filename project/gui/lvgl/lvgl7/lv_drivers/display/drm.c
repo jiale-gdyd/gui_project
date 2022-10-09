@@ -23,9 +23,9 @@
 #include <sys/mman.h>
 #include <inttypes.h>
 
-#include <xf86drm.h>
-#include <xf86drmMode.h>
-#include <libdrm/drm_fourcc.h>
+#include <libdrm/xf86drm.h>
+#include <libdrm/xf86drmMode.h>
+#include <libdrm/drm/drm_fourcc.h>
 
 #define DBG_TAG "drm"
 

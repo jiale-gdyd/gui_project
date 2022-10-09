@@ -5,14 +5,14 @@ USER_PTH_RT_LIB  :=
 
 GUI_ROOT         := $(shell pwd)/project
 HOST_ROOT        := /usr/include
+HOST_ROOT2       := /usr/local/include
 
 USER_LIB_INCLUDE += $(HOST_ROOT) \
-                    /usr/local/include \
-                    $(HOST_ROOT)/libdrm \
+                    $(HOST_ROOT2) \
                     $(HOST_ROOT)/opencv4 \
                     $(HOST_ROOT)/glib-2.0 \
                     $(HOST_ROOT)/freetype2 \
-                    /usr/local/include/opencv4 \
+                    $(HOST_ROOT2)/opencv4 \
                     $(HOST_ROOT)/gstreamer-1.0 \
                     /usr/lib/x86_64-linux-gnu/glib-2.0/include \
                     $(GUI_ROOT)/gui \
@@ -23,7 +23,7 @@ USER_LIB_INCLUDE += $(HOST_ROOT) \
 USER_LINK_LIB    := -L/usr/local/lib \
                     -L/usr/libx86_64-linux-gnu
 
-USER_LD_LIB      := drm X11
+USER_LD_LIB      := X11
 
 USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})
 USER_PTH_RT_LIB       += -lpthread -lrt -lm -ldl $(USE_STDCPP_VERSION)

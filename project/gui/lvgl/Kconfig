@@ -7,6 +7,7 @@ menu "LittlevGL"
 config LVGL
     bool "Light and Versatile Embedded Graphics Library"
     depends on GUI
+    select LIBDRM
     default n
     help
       Light and Versatile Embedded Graphics Library

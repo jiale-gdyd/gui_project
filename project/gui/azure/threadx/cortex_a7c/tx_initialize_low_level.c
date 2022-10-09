@@ -68,6 +68,10 @@ __thread int        _tx_linux_threadx_thread = 0;
 pthread_t           _tx_linux_timer_id;
 sem_t               _tx_linux_timer_semaphore;
 sem_t               _tx_linux_isr_semaphore;
+
+// pthread_cond_t _tx_linux_timer_cond = PTHREAD_COND_INITIALIZER;
+// pthread_mutex_t _tx_linux_timer_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void               *_tx_linux_timer_interrupt(void *p);
 
 
@@ -325,6 +329,10 @@ void    _tx_initialize_start_interrupts(void)
     /* Kick the timer thread off to generate the ThreadX periodic interrupt
        source.  */
     tx_linux_sem_post(&_tx_linux_timer_semaphore);
+
+    // pthread_mutex_lock(&_tx_linux_timer_mutex);
+    // pthread_cond_signal(&_tx_linux_timer_cond);
+    // pthread_mutex_unlock(&_tx_linux_timer_mutex);
 }
 
 
@@ -364,6 +372,12 @@ int err;
             }
             err = errno;
         } while (err != ETIMEDOUT);
+
+        /////////////////////////////////////////////////
+        // pthread_mutex_lock(&_tx_linux_timer_mutex);
+        // pthread_cond_timedwait(&_tx_linux_timer_cond, &_tx_linux_timer_mutex, &ts);
+        // pthread_mutex_unlock(&_tx_linux_timer_mutex);
+        /////////////////////////////////////////////////
 
         /* Call ThreadX context save for interrupt preparation.  */
         _tx_thread_context_save();
