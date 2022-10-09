@@ -38,6 +38,10 @@
 #define DRM_CONNECTOR_ID                    -1
 #endif
 
+#ifndef DRM_DISP_ZPOS
+#define DRM_DISP_ZPOS                       DRM_PLANE_TYPE_OVERLAY
+#endif
+
 #define DIV_ROUND_UP(n, d)                  (((n) + (d) - 1) / (d))
 #define DUMP_FOURCC(fourcc)                 (fourcc >> 0) & 0xFF, (fourcc >> 8) & 0xFF, (fourcc >> 16) & 0xFF, (fourcc >> 24) & 0xFF
 
@@ -227,9 +231,24 @@ static int drm_add_plane_property(const char *name, uint64_t value)
         return -1;
     }
 
+    if (!strcmp(name, "ZPOS")) {
+        drm_info("ZPOS property id:[%u], set value:[%llu]", prop_id, value);
+    }
+
     ret = drmModeAtomicAddProperty(g_drmDev.req, g_drmDev.plane_id, prop_id, value);
     if (ret < 0) {
         drm_error("drmModeAtomicAddProperty (%s:%" PRIu64 ") failed, return:[%d]", name, value, ret);
+        return ret;
+    }
+
+    return 0;
+}
+
+static int drm_add_plane_id(uint32_t id, uint64_t value)
+{
+    int ret = drmModeAtomicAddProperty(g_drmDev.req, g_drmDev.plane_id, id, value);
+    if (ret < 0) {
+        drm_error("drmModeAtomicAddProperty (%s:%" PRIu64 ") failed, return:[%d], errstr:[%s]", "zpos", value, ret, strerror(errno));
         return ret;
     }
 
@@ -295,14 +314,15 @@ static int drm_dmabuf_set_plane(struct drm_buffer *buf)
 
     drm_add_plane_property("FB_ID", buf->fb_handle);
     drm_add_plane_property("CRTC_ID", g_drmDev.crtc_id);
-    drm_add_plane_property("SRC_X", 0);
-    drm_add_plane_property("SRC_Y", 0);
+    drm_add_plane_property("SRC_X", 0 << 16);
+    drm_add_plane_property("SRC_Y", 0 << 16);
     drm_add_plane_property("SRC_W", g_drmDev.width << 16);
     drm_add_plane_property("SRC_H", g_drmDev.height << 16);
     drm_add_plane_property("CRTC_X", 0);
     drm_add_plane_property("CRTC_Y", 0);
     drm_add_plane_property("CRTC_W", g_drmDev.width);
     drm_add_plane_property("CRTC_H", g_drmDev.height);
+    drm_add_plane_property("ZPOS", DRM_DISP_ZPOS);
 
     // 提交数据进行显示
     ret = drmModeAtomicCommit(g_drmDev.fd, g_drmDev.req, flags, NULL);

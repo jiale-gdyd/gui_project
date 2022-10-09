@@ -19,7 +19,7 @@
 #include <libdrm/xf86drmMode.h>
 #include <libdrm/drm/drm_fourcc.h>
 
-#define DBG_TAG     "drm"
+#define DBG_TAG                 "drm"
 
 #define DIV_ROUND_UP(n, d)      (((n) + (d) - 1) / (d))
 
@@ -27,6 +27,10 @@
 #define err(msg, ...)           print("error: " msg "\n", ##__VA_ARGS__)
 #define info(msg, ...)          print(msg "\n", ##__VA_ARGS__)
 #define dbg(msg, ...)           {}
+
+#ifndef DRM_DISP_ZPOS
+#define DRM_DISP_ZPOS           DRM_PLANE_TYPE_PRIMARY
+#endif
 
 struct drm_buffer {
     uint32_t          handle;
@@ -257,6 +261,7 @@ static int drm_dmabuf_set_plane(struct drm_buffer *buf)
         first = 0;
     }
 
+    drm_add_plane_property("ZPOS", DRM_DISP_ZPOS);
     drm_add_plane_property("FB_ID", buf->fb_handle);
     drm_add_plane_property("CRTC_ID", drm_dev.crtc_id);
     drm_add_plane_property("SRC_X", 0);
