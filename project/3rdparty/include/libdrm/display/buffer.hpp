@@ -1,0 +1,6 @@
+#ifndef LIBDRM_DISPLAY_BUFFER_HPP
+#define LIBDRM_DISPLAY_BUFFER_HPP
+
+
+
+#endif
