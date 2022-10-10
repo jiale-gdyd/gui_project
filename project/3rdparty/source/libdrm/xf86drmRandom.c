@@ -11,7 +11,7 @@ drm_public void *drmRandomCreate(unsigned long seed)
 {
     RandomState *state;
 
-    state = drmMalloc(sizeof(*state));
+    state = (RandomState *)drmMalloc(sizeof(*state));
     if (!state) {
         return NULL;
     }

@@ -12,5 +12,5 @@ obj-$(CONFIG_AZURE_GUIX_WASHING_MACHINE) += washing_machine/
 obj-$(CONFIG_AZURE_GUIX_HOME_AUTOMATION) += home_automation/
 obj-$(CONFIG_AZURE_GUIX_CAR_INFOTAINMENT) += car_infotainment/
 
-obj-y += dispDriver/
+obj-y += display/
 obj-y += azure_guix_demo.o

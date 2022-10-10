@@ -156,7 +156,7 @@ extern   "C" {
 #define TX_NO_ACTIVATE                  ((UINT)   0)
 #define TX_TRUE                         ((UINT)   1)
 #define TX_FALSE                        ((UINT)   0)
-#define TX_NULL                         ((void *) 0)
+#define TX_NULL                         /*((void *) 0)*/NULL
 #define TX_INHERIT                      ((UINT)   1)
 #define TX_NO_INHERIT                   ((UINT)   0)
 #define TX_THREAD_ENTRY                 ((UINT)   0)

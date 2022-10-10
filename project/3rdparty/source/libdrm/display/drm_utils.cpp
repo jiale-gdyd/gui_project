@@ -179,9 +179,9 @@ const struct PlayTypeMap {
     int        type;
     const char *type_str;
 } plane_type_string_map[] = {
-    {DRM_PLANE_TYPE_OVERLAY, KEY_OVERLAY},
-    {DRM_PLANE_TYPE_PRIMARY, KEY_PRIMARY},
-    {DRM_PLANE_TYPE_CURSOR,  KEY_CURSOR}
+    {DRM_PLANE_TYPE_OVERLAY, DRM_KEY_OVERLAY},
+    {DRM_PLANE_TYPE_PRIMARY, DRM_KEY_PRIMARY},
+    {DRM_PLANE_TYPE_CURSOR,  DRM_KEY_CURSOR}
 };
 
 static int GetPlaneTypeByString(const char *type_str)

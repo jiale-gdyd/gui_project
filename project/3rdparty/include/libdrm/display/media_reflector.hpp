@@ -20,7 +20,7 @@
     bool REAL_PRODUCT##Factory::AcceptRules(const std::map<std::string, std::string> &map) const {                      \
         static std::list<std::string> expected_data_type_list;                                                          \
         static std::list<std::string> out_data_type_list;                                                               \
-        static const char *static_keys[] = {KEY_INPUTDATATYPE, KEY_OUTPUTDATATYPE, NULL};                               \
+        static const char *static_keys[] = {DRM_KEY_INPUTDATATYPE, DRM_KEY_OUTPUTDATATYPE, NULL};                       \
         static const decltype(ExpectedInputDataType) *static_call[] = {&ExpectedInputDataType, &OutPutDataType, NULL};  \
         static std::list<std::string> *static_list[] = {&expected_data_type_list, &out_data_type_list, NULL};           \
         const char **keys = static_keys;                                                                                \

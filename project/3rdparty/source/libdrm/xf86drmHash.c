@@ -40,7 +40,7 @@ drm_public void *drmHashCreate(void)
 {
     HashTablePtr table;
 
-    table = drmMalloc(sizeof(*table));
+    table = (HashTablePtr)drmMalloc(sizeof(*table));
     if (!table) {
         return NULL;
     }
@@ -135,7 +135,7 @@ drm_public int drmHashInsert(void *t, unsigned long key, void *value)
         return 1;
     }
 
-    bucket = drmMalloc(sizeof(*bucket));
+    bucket = (HashBucketPtr)drmMalloc(sizeof(*bucket));
     if (!bucket) {
         return -1;
     }

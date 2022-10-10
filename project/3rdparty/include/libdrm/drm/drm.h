@@ -76,13 +76,21 @@ struct drm_block {
     int unused;
 };
 
+enum {
+    DRM_ADD_COMMAND,
+    DRM_RM_COMMAND,
+    DRM_INST_HANDLER,
+    DRM_UNINST_HANDLER
+};
+
 struct drm_control {
-    enum {
-        DRM_ADD_COMMAND,
-        DRM_RM_COMMAND,
-        DRM_INST_HANDLER,
-        DRM_UNINST_HANDLER
-    } func;
+    // enum {
+    //     DRM_ADD_COMMAND,
+    //     DRM_RM_COMMAND,
+    //     DRM_INST_HANDLER,
+    //     DRM_UNINST_HANDLER
+    // } func;
+    int func;
     int irq;
 };
 
@@ -179,19 +187,28 @@ enum drm_dma_flags {
     _DRM_DMA_LARGER_OK    = 0x40
 };
 
+enum {
+    _DRM_PAGE_ALIGN    = 0x01,
+    _DRM_AGP_BUFFER    = 0x02,
+    _DRM_SG_BUFFER     = 0x04,
+    _DRM_FB_BUFFER     = 0x08,
+    _DRM_PCI_BUFFER_RO = 0x10
+};
+
 struct drm_buf_desc {
     int count;
     int size;
     int low_mark;
     int high_mark;
 
-    enum {
-        _DRM_PAGE_ALIGN    = 0x01,
-        _DRM_AGP_BUFFER    = 0x02,
-        _DRM_SG_BUFFER     = 0x04,
-        _DRM_FB_BUFFER     = 0x08,
-        _DRM_PCI_BUFFER_RO = 0x10
-    } flags;
+    // enum {
+    //     _DRM_PAGE_ALIGN    = 0x01,
+    //     _DRM_AGP_BUFFER    = 0x02,
+    //     _DRM_SG_BUFFER     = 0x04,
+    //     _DRM_FB_BUFFER     = 0x08,
+    //     _DRM_PCI_BUFFER_RO = 0x10
+    // } flags;
+    int flags;
 
     unsigned long agp_start;
 };

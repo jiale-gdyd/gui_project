@@ -38,7 +38,7 @@ static SLEntryPtr SLCreateEntry(int max_level, unsigned long key, void *value)
         max_level = SL_MAX_LEVEL;
     }
 
-    entry = drmMalloc(sizeof(*entry) + (max_level + 1) * sizeof(entry->forward[0]));
+    entry = (SLEntryPtr)drmMalloc(sizeof(*entry) + (max_level + 1) * sizeof(entry->forward[0]));
     if (!entry) {
         return NULL;
     }
@@ -70,7 +70,7 @@ drm_public void *drmSLCreate(void)
     int i;
     SkipListPtr list;
 
-    list = drmMalloc(sizeof(*list));
+    list = (SkipListPtr)drmMalloc(sizeof(*list));
     if (!list) {
         return NULL;
     }

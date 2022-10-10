@@ -76,4 +76,8 @@
 
 #define DRM_KEY_ALLOW_THROUGH_COUNT             "allow_through_count"
 
+#define DRM_KEY_CHANNELS                        "channel_num"
+#define DRM_KEY_SAMPLE_RATE                     "sample_rate"
+#define DRM_KEY_FRAMES                          "frame_num"
+
 #endif

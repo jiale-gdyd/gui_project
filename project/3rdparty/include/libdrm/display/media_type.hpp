@@ -1,6 +1,8 @@
 #ifndef LIBDRM_DISPLAY_MEDIA_TYPE_HPP
 #define LIBDRM_DISPLAY_MEDIA_TYPE_HPP
 
+#include "../drm_media_common.h"
+
 enum class DrmType {
     None = -1,
     Audio = 0,
@@ -40,18 +42,44 @@ enum class DrmType {
 #define DRM_IMAGE_RGBA8888                          DRM_IMAGE_PREFIX "rgba8888"
 #define DRM_IMAGE_BGRA8888                          DRM_IMAGE_PREFIX "bgra8888"
 
-typedef enum {
-    DRM_CODEC_TYPE_NONE = -1,
-    DRM_CODEC_TYPE_MP3,
-    DRM_CODEC_TYPE_MP2,
-    DRM_CODEC_TYPE_G711A,
-    DRM_CODEC_TYPE_G711U,
-    DRM_CODEC_TYPE_G726,
-    DRM_CODEC_TYPE_H264,
-    DRM_CODEC_TYPE_H265,
-    DRM_CODEC_TYPE_JPEG,
-    DRM_CODEC_TYPE_NB
-} DrmCodecType;
+#define DRM_IMAGE_PREFIX                            "image:"
+#define DRM_IMAGE_JPEG                              DRM_IMAGE_PREFIX "jpeg"
+
+#define DRM_VIDEO_PREFIX                            "video:"
+#define DRM_VIDEO_H264                              DRM_VIDEO_PREFIX "h264"
+#define DRM_VIDEO_H265                              DRM_VIDEO_PREFIX "h265"
+#define DRM_VIDEO_MJPEG                             DRM_VIDEO_PREFIX "mjpeg"
+
+#define DRM_AUDIO_PREFIX                            "audio:"
+#define DRM_AUDIO_MP3                               DRM_AUDIO_PREFIX "mp3"
+#define DRM_AUDIO_MP2                               DRM_AUDIO_PREFIX "mp2"
+#define DRM_AUDIO_G711A                             DRM_AUDIO_PREFIX "g711a"
+#define DRM_AUDIO_G711U                             DRM_AUDIO_PREFIX "g711U"
+#define DRM_AUDIO_G726                              DRM_AUDIO_PREFIX "g726"
+
+#define DRM_TEXT_PREFIX                             "text:"
+
+#define DRM_AUDIO_PREFIX                            "audio:"
+#define DRM_AUDIO_PCM_U8                            DRM_AUDIO_PREFIX "pcm_u8"
+#define DRM_AUDIO_PCM_S16                           DRM_AUDIO_PREFIX "pcm_s16"
+#define DRM_AUDIO_PCM_S32                           DRM_AUDIO_PREFIX "pcm_s32"
+#define DRM_AUDIO_PCM_FLT                           DRM_AUDIO_PREFIX "pcm_flt"
+#define DRM_AUDIO_PCM_U8P                           DRM_AUDIO_PREFIX "pcm_u8p"
+#define DRM_AUDIO_PCM_S16P                          DRM_AUDIO_PREFIX "pcm_s16p"
+#define DRM_AUDIO_PCM_S32P                          DRM_AUDIO_PREFIX "pcm_s32p"
+#define DRM_AUDIO_PCM_FLTP                          DRM_AUDIO_PREFIX "pcm_fltp"
+#define DRM_AUDIO_PCM_G711A                         DRM_AUDIO_PREFIX "pcm_g711a"
+#define DRM_AUDIO_PCM_G711U                         DRM_AUDIO_PREFIX "pcm_g711u"
+
+#define DRM_AUDIO_PCM                               \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_U8)                  \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_S16)                 \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_S32)                 \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_FLT)                 \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_U8P)                 \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_S16P)                \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_S32P)                \
+    DRM_TYPENEAR(DRM_AUDIO_PCM_FLTP)
 
 const char *CodecTypeToString(DrmCodecType fmt);
 DrmCodecType StringToCodecType(const char *fmt_str);

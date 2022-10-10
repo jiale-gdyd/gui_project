@@ -1,0 +1,13 @@
+#ifndef LIBDRM_MEDIA_UTILS_HPP
+#define LIBDRM_MEDIA_UTILS_HPP
+
+#include <string>
+#include <libdrm/drm_media_common.h>
+
+std::string ImageTypeToString(drm_image_type_e type);
+drm_image_type_e StringToImageType(std::string type);
+
+std::string CodecToString(drm_codec_type_e type);
+std::string SampleFormatToString(drm_sample_format_e type);
+
+#endif

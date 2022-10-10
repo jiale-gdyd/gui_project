@@ -6,7 +6,7 @@
 
 #define STATIC_ASSERT(COND)                                 \
     do {                                                    \
-        (void) sizeof(char [1 - 2*!(COND)]);                \
+        /*(void) sizeof(char [1 - 2*!(COND)]);*/                \
     } while (0)
 
 #include <sys/mman.h>

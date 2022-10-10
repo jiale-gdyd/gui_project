@@ -232,7 +232,7 @@ static int drm_add_plane_property(const char *name, uint64_t value)
     }
 
     if (!strcmp(name, "ZPOS")) {
-        drm_info("ZPOS property id:[%u], set value:[%llu]", prop_id, value);
+        drm_info("ZPOS property id:[%u], set value:[%llu]", prop_id, (unsigned long long)value);
     }
 
     ret = drmModeAtomicAddProperty(g_drmDev.req, g_drmDev.plane_id, prop_id, value);
@@ -1255,4 +1255,14 @@ UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
 #else
     return GX_FAILURE;
 #endif
+}
+
+int gx_drm_graphics_driver_exit(int channel)
+{
+    return -1;
+}
+
+int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_t xoffset, size_t yoffset, disp_image_type_e type, disp_plane_type_e dispLayer, int zpos)
+{
+    return -1;
 }

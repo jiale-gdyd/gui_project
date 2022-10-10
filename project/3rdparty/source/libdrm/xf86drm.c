@@ -558,13 +558,13 @@ drm_public drmHashEntry *drmGetEntry(int fd)
     }
 
     if (drmHashLookup(drmHashTable, key, &value)) {
-        entry = drmMalloc(sizeof(*entry));
+        entry = (drmHashEntry *)drmMalloc(sizeof(*entry));
         entry->fd = fd;
         entry->f = NULL;
         entry->tagTable = drmHashCreate();
         drmHashInsert(drmHashTable, key, entry);
     } else {
-        entry = value;
+        entry = (drmHashEntry *)value;
     }
 
     return entry;
@@ -1051,7 +1051,7 @@ static void drmCopyVersion(drmVersionPtr d, const drm_version_t *s)
 drm_public drmVersionPtr drmGetVersion(int fd)
 {
     drmVersionPtr retval;
-    drm_version_t *version = drmMalloc(sizeof(*version));
+    drm_version_t *version = (drm_version_t *)drmMalloc(sizeof(*version));
 
     if (drmIoctl(fd, DRM_IOCTL_VERSION, version)) {
         drmFreeKernelVersion(version);
@@ -1059,15 +1059,15 @@ drm_public drmVersionPtr drmGetVersion(int fd)
     }
 
     if (version->name_len) {
-        version->name = drmMalloc(version->name_len + 1);
+        version->name = (char *)drmMalloc(version->name_len + 1);
     }
 
     if (version->date_len) {
-        version->date = drmMalloc(version->date_len + 1);
+        version->date = (char *)drmMalloc(version->date_len + 1);
     }
 
     if (version->desc_len) {
-        version->desc = drmMalloc(version->desc_len + 1);
+        version->desc = (char *)drmMalloc(version->desc_len + 1);
     }
 
     if (drmIoctl(fd, DRM_IOCTL_VERSION, version)) {
@@ -1088,7 +1088,7 @@ drm_public drmVersionPtr drmGetVersion(int fd)
         version->desc[version->desc_len] = '\0';
     }
 
-    retval = drmMalloc(sizeof(*retval));
+    retval = (drmVersionPtr)drmMalloc(sizeof(*retval));
     drmCopyVersion(retval, version);
     drmFreeKernelVersion(version);
 
@@ -1097,7 +1097,7 @@ drm_public drmVersionPtr drmGetVersion(int fd)
 
 drm_public drmVersionPtr drmGetLibVersion(int fd)
 {
-    drm_version_t *version = drmMalloc(sizeof(*version));
+    drm_version_t *version = (drm_version_t *)drmMalloc(sizeof(*version));
 
     version->version_major = 1;
     version->version_minor = 3;
@@ -1149,7 +1149,7 @@ drm_public char *drmGetBusid(int fd)
         return NULL;
     }
 
-    u.unique = drmMalloc(u.unique_len + 1);
+    u.unique = (char *)drmMalloc(u.unique_len + 1);
     if (drmIoctl(fd, DRM_IOCTL_GET_UNIQUE, &u)) {
         drmFree(u.unique);
         return NULL;
@@ -1244,7 +1244,7 @@ drm_public int drmAddBufs(int fd, int count, int size, drmBufDescFlags flags, in
     memclear(request);
     request.count = count;
     request.size = size;
-    request.flags = (int)flags;
+    request.flags = /*(int)*/flags;
     request.agp_start = agp_offset;
 
     if (drmIoctl(fd, DRM_IOCTL_ADD_BUFS, &request)) {
@@ -1269,7 +1269,7 @@ drm_public int drmMarkBufs(int fd, double low, double high)
         return -EINVAL;
     }
 
-    if (!(info.list = drmMalloc(info.count * sizeof(*info.list)))) {
+    if (!(info.list = (struct drm_buf_desc *)drmMalloc(info.count * sizeof(*info.list)))) {
         return -ENOMEM;
     }
 
@@ -1364,7 +1364,7 @@ drm_public drmBufInfoPtr drmGetBufInfo(int fd)
     }
 
     if (info.count) {
-        if (!(info.list = drmMalloc(info.count * sizeof(*info.list)))) {
+        if (!(info.list = (struct drm_buf_desc *)drmMalloc(info.count * sizeof(*info.list)))) {
             return NULL;
         }
 
@@ -1373,9 +1373,9 @@ drm_public drmBufInfoPtr drmGetBufInfo(int fd)
             return NULL;
         }
 
-        retval = drmMalloc(sizeof(*retval));
+        retval = (drmBufInfoPtr)drmMalloc(sizeof(*retval));
         retval->count = info.count;
-        if (!(retval->list = drmMalloc(info.count * sizeof(*retval->list)))) {
+        if (!(retval->list = (drmBufDescPtr)drmMalloc(info.count * sizeof(*retval->list)))) {
             drmFree(retval);
             drmFree(info.list);
             return NULL;
@@ -1410,7 +1410,7 @@ drm_public drmBufMapPtr drmMapBufs(int fd)
         return NULL;
     }
 
-    if (!(bufs.list = drmMalloc(bufs.count * sizeof(*bufs.list)))) {
+    if (!(bufs.list = (struct drm_buf_pub *)drmMalloc(bufs.count * sizeof(*bufs.list)))) {
         return NULL;
     }
 
@@ -1419,9 +1419,9 @@ drm_public drmBufMapPtr drmMapBufs(int fd)
         return NULL;
     }
 
-    retval = drmMalloc(sizeof(*retval));
+    retval = (drmBufMapPtr)drmMalloc(sizeof(*retval));
     retval->count = bufs.count;
-    retval->list = drmMalloc(bufs.count * sizeof(*retval->list));
+    retval->list = (drmBufPtr)drmMalloc(bufs.count * sizeof(*retval->list));
     for (i = 0; i < bufs.count; i++) {
         retval->list[i].idx = bufs.list[i].idx;
         retval->list[i].total = bufs.list[i].total;
@@ -1483,29 +1483,29 @@ drm_public int drmGetLock(int fd, drm_context_t context, drmLockFlags flags)
 
     memclear(lock);
     lock.context = context;
-    lock.flags = 0;
+    lock.flags = (enum drm_lock_flags)0;
     if (flags & DRM_LOCK_READY)  {
-        lock.flags |= _DRM_LOCK_READY;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_READY);
     }
 
     if (flags & DRM_LOCK_QUIESCENT)  {
-        lock.flags |= _DRM_LOCK_QUIESCENT;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_QUIESCENT);
     }
 
     if (flags & DRM_LOCK_FLUSH)  {
-        lock.flags |= _DRM_LOCK_FLUSH;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_FLUSH);
     }
 
     if (flags & DRM_LOCK_FLUSH_ALL)  {
-        lock.flags |= _DRM_LOCK_FLUSH_ALL;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_FLUSH_ALL);
     }
 
     if (flags & DRM_HALT_ALL_QUEUES)  {
-        lock.flags |= _DRM_HALT_ALL_QUEUES;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_HALT_ALL_QUEUES);
     }
 
     if (flags & DRM_HALT_CUR_QUEUES)  {
-        lock.flags |= _DRM_HALT_CUR_QUEUES;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_HALT_CUR_QUEUES);
     }
 
     while (drmIoctl(fd, DRM_IOCTL_LOCK, &lock));
@@ -1538,11 +1538,11 @@ drm_public drm_context_t *drmGetReservedContextList(int fd, int *count)
         return NULL;
     }
 
-    if (!(list = drmMalloc(res.count * sizeof(*list)))) {
+    if (!(list = (drm_ctx_t *)drmMalloc(res.count * sizeof(*list)))) {
         return NULL;
     }
 
-    if (!(retval = drmMalloc(res.count * sizeof(*retval)))) {
+    if (!(retval = (drm_context_t *)drmMalloc(res.count * sizeof(*retval)))) {
         goto err_free_list;
     }
 
@@ -1605,11 +1605,11 @@ drm_public int drmSetContextFlags(int fd, drm_context_t context, drm_context_tFl
     memclear(ctx);
     ctx.handle = context;
     if (flags & DRM_CONTEXT_PRESERVED) {
-        ctx.flags |= _DRM_CONTEXT_PRESERVED;
+        ctx.flags = (enum drm_ctx_flags)(ctx.flags | _DRM_CONTEXT_PRESERVED);
     }
 
     if (flags & DRM_CONTEXT_2DONLY) {
-        ctx.flags |= _DRM_CONTEXT_2DONLY;
+        ctx.flags = (enum drm_ctx_flags)(ctx.flags | _DRM_CONTEXT_2DONLY);
     }
 
     if (drmIoctl(fd, DRM_IOCTL_MOD_CTX, &ctx)) {
@@ -1629,13 +1629,13 @@ drm_public int drmGetContextFlags(int fd, drm_context_t context, drm_context_tFl
         return -errno;
     }
 
-    *flags = 0;
+    *flags = (drm_context_tFlags)0;
     if (ctx.flags & _DRM_CONTEXT_PRESERVED) {
-        *flags |= DRM_CONTEXT_PRESERVED;
+        *flags = (drm_context_tFlags)(*flags | DRM_CONTEXT_PRESERVED);
     }
 
     if (ctx.flags & _DRM_CONTEXT_2DONLY) {
-        *flags |= DRM_CONTEXT_2DONLY;
+        *flags = (drm_context_tFlags)(*flags | DRM_CONTEXT_2DONLY);
     }
 
     return 0;
@@ -1982,14 +1982,14 @@ drm_public int drmWaitVBlank(int fd, drmVBlankPtr vbl)
 
     do {
        ret = ioctl(fd, DRM_IOCTL_WAIT_VBLANK, vbl);
-       vbl->request.type &= ~DRM_VBLANK_RELATIVE;
+       vbl->request.type = (drmVBlankSeqType)(vbl->request.type & ~DRM_VBLANK_RELATIVE);
 
        if (ret && errno == EINTR) {
            clock_gettime(CLOCK_MONOTONIC, &cur);
            if (cur.tv_sec > timeout.tv_sec + 1 || (cur.tv_sec == timeout.tv_sec && cur.tv_nsec >= timeout.tv_nsec)) {
-                   errno = EBUSY;
-                   ret = -1;
-                   break;
+                errno = EBUSY;
+                ret = -1;
+                break;
            }
        }
     } while (ret && errno == EINTR);
@@ -2063,27 +2063,27 @@ drm_public int drmFinish(int fd, int context, drmLockFlags flags)
     memclear(lock);
     lock.context = context;
     if (flags & DRM_LOCK_READY)  {
-        lock.flags |= _DRM_LOCK_READY;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_READY);
     }
 
     if (flags & DRM_LOCK_QUIESCENT)  {
-        lock.flags |= _DRM_LOCK_QUIESCENT;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_QUIESCENT);
     }
 
     if (flags & DRM_LOCK_FLUSH)  {
-        lock.flags |= _DRM_LOCK_FLUSH;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_FLUSH);
     }
 
     if (flags & DRM_LOCK_FLUSH_ALL)  {
-        lock.flags |= _DRM_LOCK_FLUSH_ALL;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_LOCK_FLUSH_ALL);
     }
 
     if (flags & DRM_HALT_ALL_QUEUES)  {
-        lock.flags |= _DRM_HALT_ALL_QUEUES;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_HALT_ALL_QUEUES);
     }
 
     if (flags & DRM_HALT_CUR_QUEUES)  {
-        lock.flags |= _DRM_HALT_CUR_QUEUES;
+        lock.flags = (enum drm_lock_flags)(lock.flags | _DRM_HALT_CUR_QUEUES);
     }
 
     if (drmIoctl(fd, DRM_IOCTL_FINISH, &lock)) {
@@ -3032,7 +3032,7 @@ static drmDevicePtr drmDeviceAlloc(unsigned int type, const char *node, size_t b
 
     size = sizeof(*device) + extra + bus_size + device_size;
 
-    device = calloc(1, size);
+    device = (drmDevicePtr)calloc(1, size);
     if (!device) {
         return NULL;
     }
@@ -3287,7 +3287,7 @@ static int drmParseOFDeviceInfo(int maj, int min, char ***compatible)
         count = 1;
     }
 
-    *compatible = calloc(count + 1, sizeof(char *));
+    *compatible = (char **)calloc(count + 1, sizeof(char *));
     if (!*compatible) {
         return -ENOMEM;
     }
@@ -3960,7 +3960,7 @@ drm_public char *drmGetFormatName(uint32_t format)
     }
 
     str_size = 5;
-    str = malloc(str_size);
+    str = (char *)malloc(str_size);
     if (!str) {
         return NULL;
     }
