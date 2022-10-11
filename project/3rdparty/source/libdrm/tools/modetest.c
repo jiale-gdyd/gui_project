@@ -2146,13 +2146,13 @@ int libdrm_modetest_main(int argc, char **argv)
         return -1;
     }
 
-    dump_only = !count && !plane_count && !prop_count;
+    dump_only = 1;//!count && !plane_count && !prop_count;
 
-    if (dump_only && !device) {
-        dev.fd = open("/dev/dri/card0", O_RDWR);
-    } else {
+    // if (dump_only && !device) {
+    //     dev.fd = open("/dev/dri/card0", O_RDWR);
+    // } else {
         dev.fd = util_open(device, module);
-    }
+    //}
 
     if (dev.fd < 0) {
         return -1;
