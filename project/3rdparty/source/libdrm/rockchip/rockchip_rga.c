@@ -454,7 +454,7 @@ static int rga_add_cmd(struct rga_context *ctx, unsigned long cmd, unsigned long
 
     if (ctx->log & 1) {
         get_string_of_cmd(cmd, buf);
-        fprintf(stderr, "%s:0x%x:0x%x\n", buf, cmd, value);
+        fprintf(stderr, "%s:0x%lx:0x%lx\n", buf, cmd, value);
     }
 
     switch (cmd & ~(RGA_IMGBUF_USERPTR)) {
