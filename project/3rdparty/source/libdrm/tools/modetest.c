@@ -93,7 +93,7 @@ struct device {
 static int dump_only;
 static int encoders = 0, connectors = 0, crtcs = 0, planes = 0, fbs = 0;
 
-#define need_resource(type)         (!dump_only || type##s)
+#define need_resource(type)         /*(!dump_only || type##s)*/
 
 static inline int64_t U642I64(uint64_t val)
 {
