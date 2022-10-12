@@ -173,7 +173,7 @@ SECTIONS
     
     _end = .;
 
-    .pagetable 0x80200000 (NOLOAD):
+    .pagetable 0x80100000 (NOLOAD):
     {
         _page_table_top = .;
         __pagetable_start = .;
