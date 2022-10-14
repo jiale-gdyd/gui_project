@@ -412,7 +412,7 @@ int gx_drm_graphics_driver_exit(int channel)
     g_driverInied = false;
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
         if (g_canvasBuffer[i] != NULL) {
-            drm_mpi_mb_convert_to_audio_buffer(g_canvasBuffer[i]);
+            drm_mpi_mb_release_buffer(g_canvasBuffer[i]);
         }
     }
 

@@ -2,8 +2,10 @@
 #define LIBDRM_DISPLAY_REFLECTOR_HPP
 
 #include <map>
+#include <list>
 #include <memory>
 #include <string>
+#include <exception>
 
 #include "utils.hpp"
 
@@ -17,31 +19,37 @@
     public:                                                                                                         \
         static const char *FindFirstMatchIdentifier(const char *rules);                                             \
         static bool IsMatch(const char *identifier, const char *rules);                                             \
+                                                                                                                    \
         template <class T>                                                                                          \
         static std::shared_ptr<T> Create(const char *request, const char *param = nullptr) {                        \
-            if (!IsDerived<T, PRODUCT>::Result) {                                                                   \
-                printf("The template class type is not derived of required type\n");                                \
-                return nullptr;                                                                                     \
-            }                                                                                                       \
-                                                                                                                    \
-            const char *identifier = PRODUCT##Factory::Parse(request);                                              \
-            if (!identifier) {                                                                                      \
-                return nullptr;                                                                                     \
-            }                                                                                                       \
-                                                                                                                    \
-            auto it = factories.find(identifier);                                                                   \
-            if (it != factories.end()) {                                                                            \
-                const PRODUCT##Factory *f = it->second;                                                             \
-                if (!T::Compatible(f)) {                                                                            \
-                    printf("%s is not compatible with the template\n", request);                                    \
+            try {                                                                                                   \
+                if (!IsDerived<T, PRODUCT>::Result) {                                                               \
+                    printf("The template class type is not derived of required type\n");                            \
                     return nullptr;                                                                                 \
                 }                                                                                                   \
                                                                                                                     \
-                return std::static_pointer_cast<T>(const_cast<PRODUCT##Factory *>(f)->NewProduct(param));           \
-            }                                                                                                       \
+                const char *identifier = PRODUCT##Factory::Parse(request);                                          \
+                if (!identifier) {                                                                                  \
+                    return nullptr;                                                                                 \
+                }                                                                                                   \
                                                                                                                     \
-            printf("%s is not Integrated\n", request);                                                              \
-            return nullptr;                                                                                         \
+                auto it = factories.find(identifier);                                                               \
+                if (it != factories.end()) {                                                                        \
+                    const PRODUCT##Factory *f = it->second;                                                         \
+                    if (!T::Compatible(f)) {                                                                        \
+                        printf("%s is not compatible with the template\n", request);                                \
+                        return nullptr;                                                                             \
+                    }                                                                                               \
+                                                                                                                    \
+                    return std::static_pointer_cast<T>(const_cast<PRODUCT##Factory *>(f)->NewProduct(param));       \
+                }                                                                                                   \
+                                                                                                                    \
+                printf("%s is not Integrated\n", request);                                                          \
+                return nullptr;                                                                                     \
+            } catch (const std::exception &e) {                                                                     \
+                printf("[1] catch exception:[%s]\n", e.what());                                                     \
+                return nullptr;                                                                                     \
+            }                                                                                                       \
         }                                                                                                           \
                                                                                                                     \
         static void RegisterFactory(std::string identifier, const PRODUCT##Factory *factory);                       \
@@ -59,33 +67,46 @@
 #define DEFINE_REFLECTOR(PRODUCT)                                                                                   \
     std::map<std::string, const PRODUCT##Factory *> PRODUCT##Reflector::factories;                                  \
     const char *PRODUCT##Reflector::FindFirstMatchIdentifier(const char *rules) {                                   \
-        for (auto &it : factories) {                                                                                \
-            const PRODUCT##Factory *f = it.second;                                                                  \
-            if (f->AcceptRules(rules)) {                                                                            \
-                return it.first.c_str();                                                                            \
+        try {                                                                                                       \
+            for (auto &it : factories) {                                                                            \
+                const PRODUCT##Factory *f = it.second;                                                              \
+                if (f->AcceptRules(rules)) {                                                                        \
+                    return it.first.c_str();                                                                        \
+                }                                                                                                   \
             }                                                                                                       \
+        } catch (const std::exception &e) {                                                                         \
+            printf("[2] catch exception:[%s]\n", e.what());                                                         \
         }                                                                                                           \
                                                                                                                     \
         return nullptr;                                                                                             \
     }                                                                                                               \
                                                                                                                     \
     bool PRODUCT##Reflector::IsMatch(const char *identifier, const char *rules) {                                   \
-        auto it = factories.find(identifier);                                                                       \
-        if (it == factories.end()) {                                                                                \
-            printf("%s is not Integrated\n", identifier);                                                           \
+        try {                                                                                                       \
+            auto it = factories.find(identifier);                                                                   \
+            if (it == factories.end()) {                                                                            \
+                printf("%s is not Integrated\n", identifier);                                                       \
+                return false;                                                                                       \
+            }                                                                                                       \
+                                                                                                                    \
+            return it->second->AcceptRules(rules);                                                                  \
+        } catch (const std::exception &e) {                                                                         \
+            printf("[3] catch exception:[%s]\n", e.what());                                                         \
             return false;                                                                                           \
         }                                                                                                           \
-                                                                                                                    \
-        return it->second->AcceptRules(rules);                                                                      \
     }                                                                                                               \
                                                                                                                     \
     void PRODUCT##Reflector::RegisterFactory(std::string identifier, const PRODUCT##Factory *factory) {             \
-        auto it = factories.find(identifier);                                                                       \
-        if (it == factories.end()) {                                                                                \
-            factories[identifier] = factory;                                                                        \
-            printf("register factory : %s\n", identifier.c_str());                                                  \
-        } else {                                                                                                    \
-            printf("repeated identifier : %s\n", identifier.c_str());                                               \
+        try {                                                                                                       \
+            auto it = factories.find(identifier);                                                                   \
+            if (it == factories.end()) {                                                                            \
+                factories[identifier] = factory;                                                                    \
+                printf("register factory:[%s]\n", identifier.c_str());                                              \
+            } else {                                                                                                \
+                printf("repeated identifier:[%s]\n", identifier.c_str());                                           \
+            }                                                                                                       \
+        } catch (const std::exception &e) {                                                                         \
+            printf("[4] catch exception:[%s]\n", e.what());                                                         \
         }                                                                                                           \
     }                                                                                                               \
                                                                                                                     \
@@ -106,15 +127,15 @@
         virtual std::shared_ptr<PRODUCT> NewProduct(const char *param) = 0;                                         \
                                                                                                                     \
         bool AcceptRules(const char *rules) const {                                                                 \
-            std::map<std::string, std::string> map;                                                                 \
-            if (!parse_media_param_map(rules, map)) {                                                               \
+            std::map<std::string, std::string> maps;                                                                \
+            if (!parse_media_param_map(rules, maps)) {                                                              \
                 return false;                                                                                       \
             }                                                                                                       \
                                                                                                                     \
-            return AcceptRules(map);                                                                                \
+            return AcceptRules(maps);                                                                               \
         }                                                                                                           \
                                                                                                                     \
-        virtual bool AcceptRules(const std::map<std::string, std::string> &map) const = 0;                          \
+        virtual bool AcceptRules(const std::map<std::string, std::string> &maps) const = 0;                         \
                                                                                                                     \
     protected:                                                                                                      \
         PRODUCT##Factory() = default;                                                                               \
@@ -191,18 +212,25 @@
 #define DEFINE_PART_FINAL_EXPOSE_PRODUCT(FINAL_EXPOSE_PRODUCT, PRODUCT)                                             \
     std::list<const PRODUCT##Factory *> FINAL_EXPOSE_PRODUCT::compatiable_factories;                                \
     bool FINAL_EXPOSE_PRODUCT::Compatible(const PRODUCT##Factory *factory) {                                        \
-        auto it = std::find(compatiable_factories.begin(), compatiable_factories.end(), factory);                   \
-        if (it != compatiable_factories.end()) {                                                                    \
-            return true;                                                                                            \
+        try {                                                                                                       \
+            auto it = std::find(compatiable_factories.begin(), compatiable_factories.end(), factory);               \
+            if (it != compatiable_factories.end()) {                                                                \
+                return true;                                                                                        \
+            }                                                                                                       \
+        } catch (const std::exception &e) {                                                                         \
+            printf("[5] catch exception:[%s]\n", e.what());                                                         \
         }                                                                                                           \
-                                                                                                                    \
         return false;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
     void FINAL_EXPOSE_PRODUCT::RegisterFactory(const PRODUCT##Factory *factory) {                                   \
-        auto it = std::find(compatiable_factories.begin(), compatiable_factories.end(), factory);                   \
-        if (it == compatiable_factories.end()) {                                                                    \
-            compatiable_factories.push_back(factory);                                                               \
+        try {                                                                                                       \
+            auto it = std::find(compatiable_factories.begin(), compatiable_factories.end(), factory);               \
+            if (it == compatiable_factories.end()) {                                                                \
+                compatiable_factories.push_back(factory);                                                           \
+            }                                                                                                       \
+        } catch (const std::exception &e) {                                                                         \
+            printf("[6] catch exception:[%s]\n", e.what());                                                         \
         }                                                                                                           \
     }
 

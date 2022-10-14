@@ -506,6 +506,6 @@ const char *FACTORY(DRMOutPutStream)::ExpectedInputDataType()
 
 const char *FACTORY(DRMOutPutStream)::OutPutDataType()
 {
-    return nullptr;
+    return DRM_TYPE_NOTHING;
 }
 }

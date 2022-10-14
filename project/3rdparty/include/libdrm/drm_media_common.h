@@ -10,6 +10,7 @@ extern "C" {
 
 typedef enum MOD_ID_E {
     MOD_ID_UNKNOW = 0,
+    MOD_ID_SYS,
     MOD_ID_VO,
     MOD_ID_BUTT
 } mod_id_e;
@@ -79,6 +80,23 @@ typedef struct rkRECT_S {
     uint32_t u32Width;
     uint32_t u32Height;
 } drm_rect_t;
+
+typedef struct DRM_CHN_S {
+    mod_id_e enModId;
+    int      s32DevId;
+    int      s32ChnId;
+} drm_chn_t;
+
+typedef struct DRM_FPS_ATTR_S {
+    int s32FpsInNum;
+    int s32FpsInDen;
+    int s32FpsOutNum;
+    int s32FpsOutDen;
+} drm_fps_attr_t;
+
+typedef struct DRM_RECV_PIC_PARAM_S {
+    int s32RecvPicNum;
+} drm_recv_pic_param_t;
 
 #ifdef __cplusplus
 }

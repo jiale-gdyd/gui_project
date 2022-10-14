@@ -4,6 +4,17 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "../drm_media_common.h"
+
+#define DRM_LOG_LEVEL_ERR                   0
+#define DRM_LOG_LEVEL_WARN                  1
+#define DRM_LOG_LEVEL_INFO                  2
+#define DRM_LOG_LEVEL_DEBUG                 3
+
+#ifndef MOD_TAG
+#define MOD_TAG                             MOD_ID_SYS
+#endif
+
 #define _DRM_UNUSED                         __attribute__((unused))
 #define DRM_UNUSED(x)                       (void)x
 
@@ -26,6 +37,52 @@
 #define DRM_VALUE_MAX(A, B)                 ((A) > (B) ? (A) : (B))
 #define DRM_VALUE_MIN(A, B)                 ((A) < (B) ? (A) : (B))
 #define DRM_VALUE_SCOPE_CHECK(X, MIN, MAX)  assert((X >= MIN) && (X <= MAX))
+
+extern int drm_media_log_method;
+extern short g_level_list[MOD_ID_BUTT];
+
+#define DRM_LOG_LEVEL_JUDGE(FILTER_LEVEL)                                                                               \
+    {                                                                                                                   \
+        if (g_level_list[MOD_TAG] < FILTER_LEVEL) {                                                                     \
+            break;                                                                                                      \
+        }                                                                                                               \
+    }
+
+#define DRM_MEDIA_LOGE(format, ...)                                                                                     \
+    do {                                                                                                                \
+        DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
+        fprintf(stderr, "\033[1;31m[DRMMEDIA][E]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+    } while (0);
+
+#define DRM_MEDIA_LOGW(format, ...)                                                                                     \
+    do {                                                                                                                \
+        DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
+        fprintf(stderr, "\033[1;33m[DRMMEDIA][W]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+    } while (0);
+
+#define DRM_MEDIA_LOGI(format, ...)                                                                                     \
+    do {                                                                                                                \
+        DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
+        fprintf(stderr, "\033[1;32m[DRMMEDIA][I]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+    } while (0);
+
+#define DRM_MEDIA_LOGD(format, ...)                                                                                     \
+    do {                                                                                                                \
+        DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
+        fprintf(stderr, "\033[1;34m[DRMMEDIA][D]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+    } while (0);
+
+void drm_log_init();
+void drm_log_exit();
+
+#define DRM_LOG_MEMORY()                                                                                                \
+    DRM_MEDIA_LOGI("no memory %s:%04d", __FUNCTION__, __LINE__)
+
+#define DRM_FILE_FUNC_LINE()                                                                                            \
+    DRM_MEDIA_LOGI("%s -> %s:%04d", __FILE__, __FUNCTION__, __LINE__)
+
+#define DRM_TODO()                                                                                                      \
+    DRM_MEDIA_LOGI("Todo: %s -> %s:%04d", __FILE__, __FUNCTION__, __LINE__)
 
 template <typename T, typename TBase>
 class IsDerived {
@@ -57,7 +114,7 @@ namespace libdrm {
 #define CHECK_EMPTY_SETERRNO_RETURN(v_type, v, map, k, seterrno, ret)                   \
     v_type v = map[k];                                                                  \
     if (v.empty()) {                                                                    \
-        printf("%s: miss %s\n", __func__, k);                                           \
+        DRM_MEDIA_LOGE("%s: miss %s", __func__, k);                                     \
         seterrno;                                                                       \
         return ret;                                                                     \
     }
@@ -138,6 +195,8 @@ inline int xioctl(Ioctl_f f, int fd, int request, void *argp)
     return r;
 }
 
+bool DumpToFile(std::string path, const char *ptr, size_t len);
+
 class AutoDuration {
 public:
     AutoDuration() {
@@ -166,9 +225,17 @@ private:
 
 class AutoPrintLine {
 public:
-    AutoPrintLine(const char *f _DRM_UNUSED) {
-
+public:
+    AutoPrintLine(const char *f) : func(f) {
+        DRM_MEDIA_LOGD("Enter %s", f);
     }
+
+    ~AutoPrintLine() {
+        DRM_MEDIA_LOGD("Exit %s", func);
+    }
+
+private:
+    const char *func;
 };
 }
 

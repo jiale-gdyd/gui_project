@@ -17,6 +17,7 @@
 
 namespace libdrm {
 DECLARE_FACTORY(Flow)
+
 DECLARE_REFLECTOR(Flow)
 
 #define DEFINE_FLOW_FACTORY(REAL_PRODUCT, FINAL_EXPOSE_PRODUCT)                                         \
@@ -51,15 +52,15 @@ using FunctionProcess = std::add_pointer<bool(Flow *f, MediaBufferVector &input_
 template <int in_index, int out_index>
 bool void_transaction(Flow *f, MediaBufferVector &input_vector);
 
-using LinkVideoHandler = std::add_pointer<void(unsigned char *buffer, unsigned int buffer_size, int64_t present_time, int nat_type)>::type;
-using LinkAudioHandler = std::add_pointer<void(unsigned char *buffer, unsigned int buffer_size, int64_t present_time)>::type;
-using LinkCaptureHandler = std::add_pointer<void(unsigned char *buffer, unsigned int buffer_size, int type, const char *id)>::type;
-using PlayVideoHandler = std::add_pointer<void(Flow *f)>::type;
-using PlayAudioHandler = std::add_pointer<void(Flow *f)>::type;
+using LinkVideoHandler = std::add_pointer<void (unsigned char *buffer, unsigned int buffer_size, int64_t present_time, int nat_type)>::type;
+using LinkAudioHandler = std::add_pointer<void (unsigned char *buffer, unsigned int buffer_size, int64_t present_time)>::type;
+using LinkCaptureHandler = std::add_pointer<void (unsigned char *buffer, unsigned int buffer_size, int type, const char *id)>::type;
+using PlayVideoHandler = std::add_pointer<void (Flow *f)>::type;
+using PlayAudioHandler = std::add_pointer<void (Flow *f)>::type;
 using CallBackHandler = std::add_pointer<void>::type;
-using UserCallBack = std::add_pointer<void(void *handler, int type, void *ptr, int size)>::type;
-using OutputCallBack = std::add_pointer<void(void *handler, std::shared_ptr<MediaBuffer> mb)>::type;
-using EventCallBack = std::add_pointer<void(void *handler, void *data)>::type;
+using UserCallBack = std::add_pointer<void (void *handler, int type, void *ptr, int size)>::type;
+using OutputCallBack = std::add_pointer<void (void *handler, std::shared_ptr<MediaBuffer> mb)>::type;
+using EventCallBack = std::add_pointer<void (void *handler, void *data)>::type;
 
 class SlotMap {
 public:

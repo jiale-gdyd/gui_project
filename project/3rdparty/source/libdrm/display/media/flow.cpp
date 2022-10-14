@@ -402,7 +402,9 @@ void FlowCoroutine::ClearCachedBuffers()
 }
 
 DEFINE_REFLECTOR(Flow)
+
 DEFINE_FACTORY_COMMON_PARSE(Flow)
+
 DEFINE_PART_FINAL_EXPOSE_PRODUCT(Flow, Flow)
 
 const FunctionProcess Flow::void_transaction00 = void_transaction<0, 0>;

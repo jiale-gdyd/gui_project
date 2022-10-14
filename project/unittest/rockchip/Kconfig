@@ -1,0 +1,5 @@
+#
+# rockchip unittest Kconfig
+#
+
+source "project/unittest/rockchip/rv11xx/Kconfig"

@@ -3,6 +3,7 @@
 source ${TOPSHELL}/shell/buildFunc.sh
 source ${TOPSHELL}/shell/buildConf.sh
 
+RV11XX_UNITTEST_CONFIG=rv1126_unittest_defconfig
 RV11XX_LVGL_GUI_CONFIG=rv1126_lvgl_gui_defconfig
 RV11XX_AZURE_GUI_CONFIG=rv1126_azure_gui_defconfig
 
@@ -16,6 +17,7 @@ function rv1126_clean()
 {
     rm -rf lvgl_gui
     rm -rf azure_gui
+    rm -rf rv11xx_unittest
     remove_gitcommit
 }
 
@@ -84,6 +86,46 @@ function rv1126_azure_gui()
     generate_gitcommit
 
     make ${RV11XX_AZURE_GUI_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
+    if [ $? -ne 0 ]; then
+        error_exit "Unfortunately, build ${PROJECT_NAME} failed"
+    fi
+
+    print_info "build ${PROJECT_NAME} project done."
+    print_info "Congratulations, the compilation is successful, Modify by [${AUTHOR_NAME}]"
+
+    print_info "Finished '${SHELL_NAME}'"
+
+    end=`get_timestamp`
+    second=`expr ${end} - ${begin}`
+    min=`expr ${second} / 60`
+    echo "It takes "${min}" minutes, and "${second} "seconds"
+}
+
+function rv1126_unittest()
+{
+    begin=`get_timestamp`
+    type=$(uname)
+    distro=`get_linux_distro`
+    if [ ${distro} == "Ubuntu" ]; then
+        version=$(get_ubuntu_version)
+    elif [ ${distro} == "LinuxMint" ]; then
+        version=$(get_ubuntu_version)
+    elif [ ${distro} == "CentOS" ]; then
+        version=$(get_centos_version)
+    fi
+    echo "Platform type: "${type}" "${distro}" "${version}
+
+    print_info "Starting '${SHELL_NAME}'"
+
+    print_info "build ${PROJECT_NAME} project start"
+
+    export SOC=rv11xx
+    export Platform=rockchip
+    export APP_NAME=rv11xx_unittest
+    export USE_STDCPP_VERSION=-std=c++11
+    generate_gitcommit
+
+    make ${RV11XX_UNITTEST_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
     if [ $? -ne 0 ]; then
         error_exit "Unfortunately, build ${PROJECT_NAME} failed"
     fi

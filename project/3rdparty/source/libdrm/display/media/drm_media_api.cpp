@@ -15,9 +15,11 @@
 #include <libdrm/display/stream.hpp>
 #include <libdrm/drm_media_buffer.h>
 #include <libdrm/display/control.hpp>
+#include <libdrm/display/encoder.hpp>
 #include <libdrm/display/message.hpp>
 #include <libdrm/display/key_string.hpp>
 #include <libdrm/display/media_type.hpp>
+#include <libdrm/display/media_config.hpp>
 
 #include "media_utils.hpp"
 #include "drm_media_buffer_impl.hpp"
@@ -81,103 +83,103 @@ drm_media_channel_t g_vo_chns[DRM_VO_CHANNEL_BUTT];
 
 static unsigned char g_sys_init = 0;
 
-static inline void media_push_pip_fd(int fd)
-{
-    int i = 0;
-    ssize_t count = write(fd, &i, sizeof(i));
-    if (count < 0) {
-        printf("%s: write(%d) failed: %s\n", __func__, fd, strerror(errno));
-    }
-}
+// static inline void media_push_pip_fd(int fd)
+// {
+//     int i = 0;
+//     ssize_t count = write(fd, &i, sizeof(i));
+//     if (count < 0) {
+//         printf("%s: write(%d) failed: %s\n", __func__, fd, strerror(errno));
+//     }
+// }
 
-static inline void media_pop_pip_fd(int fd)
-{
-    int i = 0;
-    ssize_t read_size = (ssize_t)sizeof(i);
-    ssize_t ret = read(fd, &i, sizeof(i));
-    if (ret != read_size) {
-        printf("%s: Read(%d) failed: %s\n", __func__, fd, strerror(errno));
-    }
-}
+// static inline void media_pop_pip_fd(int fd)
+// {
+//     int i = 0;
+//     ssize_t read_size = (ssize_t)sizeof(i);
+//     ssize_t ret = read(fd, &i, sizeof(i));
+//     if (ret != read_size) {
+//         printf("%s: Read(%d) failed: %s\n", __func__, fd, strerror(errno));
+//     }
+// }
 
-static int media_channel_push_buffer(drm_media_channel_t *ptrChn, media_buffer_t buffer)
-{
-    if (!ptrChn || !buffer) {
-        return -1;
-    }
+// static int media_channel_push_buffer(drm_media_channel_t *ptrChn, media_buffer_t buffer)
+// {
+//     if (!ptrChn || !buffer) {
+//         return -1;
+//     }
 
-    ptrChn->buffer_list_mtx.lock();
-    if (!ptrChn->buffer_list_quit) {
-        ptrChn->buffer_list.push_back(buffer);
-        if (ptrChn->wake_fd[1] > 0)
-        media_push_pip_fd(ptrChn->wake_fd[1]);
-    } else {
-        drm_mpi_mb_release_buffer(buffer);
-    }
+//     ptrChn->buffer_list_mtx.lock();
+//     if (!ptrChn->buffer_list_quit) {
+//         ptrChn->buffer_list.push_back(buffer);
+//         if (ptrChn->wake_fd[1] > 0)
+//         media_push_pip_fd(ptrChn->wake_fd[1]);
+//     } else {
+//         drm_mpi_mb_release_buffer(buffer);
+//     }
 
-    ptrChn->buffer_list_cond.notify_all();
-    ptrChn->buffer_list_mtx.unlock();
-    pthread_yield();
+//     ptrChn->buffer_list_cond.notify_all();
+//     ptrChn->buffer_list_mtx.unlock();
+//     pthread_yield();
 
-    return 0;
-}
+//     return 0;
+// }
 
-static media_buffer_t media_channel_pop_buffer(drm_media_channel_t *ptrChn, int s32MilliSec)
-{
-    if (!ptrChn) {
-        return NULL;
-    }
+// static media_buffer_t media_channel_pop_buffer(drm_media_channel_t *ptrChn, int s32MilliSec)
+// {
+//     if (!ptrChn) {
+//         return NULL;
+//     }
 
-    std::unique_lock<std::mutex> lck_pop(ptrChn->buffer_list_pop_mtx);
-    std::unique_lock<std::mutex> lck(ptrChn->buffer_list_mtx);
-    if (ptrChn->buffer_list.empty()) {
-        if (s32MilliSec < 0 && !ptrChn->buffer_list_quit) {
-            ptrChn->buffer_list_cond.wait(lck);
-        } else if (s32MilliSec > 0) {
-            if (ptrChn->buffer_list_cond.wait_for(lck, std::chrono::milliseconds(s32MilliSec)) == std::cv_status::timeout) {
-                printf("INFO: %s: Chn[%d] get mediabuffer timeout!\n", __func__, ptrChn->chn_id);
-                return NULL;
-            }
-        } else {
-            return NULL;
-        }
-    }
+//     std::unique_lock<std::mutex> lck_pop(ptrChn->buffer_list_pop_mtx);
+//     std::unique_lock<std::mutex> lck(ptrChn->buffer_list_mtx);
+//     if (ptrChn->buffer_list.empty()) {
+//         if (s32MilliSec < 0 && !ptrChn->buffer_list_quit) {
+//             ptrChn->buffer_list_cond.wait(lck);
+//         } else if (s32MilliSec > 0) {
+//             if (ptrChn->buffer_list_cond.wait_for(lck, std::chrono::milliseconds(s32MilliSec)) == std::cv_status::timeout) {
+//                 printf("INFO: %s: Chn[%d] get mediabuffer timeout!\n", __func__, ptrChn->chn_id);
+//                 return NULL;
+//             }
+//         } else {
+//             return NULL;
+//         }
+//     }
 
-    media_buffer_t mb = NULL;
-    if (!ptrChn->buffer_list.empty()) {
-        if (ptrChn->wake_fd[0] > 0) {
-            media_pop_pip_fd(ptrChn->wake_fd[0]);
-        }
+//     media_buffer_t mb = NULL;
+//     if (!ptrChn->buffer_list.empty()) {
+//         if (ptrChn->wake_fd[0] > 0) {
+//             media_pop_pip_fd(ptrChn->wake_fd[0]);
+//         }
 
-        mb = ptrChn->buffer_list.front();
-        ptrChn->buffer_list.pop_front();
-    }
+//         mb = ptrChn->buffer_list.front();
+//         ptrChn->buffer_list.pop_front();
+//     }
 
-    return mb;
-}
+//     return mb;
+// }
 
-static void media_channel_init_buffer(drm_media_channel_t *ptrChn)
-{
-    if (!ptrChn) {
-        return;
-    }
+// static void media_channel_init_buffer(drm_media_channel_t *ptrChn)
+// {
+//     if (!ptrChn) {
+//         return;
+//     }
 
-    printf("#%p Chn[%d] clear media buffer start...\n", ptrChn, ptrChn->chn_id);
+//     printf("#%p Chn[%d] clear media buffer start...\n", ptrChn, ptrChn->chn_id);
 
-    media_buffer_t mb = NULL;
-    ptrChn->buffer_list_mtx.lock();
-    while (!ptrChn->buffer_list.empty()) {
-        mb = ptrChn->buffer_list.front();
-        ptrChn->buffer_list.pop_front();
-        drm_mpi_mb_release_buffer(mb);
-    }
+//     media_buffer_t mb = NULL;
+//     ptrChn->buffer_list_mtx.lock();
+//     while (!ptrChn->buffer_list.empty()) {
+//         mb = ptrChn->buffer_list.front();
+//         ptrChn->buffer_list.pop_front();
+//         drm_mpi_mb_release_buffer(mb);
+//     }
 
-    ptrChn->buffer_list_quit = true;
-    ptrChn->buffer_list_cond.notify_all();
-    ptrChn->buffer_list_mtx.unlock();
+//     ptrChn->buffer_list_quit = true;
+//     ptrChn->buffer_list_cond.notify_all();
+//     ptrChn->buffer_list_mtx.unlock();
 
-    printf("#%p Chn[%d] clear media buffer end...\n", ptrChn, ptrChn->chn_id);
-}
+//     printf("#%p Chn[%d] clear media buffer end...\n", ptrChn, ptrChn->chn_id);
+// }
 
 static void reset_channel_table(drm_media_channel_t *tbl, int cnt, mod_id_e mid)
 {
@@ -195,7 +197,7 @@ static void reset_channel_table(drm_media_channel_t *tbl, int cnt, mod_id_e mid)
         tbl[i].bind_ref_nxt = 0;
         tbl[i].bColorTblInit = false;
         tbl[i].bColorDichotomyEnable = false;
-        memset(tbl[i].u32ArgbColorTbl, 0, 256);
+        //memset(tbl[i].u32ArgbColorTbl, 0, 256);
         tbl[i].buffer_depth = 2;
     }
 }
@@ -203,11 +205,102 @@ static void reset_channel_table(drm_media_channel_t *tbl, int cnt, mod_id_e mid)
 int drm_mpi_system_init(void)
 {
     if (g_sys_init) {
+        printf("drm_mpi_system_init has been called\n");
         return -1;
+    }
+
+    drm_log_init();
+
+    for (int i = 0; i < MOD_ID_BUTT; i++) {
+        g_level_list[i] = 3;
     }
 
     reset_channel_table(g_vo_chns, DRM_VO_CHANNEL_BUTT, MOD_ID_VO);
     g_sys_init = 1;
+
+    return 0;
+}
+
+int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t *pstFpsAttr)
+{
+    std::mutex *target_mutex = NULL;
+    drm_media_channel_t *target_chn = NULL;
+
+    if (!pstFpsAttr) {
+        return -1;
+    }
+
+    int s32FpsInRatio = pstFpsAttr->s32FpsInNum * pstFpsAttr->s32FpsOutDen;
+    int s32FpsOutRatio = pstFpsAttr->s32FpsOutNum * pstFpsAttr->s32FpsInDen;
+
+    if (s32FpsInRatio < s32FpsOutRatio) {
+        return -2;
+    }
+
+    switch (enModID) {
+        case MOD_ID_VO:
+            if ((s32ChnId < 0) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
+                return -3;
+            }
+            target_chn = &g_vo_chns[s32ChnId];
+            target_mutex = &g_vo_mtx;
+            break;
+
+        default:
+            return -4;
+    }
+
+    target_mutex->lock();
+    if (target_chn->status < CHN_STATUS_OPEN) {
+        DRM_MEDIA_LOGE("chn:[%d] in status:[%d], this operation is not allowed", s32ChnId, target_chn->status);
+        target_mutex->unlock();
+        return -5;
+    }
+
+    int ret = 0;
+    ret = target_chn->media_flow->SetInputFpsControl(s32FpsInRatio, s32FpsOutRatio);
+    target_mutex->unlock();
+    if (ret) {
+        return -6;
+    }
+
+    return 0;
+}
+
+int drm_mpi_system_start_recv_frame(mod_id_e enModID, int s32ChnId, const drm_recv_pic_param_t *pstRecvParam)
+{
+    std::mutex *target_mutex = NULL;
+    drm_media_channel_t *target_chn = NULL;
+
+    if (!pstRecvParam) {
+        return -1;
+    }
+
+    switch (enModID) {
+        case MOD_ID_VO:
+            if ((s32ChnId < 0) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
+                return -2;
+            }
+            target_chn = &g_vo_chns[s32ChnId];
+            target_mutex = &g_vo_mtx;
+            break;
+
+        default:
+            return -3;
+    }
+
+    target_mutex->lock();
+    if (target_chn->status < CHN_STATUS_OPEN) {
+        DRM_MEDIA_LOGE("chn:[%d] in status:[%d], this operation is not allowed", s32ChnId, target_chn->status);
+        target_mutex->unlock();
+        return -4;
+    }
+
+    int ret = target_chn->media_flow->SetRunTimes(pstRecvParam->s32RecvPicNum);
+    target_mutex->unlock();
+    if (ret != pstRecvParam->s32RecvPicNum) {
+        return -5;
+    }
 
     return 0;
 }
@@ -244,16 +337,80 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
     return 0;
 }
 
+int drm_mpi_system_register_output_callback(const drm_chn_t *pstChn, OutCallbackFunction callback)
+{
+    std::shared_ptr<libdrm::Flow> flow;
+    drm_media_channel_t *target_chn = NULL;
+
+    switch (pstChn->enModId) {
+        case MOD_ID_VO:
+            target_chn = &g_vo_chns[pstChn->s32ChnId];
+            break;
+
+        default:
+            return -1;
+    }
+
+    if (target_chn->status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (!target_chn->media_flow_list.empty()) {
+        flow = target_chn->media_flow_list.back();
+    } else if (target_chn->media_flow) {
+        flow = target_chn->media_flow;
+    }
+
+    if (!flow) {
+        DRM_MEDIA_LOGE("<ModeID:%d ChnID:%d> fatal error! Status does not match the resource", pstChn->enModId, pstChn->s32ChnId);
+        return -3;
+    }
+
+    target_chn->out_cb = callback;
+    return 0;
+}
+
+int drm_mpi_system_register_output_callbackEx(const drm_chn_t *pstChn, OutCallbackFunctionEx callback, void *handle)
+{
+    std::shared_ptr<libdrm::Flow> flow;
+    drm_media_channel_t *target_chn = NULL;
+
+    switch (pstChn->enModId) {
+        case MOD_ID_VO:
+            target_chn = &g_vo_chns[pstChn->s32ChnId];
+            break;
+
+        default:
+            return -1;
+    }
+
+    if (target_chn->status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (!target_chn->media_flow_list.empty()) {
+        flow = target_chn->media_flow_list.back();
+    } else if (target_chn->media_flow) {
+        flow = target_chn->media_flow;
+    }
+
+    if (!flow) {
+        DRM_MEDIA_LOGE("<ModeID:%d ChnID:%d> fatal error! Status does not match the resource", pstChn->enModId, pstChn->s32ChnId);
+        return -3;
+    }
+
+    target_chn->out_ex_cb = callback;
+    target_chn->out_handle = handle;
+
+    return 0;
+}
+
 int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
 {
-    int ret = 0;
     const char *pcPlaneType = NULL;
 
-    if ((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT))
+    if (((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT)) || !pstAttr) {
         return -1;
-
-    if (!pstAttr) {
-        return -2;
     }
 
     switch (pstAttr->emPlaneType) {
@@ -274,13 +431,13 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
     }
 
     if (!pcPlaneType) {
-        return -3;
+        return -2;
     }
 
     g_vo_mtx.lock();
     if (g_vo_chns[channel].status != CHN_STATUS_CLOSED) {
         g_vo_mtx.unlock();
-        return -4;
+        return -3;
     }
 
     printf("Enable vo channel:[%d] starting......\n", channel);
@@ -291,7 +448,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
 
     std::string stream_param = "";
     if (!pstAttr->pcDevNode) {
-        printf("vo: use default DevNode:/dev/dri/card0\n");
+        printf("use default DevNode:/dev/dri/card0\n");
         PARAM_STRING_APPEND(stream_param, DRM_KEY_DEVICE, "/dev/dri/card0");
     } else {
         PARAM_STRING_APPEND(stream_param, DRM_KEY_DEVICE, pstAttr->pcDevNode);
@@ -328,7 +485,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
     g_vo_chns[channel].media_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
     if (!g_vo_chns[channel].media_flow) {
         g_vo_mtx.unlock();
-        return -5;
+        return -4;
     }
 
     if (pstAttr->stDispRect.s32X || pstAttr->stDispRect.s32Y || pstAttr->stDispRect.u32Width || pstAttr->stDispRect.u32Height) {
@@ -342,7 +499,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
         if (g_vo_chns[channel].media_flow->Control(libdrm::S_DESTINATION_RECT, &PlaneRect)) {
             g_vo_chns[channel].media_flow.reset();
             g_vo_mtx.unlock();
-            return -6;
+            return -5;
         }
     }
 
@@ -357,7 +514,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
         if (g_vo_chns[channel].media_flow->Control(libdrm::S_SOURCE_RECT, &ImgRect)) {
             g_vo_chns[channel].media_flow.reset();
             g_vo_mtx.unlock();
-            return -7;
+            return -6;
         }
     }
 
@@ -387,7 +544,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
     g_vo_mtx.unlock();
     printf("Enable vo channel:[%d] finished......\n", channel);
 
-    return ret;
+    return 0;
 }
 
 int drm_mpi_destroy_vo_channel(int channel)

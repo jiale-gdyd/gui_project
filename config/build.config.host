@@ -15,6 +15,7 @@ USER_LIB_INCLUDE += $(HOST_ROOT) \
                     $(HOST_ROOT2)/opencv4 \
                     $(HOST_ROOT)/gstreamer-1.0 \
                     /usr/lib/x86_64-linux-gnu/glib-2.0/include \
+                    $(GUI_ROOT) \
                     $(GUI_ROOT)/gui \
                     $(GUI_ROOT)/gui/azure \
                     $(GUI_ROOT)/gui/azure/guix \

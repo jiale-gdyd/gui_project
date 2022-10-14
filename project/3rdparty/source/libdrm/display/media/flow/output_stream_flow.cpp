@@ -1,5 +1,6 @@
 #include <libdrm/display/flow.hpp>
 #include <libdrm/display/stream.hpp>
+#include <libdrm/display/media_type.hpp>
 
 namespace libdrm {
 static bool send_buffer(Flow *f, MediaBufferVector &input_vector);
@@ -99,11 +100,11 @@ DEFINE_FLOW_FACTORY(OutPutStreamFlow, Flow)
 
 const char *FACTORY(OutPutStreamFlow)::ExpectedInputDataType()
 {
-    return "";
+    return DRM_TYPE_ANYTHING;
 }
 
 const char *FACTORY(OutPutStreamFlow)::OutPutDataType()
 {
-    return nullptr;
+    return DRM_TYPE_NOTHING;
 }
 }

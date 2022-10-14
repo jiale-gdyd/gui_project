@@ -129,11 +129,11 @@ void SourceStreamFlow::ReadThreadRun()
 DEFINE_FLOW_FACTORY(SourceStreamFlow, Flow)
 const char *FACTORY(SourceStreamFlow)::ExpectedInputDataType()
 {
-    return nullptr;
+    return DRM_TYPE_NOTHING;
 }
 
 const char *FACTORY(SourceStreamFlow)::OutPutDataType()
 {
-    return "";
+    return DRM_TYPE_ANYTHING;
 }
 }

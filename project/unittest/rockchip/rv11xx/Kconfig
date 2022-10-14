@@ -1,0 +1,21 @@
+#
+# rockchip rv11xx Kconfig
+#
+
+menu "rockchip rv11xx unittest menu"
+
+choice
+    prompt "rockchip rv11xx unittest demo"
+    depends on ROCKCHIP && UNITTEST && RV11XX
+    default ROCKCHIP_RV11XX_UNKNOWN
+
+    config ROCKCHIP_RV11XX_LIBDRM
+        bool "rockchip rv11xx unittest libdrm demo"
+        select LIBDRM_DISPLAY
+
+    config ROCKCHIP_RV11XX_UNKNOWN
+        bool "rockchip rv11xx unittest unknow demo"
+
+endchoice
+
+endmenu

@@ -32,7 +32,7 @@ DECLARE_REFLECTOR(Stream)
 
 class MediaBuffer;
 
-static int local_close(void *stream);
+int local_close(void *stream);
 
 class Stream {
 public:

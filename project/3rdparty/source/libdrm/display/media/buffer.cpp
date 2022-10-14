@@ -17,7 +17,7 @@ MediaBuffer::MemType StringToMemType(const char *s)
             return MediaBuffer::MemType::MEM_HARD_WARE;
         }
 
-        printf("%s is not supported or not integrated, fallback to common\n", s);
+        DRM_MEDIA_LOGW("%s is not supported or not integrated, fallback to common", s);
     }
 
     return MediaBuffer::MemType::MEM_COMMON;
@@ -39,7 +39,7 @@ static MediaBuffer alloc_common_memory(size_t size)
         return MediaBuffer();
     }
 
-    printf("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u\n", __func__, buffer, -1, 0, -1, (unsigned)size);
+    DRM_MEDIA_LOGD("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u", __func__, buffer, -1, 0, -1, (unsigned)size);
     return MediaBuffer(buffer, size, -1, 0, -1, buffer, free_common_memory);
 }
 
@@ -88,22 +88,22 @@ static int drm_device_open(const char *device = nullptr)
 
     int fd = open(device, O_RDWR);
     if (fd < 0) {
-        printf("Failed to open %s,please enable display_subsystem in the dts\n", device);
+        DRM_MEDIA_LOGE("Failed to open %s,please enable display_subsystem in the dts", device);
         return fd;
     }
 
     version = drmGetVersion(fd);
     if (!version) {
-        printf("Failed to get version information from %s: probably not a DRM device?\n", device);
+        DRM_MEDIA_LOGI("Failed to get version information from %s: probably not a DRM device?", device);
         close(fd);
         return -1;
     }
 
-    printf("Opened DRM device %s: driver %s version %d.%d.%d.\n", device, version->name, version->version_major, version->version_minor, version->version_patchlevel);
+    DRM_MEDIA_LOGI("Opened DRM device %s: driver %s version %d.%d.%d", device, version->name, version->version_major, version->version_minor, version->version_patchlevel);
     drmFreeVersion(version);
 
     if (drmGetCap(fd, DRM_CAP_DUMB_BUFFER, &has_dumb) < 0 || !has_dumb) {
-        printf("drm device '%s' does not support dumb buffers\n", device);
+        DRM_MEDIA_LOGE("drm device '%s' does not support dumb buffers", device);
         close(fd);
         return -1;
     }
@@ -150,7 +150,7 @@ public:
 
         int ret = drmIoctl(dev->fd, DRM_IOCTL_MODE_CREATE_DUMB, &dmcb);
         if (ret < 0) {
-            printf("Failed to create dumb<w,h,bpp: %d,%d,%d>: %m\n", dmcb.width, dmcb.height, dmcb.bpp);
+            DRM_MEDIA_LOGE("Failed to create dumb<w,h,bpp: %d,%d,%d>: %m", dmcb.width, dmcb.height, dmcb.bpp);
             return;
         }
 
@@ -161,7 +161,7 @@ public:
         len = dmcb.size;
         ret = drmPrimeHandleToFD(dev->fd, dmcb.handle, DRM_CLOEXEC, &fd);
         if (ret) {
-            printf("Failed to convert drm handle to fd: %m\n");
+            DRM_MEDIA_LOGE("Failed to convert drm handle to fd: %m");
             return;
         }
 
@@ -182,14 +182,14 @@ public:
     
             ret = drmIoctl(device->fd, DRM_IOCTL_MODE_DESTROY_DUMB, &data);
             if (ret) {
-                printf("Failed to free drm handle <%d>: %m\n", handle);
+                DRM_MEDIA_LOGE("Failed to free drm handle <%d>: %m", handle);
             }
         }
 
         if (fd >= 0) {
             ret = close(fd);
             if (ret) {
-                printf("Failed to close drm buffer fd <%d>: %m\n", fd);
+                DRM_MEDIA_LOGE("Failed to close drm buffer fd <%d>: %m", fd);
             }
         }
     }
@@ -202,13 +202,13 @@ public:
 
         int ret = drmIoctl(device->fd, DRM_IOCTL_MODE_MAP_DUMB, &dmmd);
         if (ret) {
-            printf("Failed to map dumb: %m\n");
+            DRM_MEDIA_LOGE("Failed to map dumb: %m");
             return false;
         }
 
         void *ptr = drm_mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, device->fd, dmmd.offset);
         if (ptr == MAP_FAILED) {
-            printf("Failed to drm_mmap: %m\n");
+            DRM_MEDIA_LOGE("Failed to drm_mmap: %m");
             return false;
         }
 
@@ -256,7 +256,7 @@ static MediaBuffer alloc_drm_memory(size_t size, unsigned int flag, bool map = t
             break;
         }
 
-        printf("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u\n", __func__, db->map_ptr, db->fd, db->handle, db->dev_fd, (unsigned)size);
+        DRM_MEDIA_LOGD("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u", __func__, db->map_ptr, db->fd, db->handle, db->dev_fd, (unsigned)size);
         return MediaBuffer(db->map_ptr, db->len, db->fd, db->handle, db->dev_fd, db, free_drm_memory);
     } while (false);
 
@@ -298,7 +298,6 @@ static MediaGroupBuffer *alloc_drm_memory_group(size_t size, unsigned int flag, 
     return nullptr;
 }
 
-
 std::shared_ptr<MediaBuffer> MediaBuffer::Alloc(size_t size, MemType type, unsigned int flag)
 {
     MediaBuffer &&mb = Alloc2(size, type, flag);
@@ -319,7 +318,7 @@ MediaBuffer MediaBuffer::Alloc2(size_t size, MemType type, unsigned int flag)
             return alloc_drm_memory(size, flag);
 
         default:
-            printf("unknown memtype\n");
+            DRM_MEDIA_LOGE("unknown memtype");
             return MediaBuffer();
     }
 }
@@ -333,12 +332,12 @@ std::shared_ptr<MediaBuffer> MediaBuffer::Clone(MediaBuffer &src, MemType dst_ty
 
     auto new_buffer = Alloc(size, dst_type);
     if (!new_buffer) {
-        printf("not enough memory to alloc\n");
+        DRM_LOG_MEMORY();
         return nullptr;
     }
 
     if (src.IsHwBuffer() && new_buffer->IsHwBuffer()) {
-        printf("todo\n");
+        DRM_TODO();
     }
 
     memcpy(new_buffer->GetPtr(), src.GetPtr(), size);
@@ -357,7 +356,7 @@ std::shared_ptr<MediaBuffer> MediaBuffer::Clone2(MediaBuffer &src, MemType dst_t
 
     auto new_buffer = Alloc(size, dst_type);
     if (!new_buffer) {
-        printf("no memory for media buffer\n");
+        DRM_LOG_MEMORY();
         return nullptr;
     }
 
@@ -405,7 +404,7 @@ void MediaBuffer::BeginCPUAccess(bool readonly)
 
     int ret = ioctl(fd, DMA_BUF_IOCTL_SYNC, &sync);
     if (ret < 0) {
-        printf("%s: %s\n", __func__, strerror(errno));
+        DRM_MEDIA_LOGE("%s: %s", __func__, strerror(errno));
     }
 }
 
@@ -425,7 +424,7 @@ void MediaBuffer::EndCPUAccess(bool readonly)
 
     int ret = ioctl(fd, DMA_BUF_IOCTL_SYNC, &sync);
     if (ret < 0) {
-        printf("%s: %s\n", __func__, strerror(errno));
+        DRM_MEDIA_LOGE("%s: %s", __func__, strerror(errno));
     }
 }
 
@@ -439,7 +438,7 @@ MediaGroupBuffer *MediaGroupBuffer::Alloc(size_t size, MediaBuffer::MemType type
             return alloc_drm_memory_group(size, flag);
 
         default:
-            printf("unknown memtype\n");
+            DRM_MEDIA_LOGE("unknown memtype");
             return nullptr;
     }
 }
@@ -449,7 +448,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type)
     bool sucess = true;
 
     if (cnt <= 0) {
-        printf("BufferPool: cnt:%d is invalid!\n", cnt);
+        DRM_MEDIA_LOGE("BufferPool: cnt:%d is invalid", cnt);
         return;
     }
 
@@ -461,7 +460,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type)
         }
 
         mgb->SetBufferPool(this);
-        printf("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu\n", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
+        DRM_MEDIA_LOGD("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
         ready_buffers.push_back(mgb);
     }
 
@@ -470,13 +469,13 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type)
             ready_buffers.pop_front();
         }
 
-        printf("BufferPool: Create buffer pool failed! Please check space is enough!\n");
+        DRM_MEDIA_LOGE("BufferPool: Create buffer pool failed! Please check space is enough");
         return;
     }
 
     buf_cnt = cnt;
     buf_size = size;
-    printf("BufferPool: Create buffer pool:%p, size:%d, cnt:%d\n", this, size, cnt);
+    DRM_MEDIA_LOGD("BufferPool: Create buffer pool:%p, size:%d, cnt:%d", this, size, cnt);
 }
 
 BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned int flag)
@@ -484,7 +483,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned in
     bool sucess = true;
 
     if (cnt <= 0) {
-        printf("BufferPool: cnt:%d is invalid!\n", cnt);
+        DRM_MEDIA_LOGE("BufferPool: cnt:%d is invalid", cnt);
         return;
     }
 
@@ -496,7 +495,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned in
         }
 
         mgb->SetBufferPool(this);
-        printf("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu\n", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
+        DRM_MEDIA_LOGD("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
         ready_buffers.push_back(mgb);
     }
 
@@ -505,13 +504,13 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned in
             ready_buffers.pop_front();
         }
 
-        printf("BufferPool: Create buffer pool failed! Please check space is enough!\n");
+        DRM_MEDIA_LOGE("BufferPool: Create buffer pool failed! Please check space is enough");
         return;
     }
 
     buf_cnt = cnt;
     buf_size = size;
-    printf("BufferPool: Create buffer pool:%p, size:%d, cnt:%d\n", this, size, cnt);
+    DRM_MEDIA_LOGD("BufferPool: Create buffer pool:%p, size:%d, cnt:%d", this, size, cnt);
 }
 
 BufferPool::~BufferPool()
@@ -521,7 +520,7 @@ BufferPool::~BufferPool()
 
     while (busy_buffers.size() > 0) {
         if (wait_times-- <= 0) {
-            printf("BufferPool: waiting bufferpool free for 900ms, TimeOut!\n");
+            DRM_MEDIA_LOGE("BufferPool: waiting bufferpool free for 900ms, TimeOut");
             break;
         }
 
@@ -532,7 +531,7 @@ BufferPool::~BufferPool()
     while (ready_buffers.size() > 0) {
         mgb = ready_buffers.front();
         ready_buffers.pop_front();
-        printf("BufferPool: #%02d Destroy buffer pool(ready):[%p,%p]\n", cnt, this, mgb);
+        DRM_MEDIA_LOGD("BufferPool: #%02d Destroy buffer pool(ready):[%p,%p]", cnt, this, mgb);
         delete mgb;
         cnt++;
     }
@@ -540,7 +539,7 @@ BufferPool::~BufferPool()
     while (busy_buffers.size() > 0) {
         mgb = busy_buffers.front();
         busy_buffers.pop_front();
-        printf("BufferPool: #%02d Destroy buffer pool(busy):[%p,%p]\n", cnt, this, mgb);
+        DRM_MEDIA_LOGW("BufferPool: #%02d Destroy buffer pool(busy):[%p,%p]", cnt, this, mgb);
         delete mgb;
         cnt++;
     }
@@ -551,13 +550,13 @@ static int __groupe_buffer_free(void *data)
     assert(data);
 
     if (data == NULL) {
-        printf("BufferPool: free ptr is null!\n");
+        DRM_MEDIA_LOGE("BufferPool: free ptr is null");
         return 0;
     }
 
     MediaGroupBuffer *mgb = (MediaGroupBuffer *)data;
     if (mgb->pool == NULL) {
-        printf("BufferPool: free pool ptr is null!\n");
+        DRM_MEDIA_LOGE("BufferPool: free pool ptr is null");
         return 0;
     }
 
@@ -611,7 +610,7 @@ int BufferPool::PutBuffer(MediaGroupBuffer *mgb)
     }
 
     if (!sucess) {
-        printf("BufferPool: Unknow media group buffer:%p\n", mgb);
+        DRM_MEDIA_LOGE("BufferPool: Unknow media group buffer:%p", mgb);
     }
 
     return sucess ? 0 : -1;
@@ -621,18 +620,18 @@ void BufferPool::DumpInfo()
 {
     int id = 0;
 
-    printf("##BufferPool DumpInfo:%p\n", this);
-    printf("\tcnt:%d\n", buf_cnt);
-    printf("\tsize:%d\n", buf_size);
-    printf("\tready buffers(%zu):\n", ready_buffers.size());
+    DRM_MEDIA_LOGI("##BufferPool DumpInfo:%p", this);
+    DRM_MEDIA_LOGI("\tcnt:%d", buf_cnt);
+    DRM_MEDIA_LOGI("\tsize:%d", buf_size);
+    DRM_MEDIA_LOGI("\tready buffers(%zu):", ready_buffers.size());
     for (auto dev : ready_buffers) {
-        printf("\t  #%02d Pool:%p, mgb:%p, ptr:%p\n", id++, dev->pool, dev, dev->GetPtr());
+        DRM_MEDIA_LOGI("\t  #%02d Pool:%p, mgb:%p, ptr:%p", id++, dev->pool, dev, dev->GetPtr());
     }
-    printf("\tbusy buffers(%zu):\n", busy_buffers.size());
+    DRM_MEDIA_LOGI("\tbusy buffers(%zu):", busy_buffers.size());
 
     id = 0;
     for (auto dev : busy_buffers) {
-        printf("\t  #%02d Pool:%p, mgb:%p, ptr:%p\n", id++, dev->pool, dev, dev->GetPtr());
+        DRM_MEDIA_LOGI("\t  #%02d Pool:%p, mgb:%p, ptr:%p", id++, dev->pool, dev, dev->GetPtr());
     }
 }
 }

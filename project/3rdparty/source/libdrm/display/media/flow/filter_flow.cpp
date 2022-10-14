@@ -271,11 +271,11 @@ DEFINE_FLOW_FACTORY(FilterFlow, Flow)
 
 const char *FACTORY(FilterFlow)::ExpectedInputDataType()
 {
-    return "";
+    return DRM_TYPE_ANYTHING;
 }
 
 const char *FACTORY(FilterFlow)::OutPutDataType()
 {
-    return "";
+    return DRM_TYPE_ANYTHING;
 }
 }

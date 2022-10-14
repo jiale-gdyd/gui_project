@@ -10,7 +10,14 @@ extern "C" {
 #endif
 
 int drm_mpi_system_init(void);
+
 int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffer_t buffer);
+
+int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t *pstFpsAttr);
+int drm_mpi_system_start_recv_frame(mod_id_e enModID, int s32ChnId, const drm_recv_pic_param_t *pstRecvParam);
+
+int drm_mpi_system_register_output_callback(const drm_chn_t *pstChn, OutCallbackFunction callback);
+int drm_mpi_system_register_output_callbackEx(const drm_chn_t *pstChn, OutCallbackFunctionEx callback, void *handle);
 
 int drm_mpi_destroy_vo_channel(int channel);
 int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr);

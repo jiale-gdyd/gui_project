@@ -107,11 +107,11 @@ DEFINE_FLOW_FACTORY(LinkFlow, Flow)
 
 const char *FACTORY(LinkFlow)::ExpectedInputDataType()
 {
-    return nullptr;
+    return DRM_TYPE_NOTHING;
 }
 
 const char *FACTORY(LinkFlow)::OutPutDataType()
 {
-    return "";
+    return DRM_TYPE_ANYTHING;
 }
 }

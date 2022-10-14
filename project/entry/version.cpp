@@ -21,7 +21,7 @@ int app_version_header(void)
     std::string buildPlatform = std::string(BUILD_OS) + " " + std::string(OS_CODENAME) + " " + std::string(OS_VERSION);
     std::string gitCommitMesg = std::string(GIT_SHORT_COMMIT);
 
-    int maxSize = appName.length();
+    size_t maxSize = appName.length();
     maxSize = maxSize > appVersion.length() ? maxSize : appVersion.length();
     maxSize = maxSize > appAuthor.length() ? maxSize : appAuthor.length();
     maxSize = maxSize > buildPlatform.length() ? maxSize : buildPlatform.length();

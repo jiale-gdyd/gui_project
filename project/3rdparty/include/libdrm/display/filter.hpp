@@ -9,6 +9,7 @@
 
 namespace libdrm {
 DECLARE_FACTORY(Filter)
+
 DECLARE_REFLECTOR(Filter)
 
 #define DEFINE_FILTER_FACTORY(REAL_PRODUCT, FINAL_EXPOSE_PRODUCT)                                           \

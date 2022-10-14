@@ -10,12 +10,31 @@ typedef enum {
     MSG_FLOW_EVENT_INFO_EOS,
     MSG_FLOW_EVENT_WARN_UNKNOW  = MSG_WARN_MASK,
     MSG_FLOW_EVENT_ERROR_UNKNOW = MSG_ERROR_MASK,
-} msg_id_e;
+} DrmMessageId;
+
+typedef enum {
+    MUX_EVENT_STREAM_START = 0,
+    MUX_EVENT_STREAM_STOP,
+    MUX_EVENT_FILE_BEGIN,
+    MUX_EVENT_FILE_END,
+    MUX_EVENT_MANUAL_SPLIT_END,
+    MUX_EVENT_ERR_CREATE_FILE_FAIL,
+    MUX_EVENT_ERR_WRITE_FILE_FAIL,
+    MUX_EVENT_WARN_FILE_WRITING_SLOW,
+    MUX_EVENT_WARN_FILE_WRITING_NORMAL,
+    MUX_EVENT_BUTT
+} DrmMuxerEventType;
+
+typedef struct {
+    DrmMuxerEventType type;
+    char              file_name[256];
+    int               value;
+} DrmMuxerEvent;
 
 typedef enum {
     MESSAGE_TYPE_FIFO = 0,
     MESSAGE_TYPE_LIFO,
     MESSAGE_TYPE_UNIQUE
-} msg_type_e;
+} DrmMessageType;
 
 #endif

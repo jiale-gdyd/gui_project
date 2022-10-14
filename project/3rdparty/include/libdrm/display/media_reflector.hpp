@@ -4,12 +4,16 @@
 #include "key_string.hpp"
 #include "reflector.hpp"
 
+#include <map>
+#include <list>
+#include <string>
 #include <algorithm>
+#include <exception>
 
 #define DEFINE_MEDIA_CHILD_FACTORY(REAL_PRODUCT, IDENTIFIER, FINAL_EXPOSE_PRODUCT, PRODUCT)                             \
     DEFINE_CHILD_FACTORY(REAL_PRODUCT, IDENTIFIER, FINAL_EXPOSE_PRODUCT, PRODUCT,                                       \
         public:                                                                                                         \
-            virtual bool AcceptRules(const std::map<std::string, std::string> &map) const override;                     \
+            virtual bool AcceptRules(const std::map<std::string, std::string> &maps) const override;                    \
                                                                                                                         \
             static const char *ExpectedInputDataType();                                                                 \
             static const char *OutPutDataType();                                                                        \
@@ -17,7 +21,7 @@
     )
 
 #define DEFINE_MEDIA_CHILD_FACTORY_EXTRA(REAL_PRODUCT)                                                                  \
-    bool REAL_PRODUCT##Factory::AcceptRules(const std::map<std::string, std::string> &map) const {                      \
+    bool REAL_PRODUCT##Factory::AcceptRules(const std::map<std::string, std::string> &maps) const {                     \
         static std::list<std::string> expected_data_type_list;                                                          \
         static std::list<std::string> out_data_type_list;                                                               \
         static const char *static_keys[] = {DRM_KEY_INPUTDATATYPE, DRM_KEY_OUTPUTDATATYPE, NULL};                       \
@@ -28,16 +32,20 @@
         std::list<std::string> **list = static_list;                                                                    \
                                                                                                                         \
         while (*keys) {                                                                                                 \
-            auto it = map.find(*keys);                                                                                  \
-            if (it == map.end()) {                                                                                      \
-                if ((*call)()) {                                                                                        \
-                    return false;                                                                                       \
+            try {                                                                                                       \
+                auto it = maps.find(*keys);                                                                             \
+                if (it == maps.end()) {                                                                                 \
+                    if ((*call)()) {                                                                                    \
+                        return false;                                                                                   \
+                    }                                                                                                   \
+                } else {                                                                                                \
+                    const std::string &value = it->second;                                                              \
+                    if (!value.empty() && !has_intersection(value.c_str(), (*call)(), *list)) {                         \
+                        return false;                                                                                   \
+                    }                                                                                                   \
                 }                                                                                                       \
-            } else {                                                                                                    \
-                const std::string &value = it->second;                                                                  \
-                if (!value.empty() && !has_intersection(value.c_str(), (*call)(), *list)) {                             \
-                    return false;                                                                                       \
-                }                                                                                                       \
+            } catch (const std::exception &e) {                                                                         \
+                printf("catch exception:[%s]\n", e.what());                                                             \
             }                                                                                                           \
                                                                                                                         \
             ++keys;                                                                                                     \
