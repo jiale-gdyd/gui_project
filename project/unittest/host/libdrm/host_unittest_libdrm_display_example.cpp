@@ -93,8 +93,6 @@ int host_unittest_libdrm_display_init(int argc, char *argv[])
         return -1;
     }
 
-    signal(SIGINT, sigterm_handler);
-
     float fltImgRatio = 0.0f;
     if (g_dispImageType == DRM_IMAGE_TYPE_RGB888) {
         fltImgRatio = 3.0;
@@ -106,8 +104,11 @@ int host_unittest_libdrm_display_init(int argc, char *argv[])
 
     u32FrameSize = (size_t)(g_DispWidth * g_DispHeight * fltImgRatio);
 
+    int frameCount = 0;
     bool bSet0xFF = false;
     media_buffer_t frame = NULL;
+
+    signal(SIGINT, sigterm_handler);
 
     while (!g_quit) {
         if (g_dispBufferPool != NULL) {
@@ -116,12 +117,19 @@ int host_unittest_libdrm_display_init(int argc, char *argv[])
                 memset(drm_mpi_mb_get_ptr(frame), bSet0xFF ? 0xFF : 0x00, u32FrameSize);
                 drm_mpi_mb_set_size(frame, u32FrameSize);
 
-                bSet0xFF = !bSet0xFF;
-                drm_send_frame_video_output(g_voChannel, frame);
+            }
+
+            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, u32FrameSize);
+
+            bSet0xFF = !bSet0xFF;
+            ret = drm_send_frame_video_output(g_voChannel, frame);
+            if (ret) {
+                break;
             }
         }
 
-        sleep(3);
+        frameCount++;
+        sleep(5);
     }
 
     if (frame) {

@@ -7,7 +7,7 @@ menu "AZURE-RTOS GUIX Demo Menu"
 config DRM_DISP_DRIVER
     bool "Direct Rendering Manger display driver"
     depends on AZURE_GUIX
-    select LIBDRM
+    select LIBDRM_DISPLAY
     default n
     help
       DRM display driver

@@ -44,7 +44,7 @@ typedef enum displayImageTypeEnum {
     DISP_IMAGE_TYPE_BUTT
 } disp_image_type_e;
 
-int gx_drm_graphics_driver_exit(int channel);
+int gx_drm_graphics_driver_exit(void);
 int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_t xoffset, size_t yoffset, disp_image_type_e type, disp_plane_type_e dispLayer, int zpos);
 
 UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display);

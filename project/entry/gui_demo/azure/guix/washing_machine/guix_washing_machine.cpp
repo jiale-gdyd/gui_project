@@ -27,13 +27,17 @@ VOID  guix_setup(void);
 
 int azure_guix_washing_machine_demo_init(int argc, char *argv[])
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
+    gx_drm_graphics_driver_setup(1, MAIN_DISPLAY_X_RESOLUTION, MAIN_DISPLAY_Y_RESOLUTION, 0, 0, DISP_IMAGE_TYPE_RGB888, DISP_PLANE_OVERLAY, 1);
+#endif
+
     tx_kernel_enter();
     return 0;
 }
 
 int azure_guix_washing_machine_demo_exit(void)
 {
-    return -1;
+    return gx_drm_graphics_driver_exit();
 }
 
 /******************************************************************************************/

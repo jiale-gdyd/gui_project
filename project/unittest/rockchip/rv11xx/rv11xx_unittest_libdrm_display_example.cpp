@@ -117,10 +117,14 @@ int rv11xx_unittest_libdrm_display_init(int argc, char *argv[])
                 memset(drm_mpi_mb_get_ptr(frame), bSet0xFF ? 0xFF : 0x00, u32FrameSize);
                 drm_mpi_mb_set_size(frame, u32FrameSize);
 
-                unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, u32FrameSize);
+            }
 
-                bSet0xFF = !bSet0xFF;
-                drm_send_frame_video_output(g_voChannel, frame);
+            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, u32FrameSize);
+
+            bSet0xFF = !bSet0xFF;
+            ret = drm_send_frame_video_output(g_voChannel, frame);
+            if (ret) {
+                break;
             }
         }
 

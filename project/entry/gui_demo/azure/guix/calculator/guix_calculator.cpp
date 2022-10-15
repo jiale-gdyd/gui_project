@@ -55,13 +55,17 @@ KEY_INFO_ENTRY key_info[] = {
 
 int azure_guix_calculator_demo_init(int argc, char *argv[])
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
+    gx_drm_graphics_driver_setup(1, MAIN_SCREEN_X_RESOLUTION, MAIN_SCREEN_Y_RESOLUTION, 0, 0, DISP_IMAGE_TYPE_RGB565, DISP_PLANE_OVERLAY, 1);
+#endif
+
     tx_kernel_enter();
     return 0;
 }
 
 int azure_guix_calculator_demo_exit(void)
 {
-    return -1;
+    return gx_drm_graphics_driver_exit();
 }
 
 // 自定义像素地图按钮绘制

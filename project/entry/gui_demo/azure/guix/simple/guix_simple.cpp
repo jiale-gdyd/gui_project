@@ -23,7 +23,7 @@ int azure_guix_simple_demo_init(int argc, char *argv[])
 
 int azure_guix_simple_demo_exit(void)
 {
-    return -1;
+    return gx_drm_graphics_driver_exit();
 }
 
 void tx_application_define(void *first_unused_memory)

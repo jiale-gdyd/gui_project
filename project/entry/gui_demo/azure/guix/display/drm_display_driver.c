@@ -1257,7 +1257,7 @@ UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
 #endif
 }
 
-int gx_drm_graphics_driver_exit(int channel)
+int gx_drm_graphics_driver_exit()
 {
     return -1;
 }

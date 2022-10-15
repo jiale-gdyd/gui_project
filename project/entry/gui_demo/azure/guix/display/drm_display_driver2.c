@@ -34,6 +34,7 @@ enum guixCachePingPong {
 
 static int g_dispVoChannel = 0;
 static bool g_driverInied = false;
+static int g_bufPingPong = CACHE_BUF_PING;
 static media_buffer_t g_canvasBuffer[CACHE_BUF_BUTT] = {NULL, };
 
 static void _gx_copy_canvas_to_buffer_332rgb(void *dest, GX_CANVAS *canvas, GX_RECTANGLE *dirty_area)
@@ -279,7 +280,10 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
         format = canvas->gx_canvas_display->gx_display_color_format;
     }
 
-    void *gx_canvas_memory = drm_mpi_mb_get_ptr(g_canvasBuffer[0]);
+    void *gx_canvas_memory = drm_mpi_mb_get_ptr(g_canvasBuffer[g_bufPingPong]);
+    if (gx_canvas_memory == NULL) {
+        return;
+    }
 
     switch (format) {
         case GX_COLOR_FORMAT_8BIT_PACKED_PIXEL:
@@ -309,8 +313,11 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
     }
 
     // 发送数据帧到VO
-    if (gx_canvas_memory != NULL) {
-        drm_send_frame_video_output(g_dispVoChannel, g_canvasBuffer[0]);
+    int ret = drm_send_frame_video_output(g_dispVoChannel, g_canvasBuffer[g_bufPingPong]);
+    if (g_bufPingPong == CACHE_BUF_PING) {
+        g_bufPingPong = CACHE_BUF_PONG;
+    } else {
+        g_bufPingPong = CACHE_BUF_PING;
     }
 }
 
@@ -381,8 +388,6 @@ UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
 
 int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_t xoffset, size_t yoffset, disp_image_type_e type, disp_plane_type_e dispLayer, int zpos)
 {
-    g_dispVoChannel = channel;
-
     int ret = drm_mpi_system_init();
     if (ret != 0) {
         return -1;
@@ -393,9 +398,12 @@ int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_
         return -1;
     }
 
+    g_dispVoChannel = channel;
+    g_bufPingPong = CACHE_BUF_PING;
+
     mb_image_info_t dispImageInfo = { width, height, width, height, (drm_image_type_e)type };
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
-        g_canvasBuffer[i] = drm_mpi_mb_create_image_buffer(&dispImageInfo, false, 0);
+        g_canvasBuffer[i] = drm_mpi_mb_create_image_buffer(&dispImageInfo, true, MB_FLAG_NOCACHED);
         if (g_canvasBuffer[i] != NULL) {
             size_t size = drm_mpi_mb_get_size(g_canvasBuffer[i]);
             media_buffer_t ptr = drm_mpi_mb_get_ptr(g_canvasBuffer[i]);
@@ -407,7 +415,7 @@ int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_
     return 0;
 }
 
-int gx_drm_graphics_driver_exit(int channel)
+int gx_drm_graphics_driver_exit()
 {
     g_driverInied = false;
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
@@ -416,6 +424,6 @@ int gx_drm_graphics_driver_exit(int channel)
         }
     }
 
-    drm_destroy_video_output(channel);
+    drm_destroy_video_output(g_dispVoChannel);
     return 0;
 }

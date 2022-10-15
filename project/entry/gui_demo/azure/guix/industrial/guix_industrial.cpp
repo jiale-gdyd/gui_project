@@ -49,7 +49,7 @@ int azure_guix_industrial_demo_init(int argc, char ** argv)
 
 int azure_guix_industrial_demo_exit(void)
 {
-    return -1;
+    return gx_drm_graphics_driver_exit();
 }
 
 /******************************************************************************************/
