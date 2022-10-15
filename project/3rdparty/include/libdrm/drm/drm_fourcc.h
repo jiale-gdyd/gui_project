@@ -15,6 +15,9 @@ extern "C" {
 
 #define DRM_FORMAT_C8                                   fourcc_code('C', '8', ' ', ' ') /* [7:0] C */
 #define DRM_FORMAT_R8                                   fourcc_code('R', '8', ' ', ' ') /* [7:0] R */
+#define DRM_FORMAT_R10                                  fourcc_code('R', '1', '0', ' ') /* [15:0] x:R 6:10 little endian */
+#define DRM_FORMAT_R12                                  fourcc_code('R', '1', '2', ' ') /* [15:0] x:R 4:12 little endian */
+
 #define DRM_FORMAT_R16                                  fourcc_code('R', '1', '6', ' ') /* [15:0] R little endian */
 
 #define DRM_FORMAT_RG88                                 fourcc_code('R', 'G', '8', '8') /* [15:0] R:G 8:8 little endian */
@@ -145,6 +148,7 @@ extern "C" {
 #define DRM_FORMAT_P010                                 fourcc_code('P', '0', '1', '0') /* 2x2 subsampled Cr:Cb plane 10 bits per channel */
 #define DRM_FORMAT_P012                                 fourcc_code('P', '0', '1', '2') /* 2x2 subsampled Cr:Cb plane 12 bits per channel */
 #define DRM_FORMAT_P016                                 fourcc_code('P', '0', '1', '6') /* 2x2 subsampled Cr:Cb plane 16 bits per channel */
+#define DRM_FORMAT_P030                                 fourcc_code('P', '0', '3', '0') /* 2x2 subsampled Cr:Cb plane 10 bits per channel packed */
 
 #define DRM_FORMAT_Q410                                 fourcc_code('Q', '4', '1', '0')
 #define DRM_FORMAT_Q401                                 fourcc_code('Q', '4', '0', '1')
@@ -174,6 +178,9 @@ extern "C" {
 
 #define DRM_FORMAT_RESERVED                             ((1ULL << 56) - 1)
 
+#define fourcc_mod_get_vendor(modifier)                 (((modifier) >> 56) & 0xff)
+#define fourcc_mod_is_vendor(modifier, vendor)          (fourcc_mod_get_vendor(modifier) == DRM_FORMAT_MOD_VENDOR_## vendor)
+
 #define fourcc_mod_code(vendor, val)                    ((((__u64)DRM_FORMAT_MOD_VENDOR_## vendor) << 56) | ((val) & 0x00ffffffffffffffULL))
 
 #define DRM_FORMAT_MOD_GENERIC_16_16_TILE               DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
@@ -195,10 +202,18 @@ extern "C" {
 #define I915_FORMAT_MOD_Y_TILED_GEN12_MC_CCS            fourcc_mod_code(INTEL, 7)
 #define I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC         fourcc_mod_code(INTEL, 8)
 
+#define I915_FORMAT_MOD_4_TILED                         fourcc_mod_code(INTEL, 9)
+#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS              fourcc_mod_code(INTEL, 10)
+#define I915_FORMAT_MOD_4_TILED_DG2_MC_CCS              fourcc_mod_code(INTEL, 11)
+#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS_CC           fourcc_mod_code(INTEL, 12)
+
 #define DRM_FORMAT_MOD_SAMSUNG_64_32_TILE               fourcc_mod_code(SAMSUNG, 1)
 #define DRM_FORMAT_MOD_SAMSUNG_16_16_TILE               fourcc_mod_code(SAMSUNG, 2)
 
 #define DRM_FORMAT_MOD_QCOM_COMPRESSED                  fourcc_mod_code(QCOM, 1)
+
+#define DRM_FORMAT_MOD_QCOM_TILED3                      fourcc_mod_code(QCOM, 3)
+#define DRM_FORMAT_MOD_QCOM_TILED2                      fourcc_mod_code(QCOM, 2)
 
 #define DRM_FORMAT_MOD_VIVANTE_TILED                    fourcc_mod_code(VIVANTE, 1)
 #define DRM_FORMAT_MOD_VIVANTE_SUPER_TILED              fourcc_mod_code(VIVANTE, 2)
@@ -307,12 +322,14 @@ static __inline__ __u64 drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier
 #define AMD_FMT_MOD_TILE_VER_GFX9                       1
 #define AMD_FMT_MOD_TILE_VER_GFX10                      2
 #define AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS               3
-#define AMD_FMT_MOD_TILE_GFX9_64K_S                     9
+#define AMD_FMT_MOD_TILE_VER_GFX11                      4
 
+#define AMD_FMT_MOD_TILE_GFX9_64K_S                     9
 #define AMD_FMT_MOD_TILE_GFX9_64K_D                     10
 #define AMD_FMT_MOD_TILE_GFX9_64K_S_X                   25
 #define AMD_FMT_MOD_TILE_GFX9_64K_D_X                   26
 #define AMD_FMT_MOD_TILE_GFX9_64K_R_X                   27
+#define AMD_FMT_MOD_TILE_GFX11_256K_R_X                 31
 
 #define AMD_FMT_MOD_DCC_BLOCK_64B                       0
 #define AMD_FMT_MOD_DCC_BLOCK_128B                      1
@@ -353,9 +370,9 @@ static __inline__ __u64 drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier
 #define AMD_FMT_MOD_PIPE_SHIFT                          33
 #define AMD_FMT_MOD_PIPE_MASK                           0x7
 
-#define AMD_FMT_MOD_SET(field, value)                   ((uint64_t)(value) << AMD_FMT_MOD_##field##_SHIFT)
+#define AMD_FMT_MOD_SET(field, value)                   ((__u64)(value) << AMD_FMT_MOD_##field##_SHIFT)
 #define AMD_FMT_MOD_GET(field, value)                   (((value) >> AMD_FMT_MOD_##field##_SHIFT) & AMD_FMT_MOD_##field##_MASK)
-#define AMD_FMT_MOD_CLEAR(field)                        (~((uint64_t)AMD_FMT_MOD_##field##_MASK << AMD_FMT_MOD_##field##_SHIFT))
+#define AMD_FMT_MOD_CLEAR(field)                        (~((__u64)AMD_FMT_MOD_##field##_MASK << AMD_FMT_MOD_##field##_SHIFT))
 
 #if defined(__cplusplus)
 }
