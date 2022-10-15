@@ -1,9 +1,9 @@
 #include <stdlib.h>
-#include <libdrm/display/image.hpp>
+#include <libdrm/display/image.h>
 #include <libdrm/drm_media_buffer.h>
 
-#include "media_utils.hpp"
-#include "drm_media_buffer_impl.hpp"
+#include "media_utils.h"
+#include "drm_media_buffer_impl.h"
 
 std::mutex g_handle_mb_mutex;
 std::list<handle_mb_t *> g_handle_mb;
@@ -144,7 +144,7 @@ media_buffer_t drm_mpi_mb_create_audio_bufferEx(mb_audio_info_t *pstAudioInfo, b
     std::string strSampleFormat = SampleFormatToString(pstAudioInfo->enSampleFmt);
     DrmSampleFormat mediaSampleFormat = StringToSampleFmt(strSampleFormat.c_str());
     if (mediaSampleFormat == DRM_SAMPLE_FMT_NONE) {
-        printf("%s: unsupport sample format!\n", __func__);
+        DRM_MEDIA_LOGE("unsupport sample format");
         return NULL;
     }
 
@@ -160,7 +160,7 @@ media_buffer_t drm_mpi_mb_create_audio_bufferEx(mb_audio_info_t *pstAudioInfo, b
 
     media_buffer_impl_t *mb = new media_buffer_impl_t;
     if (!mb) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -174,7 +174,7 @@ media_buffer_t drm_mpi_mb_create_audio_bufferEx(mb_audio_info_t *pstAudioInfo, b
     auto &&media_mb = libdrm::MediaBuffer::Alloc(buf_size, boolHardWare ? libdrm::MediaBuffer::MemType::MEM_HARD_WARE : libdrm::MediaBuffer::MemType::MEM_COMMON, u32mediaBufFlag);
     if (!media_mb) {
         delete mb;
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -205,13 +205,13 @@ media_buffer_t drm_mpi_mb_create_audio_buffer(uint32_t u32BufferSize, bool boolH
 
     media_buffer_impl_t *mb = new media_buffer_impl_t;
     if (!mb) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
     if (!media_mb) {
         delete mb;
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -241,7 +241,7 @@ media_buffer_t drm_mpi_mb_create_image_buffer(mb_image_info_t *pstImageInfo, boo
     std::string strPixFormat = ImageTypeToString(pstImageInfo->enImgType);
     DrmPixelFormat mediaPixFormat = StringToPixFmt(strPixFormat.c_str());
     if (mediaPixFormat == DRM_PIX_FMT_NONE) {
-        printf("%s: unsupport pixformat!\n", __func__);
+        DRM_MEDIA_LOGE("unsupport pixformat");
         return NULL;
     }
 
@@ -252,7 +252,7 @@ media_buffer_t drm_mpi_mb_create_image_buffer(mb_image_info_t *pstImageInfo, boo
 
     media_buffer_impl_t *mb = new media_buffer_impl_t;
     if (!mb) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -266,7 +266,7 @@ media_buffer_t drm_mpi_mb_create_image_buffer(mb_image_info_t *pstImageInfo, boo
     auto &&media_mb = libdrm::MediaBuffer::Alloc(buf_size, boolHardWare ? libdrm::MediaBuffer::MemType::MEM_HARD_WARE : libdrm::MediaBuffer::MemType::MEM_COMMON, u32mediaBufFlag);
     if (!media_mb) {
         delete mb;
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -348,13 +348,13 @@ int drm_mpi_mb_get_tsvc_level(media_buffer_t mb)
 media_buffer_t drm_mpi_mb_create_buffer(uint32_t u32Size, bool boolHardWare, uint8_t u8Flag)
 {
     if (!u32Size) {
-        printf("%s: Invalid buffer size!\n", __func__);
+        DRM_MEDIA_LOGE("Invalid buffer size");
         return NULL;
     }
 
     media_buffer_impl_t *mb = new media_buffer_impl_t;
     if (!mb) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -368,7 +368,7 @@ media_buffer_t drm_mpi_mb_create_buffer(uint32_t u32Size, bool boolHardWare, uin
     mb->media_mb = libdrm::MediaBuffer::Alloc(u32Size, boolHardWare ? libdrm::MediaBuffer::MemType::MEM_HARD_WARE : libdrm::MediaBuffer::MemType::MEM_COMMON, u32mediaBufFlag);
     if (!mb->media_mb) {
         delete mb;
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -390,28 +390,27 @@ media_buffer_t drm_mpi_mb_create_buffer(uint32_t u32Size, bool boolHardWare, uin
 
 media_buffer_t drm_mpi_mb_convert_to_image_buffer(media_buffer_t mb, mb_image_info_t *pstImageInfo)
 {
-    if (!mb || !pstImageInfo || !pstImageInfo->u32Height || !pstImageInfo->u32Width || !pstImageInfo->u32VerStride || !pstImageInfo->u32HorStride)
-    {
-        printf("%s: invalid args!\n", __func__);
+    if (!mb || !pstImageInfo || !pstImageInfo->u32Height || !pstImageInfo->u32Width || !pstImageInfo->u32VerStride || !pstImageInfo->u32HorStride) {
+        DRM_MEDIA_LOGE("invalid args");
         return NULL;
     }
 
     media_buffer_impl_t *mb_impl = (media_buffer_impl_t *)mb;
     if (!mb_impl->media_mb) {
-        printf("%s: mediabuffer not init yet!\n", __func__);
+        DRM_MEDIA_LOGE("mediabuffer not init yet");
         return NULL;
     }
 
     std::string strPixFormat = ImageTypeToString(pstImageInfo->enImgType);
     DrmPixelFormat mediaPixFormat = StringToPixFmt(strPixFormat.c_str());
     if (mediaPixFormat == DRM_PIX_FMT_NONE) {
-        printf("%s: unsupport pixformat!\n", __func__);
+        DRM_MEDIA_LOGE("unsupport pixformat");
         return NULL;
     }
 
     uint32_t buf_size = CalPixFmtSize(mediaPixFormat, pstImageInfo->u32HorStride, pstImageInfo->u32VerStride, 1);
     if (buf_size > mb_impl->media_mb->GetSize()) {
-        printf("%s: buffer size:%zu do not match imgInfo(%dx%d, %s)!\n", __func__, mb_impl->media_mb->GetSize(), pstImageInfo->u32HorStride, pstImageInfo->u32VerStride, strPixFormat.c_str());
+        DRM_MEDIA_LOGE("buffer size:%zu do not match imgInfo(%dx%d, %s)", mb_impl->media_mb->GetSize(), pstImageInfo->u32HorStride, pstImageInfo->u32VerStride, strPixFormat.c_str());
         return NULL;
     }
 
@@ -433,20 +432,20 @@ media_buffer_t drm_mpi_mb_convert_to_image_buffer(media_buffer_t mb, mb_image_in
 media_buffer_t drm_mpi_mb_convert_to_audio_bufferEx(media_buffer_t mb, mb_audio_info_t *pstAudioInfo)
 {
     if (!mb || !pstAudioInfo || !pstAudioInfo->u32Channels || !pstAudioInfo->u32NBSamples || !pstAudioInfo->u32SampleRate) {
-        printf("%s: invalid args!\n", __func__);
+        DRM_MEDIA_LOGE("invalid args");
         return NULL;
     }
 
     media_buffer_impl_t *mb_impl = (media_buffer_impl_t *)mb;
     if (!mb_impl->media_mb) {
-        printf("%s: mediabuffer not init yet!\n", __func__);
+        DRM_MEDIA_LOGE("mediabuffer not init yet");
         return NULL;
     }
 
     std::string strSampleFormat = SampleFormatToString(pstAudioInfo->enSampleFmt);
     DrmSampleFormat mediaSampleFormat = StringToSampleFmt(strSampleFormat.c_str());
     if (mediaSampleFormat == DRM_SAMPLE_FMT_NONE) {
-        printf("%s: unsupport sample format!\n", __func__);
+        DRM_MEDIA_LOGE("unsupport sample format");
         return NULL;
     }
 
@@ -461,7 +460,7 @@ media_buffer_t drm_mpi_mb_convert_to_audio_bufferEx(media_buffer_t mb, mb_audio_
     }
 
     if (buf_size > mb_impl->media_mb->GetSize()) {
-        printf("%s: buffer size:%zu do not match AudioInfo(%dx%d%d, %s)!\n", __func__, mb_impl->media_mb->GetSize(), pstAudioInfo->u32Channels, pstAudioInfo->u32SampleRate, pstAudioInfo->u32NBSamples, strSampleFormat.c_str());
+        DRM_MEDIA_LOGE("buffer size:%zu do not match AudioInfo(%dx%d%d, %s)", mb_impl->media_mb->GetSize(), pstAudioInfo->u32Channels, pstAudioInfo->u32SampleRate, pstAudioInfo->u32NBSamples, strSampleFormat.c_str());
         return NULL;
     }
 
@@ -475,13 +474,13 @@ media_buffer_t drm_mpi_mb_convert_to_audio_bufferEx(media_buffer_t mb, mb_audio_
 media_buffer_t drm_mpi_mb_convert_to_audio_buffer(media_buffer_t mb)
 {
     if (!mb) {
-        printf("%s: invalid args!\n", __func__);
+        DRM_MEDIA_LOGE("invalid args");
         return NULL;
     }
 
     media_buffer_impl_t *mb_impl = (media_buffer_impl_t *)mb;
     if (!mb_impl->media_mb) {
-        printf("%s: mediabuffer not init yet!\n", __func__);
+        DRM_MEDIA_LOGE("mediabuffer not init yet");
         return NULL;
     }
 
@@ -538,14 +537,14 @@ media_buffer_t drm_mpi_mb_copy(media_buffer_t mb, bool bZeroCopy)
     media_buffer_impl_t *mb_old = (media_buffer_impl_t *)mb;
     media_buffer_impl_t *mb_new = new media_buffer_impl_t;
     if (!mb_new) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
     if (bZeroCopy) {
         *mb_new = *mb_old;
     } else {
-        printf("%s: not support DeepCopy\n", __func__);
+        DRM_MEDIA_LOGE("not support DeepCopy");
         delete mb_new;
         return NULL;
     }
@@ -564,7 +563,7 @@ media_buffer_pool_t drm_mpi_mb_pool_create(mb_pool_param_t *pstPoolParam)
     DrmPixelFormat mediaPixFormat;
 
     if (!pstPoolParam) {
-        printf("%s: param is NULL!\n", __func__);
+        DRM_MEDIA_LOGE("param is NULL");
         return NULL;
     }
 
@@ -583,14 +582,14 @@ media_buffer_pool_t drm_mpi_mb_pool_create(mb_pool_param_t *pstPoolParam)
             || (stImageInfo.u32HorStride < stImageInfo.u32Width)
             || (stImageInfo.u32VerStride < stImageInfo.u32Height))
         {
-            printf("%s: Invalid param!\n", __func__);
+            DRM_MEDIA_LOGE("Invalid param");
             return NULL;
         }
 
         std::string strPixFormat = ImageTypeToString(stImageInfo.enImgType);
         mediaPixFormat = StringToPixFmt(strPixFormat.c_str());
         if (mediaPixFormat == DRM_PIX_FMT_NONE) {
-            printf("%s: unsupport pixformat!\n", __func__);
+            DRM_MEDIA_LOGE("unsupport pixformat");
             return NULL;
         }
 
@@ -598,13 +597,13 @@ media_buffer_pool_t drm_mpi_mb_pool_create(mb_pool_param_t *pstPoolParam)
     }
 
     if (!u32Cnt || !u32Size) {
-        printf("%s: Invalid cnt(%d) or size(%d)!\n", __func__, u32Cnt, u32Size);
+        DRM_MEDIA_LOGE("Invalid cnt(%d) or size(%d)", u32Cnt, u32Size);
         return NULL;
     }
 
     media_buffer_pool_impl_t *pstMBPImpl = new media_buffer_pool_impl_t;
     if (!pstMBPImpl) {
-        printf("%s: No space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 
@@ -635,7 +634,7 @@ media_buffer_pool_t drm_mpi_mb_pool_create(mb_pool_param_t *pstPoolParam)
 media_buffer_t drm_mpi_mb_pool_get_buffer(media_buffer_pool_t MBPHandle, bool bIsBlock)
 {
     if (!MBPHandle) {
-        printf("%s: handle is null!\n", __func__);
+        DRM_MEDIA_LOGE("handle is null");
         return NULL;
     }
 
@@ -643,20 +642,20 @@ media_buffer_t drm_mpi_mb_pool_get_buffer(media_buffer_pool_t MBPHandle, bool bI
     pstMBPImpl = (media_buffer_pool_impl_t *)MBPHandle;
 
     if (!pstMBPImpl->media_mbp) {
-        printf("%s: invalid handle!\n", __func__);
+        DRM_MEDIA_LOGE("invalid handle");
         return NULL;
     }
 
     bool boolBlock = bIsBlock;
     auto media_mb = pstMBPImpl->media_mbp->GetBuffer(boolBlock);
     if (!media_mb) {
-        printf("%s: No buffer available!\n", __func__);
+        DRM_MEDIA_LOGE("no buffer available");
         return NULL;
     }
 
     media_buffer_impl_t *mb = new media_buffer_impl_t;
     if (!mb) {
-        printf("%s: no space left!\n", __func__);
+        DRM_MEDIA_LOGE("no space left");
         return NULL;
     }
 

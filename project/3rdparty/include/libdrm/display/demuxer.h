@@ -1,11 +1,11 @@
-#ifndef LIBDRM_DISPLAY_DEMUXER_HPP
-#define LIBDRM_DISPLAY_DEMUXER_HPP
+#ifndef LIBDRM_DISPLAY_DEMUXER_H
+#define LIBDRM_DISPLAY_DEMUXER_H
 
 #include <list>
 
-#include "stream.hpp"
-#include "media_config.hpp"
-#include "media_reflector.hpp"
+#include "stream.h"
+#include "media_config.h"
+#include "media_reflector.h"
 
 namespace libdrm {
 

@@ -1,10 +1,10 @@
 #include <assert.h>
 #include <string.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/image.hpp>
-#include <libdrm/display/key_string.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/image.h>
+#include <libdrm/display/key_string.h>
+#include <libdrm/display/media_type.h>
 
 void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den)
 {
@@ -53,7 +53,7 @@ void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den)
             break;
 
         default:
-            printf("unsupport get num/den for pixel fmt: %d\n", fmt);
+            DRM_MEDIA_LOGE("unsupport get num/den for pixel fmt: %d", fmt);
     }
 }
 
@@ -123,7 +123,7 @@ bool ParseImageInfoFromMap(std::map<std::string, std::string> &params, DrmImageI
 
     info.pix_fmt = StringToPixFmt(value.c_str());
     if (info.pix_fmt == DRM_PIX_FMT_NONE) {
-        printf("unsupport pix fmt %s\n", value.c_str());
+        DRM_MEDIA_LOGE("unsupport pix fmt %s", value.c_str());
         return false;
     }
 
@@ -191,7 +191,7 @@ std::vector<DrmImageRect> StringToTwoImageRect(const std::string &str_rect)
         DrmImageRect rect = {0, 0, 0, 0};
         int r = sscanf(args[i], "(%d,%d,%d,%d)", &rect.x, &rect.y, &rect.w, &rect.h);
         if (r != 4) {
-            printf("Fail to sscanf(ret=%d) : %m\n", r);
+            DRM_MEDIA_LOGE("Fail to sscanf(ret=%d) : %m", r);
             ret.clear();
             return ret;
         }
@@ -245,7 +245,7 @@ std::vector<DrmImageRect> StringToImageRect(const std::string &str_rect)
         DrmImageRect rect = {0, 0, 0, 0};
         int r = sscanf(start, "(%d,%d,%d,%d)", &rect.x, &rect.y, &rect.w, &rect.h);
         if (r != 4) {
-            printf("Fail to sscanf(ret=%d) : %m\n", r);
+            DRM_MEDIA_LOGE("Fail to sscanf(ret=%d) : %m", r);
             return ret;
         }
 

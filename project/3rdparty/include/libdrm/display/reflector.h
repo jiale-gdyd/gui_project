@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_REFLECTOR_HPP
-#define LIBDRM_DISPLAY_REFLECTOR_HPP
+#ifndef LIBDRM_DISPLAY_REFLECTOR_H
+#define LIBDRM_DISPLAY_REFLECTOR_H
 
 #include <map>
 #include <list>
@@ -7,7 +7,7 @@
 #include <string>
 #include <exception>
 
-#include "utils.hpp"
+#include "utils.h"
 
 #define REFLECTOR(PRODUCT)          PRODUCT##Reflector
 #define FACTORY(PRODUCT)            PRODUCT##Factory
@@ -166,7 +166,7 @@
     class Register_##FACTORY {                                                                                      \
     public:                                                                                                         \
         Register_##FACTORY() {                                                                                      \
-        const FACTORY &obj = FACTORY::Instance();                                                                   \
+            const FACTORY &obj = FACTORY::Instance();                                                               \
             REFLECTOR::RegisterFactory(obj.Identifier(), &obj);                                                     \
             FINAL_EXPOSE_PRODUCT::RegisterFactory(&obj);                                                            \
         }                                                                                                           \

@@ -6,10 +6,10 @@
 #include <algorithm>
 #include <functional>
 
-#include <libdrm/display/drm_utils.hpp>
-#include <libdrm/display/key_string.hpp>
-#include <libdrm/display/media_type.hpp>
-#include <libdrm/display/utils.hpp>
+#include <libdrm/display/drm_utils.h>
+#include <libdrm/display/key_string.h>
+#include <libdrm/display/media_type.h>
+#include <libdrm/display/utils.h>
 
 namespace libdrm {
 
@@ -84,7 +84,7 @@ void dump_suitable_ids(struct resources *res)
     DUMP_IDS(type, ids.count_##type##s, ids.type##_ids)
 
     struct drm_ids &ids = res->ids;
-    printf("suitable ids: \n");
+    DRM_MEDIA_LOGI("suitable ids: ");
     DUMP_SUITABLE_IDS(connector)
     DUMP_SUITABLE_IDS(encoder)
     DUMP_SUITABLE_IDS(crtc)
@@ -1008,14 +1008,14 @@ const std::string &GetStringOfDRMFmts()
 DRMDevice::DRMDevice(const std::string &drm_path) : fd(-1), path(drm_path)
 {
     fd = open(drm_path.c_str(), O_RDWR | O_CLOEXEC);
-    printf("open %s = %d\n", drm_path.c_str(), fd);
+    DRM_MEDIA_LOGI("open %s = %d", drm_path.c_str(), fd);
 }
 
 DRMDevice::~DRMDevice()
 {
     if (fd >= 0) {
         close(fd);
-        printf("close %s = %d\n", path.c_str(), fd);
+        DRM_MEDIA_LOGI("close %s = %d", path.c_str(), fd);
         fd = -1;
     }
 }
@@ -1027,12 +1027,12 @@ struct resources *DRMDevice::get_resources()
     }
 
     if (drmSetClientCap(fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1)) {
-        printf("Failed to set universal planes cap %m\n");
+        DRM_MEDIA_LOGE("Failed to set universal planes cap %m");
         return nullptr;
     }
 
     if (drmSetClientCap(fd, DRM_CLIENT_CAP_ATOMIC, 1)) {
-        printf("Failed set drm atomic cap %m\n");
+        DRM_MEDIA_LOGE("Failed set drm atomic cap %m");
         return nullptr;
     }
 
@@ -1045,7 +1045,7 @@ struct resources *DRMDevice::get_resources()
     res->drm_fd = -1;
     res->res = drmModeGetResources(fd);
     if (!res->res) {
-        printf("drmModeGetResources failed: %m\n");
+        DRM_MEDIA_LOGE("drmModeGetResources failed: %m");
         goto error;
     }
 
@@ -1070,7 +1070,7 @@ struct resources *DRMDevice::get_resources()
         for (i = 0; i < (int)(_res)->__res->count_##type##s; ++i) {                                 \
             (_res)->type##s[i].type = drmModeGet##Type(fd, (_res)->__res->type##s[i]);              \
             if (!(_res)->type##s[i].type) {                                                         \
-                printf("could not get %s %i: %m\n", #type, (_res)->__res->type##s[i]);              \
+                DRM_MEDIA_LOGE("could not get %s %i: %m", #type, (_res)->__res->type##s[i]);        \
             } else if ((_res)->ids.type##_ids) {                                                    \
                 (_res)->ids.type##_ids[(_res)->ids.count_##type##s++] = (_res)->__res->type##s[i];  \
             }                                                                                       \
@@ -1088,7 +1088,7 @@ struct resources *DRMDevice::get_resources()
 
         int ret = asprintf(&sconnector->name, "%s-%u", lookup_drm_connector_type_name(conn->connector_type), conn->connector_type_id);
         if (ret < 0) {
-            printf("asprintf failed\n");
+            DRM_MEDIA_LOGE("asprintf failed");
         }
     }
 
@@ -1099,7 +1099,7 @@ struct resources *DRMDevice::get_resources()
             unsigned int j;                                                                                     \
             obj->props = drmModeObjectGetProperties(fd, obj->type->type##_id, DRM_MODE_OBJECT_##Type);          \
             if (!obj->props) {                                                                                  \
-                printf("could not get %s %i properties: %m\n", #type, obj->type->type##_id);                    \
+                DRM_MEDIA_LOGE("could not get %s %i properties: %m", #type, obj->type->type##_id);              \
                 continue;                                                                                       \
             }                                                                                                   \
             obj->props_info = (drmModePropertyRes **)calloc(obj->props->count_props, sizeof(*obj->props_info)); \
@@ -1121,7 +1121,7 @@ struct resources *DRMDevice::get_resources()
 
     res->plane_res = drmModeGetPlaneResources(fd);
     if (!res->plane_res) {
-        printf("drmModeGetPlaneResources failed: %m\n");
+        DRM_MEDIA_LOGE("drmModeGetPlaneResources failed: %m");
         goto error;
     }
 

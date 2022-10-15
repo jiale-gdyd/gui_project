@@ -1,8 +1,7 @@
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/filter.hpp>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/filter.h>
 
 namespace libdrm {
-
 class ThroughGuard : public Filter {
 public:
     ThroughGuard(const char *param);
@@ -36,7 +35,7 @@ ThroughGuard::ThroughGuard(const char *param) : allow_through_count(0)
 int ThroughGuard::Process(std::shared_ptr<MediaBuffer> input, std::shared_ptr<MediaBuffer> &output)
 {
     if (allow_through_count > 0) {
-        printf("Process allow through count %d\n", allow_through_count);
+        DRM_MEDIA_LOGI("Process allow through count %d", allow_through_count);
 
         output = input;
         allow_through_count--;
@@ -76,7 +75,7 @@ DEFINE_COMMON_FILTER_FACTORY(ThroughGuard)
 
 const char *FACTORY(ThroughGuard)::ExpectedInputDataType()
 {
-  return DRM_TYPE_ANYTHING;
+    return DRM_TYPE_ANYTHING;
 }
 
 const char *FACTORY(ThroughGuard)::OutPutDataType()

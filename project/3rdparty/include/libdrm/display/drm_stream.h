@@ -1,12 +1,12 @@
-#ifndef LIBDRM_DISPLAY_DRM_STREAM_HPP
-#define LIBDRM_DISPLAY_DRM_STREAM_HPP
+#ifndef LIBDRM_DISPLAY_DRM_STREAM_H
+#define LIBDRM_DISPLAY_DRM_STREAM_H
 
 #include <assert.h>
 #include <vector>
 
-#include "drm_utils.hpp"
-#include "image.hpp"
-#include "stream.hpp"
+#include "image.h"
+#include "stream.h"
+#include "drm_utils.h"
 
 namespace libdrm {
 class DRMStream : public Stream {

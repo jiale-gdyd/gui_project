@@ -5,6 +5,7 @@
 
 # unittest
 CONFIG_UNITTEST=y
+CONFIG_HOST_LIBDRM_DISP=y
 
 #
 # hardware platform

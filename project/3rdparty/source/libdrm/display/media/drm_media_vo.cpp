@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <libdrm/drm_media_api.h>
+#include <libdrm/display/utils.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,12 +14,12 @@ static bool g_voChnStated[DRM_VO_CHANNEL_BUTT] = {false, };
 int drm_destroy_video_output(int channel)
 {
     if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        printf("vo channel:[%d] invalid , only:[%d, %d)\n", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 
     if (g_voChnStated[channel] == false) {
-        printf("vo channel:[%d] had destroy\n", channel);
+        DRM_MEDIA_LOGE("vo channel:[%d] had destroy", channel);
         return 0;
     }
 
@@ -30,12 +32,12 @@ int drm_destroy_video_output(int channel)
 int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_t dispWidth, size_t dispHeight, size_t dispXoffset, size_t dispYoffset, drm_image_type_e imageType, const char *card)
 {
     if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        printf("vo channel:[%d] invalid , only:[%d, %d)\n", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 
     if (g_voChnStated[channel]) {
-        printf("vo channel:[%d] had started\n", channel);
+        DRM_MEDIA_LOGE("vo channel:[%d] had started", channel);
         return 0;
     }
 
@@ -58,7 +60,7 @@ int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_
 
     ret = drm_mpi_create_vo_channel(channel, (const drm_vo_chn_attr_t *)&stVoAttr);
     if (ret) {
-        printf("create vo channel:[%d] failed, return:[%d]", channel, ret);
+        DRM_MEDIA_LOGE("create vo channel:[%d] failed, return:[%d]", channel, ret);
         return ret;
     }
 
@@ -69,12 +71,12 @@ int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_
 int drm_send_frame_video_output(int channel, media_buffer_t frame)
 {
     if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        printf("vo channel:[%d] invalid , only:[%d, %d)\n", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 
     if (g_voChnStated[channel] == false) {
-        printf("vo channel:[%d] not start\n", channel);
+        DRM_MEDIA_LOGE("vo channel:[%d] not start", channel);
         return -2;
     }
 

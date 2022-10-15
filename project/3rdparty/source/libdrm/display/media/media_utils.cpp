@@ -1,8 +1,8 @@
-#include <libdrm/display/sound.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/sound.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/media_type.h>
 
-#include "media_utils.hpp"
+#include "media_utils.h"
 
 std::string ImageTypeToString(drm_image_type_e type)
 {
@@ -83,7 +83,7 @@ std::string ImageTypeToString(drm_image_type_e type)
             return DRM_IMAGE_JPEG;
 
         default:
-            printf("%s: not support image type:%d", __func__, type);
+            DRM_MEDIA_LOGE("not support image type:%d", type);
             return "";
     }
 }
@@ -141,7 +141,7 @@ drm_image_type_e StringToImageType(std::string type)
     } else if (type == DRM_IMAGE_JPEG) {
         return DRM_IMAGE_TYPE_JPEG;
     } else {
-        printf("%s: unknown image type:%s", __func__, type.c_str());
+        DRM_MEDIA_LOGE("unknown image type:%s", type.c_str());
     }
 
     return DRM_IMAGE_TYPE_UNKNOW;

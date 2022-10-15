@@ -1,9 +1,9 @@
 #include <assert.h>
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/image.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/filter.hpp>
-#include <libdrm/display/key_string.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/image.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/filter.h>
+#include <libdrm/display/key_string.h>
 
 namespace libdrm {
 static bool do_filters(Flow *f, MediaBufferVector &input_vector);
@@ -76,7 +76,7 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
     std::string &&rule = gen_datatype_rule(params);
     if (!rule.empty()) {
         if (!REFLECTOR(Filter)::IsMatch(filter_name, rule.c_str())) {
-            printf("Unsupport for filter %s : [%s]\n", filter_name, rule.c_str());
+            DRM_MEDIA_LOGE("Unsupport for filter %s : [%s]", filter_name, rule.c_str());
             SetError(-EINVAL);
             return;
         }
@@ -101,7 +101,7 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
     for (auto &param_str : separate_list) {
         auto filter = REFLECTOR(Filter)::Create<Filter>(filter_name, param_str.c_str());
         if (!filter) {
-            printf("Fail to create filter %s<%s>\n", filter_name, param_str.c_str());
+            DRM_MEDIA_LOGE("Fail to create filter %s<%s>", filter_name, param_str.c_str());
             SetError(-EINVAL);
             return;
         }
@@ -121,7 +121,7 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
     std::string tag = "FilterFlow:";
     tag.append(filter_name);
     if (!InstallSlotMap(sm, tag, -1)) {
-        printf("Fail to InstallSlotMap for %s\n", tag.c_str());
+        DRM_MEDIA_LOGE("Fail to InstallSlotMap for %s", tag.c_str());
         SetError(-EINVAL);
         return;
     }
@@ -132,7 +132,7 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
         support_async = false;
         if (input_pix_fmt != DRM_PIX_FMT_NONE && !ParseImageInfoFromMap(params, out_img_info, false)) {
             if (filters.size() > 1) {
-                printf("missing out image info for multi filters\n");
+                DRM_MEDIA_LOGE("missing out image info for multi filters");
                 SetError(-EINVAL);
                 return;
             }
@@ -141,11 +141,11 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
         std::string &mem_type = params[DRM_KEY_MEM_TYPE];
         std::string &mem_cnt = params[DRM_KEY_MEM_CNT];
         if ((input_pix_fmt != DRM_PIX_FMT_NONE) && (out_img_info.vir_height > 0) && (out_img_info.vir_width > 0) && (!mem_type.empty()) && (!mem_cnt.empty())) {
-            printf("%s: Enable BufferPool! memtype:%s, memcnt:%s\n", tag.c_str(), mem_type.c_str(), mem_cnt.c_str());
+            DRM_MEDIA_LOGI("%s: Enable BufferPool! memtype:%s, memcnt:%s", tag.c_str(), mem_type.c_str(), mem_cnt.c_str());
 
             int m_cnt = std::stoi(mem_cnt);
             if (m_cnt <= 0) {
-                printf("%s: mem_cnt %s invalid!\n", tag.c_str(), mem_cnt.c_str());
+                DRM_MEDIA_LOGE("%s: mem_cnt %s invalid", tag.c_str(), mem_cnt.c_str());
                 SetError(-EINVAL);
                 return;
             }
@@ -158,7 +158,7 @@ FilterFlow::FilterFlow(const char *param) : support_async(true), thread_model(Mo
             for (int i = 0; i < m_cnt; i++) {
                 auto mb = buffer_pool->GetBuffer(false);
                 if (!mb) {
-                    printf("%s: buffer_pool get null buffer!\n", GetFlowTag());
+                    DRM_MEDIA_LOGE("%s: buffer_pool get null buffer", GetFlowTag());
                     return;
                 }
             }
@@ -201,7 +201,7 @@ bool do_filters(Flow *f, MediaBufferVector &input_vector)
                 if (flow->buffer_pool) {
                     auto mb = flow->buffer_pool->GetBuffer(false);
                     if (!mb) {
-                        printf("%s: buffer_pool get null buffer!\n", flow->GetFlowTag());
+                        DRM_MEDIA_LOGE("%s: buffer_pool get null buffer", flow->GetFlowTag());
                         return false;
                     }
 

@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_LOCK_HPP
-#define LIBDRM_DISPLAY_LOCK_HPP
+#ifndef LIBDRM_DISPLAY_LOCK_H
+#define LIBDRM_DISPLAY_LOCK_H
 
 #include <assert.h>
 #include <pthread.h>

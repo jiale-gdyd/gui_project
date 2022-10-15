@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_MEDIA_TYPE_HPP
-#define LIBDRM_DISPLAY_MEDIA_TYPE_HPP
+#ifndef LIBDRM_DISPLAY_MEDIA_TYPE_H
+#define LIBDRM_DISPLAY_MEDIA_TYPE_H
 
 #include "../drm_media_common.h"
 

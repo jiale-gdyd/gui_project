@@ -1,10 +1,10 @@
 #include <string.h>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/media_type.h>
 
 static const struct CodecTypeEntry {
-  DrmCodecType fmt;
-  const char *fmt_str;
+    DrmCodecType fmt;
+    const char   *fmt_str;
 } codec_type_string_map[] = {
     {DRM_CODEC_TYPE_MP3,   DRM_AUDIO_MP3},   {DRM_CODEC_TYPE_MP2,   DRM_AUDIO_MP2},
     {DRM_CODEC_TYPE_G711A, DRM_AUDIO_G711A}, {DRM_CODEC_TYPE_G711U, DRM_AUDIO_G711U},

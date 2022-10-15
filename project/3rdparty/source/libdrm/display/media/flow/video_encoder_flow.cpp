@@ -1,9 +1,9 @@
 #include <assert.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/encoder.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/encoder.h>
+#include <libdrm/display/media_type.h>
 
 #define ENC_CONST_MAX_TIME          12000
 

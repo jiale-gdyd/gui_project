@@ -1,6 +1,6 @@
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/demuxer.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/demuxer.h>
 
 namespace libdrm {
 DEFINE_REFLECTOR(Demuxer)

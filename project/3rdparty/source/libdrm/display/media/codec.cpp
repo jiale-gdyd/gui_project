@@ -1,7 +1,7 @@
 #include <sys/prctl.h>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/codec.hpp>
-#include <libdrm/display/buffer.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/codec.h>
+#include <libdrm/display/buffer.h>
 
 namespace libdrm {
 std::shared_ptr<MediaBuffer> Codec::GetExtraData(void **data, size_t *size)

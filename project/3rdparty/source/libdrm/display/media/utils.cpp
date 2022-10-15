@@ -9,7 +9,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include <libdrm/display/utils.hpp>
+#include <libdrm/display/utils.h>
 
 short g_level_list[MOD_ID_BUTT] = {
     DRM_LOG_LEVEL_INFO,
@@ -126,7 +126,7 @@ void drm_log_init()
 
     fprintf(stderr, "DRM MEDIA Log level: %d\n", media_log_level);
 
-    int log_file_fd = open(LOG_FILE_PATH, O_RDWR | O_CREAT | O_TRUNC);
+    int log_file_fd = open(LOG_FILE_PATH, O_RDWR | O_CREAT | O_TRUNC, 0666);
     if (log_file_fd != -1) {
         char init_log_level[6];
         sprintf(init_log_level, "all=%d", media_log_level);
@@ -263,7 +263,7 @@ bool string_end_withs(std::string const &fullString, std::string const &ending)
 
 bool DumpToFile(std::string path, const char *ptr, size_t len)
 {
-    int fd = open(path.c_str(), O_CREAT | O_WRONLY | O_FSYNC);
+    int fd = open(path.c_str(), O_CREAT | O_WRONLY | O_FSYNC, 0666);
     if (fd < 0) {
         DRM_MEDIA_LOGI("Fail to open %s", path.c_str());
         return false;

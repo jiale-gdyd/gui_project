@@ -1,14 +1,13 @@
-#ifndef LIBDRM_DISPLAY_ENCODER_HPP
-#define LIBDRM_DISPLAY_ENCODER_HPP
+#ifndef LIBDRM_DISPLAY_ENCODER_H
+#define LIBDRM_DISPLAY_ENCODER_H
 
 #include <mutex>
 
 #ifdef __cplusplus
-#include "codec.hpp"
-#include "media_reflector.hpp"
+#include "codec.h"
+#include "media_reflector.h"
 
 namespace libdrm {
-
 DECLARE_FACTORY(Encoder)
 DECLARE_REFLECTOR(Encoder)
 

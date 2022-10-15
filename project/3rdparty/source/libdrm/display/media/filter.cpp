@@ -1,8 +1,10 @@
-#include <libdrm/display/filter.hpp>
+#include <libdrm/display/filter.h>
 
 namespace libdrm {
 DEFINE_REFLECTOR(Filter)
+
 DEFINE_FACTORY_COMMON_PARSE(Filter)
+
 DEFINE_PART_FINAL_EXPOSE_PRODUCT(Filter, Filter)
 
 Filter::~Filter()

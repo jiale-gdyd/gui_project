@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_DRM_UTILS_HPP
-#define LIBDRM_DISPLAY_DRM_UTILS_HPP
+#ifndef LIBDRM_DISPLAY_DRM_UTILS_H
+#define LIBDRM_DISPLAY_DRM_UTILS_H
 
 #include "../xf86drm.h"
 #include "../xf86drmMode.h"

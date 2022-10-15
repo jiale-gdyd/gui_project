@@ -2,8 +2,4 @@
 # host unittest Kconfig
 #
 
-menu "host unittest menu"
-
-
-
-endmenu
+source "project/unittest/host/libdrm/Kconfig"

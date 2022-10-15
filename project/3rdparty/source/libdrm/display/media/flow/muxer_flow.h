@@ -1,5 +1,5 @@
-#ifndef LIBDRM_MEDIA_MUXER_FLOW_HPP
-#define LIBDRM_MEDIA_MUXER_FLOW_HPP
+#ifndef LIBDRM_MEDIA_MUXER_FLOW_H
+#define LIBDRM_MEDIA_MUXER_FLOW_H
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -7,10 +7,10 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/muxer.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/muxer.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
 
 namespace libdrm {
 #define PRE_RECORD_DEBUG            0

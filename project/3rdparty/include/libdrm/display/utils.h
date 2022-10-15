@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_UTILS_HPP
-#define LIBDRM_DISPLAY_UTILS_HPP
+#ifndef LIBDRM_DISPLAY_UTILS_H
+#define LIBDRM_DISPLAY_UTILS_H
 
 #include <stdarg.h>
 #include <string.h>

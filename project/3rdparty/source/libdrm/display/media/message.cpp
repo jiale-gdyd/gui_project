@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <sys/mman.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/message.hpp>
-#include <libdrm/display/key_string.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/message.h>
+#include <libdrm/display/key_string.h>
 
 namespace libdrm {
 void EventHandler::RegisterEventHook(std::shared_ptr<libdrm::Flow> flow, EventHook proc)

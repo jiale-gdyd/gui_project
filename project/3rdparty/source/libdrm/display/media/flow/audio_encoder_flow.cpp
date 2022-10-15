@@ -1,10 +1,10 @@
 #include <assert.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/sound.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/encoder.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/sound.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/encoder.h>
+#include <libdrm/display/media_type.h>
 
 namespace libdrm {
 static bool encode(Flow *f, MediaBufferVector &input_vector);

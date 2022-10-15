@@ -1,0 +1,21 @@
+#
+# host unittest Kconfig
+#
+
+menu "host libdrm unittest menu"
+
+choice
+    prompt "host libdrm unittest demo"
+    depends on X86_64 && UNITTEST
+    default HOST_LIBDRM_UNKNOWN
+
+    config HOST_LIBDRM_DISP
+        bool "host libdrm display unittest demo"
+        select LIBDRM_DISPLAY
+
+    config HOST_LIBDRM_UNKNOWN
+        bool "libdrm libdrm unittest unknow demo"
+
+endchoice
+
+endmenu

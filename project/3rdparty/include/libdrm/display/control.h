@@ -1,8 +1,9 @@
-#ifndef LIBDRM_DISPLAY_CONTROL_HPP
-#define LIBDRM_DISPLAY_CONTROL_HPP
+#ifndef LIBDRM_DISPLAY_CONTROL_H
+#define LIBDRM_DISPLAY_CONTROL_H
 
 #include <stdint.h>
-#include "image.hpp"
+
+#include "image.h"
 
 namespace libdrm {
 typedef struct {

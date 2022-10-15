@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_MESSAGE_HPP
-#define LIBDRM_DISPLAY_MESSAGE_HPP
+#ifndef LIBDRM_DISPLAY_MESSAGE_H
+#define LIBDRM_DISPLAY_MESSAGE_H
 
 #include <stdint.h>
 #include <string.h>
@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 
-#include "lock.hpp"
-#include "message_type.hpp"
+#include "lock.h"
+#include "message_type.h"
 
 namespace libdrm {
 class Flow;

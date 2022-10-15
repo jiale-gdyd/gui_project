@@ -1,5 +1,5 @@
-#ifndef LIBDRM_MEDIA_UTILS_HPP
-#define LIBDRM_MEDIA_UTILS_HPP
+#ifndef LIBDRM_MEDIA_UTILS_H
+#define LIBDRM_MEDIA_UTILS_H
 
 #include <string>
 #include <libdrm/drm_media_common.h>

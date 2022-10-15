@@ -1,13 +1,14 @@
-#ifndef LIBDRM_DISPLAY_MUXER_HPP
-#define LIBDRM_DISPLAY_MUXER_HPP
+#ifndef LIBDRM_DISPLAY_MUXER_H
+#define LIBDRM_DISPLAY_MUXER_H
 
-#include "media_config.hpp"
-#include "media_reflector.hpp"
-#include "media_type.hpp"
-#include "stream.hpp"
+#include "media_config.h"
+#include "media_reflector.h"
+#include "media_type.h"
+#include "stream.h"
 
 namespace libdrm {
 DECLARE_FACTORY(Muxer)
+
 DECLARE_REFLECTOR(Muxer)
 
 #define DEFINE_MUXER_FACTORY(REAL_PRODUCT, FINAL_EXPOSE_PRODUCT)                                        \

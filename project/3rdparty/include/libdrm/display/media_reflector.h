@@ -1,8 +1,8 @@
-#ifndef LIBDRM_DISPLAY_MEDIA_REFLECTOR_HPP
-#define LIBDRM_DISPLAY_MEDIA_REFLECTOR_HPP
+#ifndef LIBDRM_DISPLAY_MEDIA_REFLECTOR_H
+#define LIBDRM_DISPLAY_MEDIA_REFLECTOR_H
 
-#include "key_string.hpp"
-#include "reflector.hpp"
+#include "key_string.h"
+#include "reflector.h"
 
 #include <map>
 #include <list>

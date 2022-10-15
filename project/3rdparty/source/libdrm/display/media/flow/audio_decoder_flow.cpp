@@ -1,10 +1,11 @@
 #include <assert.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/sound.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/decoder.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/sound.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/decoder.h>
+#include <libdrm/display/media_type.h>
 
 namespace libdrm {
 static bool decode(Flow *f, MediaBufferVector &input_vector);
@@ -73,7 +74,7 @@ bool decode(Flow *f, MediaBufferVector &input_vector)
 
 AudioDecoderFlow::AudioDecoderFlow(const char *param)
 {
-    printf("AudioDecoderFlow.\n");
+    DRM_MEDIA_LOGD("AudioDecoderFlow");
 
     std::list<std::string> separate_list;
     std::map<std::string, std::string> params;
@@ -92,7 +93,7 @@ AudioDecoderFlow::AudioDecoderFlow(const char *param)
     const char *ccodec_name = codec_name.c_str();
 
     const std::string &dec_param_str = separate_list.back();
-    printf("dec_param_str = %s.\n", dec_param_str.c_str());
+    DRM_MEDIA_LOGI("dec_param_str = %s", dec_param_str.c_str());
     std::map<std::string, std::string> dec_params;
 
     if (!parse_media_param_map(dec_param_str.c_str(), dec_params)) {

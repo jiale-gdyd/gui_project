@@ -1,14 +1,13 @@
 #include <sstream>
 #include <strings.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/encoder.hpp>
-#include <libdrm/display/key_string.hpp>
-#include <libdrm/display/media_type.hpp>
-#include <libdrm/display/media_config.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/encoder.h>
+#include <libdrm/display/key_string.h>
+#include <libdrm/display/media_type.h>
+#include <libdrm/display/media_config.h>
 
 namespace libdrm {
-
 const char *rc_quality_strings[7] = {
     DRM_KEY_LOWEST, DRM_KEY_LOWER, DRM_KEY_LOW,
     DRM_KEY_MEDIUM, DRM_KEY_HIGH, DRM_KEY_HIGHER,

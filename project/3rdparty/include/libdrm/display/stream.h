@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_STREAM_HPP
-#define LIBDRM_DISPLAY_STREAM_HPP
+#ifndef LIBDRM_DISPLAY_STREAM_H
+#define LIBDRM_DISPLAY_STREAM_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -16,13 +16,14 @@ typedef struct {
 }
 #endif
 
-#include "control.hpp"
-#include "image.hpp"
-#include "media_reflector.hpp"
-#include "utils.hpp"
+#include "control.h"
+#include "image.h"
+#include "media_reflector.h"
+#include "utils.h"
 
 namespace libdrm {
 DECLARE_FACTORY(Stream)
+
 DECLARE_REFLECTOR(Stream)
 
 #define DEFINE_STREAM_FACTORY(REAL_PRODUCT, FINAL_EXPOSE_PRODUCT)                                                           \

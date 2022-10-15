@@ -1,10 +1,10 @@
-#ifndef LIBDRM_DISPLAY_MEDIA_CONFIG_HPP
-#define LIBDRM_DISPLAY_MEDIA_CONFIG_HPP
+#ifndef LIBDRM_DISPLAY_MEDIA_CONFIG_H
+#define LIBDRM_DISPLAY_MEDIA_CONFIG_H
 
-#include "flow.hpp"
-#include "image.hpp"
-#include "sound.hpp"
-#include "media_type.hpp"
+#include "flow.h"
+#include "image.h"
+#include "sound.h"
+#include "media_type.h"
 
 typedef struct {
     DrmImageInfo image_info;

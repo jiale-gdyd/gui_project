@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <libdrm/display/lock.hpp>
+#include <libdrm/display/lock.h>
 
 namespace libdrm {
 LockMutex::LockMutex() : lock_times(0)

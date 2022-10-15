@@ -1,9 +1,10 @@
-#include <libdrm/display/encoder.hpp>
+#include <libdrm/display/encoder.h>
 
 namespace libdrm {
 #define VIDEO_ENC_CHANGE_MAX        50
 
 DEFINE_REFLECTOR(Encoder)
+
 DEFINE_FACTORY_COMMON_PARSE(Encoder)
 
 void VideoEncoder::RequestChange(uint32_t change, std::shared_ptr<ParameterBuffer> value)

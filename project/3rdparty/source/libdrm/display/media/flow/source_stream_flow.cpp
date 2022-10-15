@@ -1,8 +1,8 @@
 #include <sys/prctl.h>
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/stream.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/stream.h>
 
 namespace libdrm {
 class SourceStreamFlow : public Flow {
@@ -52,7 +52,7 @@ SourceStreamFlow::SourceStreamFlow(const char *param) : loop(false), read_thread
 
     stream = REFLECTOR(Stream)::Create<Stream>(stream_name, stream_param.c_str());
     if (!stream) {
-        printf("Create stream %s failed\n", stream_name);
+        DRM_MEDIA_LOGE("Create stream %s failed", stream_name);
         SetError(-EINVAL);
         return;
     }
@@ -82,10 +82,10 @@ SourceStreamFlow::~SourceStreamFlow()
 
     int stop = 1;
     if (stream && Control(S_STREAM_OFF, &stop)) {
-        printf("Fail to stop source stream\n");
+        DRM_MEDIA_LOGE("Fail to stop source stream");
     }
 
-    printf("#SourceStreamFlow[%s]: stream off....\n", GetFlowTag());
+    DRM_MEDIA_LOGD("#SourceStreamFlow[%s]: stream off....", GetFlowTag());
     if (read_thread) {
         source_start_cond_mtx->lock();
         loop = false;
@@ -95,9 +95,9 @@ SourceStreamFlow::~SourceStreamFlow()
         delete read_thread;
     }
 
-    printf("#SourceStreamFlow[%s]: read thread exit sucessfully!\n", GetFlowTag());
+    DRM_MEDIA_LOGI("#SourceStreamFlow[%s]: read thread exit sucessfully", GetFlowTag());
     stream.reset();
-    printf("#SourceStreamFlow[%s]: stream reset sucessfully!\n", GetFlowTag());
+    DRM_MEDIA_LOGI("#SourceStreamFlow[%s]: stream reset sucessfully", GetFlowTag());
 }
 
 void SourceStreamFlow::ReadThreadRun()

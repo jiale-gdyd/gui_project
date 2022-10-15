@@ -1,10 +1,10 @@
-#ifndef LIBDRM_DISPLAY_CODEC_HPP
-#define LIBDRM_DISPLAY_CODEC_HPP
+#ifndef LIBDRM_DISPLAY_CODEC_H
+#define LIBDRM_DISPLAY_CODEC_H
 
 #include <list>
 #include <memory>
 
-#include "media_config.hpp"
+#include "media_config.h"
 
 namespace libdrm {
 class MediaBuffer;

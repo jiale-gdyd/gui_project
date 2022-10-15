@@ -1,8 +1,9 @@
-#ifndef LIBDRM_DISPLAY_SOUND_HPP
-#define LIBDRM_DISPLAY_SOUND_HPP
+#ifndef LIBDRM_DISPLAY_SOUND_H
+#define LIBDRM_DISPLAY_SOUND_H
 
 #include <stddef.h>
-#include "utils.hpp"
+
+#include "utils.h"
 #include "../drm_media_common.h"
 
 typedef struct {

@@ -1,10 +1,10 @@
 #include <assert.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/image.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/decoder.hpp>
-#include <libdrm/display/key_string.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/image.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/decoder.h>
+#include <libdrm/display/key_string.h>
 
 namespace libdrm {
 static bool do_decode(Flow *f, MediaBufferVector &input_vector);

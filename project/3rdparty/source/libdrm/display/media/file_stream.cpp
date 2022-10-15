@@ -2,13 +2,12 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/stream.hpp>
-#include <libdrm/display/key_string.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/stream.h>
+#include <libdrm/display/key_string.h>
+#include <libdrm/display/media_type.h>
 
 namespace libdrm {
-
 #define CHECK_FILE(f)                                                               \
     if (!f) {                                                                       \
         errno = EBADF;                                                              \

@@ -6,15 +6,15 @@
 #include <inttypes.h>
 #include <sys/time.h>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/codec.hpp>
-#include <libdrm/display/muxer.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/codec.h>
+#include <libdrm/display/muxer.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
 
 #include <sstream>
 
-#include "muxer_flow.hpp"
+#include "muxer_flow.h"
 
 namespace libdrm {
 static int64_t sg_last_time = 0;
@@ -530,7 +530,7 @@ void MuxerFlow::CheckRecordEnd(std::shared_ptr<MediaBuffer> vid_buffer)
         is_end = total_time > duration_s * 1000000 - frame_interval;
 
         if (is_end || change_config_split) {
-            DRM_MEDIA_LOGW("%d: duration: %lld, total_time: %lld, change_config_split: %d", muxer_id, real_file_duration, total_time, change_config_split);
+            DRM_MEDIA_LOGW("%u: duration: %lld, total_time: %lld, change_config_split: %d", muxer_id, (long long)real_file_duration, (long long)total_time, change_config_split);
             Reset();
         }
     }
@@ -779,7 +779,7 @@ void MuxerFlow::FlushThread()
 
         size = vid_deque->size();
         if (size >= cache_level && size % cache_level == 0) {
-            DRM_MEDIA_LOGE("%d: cached size(aud:%d, vid:%d)", muxer_id, aud_deque->size(), size);
+            DRM_MEDIA_LOGE("%u: cached size(aud:%lu, vid:%d)", muxer_id, (unsigned long)aud_deque->size(), size);
 
             if (size >= 2 * cache_level) {
                 cache_warning++;

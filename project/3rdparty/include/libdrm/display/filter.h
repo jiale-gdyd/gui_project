@@ -1,11 +1,11 @@
-#ifndef LIBDRM_DISPLAY_FILTER_HPP
-#define LIBDRM_DISPLAY_FILTER_HPP
+#ifndef LIBDRM_DISPLAY_FILTER_H
+#define LIBDRM_DISPLAY_FILTER_H
 
 #include <memory>
 #include <stdarg.h>
 
-#include "control.hpp"
-#include "media_reflector.hpp"
+#include "control.h"
+#include "media_reflector.h"
 
 namespace libdrm {
 DECLARE_FACTORY(Filter)

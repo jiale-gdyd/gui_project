@@ -5,9 +5,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/key_string.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/key_string.h>
 
 namespace libdrm {
 MediaBuffer::MemType StringToMemType(const char *s)

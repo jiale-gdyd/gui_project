@@ -1,8 +1,8 @@
-#ifndef LIBDRM_DISPLAY_DECODER_HPP
-#define LIBDRM_DISPLAY_DECODER_HPP
+#ifndef LIBDRM_DISPLAY_DECODER_H
+#define LIBDRM_DISPLAY_DECODER_H
 
-#include "codec.hpp"
-#include "media_reflector.hpp"
+#include "codec.h"
+#include "media_reflector.h"
 
 namespace libdrm {
 DECLARE_FACTORY(Decoder)

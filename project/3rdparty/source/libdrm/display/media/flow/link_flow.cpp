@@ -1,8 +1,8 @@
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/stream.hpp>
-#include <libdrm/display/link_config.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/stream.h>
+#include <libdrm/display/link_config.h>
 
 namespace libdrm {
 static bool process_buffer(Flow *f, MediaBufferVector &input_vector);
@@ -51,7 +51,7 @@ LinkFlow::LinkFlow(const char *param)
     sm.process = process_buffer;
 
     if (!InstallSlotMap(sm, "LinkFLow", 0)) {
-        printf("Fail to InstallSlotMap for LinkFLow\n");
+        DRM_MEDIA_LOGE("Fail to InstallSlotMap for LinkFLow");
         return;
     }
 

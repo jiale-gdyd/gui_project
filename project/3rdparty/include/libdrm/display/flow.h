@@ -1,10 +1,10 @@
-#ifndef LIBDRM_DISPLAY_FLOW_HPP
-#define LIBDRM_DISPLAY_FLOW_HPP
+#ifndef LIBDRM_DISPLAY_FLOW_H
+#define LIBDRM_DISPLAY_FLOW_H
 
-#include "lock.hpp"
-#include "utils.hpp"
-#include "message.hpp"
-#include "reflector.hpp"
+#include "lock.h"
+#include "utils.h"
+#include "message.h"
+#include "reflector.h"
 
 #include <stdarg.h>
 
@@ -13,7 +13,7 @@
 #include <vector>
 #include <type_traits>
 
-#include "control.hpp"
+#include "control.h"
 
 namespace libdrm {
 DECLARE_FACTORY(Flow)

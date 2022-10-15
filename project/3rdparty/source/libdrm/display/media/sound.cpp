@@ -1,9 +1,9 @@
 
 #include <string.h>
-#include <libdrm/display/sound.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/key_string.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/sound.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/key_string.h>
+#include <libdrm/display/media_type.h>
 
 static const struct SampleFormatEntry {
     DrmSampleFormat fmt;
@@ -66,7 +66,7 @@ bool ParseSampleInfoFromMap(std::map<std::string, std::string> &params, DrmSampl
 
     si.fmt = StringToSampleFmt(value.c_str());
     if (si.fmt == DRM_SAMPLE_FMT_NONE) {
-        printf("unsupport sample fmt %s\n", value.c_str());
+        DRM_MEDIA_LOGE("unsupport sample fmt %s", value.c_str());
         return false;
     }
 

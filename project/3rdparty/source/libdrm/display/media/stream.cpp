@@ -1,8 +1,8 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/stream.hpp>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/stream.h>
 
 namespace libdrm {
 static size_t local_read(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -136,7 +136,7 @@ bool Stream::ReadImage(void *ptr, const DrmImageInfo &info)
         break;
 
         default:
-            printf("TODO: read image fmt %d\n", info.pix_fmt);
+            DRM_MEDIA_LOGW("TODO: read image fmt %d", info.pix_fmt);
             return false;
     }
 

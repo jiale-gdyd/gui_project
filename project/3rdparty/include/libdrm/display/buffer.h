@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_BUFFER_HPP
-#define LIBDRM_DISPLAY_BUFFER_HPP
+#ifndef LIBDRM_DISPLAY_BUFFER_H
+#define LIBDRM_DISPLAY_BUFFER_H
 
 #include <stdint.h>
 #include <string.h>
@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "image.hpp"
-#include "lock.hpp"
-#include "media_type.hpp"
-#include "sound.hpp"
+#include "lock.h"
+#include "image.h"
+#include "sound.h"
+#include "media_type.h"
 
 #define NUM_DATA_POINTERS           8
 

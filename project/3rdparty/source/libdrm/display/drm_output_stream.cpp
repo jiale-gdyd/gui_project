@@ -1,6 +1,6 @@
-#include <libdrm/display/buffer.hpp>
-#include <libdrm/display/control.hpp>
-#include <libdrm/display/drm_stream.hpp>
+#include <libdrm/display/buffer.h>
+#include <libdrm/display/control.h>
+#include <libdrm/display/drm_stream.h>
 
 namespace libdrm {
 #define USING_ASYNC_COMMIT      1
@@ -29,7 +29,7 @@ public:
         int fd = buffer->GetFD();
         int ret = drmPrimeFDToHandle(drm_fd, fd, &handle);
         if (ret) {
-            printf("Fail to drmPrimeFDToHandle, ret=%d, %m\n", ret);
+            DRM_MEDIA_LOGE("Fail to drmPrimeFDToHandle, ret=%d, %m", ret);
             return;
         }
 
@@ -76,14 +76,14 @@ public:
                 break;
 
             default:
-                printf("TODO format for drm %c%c%c%c\n", DRM_DUMP_FOURCC(drm_fmt));
+                DRM_MEDIA_LOGE("TODO format for drm %c%c%c%c", DRM_DUMP_FOURCC(drm_fmt));
                 return;
         }
 
         ret = drmModeAddFB2(drm_fd, w, h, drm_fmt, handles, pitches, offsets, &fb_id, 0);
         if (ret) {
-            printf("Fail to drmModeAddFB2, ret=%d, %m\n", ret);
-            printf("num/den=%d/%d, w=%d, h=%d, drm_fmt=%c%c%c%c\n", num, den, w, h, DRM_DUMP_FOURCC(drm_fmt));
+            DRM_MEDIA_LOGE("Fail to drmModeAddFB2, ret=%d, %m", ret);
+            DRM_MEDIA_LOGI("num/den=%d/%d, w=%d, h=%d, drm_fmt=%c%c%c%c", num, den, w, h, DRM_DUMP_FOURCC(drm_fmt));
         }
     }
 
@@ -99,7 +99,7 @@ public:
 
             int ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &data);
             if (ret) {
-                printf("Fail to free drm handle <%d>: %m\n", handle);
+                DRM_MEDIA_LOGE("Fail to free drm handle <%d>: %m", handle);
             }
         }
     }
@@ -174,7 +174,7 @@ DRMOutPutStream::DRMOutPutStream(const char *param) : DRMStream(param, true), zi
     do {                                                                                                \
         ret = drmModeAtomicAddProperty(req, object_id, property_id, value);                             \
         if (ret < 0) {                                                                                  \
-            printf("Failed to add prop val[%d] to [%d], ret=%d\n", (int)value, property_id, ret);       \
+            DRM_MEDIA_LOGE("Failed to add prop val[%d] to [%d], ret=%d", (int)value, property_id, ret); \
         }                                                                                               \
     } while (0)
 
@@ -188,7 +188,7 @@ DRMOutPutStream::DRMOutPutStream(const char *param) : DRMStream(param, true), zi
     addcode                                                                                             \
     ret = drmModeAtomicCommit(fd, req, flags, NULL);                                                    \
     if (ret) {                                                                                          \
-        printf("Fail to atomic commit, ret=%d, %m\n", ret);                                             \
+        DRM_MEDIA_LOGE("Fail to atomic commit, ret=%d, %m", ret);                                       \
     }                                                                                                   \
     drmModeAtomicFree(req);
 
@@ -228,7 +228,7 @@ int DRMOutPutStream::Open()
         ret = drmModeAtomicCommit(fd, req, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
         drmModeAtomicFree(req);
         if (ret) {
-            printf("set crtc failed!\n");
+            DRM_MEDIA_LOGE("set crtc failed");
             return ret;
         }
     }
@@ -268,7 +268,7 @@ int DRMOutPutStream::Open()
     if (zindex >= 0) {
         DRM_ATOMIC_ADD_PROP_EXTRA(-1, DRM_ATOMIC_ADD_PROP(plane_id, plane_prop_ids.zpos, zindex);)
         if (ret) {
-            printf("set zpos(%d) failed!\n", zindex);
+            DRM_MEDIA_LOGE("set zpos(%d) failed", zindex);
             return ret;
         }
     }
@@ -276,13 +276,13 @@ int DRMOutPutStream::Open()
     DrmImageRect ir = {0, 0, img_info.vir_width, img_info.vir_height};
     ret = IoCtrl(S_SOURCE_RECT, &ir);
     if (ret) {
-        printf("Fail to set display source rect\n");
+        DRM_MEDIA_LOGE("Fail to set display source rect");
         return -1;
     }
 
     ret = IoCtrl(S_DESTINATION_RECT, &ir);
     if (ret) {
-        printf("Fail to set display destination rect\n");
+        DRM_MEDIA_LOGE("Fail to set display destination rect");
         return -1;
     }
 
@@ -294,7 +294,7 @@ int DRMOutPutStream::Open()
     ret = drmModeAtomicCommit(fd, req, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
     drmModeAtomicFree(req);
     if (ret) {
-        printf("set async commit failed!\n");
+        DRM_MEDIA_LOGE("set async commit failed");
         return ret;
     }
 #endif
@@ -327,7 +327,7 @@ int DRMOutPutStream::IoCtrl(unsigned long int request, ...)
         case S_SOURCE_RECT: {
             DrmImageRect *rect = (static_cast<DrmImageRect *>(arg));
             if (!support_scale && ((dst_rect.w != 0 && rect->w != dst_rect.w) || (dst_rect.h != 0 && rect->h != dst_rect.h))) {
-                printf("plane[%d] do not support scale, the source rect should the same to the destination rect\n", plane_id);
+                DRM_MEDIA_LOGE("plane:[%d] do not support scale, the source rect should the same to the destination rect", plane_id);
                 return -1;
             }
 
@@ -352,7 +352,7 @@ int DRMOutPutStream::IoCtrl(unsigned long int request, ...)
         case S_SRC_DST_RECT: {
             DrmImageRect *rect = (static_cast<DrmImageRect *>(arg));
             if (!support_scale && (rect[0].w != rect[1].w || rect[0].h != rect[1].h)) {
-                printf("plane[%d] do not support scale, input source rect and destination rect should be the same\n", plane_id);
+                DRM_MEDIA_LOGE("plane:[%d] do not support scale, input source rect and destination rect should be the same", plane_id);
                 return -1;
             }
 
@@ -405,7 +405,7 @@ int DRMOutPutStream::IoCtrl(unsigned long int request, ...)
 
             ret = set_property(res, object_type, object_id, prop_arg->name, prop_arg->value);
             if (ret < 0) {
-                printf("Fail to set propery[%s]=%d on object id[%d]\n", prop_arg->name, (int)prop_arg->value, object_id);
+                DRM_MEDIA_LOGE("Fail to set propery[%s]=%d on object id[%d]", prop_arg->name, (int)prop_arg->value, object_id);
             }
         }
         break;
@@ -447,7 +447,7 @@ bool DRMOutPutStream::Write(std::shared_ptr<MediaBuffer> input)
     rect_mtx.unlock();
 
     if ((input_img->GetVirWidth() < (src_rect_tmp.x + src_rect_tmp.w)) || (input_img->GetVirHeight() < (src_rect_tmp.y + src_rect_tmp.h))) {
-        printf("InBuf<%dx%d> does not match the imgRect<%d,%d,%d,%d>\n", input_img->GetVirWidth(), input_img->GetVirHeight(), src_rect_tmp.x, src_rect_tmp.y, src_rect_tmp.w, src_rect_tmp.h);
+        DRM_MEDIA_LOGE("InBuf<%dx%d> does not match the imgRect<%d,%d,%d,%d>", input_img->GetVirWidth(), input_img->GetVirHeight(), src_rect_tmp.x, src_rect_tmp.y, src_rect_tmp.w, src_rect_tmp.h);
         return false;
     }
 
@@ -470,7 +470,7 @@ bool DRMOutPutStream::Write(std::shared_ptr<MediaBuffer> input)
 
     int vbl_ret = drmWaitVBlank(fd, &vbl);
     if (vbl_ret != 0) {
-        printf("drmWaitVBlank (relative) failed ret: %i\n", ret);
+        DRM_MEDIA_LOGE("drmWaitVBlank (relative) failed ret: %i", ret);
     }
 #else
     drmModeAtomicReq *req = drmModeAtomicAlloc();
@@ -493,7 +493,7 @@ bool DRMOutPutStream::Write(std::shared_ptr<MediaBuffer> input)
         return true;
     }
 
-    printf("%d:%d::Imgbuf<%d,%d,%d,%d> display with <%d,%d,%d,%d> failed!\n", crtc_id, plane_id, src_rect_tmp.x, src_rect_tmp.y, src_rect_tmp.w, src_rect_tmp.h, dst_rect_tmp.x, dst_rect_tmp.y, dst_rect_tmp.w, dst_rect_tmp.h);
+    DRM_MEDIA_LOGE("%d:%d::Imgbuf<%d,%d,%d,%d> display with <%d,%d,%d,%d> failed", crtc_id, plane_id, src_rect_tmp.x, src_rect_tmp.y, src_rect_tmp.w, src_rect_tmp.h, dst_rect_tmp.x, dst_rect_tmp.y, dst_rect_tmp.w, dst_rect_tmp.h);
     return false;
 }
 

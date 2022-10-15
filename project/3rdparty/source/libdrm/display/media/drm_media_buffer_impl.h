@@ -1,8 +1,8 @@
-#ifndef LIBDRM_MEDIA_BUFFER_IMPL_HPP
-#define LIBDRM_MEDIA_BUFFER_IMPL_HPP
+#ifndef LIBDRM_MEDIA_BUFFER_IMPL_H
+#define LIBDRM_MEDIA_BUFFER_IMPL_H
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/buffer.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/buffer.h>
 #include <libdrm/drm_media_common.h>
 #include <libdrm/drm_media_buffer.h>
 

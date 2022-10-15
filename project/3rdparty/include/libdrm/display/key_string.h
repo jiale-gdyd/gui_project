@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_KEY_STRING_HPP
-#define LIBDRM_DISPLAY_KEY_STRING_HPP
+#ifndef LIBDRM_DISPLAY_KEY_STRING_H
+#define LIBDRM_DISPLAY_KEY_STRING_H
 
 #define _DRM_STR(s)                             #s
 #define DRM_STR(s)                              _DRM_STR(s)

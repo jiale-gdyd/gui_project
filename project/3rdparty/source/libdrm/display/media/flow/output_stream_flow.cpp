@@ -1,6 +1,6 @@
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/stream.hpp>
-#include <libdrm/display/media_type.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/stream.h>
+#include <libdrm/display/media_type.h>
 
 namespace libdrm {
 static bool send_buffer(Flow *f, MediaBufferVector &input_vector);
@@ -64,7 +64,7 @@ OutPutStreamFlow::OutPutStreamFlow(const char *param)
     const std::string &stream_param = separate_list.back();
     auto stream = REFLECTOR(Stream)::Create<Stream>(stream_name, stream_param.c_str());
     if (!stream) {
-        printf("Fail to create stream %s\n", stream_name);
+        DRM_MEDIA_LOGE("Fail to create stream %s", stream_name);
         SetError(-EINVAL);
         return;
     }
@@ -76,7 +76,7 @@ OutPutStreamFlow::OutPutStreamFlow(const char *param)
     std::string tag = "OutputStreamFlow:";
     tag.append(stream_name);
     if (!InstallSlotMap(sm, tag, -1)) {
-        printf("Fail to InstallSlotMap for %s\n", tag.c_str());
+        DRM_MEDIA_LOGE("Fail to InstallSlotMap for %s", tag.c_str());
         SetError(-EINVAL);
         return;
     }

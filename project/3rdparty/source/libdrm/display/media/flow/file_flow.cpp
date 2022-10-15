@@ -1,9 +1,9 @@
 #include <sstream>
 
-#include <libdrm/display/flow.hpp>
-#include <libdrm/display/utils.hpp>
-#include <libdrm/display/stream.hpp>
-#include <libdrm/display/buffer.hpp>
+#include <libdrm/display/flow.h>
+#include <libdrm/display/utils.h>
+#include <libdrm/display/stream.h>
+#include <libdrm/display/buffer.h>
 
 namespace libdrm {
 class FileReadFlow : public Flow {

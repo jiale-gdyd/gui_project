@@ -1,5 +1,5 @@
-#ifndef LIBDRM_DISPLAY_IMAGE_HPP
-#define LIBDRM_DISPLAY_IMAGE_HPP
+#ifndef LIBDRM_DISPLAY_IMAGE_H
+#define LIBDRM_DISPLAY_IMAGE_H
 
 typedef enum {
     DRM_PIX_FMT_NONE = -1,
@@ -41,7 +41,7 @@ typedef struct {
     int w, h;
 } DrmImageRect;
 
-#include "utils.hpp"
+#include "utils.h"
 
 void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den);
 int CalPixFmtSize(const DrmPixelFormat &fmt, const int width, const int height, int align = 0);
