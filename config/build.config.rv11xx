@@ -39,7 +39,7 @@ KBUILD_CXXFLAGS += -mfloat-abi=hard -mcpu=cortex-a7 -mfpu=neon-vfpv4
 KBUILD_CFLAGS_KERNEL   := -D__STDC_CONSTANT_MACROS -D__OPTIMIZE__ -fdata-sections -ffunction-sections
 KBUILD_CXXFLAGS_KERNEL := -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
 
-KBUILD_CXXFLAGS += -Wall -g \
+KBUILD_CXXFLAGS += -Wall -O2 \
                 -fno-strict-aliasing \
                 -fno-common \
                 -Wno-return-type \
@@ -70,7 +70,7 @@ KBUILD_CXXFLAGS += -Wall -g \
                 -Wno-unknown-pragmas \
                 -Wno-char-subscripts
 
-KBUILD_CFLAGS += -Wall -g \
+KBUILD_CFLAGS += -Wall -O2 \
             -Wno-trigraphs \
             -fno-strict-aliasing -fno-common \
             -Wno-format-security \

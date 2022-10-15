@@ -38,7 +38,7 @@ KBUILD_CXXFLAGS := -DRAPIDJSON_HAS_STDSTRING
 KBUILD_CFLAGS_KERNEL   := -D__OPTIMIZE__ -fdata-sections -ffunction-sections
 KBUILD_CXXFLAGS_KERNEL := -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
 
-KBUILD_CXXFLAGS += -Wall -g \
+KBUILD_CXXFLAGS += -Wall -O2 \
                 -fno-strict-aliasing \
                 -fno-common \
                 -Wno-return-type \
@@ -68,7 +68,7 @@ KBUILD_CXXFLAGS += -Wall -g \
                 -Wno-sizeof-pointer-memaccess \
                 -Wno-class-conversion
 
-KBUILD_CFLAGS := -Wall -g \
+KBUILD_CFLAGS := -Wall -O2 \
             -Wno-trigraphs \
             -fno-strict-aliasing -fno-common \
             -Wno-format-security \
