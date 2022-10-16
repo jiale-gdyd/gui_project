@@ -6,7 +6,6 @@ extern "C" {
 #endif
 
 #include <azure/azure_threadx.h>
-#include <azure/azure_guix.h>
 
 /**
  * 函数名称: azure_threadx_demo_init
