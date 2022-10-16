@@ -1023,7 +1023,7 @@ int drm_mpi_vi_enable_channel(int channel)
     PARAM_STRING_APPEND(stream_param, DRM_KEY_DEVICE, g_vi_chns[channel].vi_attr.pcVideoNode);
     PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_CAP_TYPE, DRM_KEY_V4L2_C_TYPE(VIDEO_CAPTURE));
 
-    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 1);
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 0);
     if (g_vi_chns[channel].vi_attr.enBufType == DRM_VI_CHN_BUF_TYPE_MMAP) {
         PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_MMAP));
     } else {
