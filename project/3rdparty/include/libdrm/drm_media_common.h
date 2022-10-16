@@ -12,6 +12,7 @@ typedef enum MOD_ID_E {
     MOD_ID_UNKNOW = 0,
     MOD_ID_SYS,
     MOD_ID_VO,
+    MOD_ID_VI,
     MOD_ID_BUTT
 } mod_id_e;
 

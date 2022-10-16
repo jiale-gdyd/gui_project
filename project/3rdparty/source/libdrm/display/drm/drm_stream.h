@@ -4,8 +4,9 @@
 #include <assert.h>
 #include <vector>
 
-#include "image.h"
-#include "stream.h"
+#include <libdrm/display/image.h>
+#include <libdrm/display/stream.h>
+
 #include "drm_utils.h"
 
 namespace libdrm {

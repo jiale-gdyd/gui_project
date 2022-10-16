@@ -1,6 +1,7 @@
 #include <libdrm/display/buffer.h>
 #include <libdrm/display/control.h>
-#include <libdrm/display/drm_stream.h>
+
+#include "drm_stream.h"
 
 namespace libdrm {
 #define USING_ASYNC_COMMIT      1

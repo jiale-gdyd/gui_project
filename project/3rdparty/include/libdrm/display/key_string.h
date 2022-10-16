@@ -124,7 +124,7 @@
 #define DRM_KEY_V4L2_M_TYPE(t)                  DRM_STR(t)
 #define DRM_KEY_V4L2_COLORSPACE                 "v4l2_colorspace"
 #define DRM_KEY_V4L2_QUANTIZATION               "v4l2_quantization"
-#define DRM_KEY_V4L2_CS(t) STR(t)
+#define DRM_KEY_V4L2_CS(t)                      DRM_STR(t)
 
 #define DRM_KEY_PORT_NUM                        "portnum"
 #define DRM_KEY_USERNAME                        "username"

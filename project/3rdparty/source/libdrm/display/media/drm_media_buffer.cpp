@@ -5,12 +5,12 @@
 #include "media_utils.h"
 #include "drm_media_buffer_impl.h"
 
-std::mutex g_handle_mb_mutex;
-std::list<handle_mb_t *> g_handle_mb;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+std::mutex g_handle_mb_mutex;
+std::list<handle_mb_t *> g_handle_mb;
 
 void *drm_mpi_mb_get_ptr(media_buffer_t mb)
 {
@@ -104,6 +104,18 @@ int drm_mpi_mb_release_buffer(media_buffer_t mb)
     }
 
     delete mb_impl;
+
+    g_handle_mb_mutex.lock();
+    for (auto it = g_handle_mb.begin(); it != g_handle_mb.end(); ++it) {
+        auto p = *it;
+        if (p->mb == mb) {
+            g_handle_mb.erase(it);
+            free(p);
+            break;
+        }
+    }
+    g_handle_mb_mutex.unlock();
+
     return 0;
 }
 

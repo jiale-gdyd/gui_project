@@ -41,6 +41,40 @@ typedef struct {
     int w, h;
 } DrmImageRect;
 
+typedef struct {
+    int           priv;
+    int           x;
+    int           y;
+    int           w;
+    int           h;
+    int           color;
+    int           offset;
+    unsigned char enable;
+    int           id;
+} DrmImageBorder;
+
+typedef struct {
+    int            priv;
+    int            x;
+    int            y;
+    int            w;
+    int            h;
+    void           *data;
+    DrmPixelFormat pix_fmt;
+    unsigned char  enable;
+    int            id;
+} DrmImageOsd;
+
+typedef struct {
+    int            x;
+    int            y;
+    int            w;
+    int            h;
+    void           *data;
+    DrmPixelFormat fmt;
+    unsigned char  enable;
+} DrmOsdInfo;
+
 #include "utils.h"
 
 void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den);

@@ -1,5 +1,5 @@
 #include <string.h>
-#include <libdrm/display/drm_stream.h>
+#include "drm_stream.h"
 
 namespace libdrm {
 DRMStream::DRMStream(const char *param, bool as)

@@ -45,4 +45,10 @@ config LIBDRM_MODETEST
     help
       libdrm tools modetest
 
+config LIBV4L2
+    bool "libdrm tools v4l2"
+    default n
+    help
+      v4l2 libraries
+
 endmenu

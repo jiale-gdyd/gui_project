@@ -1,9 +1,9 @@
 #ifndef LIBDRM_DISPLAY_DRM_UTILS_H
 #define LIBDRM_DISPLAY_DRM_UTILS_H
 
-#include "../xf86drm.h"
-#include "../xf86drmMode.h"
-#include "../drm/drm_fourcc.h"
+#include <libdrm/xf86drm.h>
+#include <libdrm/xf86drmMode.h>
+#include <libdrm/drm/drm_fourcc.h>
 
 #include <string>
 #include <vector>

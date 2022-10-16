@@ -17,6 +17,11 @@ typedef struct {
     void              *arg;
 } SubRequest;
 
+typedef struct {
+    size_t size;
+    void   *data;
+} UserPicArg;
+
 enum {
     S_FIRST_CONTROL = 10000,
     S_SUB_REQUEST,

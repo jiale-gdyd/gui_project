@@ -6,10 +6,11 @@
 #include <algorithm>
 #include <functional>
 
-#include <libdrm/display/drm_utils.h>
 #include <libdrm/display/key_string.h>
 #include <libdrm/display/media_type.h>
 #include <libdrm/display/utils.h>
+
+#include "drm_utils.h"
 
 namespace libdrm {
 
