@@ -25,6 +25,8 @@
 
 #include "private.h"
 
+#define BUFF_POOL_SIZE              10
+
 enum guixCachePingPong {
     CACHE_BUF_PING = 0,
     CACHE_BUF_PONG = 1,
@@ -32,6 +34,7 @@ enum guixCachePingPong {
 };
 
 static bool g_quit = false;
+static uint32_t g_BufPoolCnt = BUFF_POOL_SIZE;
 
 static int g_dispZpos = 1;
 static int g_voChannel = 0;
@@ -43,6 +46,7 @@ static size_t g_DispHeight = 480;
 static media_buffer_pool_t g_dispBufferPool = NULL;
 static drm_plane_type_e g_dispPlaneType = VO_PLANE_OVERLAY;
 static drm_image_type_e g_dispImageType = DRM_IMAGE_TYPE_RGB888;
+static unsigned char g_dispColor[BUFF_POOL_SIZE] = {0x00, 0x10, 0x20, 0x40, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0};
 
 static void sigterm_handler(int signo)
 {
@@ -76,7 +80,7 @@ int rv11xx_unittest_libdrm_display_init(int argc, char *argv[])
     }
 
     mb_pool_param_t stBufPoolParam;
-    stBufPoolParam.u32Cnt = 3;
+    stBufPoolParam.u32Cnt = g_BufPoolCnt;
     stBufPoolParam.u32Size = 0;
     stBufPoolParam.enMediaType = MB_TYPE_VIDEO;
     stBufPoolParam.bHardWare = true;
@@ -105,7 +109,6 @@ int rv11xx_unittest_libdrm_display_init(int argc, char *argv[])
     u32FrameSize = (size_t)(g_DispWidth * g_DispHeight * fltImgRatio);
 
     int frameCount = 0;
-    bool bSet0xFF = false;
     media_buffer_t frame = NULL;
 
     signal(SIGINT, sigterm_handler);
@@ -114,21 +117,24 @@ int rv11xx_unittest_libdrm_display_init(int argc, char *argv[])
         if (g_dispBufferPool != NULL) {
             frame = drm_mpi_mb_pool_get_buffer(g_dispBufferPool, true);
             if (frame != NULL) {
-                memset(drm_mpi_mb_get_ptr(frame), bSet0xFF ? 0xFF : 0x00, u32FrameSize);
+                memset(drm_mpi_mb_get_ptr(frame), g_dispColor[frameCount], u32FrameSize);
                 drm_mpi_mb_set_size(frame, u32FrameSize);
 
             }
 
-            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, u32FrameSize);
-
-            bSet0xFF = !bSet0xFF;
+            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, g_dispColor[frameCount], u32FrameSize);
             ret = drm_send_frame_video_output(g_voChannel, frame);
             if (ret) {
+                unittest_info("drm_send_frame_video_output failed, return:[%d]", ret);
                 break;
             }
         }
 
         frameCount++;
+        if (frameCount >= BUFF_POOL_SIZE) {
+            frameCount = 0;
+        }
+
         sleep(5);
     }
 

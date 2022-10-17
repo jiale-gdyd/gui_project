@@ -123,6 +123,8 @@ const std::string &GetStringOfV4L2Fmts()
 
 bool SetV4L2IoFunction(v4l2_io_t *vio, bool use_libv4l2)
 {
+typedef void *(*mmap_func_t)(void *, size_t, int, int, int, int64_t);
+
 #define SET_WRAPPERS(prefix)                                                        \
     do {                                                                            \
         vio->open_f   = prefix##open;                                               \
@@ -130,7 +132,7 @@ bool SetV4L2IoFunction(v4l2_io_t *vio, bool use_libv4l2)
         vio->dup_f    = prefix##dup;                                                \
         vio->ioctl_f  = prefix##ioctl;                                              \
         vio->read_f   = prefix##read;                                               \
-        vio->mmap_f   = prefix##mmap;                                               \
+        vio->mmap_f   = (mmap_func_t)prefix##mmap;                                  \
         vio->munmap_f = prefix##munmap;                                             \
     } while (0)
 
