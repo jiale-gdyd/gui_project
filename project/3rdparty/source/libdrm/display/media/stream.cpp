@@ -52,7 +52,9 @@ int Stream::Close()
 }
 
 DEFINE_REFLECTOR(Stream)
+
 DEFINE_FACTORY_COMMON_PARSE(Stream)
+
 DEFINE_PART_FINAL_EXPOSE_PRODUCT(Stream, Stream)
 
 bool Stream::ReadImage(void *ptr, const DrmImageInfo &info)

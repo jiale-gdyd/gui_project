@@ -23,7 +23,7 @@ int drm_destroy_video_output(int channel)
         return 0;
     }
 
-    int ret = drm_mpi_destroy_vo_channel(channel);
+    int ret = drm_mpi_vo_destroy_channel(channel);
     g_voChnStated[channel] = ret == 0 ? false : true;
 
     return ret;
@@ -58,7 +58,7 @@ int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_
     stVoAttr.stDispRect.u32Width = dispWidth;
     stVoAttr.stDispRect.u32Height = dispHeight;
 
-    ret = drm_mpi_create_vo_channel(channel, (const drm_vo_chn_attr_t *)&stVoAttr);
+    ret = drm_mpi_vo_create_channel(channel, (const drm_vo_chn_attr_t *)&stVoAttr);
     if (ret) {
         DRM_MEDIA_LOGE("create vo channel:[%d] failed, return:[%d]", channel, ret);
         return ret;

@@ -85,7 +85,7 @@ SourceStreamFlow::~SourceStreamFlow()
         DRM_MEDIA_LOGE("Fail to stop source stream");
     }
 
-    DRM_MEDIA_LOGD("#SourceStreamFlow[%s]: stream off....", GetFlowTag());
+    DRM_MEDIA_LOGD("SourceStreamFlow:[%s]: stream off....", GetFlowTag());
     if (read_thread) {
         source_start_cond_mtx->lock();
         loop = false;
@@ -95,9 +95,9 @@ SourceStreamFlow::~SourceStreamFlow()
         delete read_thread;
     }
 
-    DRM_MEDIA_LOGI("#SourceStreamFlow[%s]: read thread exit sucessfully", GetFlowTag());
+    DRM_MEDIA_LOGI("SourceStreamFlow:[%s]: read thread exit sucessfully", GetFlowTag());
     stream.reset();
-    DRM_MEDIA_LOGI("#SourceStreamFlow[%s]: stream reset sucessfully", GetFlowTag());
+    DRM_MEDIA_LOGI("SourceStreamFlow:[%s]: stream reset sucessfully", GetFlowTag());
 }
 
 void SourceStreamFlow::ReadThreadRun()

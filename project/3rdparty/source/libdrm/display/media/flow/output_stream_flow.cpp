@@ -64,7 +64,7 @@ OutPutStreamFlow::OutPutStreamFlow(const char *param)
     const std::string &stream_param = separate_list.back();
     auto stream = REFLECTOR(Stream)::Create<Stream>(stream_name, stream_param.c_str());
     if (!stream) {
-        DRM_MEDIA_LOGE("Fail to create stream %s", stream_name);
+        DRM_MEDIA_LOGE("Fail to create stream:[%s]", stream_name);
         SetError(-EINVAL);
         return;
     }

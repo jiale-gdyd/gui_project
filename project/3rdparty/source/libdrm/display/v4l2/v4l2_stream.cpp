@@ -11,9 +11,9 @@ V4L2Context::V4L2Context(enum v4l2_buf_type cap_type, v4l2_io_t io_func, const s
     const char *dev = device.c_str();
     fd = v4l2_open(dev, O_RDWR | O_CLOEXEC, 0);
     if (fd < 0) {
-        DRM_MEDIA_LOGE("V4L2-CTX: open %s failed %m", dev);
+        DRM_MEDIA_LOGE("V4L2Ctx: open:[%s] failed, errstr:[%m]", dev);
     } else {
-        DRM_MEDIA_LOGI("#V4L2Ctx: open %s, fd %d", dev, fd);
+        DRM_MEDIA_LOGI("V4L2Ctx: open:[%s], fd:[%d]", dev, fd);
     }
 }
 
@@ -22,7 +22,7 @@ V4L2Context::~V4L2Context()
     if (fd >= 0) {
         SetStarted(false);
         v4l2_close(fd);
-        DRM_MEDIA_LOGI("#V4L2Ctx: close %s, fd %d", path.c_str(), fd);
+        DRM_MEDIA_LOGI("V4L2Ctx: close:[%s], fd:[%d]", path.c_str(), fd);
     }
 }
 
@@ -36,7 +36,7 @@ bool V4L2Context::SetStarted(bool val)
     enum v4l2_buf_type cap_type = capture_type;
     unsigned int request = val ? VIDIOC_STREAMON : VIDIOC_STREAMOFF;
     if (IoCtrl(request, &cap_type) < 0) {
-        DRM_MEDIA_LOGE("ioctl(%d): %m", (int)request);
+        DRM_MEDIA_LOGE("ioctl(%d) failed, errstr:[%m]", (int)request);
         return false;
     }
 
@@ -101,7 +101,7 @@ V4L2Stream::V4L2Stream(const char *param)
     }
     v4l2_medctl = std::make_shared<V4L2MediaCtl>();
 
-    DRM_MEDIA_LOGI("#V4l2Stream: camraID:%d, Device:%s", camera_id, device.c_str());
+    DRM_MEDIA_LOGI("V4l2Stream: camra id:[%d], device:[%s]", camera_id, device.c_str());
 }
 
 int V4L2Stream::Open()
@@ -115,7 +115,7 @@ int V4L2Stream::Open()
     }
 
     devname = device;
-    DRM_MEDIA_LOGI("#V4l2Stream: camera id:%d, VideoNode:%s", camera_id, devname.c_str());
+    DRM_MEDIA_LOGI("V4l2Stream: camera id:[%d], videoNode:[%s]", camera_id, devname.c_str());
 
     v4l2_ctx = std::make_shared<V4L2Context>(capture_type, vio, devname);
     if (!v4l2_ctx) {
@@ -137,7 +137,7 @@ int V4L2Stream::Close()
     if (v4l2_ctx) {
         v4l2_ctx->SetStarted(false);
         v4l2_ctx = nullptr;
-        DRM_MEDIA_LOGI("#V4L2Stream: v4l2 ctx reset to nullptr");
+        DRM_MEDIA_LOGI("V4L2Stream: v4l2 ctx reset to nullptr");
     }
 
     fd = -1;
@@ -177,7 +177,7 @@ int V4L2Stream::IoCtrl(unsigned long int request, ...)
             va_end(vl);
 
             if (arg->data && (arg->size > 0)) {
-                DRM_MEDIA_LOGI("V4L2: Insert user picture: ptr:%p, size:%d", arg->data, (int)arg->size);
+                DRM_MEDIA_LOGI("V4L2: Insert user picture, ptr:[%p], size:[%d]", arg->data, (int)arg->size);
                 if (user_picture == nullptr) {
                     auto mb = MediaBuffer::Alloc((size_t)arg->size, MediaBuffer::MemType::MEM_HARD_WARE);
                     if (!mb) {

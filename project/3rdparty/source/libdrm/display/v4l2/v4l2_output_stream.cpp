@@ -100,7 +100,7 @@ int V4L2OutputStream::BufferExport(enum v4l2_buf_type bt, int index, int *dmafd)
     expbuf.index = index;
 
     if (v4l2_ctx->IoCtrl(VIDIOC_EXPBUF, &expbuf) == -1) {
-        DRM_MEDIA_LOGE("VIDIOC_EXPBUF %d failed, %m", index);
+        DRM_MEDIA_LOGE("VIDIOC_EXPBUF index:[%d] failed, errstr:[%m]", index);
         return -1;
     }
     *dmafd = expbuf.fd;
@@ -146,7 +146,7 @@ int V4L2OutputStream::Open()
 
     const char *dev = device.c_str();
     if (width <= 0 || height <= 0) {
-        DRM_MEDIA_LOGE("Invalid param, device=%s, width=%d, height=%d", dev, width, height);
+        DRM_MEDIA_LOGE("Invalid param, device:[%s], width:[%d], height:[%d]", dev, width, height);
         return -EINVAL;
     }
 
@@ -158,17 +158,17 @@ int V4L2OutputStream::Open()
     struct v4l2_capability cap;
     memset(&cap, 0, sizeof(cap));
     if (v4l2_ctx->IoCtrl(VIDIOC_QUERYCAP, &cap) < 0) {
-        DRM_MEDIA_LOGE("Failed to ioctl(VIDIOC_QUERYCAP): %m");
+        DRM_MEDIA_LOGE("Failed to ioctl(VIDIOC_QUERYCAP), errstr:[%m]");
         return -1;
     }
 
     if (!(cap.capabilities & V4L2_CAP_VIDEO_OUTPUT) && !(cap.capabilities & V4L2_CAP_VIDEO_OUTPUT_MPLANE)) {
-        DRM_MEDIA_LOGE("%s, Not a video output device", dev);
+        DRM_MEDIA_LOGE("device:[%s] not a video output device", dev);
         return -1;
     }
 
     if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
-        DRM_MEDIA_LOGE("%s does not support the streaming I/O method", dev);
+        DRM_MEDIA_LOGE("device:[%s] does not support the streaming I/O method", dev);
         return -1;
     }
 
@@ -198,28 +198,28 @@ int V4L2OutputStream::Open()
     fmt.fmt.pix_mp.quantization = V4L2_QUANTIZATION_FULL_RANGE;
 
     if (fmt.fmt.pix.pixelformat == 0) {
-        DRM_MEDIA_LOGE("unsupport input format : %s", data_type_str);
+        DRM_MEDIA_LOGE("unsupport input format:[%s]", data_type_str);
         return -1;
     }
 
     if (v4l2_ctx->IoCtrl(VIDIOC_S_FMT, &fmt) < 0) {
-        DRM_MEDIA_LOGE("%s, s fmt failed(cap type=%d, %c%c%c%c), %m", dev, output_type, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
+        DRM_MEDIA_LOGE("device:[%s], ioctl(VIDIOC_S_FMT) failed(cap type:[%d], [%c%c%c%c]), errstr:[%m]", dev, output_type, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
         return -1;
     }
 
     if (V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE == output_type) {
         plane_cnt = fmt.fmt.pix_mp.num_planes;
     }
-    DRM_MEDIA_LOGD("V4L2: output plane cnt:%d", plane_cnt);
+    DRM_MEDIA_LOGD("V4L2: output plane count:[%d]", plane_cnt);
 
     if (GetV4L2FmtByString(data_type_str) != fmt.fmt.pix.pixelformat) {
-        DRM_MEDIA_LOGE("%s, expect %s, return %c%c%c%c", dev, data_type_str, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
+        DRM_MEDIA_LOGE("device:[%s], expect:[%s] but return:[%c%c%c%c]", dev, data_type_str, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
         return -1;
     }
 
     pix_fmt = StringToPixFmt(data_type_str);
     if (width != (int)fmt.fmt.pix.width || height != (int)fmt.fmt.pix.height) {
-        DRM_MEDIA_LOGE("%s change res from %dx%d to %dx%d", dev, width, height, fmt.fmt.pix.width, fmt.fmt.pix.height);
+        DRM_MEDIA_LOGE("device:[%s] change res from:[%dx%d] to:[%dx%d]", dev, width, height, fmt.fmt.pix.width, fmt.fmt.pix.height);
 
         width = fmt.fmt.pix.width;
         height = fmt.fmt.pix.height;
@@ -227,7 +227,7 @@ int V4L2OutputStream::Open()
     }
 
     if (fmt.fmt.pix.field == V4L2_FIELD_INTERLACED) {
-        DRM_MEDIA_LOGI("%s is using the interlaced mode", dev);
+        DRM_MEDIA_LOGI("device:[%s] is using the interlaced mode", dev);
     }
 
     struct v4l2_requestbuffers req;
@@ -235,7 +235,7 @@ int V4L2OutputStream::Open()
     req.count = loop_num;
     req.memory = memory_type;
     if (v4l2_ctx->IoCtrl(VIDIOC_REQBUFS, &req) < 0) {
-        DRM_MEDIA_LOGE("%s, count=%d, ioctl(VIDIOC_REQBUFS): %m", dev, loop_num);
+        DRM_MEDIA_LOGE("device:[%s], count:[%d], ioctl(VIDIOC_REQBUFS) failed, errstr:[%m]", dev, loop_num);
         return -1;
     }
 
@@ -262,7 +262,7 @@ public:
 
     ~V4L2AutoQBUF() {
         if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &v4l2_buf) < 0) {
-            DRM_MEDIA_LOGE("index=%d, ioctl(VIDIOC_QBUF): %m", v4l2_buf.index);
+            DRM_MEDIA_LOGE("index:[%d], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", v4l2_buf.index);
         }
     }
 
@@ -332,13 +332,13 @@ bool V4L2OutputStream::Write(std::shared_ptr<MediaBuffer> input)
     buf.m.fd = input->GetFD();
 
     if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &buf) < 0) {
-        DRM_MEDIA_LOGE("%s, index=%d, ioctl(VIDIOC_QBUF): %m", dev, buf.index);
+        DRM_MEDIA_LOGE("device:[%s], index:[%d], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", dev, buf.index);
         return false;
     }
 
     int ret = v4l2_ctx->IoCtrl(VIDIOC_DQBUF, &buf);
     if (ret < 0) {
-        DRM_MEDIA_LOGI("%s, ioctl(VIDIOC_DQBUF): %m", dev);
+        DRM_MEDIA_LOGI("device:[%s], ioctl(VIDIOC_DQBUF) failed, errstr:[%m]", dev);
         return false;
     }
 

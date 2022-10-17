@@ -29,6 +29,10 @@ extern "C" {
 int rv11xx_unittest_libdrm_display_exit(void);
 int rv11xx_unittest_libdrm_display_init(int argc, char *argv[]);
 
+/* libdrm捕获摄像头显示 */
+int rv11xx_unittest_camera_libdrm_display_exit(void);
+int rv11xx_unittest_camera_libdrm_display_init(int argc, char *argv[]);
+
 #if defined(__cplusplus)
 }
 #endif

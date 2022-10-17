@@ -22,7 +22,7 @@
                                                                                                                     \
         template <class T>                                                                                          \
         static std::shared_ptr<T> Create(const char *request, const char *param = nullptr) {                        \
-            try {                                                                                                   \
+            /*try {*/                                                                                                   \
                 if (!IsDerived<T, PRODUCT>::Result) {                                                               \
                     printf("The template class type is not derived of required type\n");                            \
                     return nullptr;                                                                                 \
@@ -46,10 +46,10 @@
                                                                                                                     \
                 printf("%s is not Integrated\n", request);                                                          \
                 return nullptr;                                                                                     \
-            } catch (const std::exception &e) {                                                                     \
+            /*} catch (const std::exception &e) {                                                                     \
                 printf("[1] catch exception:[%s]\n", e.what());                                                     \
                 return nullptr;                                                                                     \
-            }                                                                                                       \
+            }*/                                                                                                       \
         }                                                                                                           \
                                                                                                                     \
         static void RegisterFactory(std::string identifier, const PRODUCT##Factory *factory);                       \

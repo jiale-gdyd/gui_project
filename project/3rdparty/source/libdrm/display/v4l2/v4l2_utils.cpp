@@ -123,7 +123,7 @@ const std::string &GetStringOfV4L2Fmts()
 
 bool SetV4L2IoFunction(v4l2_io_t *vio, bool use_libv4l2)
 {
-typedef void *(*mmap_func_t)(void *, size_t, int, int, int, int64_t);
+    typedef void *(*mmap_func_t)(void *, size_t, int, int, int, int64_t);
 
 #define SET_WRAPPERS(prefix)                                                        \
     do {                                                                            \

@@ -83,13 +83,13 @@ protected:
     virtual int Open() override;
     virtual int Close() override;
 
-    bool        use_libv4l2;
-    v4l2_io_t   vio;
-    std::string devname;
-    std::string device;
-    std::string sub_device;
-    int         camera_id;
-    int         fd;
+    bool                          use_libv4l2;
+    v4l2_io_t                     vio;
+    std::string                   devname;
+    std::string                   device;
+    std::string                   sub_device;
+    int                           camera_id;
+    int                           fd;
 
     enum v4l2_buf_type            capture_type;
     enum v4l2_buf_type            output_type;

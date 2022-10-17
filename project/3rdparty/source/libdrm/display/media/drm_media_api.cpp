@@ -1104,6 +1104,36 @@ int drm_mpi_vi_disable_channel(int channel)
     return 0;
 }
 
+int drm_mpi_vi_get_status(int channel)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vi_mtx.lock();
+    if (!g_vi_chns[channel].media_flow) {
+        g_vi_mtx.unlock();
+        return -2;
+    }
+
+    struct sysinfo info;
+    int64_t recent_time, current_time;
+
+    sysinfo(&info);
+    current_time = info.uptime * 1000000LL;
+    g_vi_chns[channel].media_flow->Control(libdrm::G_STREAM_RECENT_TIME, &recent_time);
+    assert(current_time - recent_time > 0);
+
+    if ((recent_time != 0) && ((current_time - recent_time) > 3000000)) {
+        DRM_MEDIA_LOGW("video input timeout more than 3 seconds");
+        g_vi_mtx.unlock();
+        return 3;
+    }
+    g_vi_mtx.unlock();
+
+    return 0;
+}
+
 int drm_mpi_vi_start_stream(int channel)
 {
     if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
@@ -1127,7 +1157,294 @@ int drm_mpi_vi_start_stream(int channel)
     return 0;
 }
 
-int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
+int drm_mpi_vi_enable_user_picture(int channel)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vi_mtx.lock();
+    if (g_vi_chns[channel].status < CHN_STATUS_OPEN) {
+        g_vi_mtx.unlock();
+        return -2;
+    }
+
+    if (!g_vi_chns[channel].media_flow) {
+        g_vi_mtx.unlock();
+        return -3;
+    }
+
+    int ret = g_vi_chns[channel].media_flow->Control(libdrm::S_ENABLE_USER_PICTURE);
+    g_vi_mtx.unlock();
+
+    return ret ? -4 : 0;
+}
+
+int drm_mpi_vi_disable_user_picture(int channel)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vi_mtx.lock();
+    if (g_vi_chns[channel].status < CHN_STATUS_OPEN) {
+        g_vi_mtx.unlock();
+        return -2;
+    }
+
+    if (!g_vi_chns[channel].media_flow) {
+        g_vi_mtx.unlock();
+        return -3;
+    }
+
+    int ret = g_vi_chns[channel].media_flow->Control(libdrm::S_DISABLE_USER_PICTURE);
+    g_vi_mtx.unlock();
+
+    return ret ? -4 : 0;
+}
+
+int drm_mpi_vi_set_user_picture(int channel, drm_vi_userpic_attr_t *pstUsrPicAttr)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstUsrPicAttr) {
+        return -2;
+    }
+
+    g_vi_mtx.lock();
+    if (g_vi_chns[channel].status < CHN_STATUS_OPEN) {
+        g_vi_mtx.unlock();
+        return -3;
+    }
+
+    if (!g_vi_chns[channel].media_flow) {
+        g_vi_mtx.unlock();
+        return -4;
+    }
+
+    DrmPixelFormat src_pixfmt = StringToPixFmt(ImageTypeToString(pstUsrPicAttr->enPixFmt).c_str());
+    DrmPixelFormat trg_pixfmt = StringToPixFmt(ImageTypeToString(g_vi_chns[channel].vi_attr.enPixFmt).c_str());
+    uint32_t u32PicSize = CalPixFmtSize(trg_pixfmt, g_vi_chns[channel].vi_attr.u32Width, g_vi_chns[channel].vi_attr.u32Height);
+
+    void *pvPicPtr = malloc(u32PicSize);
+    if (pvPicPtr == NULL) {
+        g_vi_mtx.unlock();
+        return -5;
+    }
+
+#if defined(CONFIG_RGA)
+    rga_buffer_t src_info, dst_info;
+    memset(&src_info, 0, sizeof(rga_buffer_t));
+    memset(&dst_info, 0, sizeof(rga_buffer_t));
+    src_info = wrapbuffer_virtualaddr(pstUsrPicAttr->pvPicPtr, pstUsrPicAttr->u32Width, pstUsrPicAttr->u32Height, get_rga_format(src_pixfmt));
+    dst_info = wrapbuffer_virtualaddr(pvPicPtr, g_vi_chns[channel].vi_attr.u32Width, g_vi_chns[channel].vi_attr.u32Height, get_rga_format(trg_pixfmt));
+    imresize(src_info, dst_info);
+#else
+    if ((pstUsrPicAttr->u32Width != g_vi_chns[channel].vi_attr.u32Width)
+        || (pstUsrPicAttr->u32Height != g_vi_chns[channel].vi_attr.u32Height)
+        || (src_pixfmt != trg_pixfmt))
+    {
+        DRM_MEDIA_LOGE("picWidth:[%u], viWidth:[%u], picHeight:[%u], viHeight:[%u], picFmt:[%d], viFmt:[%d]",
+            pstUsrPicAttr->u32Width, g_vi_chns[channel].vi_attr.u32Width,
+            pstUsrPicAttr->u32Height, g_vi_chns[channel].vi_attr.u32Height,
+            src_pixfmt, trg_pixfmt);
+        return -6;
+    }
+#endif
+
+    libdrm::UserPicArg media_user_pic_arg;
+    media_user_pic_arg.size = u32PicSize;
+    media_user_pic_arg.data = pvPicPtr;
+    int ret = g_vi_chns[channel].media_flow->Control(libdrm::S_INSERT_USER_PICTURE, &media_user_pic_arg);
+
+    free(pvPicPtr);
+    g_vi_mtx.unlock();
+
+    return ret ? -7 : 0;
+}
+
+static uint64_t calculate_media_region_luma(std::shared_ptr<libdrm::ImageBuffer> &media_mb, const drm_rect_t *ptrRect)
+{
+    uint64_t sum = 0;
+    DrmImageInfo &imgInfo = media_mb->GetImageInfo();
+
+    if ((imgInfo.pix_fmt != DRM_PIX_FMT_YUV420P)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_NV12)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_NV21)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_YUV422P)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_NV16)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_NV61)
+        && (imgInfo.pix_fmt != DRM_PIX_FMT_YUYV422))
+    {
+        DRM_MEDIA_LOGE("not support image type");
+        return 0;
+    }
+
+    if (((int)(ptrRect->s32X + ptrRect->u32Width) > imgInfo.width) || ((int)(ptrRect->s32Y + ptrRect->u32Height) > imgInfo.height)) {
+        DRM_MEDIA_LOGE("rect:[%d,%d,%u,%u] out of image wxh:[%d, %d]", ptrRect->s32X, ptrRect->s32Y, ptrRect->u32Width, ptrRect->u32Height, imgInfo.width, imgInfo.height);
+        return 0;
+    }
+
+    if (imgInfo.pix_fmt == DRM_PIX_FMT_YUYV422) {
+        uint32_t line_size = imgInfo.vir_width * 2;
+        uint8_t *rect_start = (uint8_t *)media_mb->GetPtr() + ptrRect->s32Y * line_size + ptrRect->s32X * 2;
+
+        for (uint32_t i = 0; i < ptrRect->u32Height; i++) {
+            uint8_t *line_start = rect_start + i * line_size;
+            for (uint32_t j = 0; j < ptrRect->u32Width; j++) {
+                sum += *(line_start + j * 2);
+            }
+        }
+    } else {
+        uint32_t line_size = imgInfo.vir_width;
+        uint8_t *rect_start = (uint8_t *)media_mb->GetPtr() + ptrRect->s32Y * line_size + ptrRect->s32X;
+
+        for (uint32_t i = 0; i < ptrRect->u32Height; i++) {
+            uint8_t *line_start = rect_start + i * line_size;
+            for (uint32_t j = 0; j < ptrRect->u32Width; j++) {
+                sum += *(line_start + j);
+            }
+        }
+    }
+
+    return sum;
+}
+
+int drm_mpi_vi_stop_region_luma(int channel)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_vi_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_vi_chns[channel].luma_buf_mtx.lock();
+    g_vi_chns[channel].luma_buf_start = false;
+    g_vi_chns[channel].luma_rkmedia_buf.reset();
+    g_vi_chns[channel].luma_buf_mtx.unlock();
+
+    g_vi_mtx.lock();
+    if (g_vi_chns[channel].media_out_cb_status == CHN_OUT_CB_LUMA) {
+        DRM_MEDIA_LOGD("luma mode: disable rkmedia out callback");
+        g_vi_chns[channel].media_out_cb_status = CHN_OUT_CB_CLOSE;
+        g_vi_chns[channel].media_flow->SetOutputCallBack(&g_vi_chns[channel], flow_output_callback);
+    }
+    g_vi_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_vi_start_region_luma(int channel)
+{
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_vi_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_vi_chns[channel].luma_buf_mtx.lock();
+    if (g_vi_chns[channel].luma_buf_start) {
+        g_vi_chns[channel].luma_buf_mtx.unlock();
+        return 0;
+    }
+
+    g_vi_chns[channel].luma_buf_start = true;
+    g_vi_chns[channel].luma_buf_mtx.unlock();
+
+    g_vi_mtx.lock();
+    if (g_vi_chns[channel].media_out_cb_status == CHN_OUT_CB_CLOSE) {
+        DRM_MEDIA_LOGD("luma mode: enable media out callback");
+        g_vi_chns[channel].media_out_cb_status = CHN_OUT_CB_LUMA;
+        g_vi_chns[channel].media_flow->SetOutputCallBack(&g_vi_chns[channel], flow_output_callback);
+    }
+    g_vi_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_t *pstRegionInfo, uint64_t *pu64LumaData, int s32MilliSec)
+{
+    int s32Ret = 0;
+    uint32_t u32XOffset = 0;
+    uint32_t u32YOffset = 0;
+    uint32_t u32ImgWidth = 0;
+    uint32_t u32ImgHeight = 0;
+
+    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstRegionInfo || !pstRegionInfo->u32RegionNum || !pu64LumaData) {
+        return -2;
+    }
+
+    std::shared_ptr<libdrm::ImageBuffer> media_mb;
+    drm_media_channel_t *target_chn = &g_vi_chns[channel];
+
+    if (target_chn->status < CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    u32ImgWidth = g_vi_chns[channel].vi_attr.u32Width;
+    u32ImgHeight = g_vi_chns[channel].vi_attr.u32Height;
+
+    for (uint32_t i = 0; i < pstRegionInfo->u32RegionNum; i++) {
+        u32XOffset = pstRegionInfo->pstRegion[i].s32X + pstRegionInfo->pstRegion[i].u32Width;
+        u32YOffset = pstRegionInfo->pstRegion[i].s32Y + pstRegionInfo->pstRegion[i].u32Height;
+
+        if ((u32XOffset > u32ImgWidth) || (u32YOffset > u32ImgHeight)) {
+            DRM_MEDIA_LOGE("lumaRgn:[%d]:<%d, %d, %d, %d> is invalid for vi channel:[%d], wxh:[%dx%d]",
+                i, pstRegionInfo->pstRegion[i].s32X, pstRegionInfo->pstRegion[i].s32Y,
+                pstRegionInfo->pstRegion[i].u32Width, pstRegionInfo->pstRegion[i].u32Height, channel, u32ImgWidth, u32ImgHeight);
+            return -4;
+        }
+    }
+
+    s32Ret = drm_mpi_vi_start_region_luma(channel);
+    if (s32Ret) {
+        return s32Ret;
+    }
+
+    {
+        std::unique_lock<std::mutex> lck(target_chn->luma_buf_mtx);
+
+        if (!target_chn->luma_rkmedia_buf) {
+            if ((s32MilliSec < 0) && !target_chn->luma_buf_quit) {
+                target_chn->luma_buf_cond.wait(lck);
+            } else if (s32MilliSec > 0) {
+                if (target_chn->luma_buf_cond.wait_for(lck, std::chrono::milliseconds(s32MilliSec)) == std::cv_status::timeout) {
+                    return -5;
+                }
+            } else {
+                return -6;
+            }
+        }
+
+        if (target_chn->luma_rkmedia_buf) {
+            media_mb = std::static_pointer_cast<libdrm::ImageBuffer>(target_chn->luma_rkmedia_buf);
+        }
+
+        target_chn->luma_rkmedia_buf.reset();
+    }
+
+    if (!media_mb) {
+        return -7;
+    }
+
+    for (uint32_t i = 0; i < pstRegionInfo->u32RegionNum; i++) {
+        *(pu64LumaData + i) = calculate_media_region_luma(media_mb, (pstRegionInfo->pstRegion + i));
+    }
+
+    return 0;
+}
+
+int drm_mpi_vo_create_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
 {
     const char *pcPlaneType = NULL;
 
@@ -1275,7 +1592,7 @@ int drm_mpi_create_vo_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
     return 0;
 }
 
-int drm_mpi_destroy_vo_channel(int channel)
+int drm_mpi_vo_destroy_channel(int channel)
 {
     if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
         return -1;
@@ -1294,7 +1611,7 @@ int drm_mpi_destroy_vo_channel(int channel)
     return 0;
 }
 
-int drm_mpi_get_vo_channel_attribute(int channel, drm_vo_chn_attr_t *pstAttr)
+int drm_mpi_vo_get_channel_attribute(int channel, drm_vo_chn_attr_t *pstAttr)
 {
     if ((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT))
         return -1;
@@ -1315,7 +1632,7 @@ int drm_mpi_get_vo_channel_attribute(int channel, drm_vo_chn_attr_t *pstAttr)
     return 0;
 }
 
-int drm_mpi_set_vo_channel_attribute(int channel, const drm_vo_chn_attr_t *pstAttr)
+int drm_mpi_vo_set_channel_attribute(int channel, const drm_vo_chn_attr_t *pstAttr)
 {
     if ((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
         return -1;

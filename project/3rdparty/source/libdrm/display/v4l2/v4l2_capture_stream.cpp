@@ -103,7 +103,7 @@ int V4L2CaptureStream::BufferExport(enum v4l2_buf_type bt, int index, int *dmafd
     expbuf.index = index;
 
     if (v4l2_ctx->IoCtrl(VIDIOC_EXPBUF, &expbuf) == -1) {
-        DRM_MEDIA_LOGE("VIDIOC_EXPBUF  %d failed, %m", index);
+        DRM_MEDIA_LOGE("VIDIOC_EXPBUF index:[%d] failed, errstr:[%m]", index);
         return -1;
     }
 
@@ -120,7 +120,7 @@ public:
     }
 
     ~V4L2Buffer() {
-        DRM_MEDIA_LOGI("free v4l2 bufs fd: %d, unmap: size1 %d, size2: %d", dmafd, (int)length, (int)length1);
+        DRM_MEDIA_LOGI("free v4l2 bufs fd:[%d], unmap: size1[%d], size2:[%d]", dmafd, (int)length, (int)length1);
 
         if (dmafd >= 0) {
             close(dmafd);
@@ -154,7 +154,7 @@ int V4L2CaptureStream::Open()
 {
     const char *dev = device.c_str();
     if (width <= 0 || height <= 0) {
-        DRM_MEDIA_LOGE("Invalid param, device=%s, width=%d, height=%d", dev, width, height);
+        DRM_MEDIA_LOGE("Invalid param, device:[%s], width:[%d], height:[%d]", dev, width, height);
         return -EINVAL;
     }
 
@@ -166,12 +166,12 @@ int V4L2CaptureStream::Open()
     struct v4l2_capability cap;
     memset(&cap, 0, sizeof(cap));
     if (v4l2_ctx->IoCtrl(VIDIOC_QUERYCAP, &cap) < 0) {
-        DRM_MEDIA_LOGE("Failed to ioctl(VIDIOC_QUERYCAP): %m");
+        DRM_MEDIA_LOGE("Failed to ioctl(VIDIOC_QUERYCAP), errstr:[%m]");
         return -1;
     }
 
     if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE) && !(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE_MPLANE)) {
-        DRM_MEDIA_LOGE("%s, Not a video capture device", dev);
+        DRM_MEDIA_LOGE("device:[%s] not a video capture device", dev);
         return -1;
     }
 
@@ -206,35 +206,35 @@ int V4L2CaptureStream::Open()
     fmt.fmt.pix_mp.quantization = quantization;
 
     if (fmt.fmt.pix.pixelformat == 0) {
-        DRM_MEDIA_LOGE("unsupport input format : %s", data_type_str);
+        DRM_MEDIA_LOGE("unsupport input format:[%s]", data_type_str);
         return -1;
     }
 
     if (v4l2_ctx->IoCtrl(VIDIOC_S_FMT, &fmt) < 0) {
-        DRM_MEDIA_LOGE("%s, s fmt failed(cap type=%d, %c%c%c%c), %m", dev, capture_type, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
+        DRM_MEDIA_LOGE("device:[%s], ioctl(VIDIOC_S_FMT) failed(cap type:[%d], [%c%c%c%c]), errstr:[%m]", dev, capture_type, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
         return -1;
     }
 
     if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == capture_type) {
         plane_cnt = fmt.fmt.pix_mp.num_planes;
     }
-    DRM_MEDIA_LOGD("V4L2: capture plane cnt:%d", plane_cnt);
+    DRM_MEDIA_LOGD("V4L2: capture plane count:[%d]", plane_cnt);
 
     if (GetV4L2FmtByString(data_type_str) != fmt.fmt.pix.pixelformat) {
-        DRM_MEDIA_LOGE("%s, expect %s, return %c%c%c%c", dev, data_type_str, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
+        DRM_MEDIA_LOGE("device:[%s], expect:[%s] but return:[%c%c%c%c]", dev, data_type_str, DRM_DUMP_FOURCC(fmt.fmt.pix.pixelformat));
         return -1;
     }
 
     pix_fmt = StringToPixFmt(data_type_str);
     if (width != (int)fmt.fmt.pix.width || height != (int)fmt.fmt.pix.height) {
-        DRM_MEDIA_LOGE("%s change res from %dx%d to %dx%d", dev, width, height, fmt.fmt.pix.width, fmt.fmt.pix.height);
+        DRM_MEDIA_LOGE("device:[%s] change res from:[%dx%d] to:[%dx%d]", dev, width, height, fmt.fmt.pix.width, fmt.fmt.pix.height);
         width = fmt.fmt.pix.width;
         height = fmt.fmt.pix.height;
         return -1;
     }
 
     if (fmt.fmt.pix.field == V4L2_FIELD_INTERLACED) {
-        DRM_MEDIA_LOGI("%s is using the interlaced mode", dev);
+        DRM_MEDIA_LOGI("device:[%s] is using the interlaced mode", dev);
     }
 
     struct v4l2_requestbuffers req;
@@ -242,7 +242,7 @@ int V4L2CaptureStream::Open()
     req.count = loop_num;
     req.memory = memory_type;
     if (v4l2_ctx->IoCtrl(VIDIOC_REQBUFS, &req) < 0) {
-        DRM_MEDIA_LOGE("%s, count=%d, ioctl(VIDIOC_REQBUFS): %m", dev, loop_num);
+        DRM_MEDIA_LOGE("device:[%s], count:[%d], ioctl(VIDIOC_REQBUFS) failed: errstr:[%m]", dev, loop_num);
         return -1;
     }
 
@@ -277,7 +277,7 @@ int V4L2CaptureStream::Open()
             buf.m.fd = buffer.GetFD();
             buf.length = buffer.GetSize();
             if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &buf) < 0) {
-                DRM_MEDIA_LOGE("%s ioctl(VIDIOC_QBUF): %m", dev);
+                DRM_MEDIA_LOGE("device:[%s] ioctl(VIDIOC_QBUF) failed, errstr:[%m]", dev);
                 return -1;
             }
         }
@@ -309,7 +309,7 @@ int V4L2CaptureStream::Open()
             }
 
             if (v4l2_ctx->IoCtrl(VIDIOC_QUERYBUF, &buf) < 0) {
-                DRM_MEDIA_LOGE("%s ioctl(VIDIOC_QUERYBUF): %m", dev);
+                DRM_MEDIA_LOGE("device:[%s] ioctl(VIDIOC_QUERYBUF) failed, errstr:[%m]", dev);
                 return -1;
             }
 
@@ -332,7 +332,7 @@ int V4L2CaptureStream::Open()
             }
 
             if (ptr_lane0 == MAP_FAILED) {
-                DRM_MEDIA_LOGE("%s v4l2_mmap (%d): %m", dev, (int)i);
+                DRM_MEDIA_LOGE("device:[%s] v4l2_mmap:[%d] failed, errstr:[%m]", dev, (int)i);
                 return -1;
             }
 
@@ -356,7 +356,7 @@ int V4L2CaptureStream::Open()
                 mb.SetFD(dmafd);
             }
 
-            DRM_MEDIA_LOGI("query v4l2 buf fd=%d, size1: %d, size2: %d", buffer->dmafd, (int)buffer->length, (int)buffer->length1);
+            DRM_MEDIA_LOGI("query v4l2 buf fd:[%d], size1:[%d], size2:[%d]", buffer->dmafd, (int)buffer->length, (int)buffer->length1);
         }
 
         for (size_t i = 0; i < req.count; ++i) {
@@ -373,7 +373,7 @@ int V4L2CaptureStream::Open()
             }
 
             if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &qbuf) < 0) {
-                DRM_MEDIA_LOGE("%s, ioctl(VIDIOC_QBUF): %m", dev);
+                DRM_MEDIA_LOGE("device:[%s], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", dev);
                 return -1;
             }
         }
@@ -385,9 +385,9 @@ int V4L2CaptureStream::Open()
 
 int V4L2CaptureStream::Close()
 {
-    struct v4l2_requestbuffers req;
-
     DRM_MEDIA_LOGI("free(close/munmap) v4l2 bufs explicitly");
+
+    struct v4l2_requestbuffers req;
 
     buffer_vec.clear();
     started = false;
@@ -397,7 +397,7 @@ int V4L2CaptureStream::Close()
     req.count = 0;
     req.memory = memory_type;
     if (v4l2_ctx->IoCtrl(VIDIOC_REQBUFS, &req) < 0) {
-        DRM_MEDIA_LOGE("%s, Free v4l2 bufs by ioctl(VIDIOC_REQBUFS) failed %d, something wrong badly! Open %s may fail(busy) next time", device.c_str(), errno, device.c_str());
+        DRM_MEDIA_LOGW("device:[%s], Free v4l2 bufs by ioctl(VIDIOC_REQBUFS) failed, errno:[%d], something wrong badly! Open device:[%s] may fail(busy) next time", device.c_str(), errno, device.c_str());
     }
 
     return V4L2Stream::Close();
@@ -416,7 +416,7 @@ public:
 
     ~V4L2AutoQBUF() {
         if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &v4l2_buf) < 0) {
-            DRM_MEDIA_LOGE("index=%d, ioctl(VIDIOC_QBUF): %m", v4l2_buf.index);
+            DRM_MEDIA_LOGE("index:[%d], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", v4l2_buf.index);
         }
     }
 
@@ -462,7 +462,7 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
 {
     const char *dev = device.c_str();
     if (!started && v4l2_ctx->SetStarted(true)) {
-        DRM_MEDIA_LOGI("Camera %d stream %d is started", camera_id, fd);
+        DRM_MEDIA_LOGI("camera id:[%d], stream fd:[%d] is started", camera_id, fd);
         started = true;
     }
 
@@ -480,7 +480,7 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
 
     int ret = v4l2_ctx->IoCtrl(VIDIOC_DQBUF, &buf);
     if (ret < 0) {
-        DRM_MEDIA_LOGI("%s, ioctl(VIDIOC_DQBUF): %m", dev);
+        DRM_MEDIA_LOGE("device:[%s], ioctl(VIDIOC_DQBUF) failed, errstr:[%m]", dev);
         return nullptr;
     }
 
@@ -499,12 +499,12 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
     }
 
     if (enable_user_picture && user_picture) {
-        DRM_MEDIA_LOGD("Send user picture...");
+        DRM_MEDIA_LOGD("Send user picture......");
 
         DrmImageInfo info{pix_fmt, width, height, width, height};
         auto user_pic_buf = std::make_shared<ImageBuffer>(*(user_picture.get()), info);
         if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &buf) < 0) {
-            DRM_MEDIA_LOGE("%s, index=%d, ioctl(VIDIOC_QBUF): %m", dev, buf.index);
+            DRM_MEDIA_LOGE("device:[%s], index:[%d], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", dev, buf.index);
         }
 
         return user_pic_buf;
@@ -608,7 +608,7 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
 #endif
     } else {
         if (v4l2_ctx->IoCtrl(VIDIOC_QBUF, &buf) < 0) {
-            DRM_MEDIA_LOGE("%s, index=%d, ioctl(VIDIOC_QBUF): %m", dev, buf.index);
+            DRM_MEDIA_LOGE("device:[%s], index:[%d], ioctl(VIDIOC_QBUF) failed, errstr:[%m]", dev, buf.index);
         }
     }
 
