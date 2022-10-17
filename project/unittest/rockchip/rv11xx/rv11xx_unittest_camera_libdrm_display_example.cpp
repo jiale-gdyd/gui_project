@@ -25,7 +25,7 @@
 
 #include "private.h"
 
-#define DISP_WIDTH_PIXELS               720
+#define DISP_WIDTH_PIXELS               1280
 #define DISP_HEIGHT_PIXELS              720
 
 #define SCREEN_WIDTH_PIXELS             1920
