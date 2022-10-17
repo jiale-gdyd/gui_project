@@ -1009,14 +1009,14 @@ const std::string &GetStringOfDRMFmts()
 DRMDevice::DRMDevice(const std::string &drm_path) : fd(-1), path(drm_path)
 {
     fd = open(drm_path.c_str(), O_RDWR | O_CLOEXEC);
-    DRM_MEDIA_LOGI("open %s = %d", drm_path.c_str(), fd);
+    DRM_MEDIA_LOGI("open device:[%s] = fd:[%d]", drm_path.c_str(), fd);
 }
 
 DRMDevice::~DRMDevice()
 {
     if (fd >= 0) {
         close(fd);
-        DRM_MEDIA_LOGI("close %s = %d", path.c_str(), fd);
+        DRM_MEDIA_LOGI("close device:[%s], fd:[%d]", path.c_str(), fd);
         fd = -1;
     }
 }

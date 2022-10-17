@@ -24,6 +24,8 @@
 #define TX_SOURCE_CODE
 #define TX_THREAD_SMP_SOURCE_CODE
 
+#define TX_LINUX_MULTI_CORE
+#define TX_LINUX_DEBUG_ENABLE
 
 /* Include necessary system files.  */
 
@@ -33,7 +35,6 @@
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
-
 
 /* Define various Linux objects used by the ThreadX port.  */
 

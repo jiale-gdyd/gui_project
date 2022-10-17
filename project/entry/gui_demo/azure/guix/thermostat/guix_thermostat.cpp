@@ -22,7 +22,7 @@ VOID  start_guix(VOID);
 int azure_guix_thermostat_demo_init(int argc, char *argv[])
 {
 #if defined(CONFIG_DRM_DISP_DRIVER)
-    gx_drm_graphics_driver_setup(1, MAIN_DISPLAY_X_RESOLUTION, MAIN_DISPLAY_Y_RESOLUTION, 0, 0, DISP_IMAGE_TYPE_RGB565, DISP_PLANE_OVERLAY, 1);
+    gx_drm_graphics_driver_setup(1, 0, 0, 1, 1);
 #endif
 
     tx_kernel_enter();

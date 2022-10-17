@@ -25,7 +25,10 @@
 
 #include "private.h"
 
-#define BUFF_POOL_SIZE              10
+#define DISP_WIDTH_PIXELS           720
+#define DISP_HEIGHT_PIXELS          720
+#define SCREEN_WIDTH_PIXELS         1920
+#define SCREEN_HEIGHT_PIXELS        720
 
 enum guixCachePingPong {
     CACHE_BUF_PING = 0,
@@ -33,20 +36,19 @@ enum guixCachePingPong {
     CACHE_BUF_BUTT
 };
 
-static bool g_quit = false;
-static uint32_t g_BufPoolCnt = BUFF_POOL_SIZE;
-
 static int g_dispZpos = 1;
 static int g_voChannel = 0;
 static size_t u32FrameSize = 0;
-static size_t g_dispXoffset = 0;
-static size_t g_dispYoffset = 0;
-static size_t g_DispWidth = 640;
-static size_t g_DispHeight = 480;
-static media_buffer_pool_t g_dispBufferPool = NULL;
+static size_t g_DispWidth = DISP_WIDTH_PIXELS;
+static size_t g_DispHeight = DISP_HEIGHT_PIXELS;
+static size_t g_dispXoffset = ((SCREEN_WIDTH_PIXELS - DISP_WIDTH_PIXELS));
+static size_t g_dispYoffset = ((SCREEN_HEIGHT_PIXELS - DISP_HEIGHT_PIXELS) / 2);
+
+static bool g_quit = false;
+static int g_bufPingPong = CACHE_BUF_PING;
 static drm_plane_type_e g_dispPlaneType = VO_PLANE_OVERLAY;
 static drm_image_type_e g_dispImageType = DRM_IMAGE_TYPE_RGB888;
-static unsigned char g_dispColor[BUFF_POOL_SIZE] = {0x00, 0x10, 0x20, 0x40, 0x80, 0x90, 0xA0, 0xB0, 0xC0, 0xD0};
+static media_buffer_t g_canvasBuffer[CACHE_BUF_BUTT] = {NULL, };
 
 static void sigterm_handler(int signo)
 {
@@ -58,8 +60,10 @@ int rv11xx_unittest_libdrm_display_exit(void)
 {
     drm_destroy_video_output(g_voChannel);
 
-    if (g_dispBufferPool != NULL) {
-        drm_mpi_mb_pool_destroy(g_dispBufferPool);
+    for (int i = 0; i < CACHE_BUF_BUTT; i++) {
+        if (g_canvasBuffer[i]) {
+            drm_mpi_mb_release_buffer(g_canvasBuffer[i]);
+        }
     }
 
     return 0;
@@ -76,70 +80,49 @@ int rv11xx_unittest_libdrm_display_init(int argc, char *argv[])
     ret = drm_create_video_output(g_voChannel, g_dispZpos, g_dispPlaneType, g_DispWidth, g_DispHeight, g_dispXoffset, g_dispYoffset, g_dispImageType, "/dev/dri/card0");
     if (ret != 0) {
         unittest_error("drm_create_video_output failed");
-        return -1;
+        return -2;
     }
 
-    mb_pool_param_t stBufPoolParam;
-    stBufPoolParam.u32Cnt = g_BufPoolCnt;
-    stBufPoolParam.u32Size = 0;
-    stBufPoolParam.enMediaType = MB_TYPE_VIDEO;
-    stBufPoolParam.bHardWare = true;
-    stBufPoolParam.u16Flag = MB_FLAG_NOCACHED;
-    stBufPoolParam.stImageInfo.enImgType = g_dispImageType;
-    stBufPoolParam.stImageInfo.u32Width = g_DispWidth;
-    stBufPoolParam.stImageInfo.u32Height = g_DispHeight;
-    stBufPoolParam.stImageInfo.u32HorStride = g_DispWidth;
-    stBufPoolParam.stImageInfo.u32VerStride = g_DispHeight;
-
-    g_dispBufferPool = drm_mpi_mb_pool_create(&stBufPoolParam);
-    if (!g_dispBufferPool) {
-        unittest_error("Couldn't create buffer pool");
-        return -1;
+    mb_image_info_t dispImageInfo = { g_DispWidth, g_DispHeight, g_DispWidth, g_DispHeight, g_dispImageType };
+    for (int i = 0; i < CACHE_BUF_BUTT; i++) {
+        g_canvasBuffer[i] = drm_mpi_mb_create_image_buffer(&dispImageInfo, true, MB_FLAG_NOCACHED);
     }
-
-    float fltImgRatio = 0.0f;
-    if (g_dispImageType == DRM_IMAGE_TYPE_RGB888) {
-        fltImgRatio = 3.0;
-    } else if (g_dispImageType == DRM_IMAGE_TYPE_ABGR8888) {
-        fltImgRatio = 4.0;
-    } else if (g_dispImageType == DRM_IMAGE_TYPE_RGB565) {
-        fltImgRatio = 2.0;
-    }
-
-    u32FrameSize = (size_t)(g_DispWidth * g_DispHeight * fltImgRatio);
-
-    int frameCount = 0;
-    media_buffer_t frame = NULL;
 
     signal(SIGINT, sigterm_handler);
 
+    int color = 0x00;
+    bool bIncNumeric = true;
+
     while (!g_quit) {
-        if (g_dispBufferPool != NULL) {
-            frame = drm_mpi_mb_pool_get_buffer(g_dispBufferPool, true);
-            if (frame != NULL) {
-                memset(drm_mpi_mb_get_ptr(frame), g_dispColor[frameCount], u32FrameSize);
-                drm_mpi_mb_set_size(frame, u32FrameSize);
+        if (g_canvasBuffer[g_bufPingPong] != NULL) {
+            size_t size = drm_mpi_mb_get_size(g_canvasBuffer[g_bufPingPong]);
+            media_buffer_t ptr = drm_mpi_mb_get_ptr(g_canvasBuffer[g_bufPingPong]);
 
+            memset(ptr, color, size);
+
+            ret = drm_send_frame_video_output(g_voChannel, g_canvasBuffer[g_bufPingPong]);
+            if (g_bufPingPong == CACHE_BUF_PING) {
+                g_bufPingPong = CACHE_BUF_PONG;
+            } else {
+                g_bufPingPong = CACHE_BUF_PING;
             }
 
-            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, g_dispColor[frameCount], u32FrameSize);
-            ret = drm_send_frame_video_output(g_voChannel, frame);
-            if (ret) {
-                unittest_info("drm_send_frame_video_output failed, return:[%d]", ret);
-                break;
+            if (bIncNumeric) {
+                color += 0x02;
+                if (color >= 0xFF) {
+                    color = 0xFF;
+                    bIncNumeric = false;
+                }
+            } else {
+                color -= 0x02;
+                if (color <= 0x00) {
+                    color = 0x00;
+                    bIncNumeric = true;
+                }
             }
         }
 
-        frameCount++;
-        if (frameCount >= BUFF_POOL_SIZE) {
-            frameCount = 0;
-        }
-
-        sleep(5);
-    }
-
-    if (frame) {
-        drm_mpi_mb_release_buffer(frame);
+        usleep(50 * 1000);
     }
 
     return 0;

@@ -168,9 +168,9 @@ static int printEncoder(int fd, drmModeResPtr res, drmModeEncoderPtr encoder, ui
         printf("Encoder\n");
     }
 
-    printf("\tid     :%i\n", id);
-    printf("\tcrtc_id   :%d\n", encoder->crtc_id);
-    printf("\ttype   :%d\n", encoder->encoder_type);
+    printf("\tid              :%i\n", id);
+    printf("\tcrtc_id         :%d\n", encoder->crtc_id);
+    printf("\ttype            :%d\n", encoder->encoder_type);
     printf("\tpossible_crtcs  :0x%x\n", encoder->possible_crtcs);
     printf("\tpossible_clones :0x%x\n", encoder->possible_clones);
     return 0;

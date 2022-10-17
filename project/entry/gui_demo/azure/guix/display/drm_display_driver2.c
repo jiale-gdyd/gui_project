@@ -32,9 +32,13 @@ enum guixCachePingPong {
     CACHE_BUF_BUTT
 };
 
+static int g_dispZpos = 1;
 static int g_dispVoChannel = 0;
-static bool g_driverInied = false;
+static size_t g_dispXoffset = 0;
+static size_t g_dispYoffset = 0;
 static int g_bufPingPong = CACHE_BUF_PING;
+static drm_plane_type_e g_planeType = VO_PLANE_PRIMARY;
+static drm_image_type_e g_imageType = DRM_IMAGE_TYPE_RGB888;
 static media_buffer_t g_canvasBuffer[CACHE_BUF_BUTT] = {NULL, };
 
 static void _gx_copy_canvas_to_buffer_332rgb(void *dest, GX_CANVAS *canvas, GX_RECTANGLE *dirty_area)
@@ -287,23 +291,33 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
 
     switch (format) {
         case GX_COLOR_FORMAT_8BIT_PACKED_PIXEL:
+            g_imageType = DRM_IMAGE_TYPE_RGB332;
             _gx_copy_canvas_to_buffer_332rgb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
         case GX_COLOR_FORMAT_565RGB:
+            g_imageType = DRM_IMAGE_TYPE_RGB565;
             _gx_copy_canvas_to_buffer_565rgb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
         case GX_COLOR_FORMAT_24XRGB:
         case GX_COLOR_FORMAT_32ARGB:
+            if (format == GX_COLOR_FORMAT_24XRGB) {
+                g_imageType = DRM_IMAGE_TYPE_RGB888;
+            } else {
+                g_imageType = DRM_IMAGE_TYPE_ARGB8888;
+            }
+
             _gx_copy_canvas_to_buffer_24xrgb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
         case GX_COLOR_FORMAT_4444ARGB:
+            g_imageType = DRM_IMAGE_TYPE_NV16;
             _gx_copy_canvas_to_buffer_4444argb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
         case GX_COLOR_FORMAT_1555XRGB:
+            g_imageType = DRM_IMAGE_TYPE_NV16;
             _gx_copy_canvas_to_buffer_1555xrgb(gx_canvas_memory, canvas, &overLapArea);
             break;
 
@@ -323,85 +337,22 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
 
 static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
 {
+    size_t width, height;
 
-}
+    width = display->gx_display_width;
+    height = display->gx_display_height;
 
-UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
-{
-    if (!g_driverInied) {
-        return GX_FAILURE;
-    }
-
-    _gx_display_driver_24xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
-
-    return GX_SUCCESS;
-}
-
-UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display)
-{
-    if (!g_driverInied) {
-        return GX_FAILURE;
-    }
-
-    _gx_display_driver_565rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
-
-    return GX_SUCCESS;
-}
-
-UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
-{
-    if (!g_driverInied) {
-        return GX_FAILURE;
-    }
-
-    _gx_display_driver_332rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
-
-    return GX_SUCCESS;
-}
-
-UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
-{
-    if (!g_driverInied) {
-        return GX_FAILURE;
-    }
-
-    _gx_display_driver_1555xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
-
-    return GX_SUCCESS;
-}
-
-UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
-{
-    if (!g_driverInied) {
-        return GX_FAILURE;
-    }
-
-    _gx_display_driver_4444argb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
-
-    return GX_SUCCESS;
-}
-
-int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_t xoffset, size_t yoffset, disp_image_type_e type, disp_plane_type_e dispLayer, int zpos)
-{
     int ret = drm_mpi_system_init();
     if (ret != 0) {
-        return -1;
+        return;
     }
 
-    ret = drm_create_video_output(channel, zpos, (drm_plane_type_e)dispLayer, width, height, xoffset, yoffset, (drm_image_type_e)type, "/dev/dri/card0");
+    ret = drm_create_video_output(g_dispVoChannel, g_dispZpos, g_planeType, width, height, g_dispXoffset, g_dispYoffset, g_imageType, "/dev/dri/card0");
     if (ret != 0) {
-        return -1;
+        return;
     }
 
-    g_dispVoChannel = channel;
-    g_bufPingPong = CACHE_BUF_PING;
-
-    mb_image_info_t dispImageInfo = { width, height, width, height, (drm_image_type_e)type };
+    mb_image_info_t dispImageInfo = { width, height, width, height, g_imageType };
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
         g_canvasBuffer[i] = drm_mpi_mb_create_image_buffer(&dispImageInfo, true, MB_FLAG_NOCACHED);
         if (g_canvasBuffer[i] != NULL) {
@@ -410,14 +361,62 @@ int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_
             memset(ptr, 0x00, size);
         }
     }
+}
 
-    g_driverInied = true;
+UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
+{
+    _gx_display_driver_24xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+}
+
+UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display)
+{
+    _gx_display_driver_565rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+}
+
+UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
+{
+    _gx_display_driver_332rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+}
+
+UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
+{
+    _gx_display_driver_1555xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+}
+
+UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
+{
+    _gx_display_driver_4444argb_setup(display, GX_NULL, gx_drm_buffer_toggle);
+    _gx_x11_graphics_driver_setup(display);
+
+    return GX_SUCCESS;
+}
+
+int gx_drm_graphics_driver_setup(int channel, size_t xoffset, size_t yoffset, int dispLayer, int zpos)
+{
+    g_dispZpos = zpos;
+    g_dispXoffset = xoffset;
+    g_dispYoffset = yoffset;
+    g_dispVoChannel = channel;
+    g_bufPingPong = CACHE_BUF_PING;
+    g_planeType = (drm_plane_type_e)dispLayer;
+
     return 0;
 }
 
 int gx_drm_graphics_driver_exit()
 {
-    g_driverInied = false;
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
         if (g_canvasBuffer[i] != NULL) {
             drm_mpi_mb_release_buffer(g_canvasBuffer[i]);

@@ -178,7 +178,7 @@ void FlowCoroutine::RunOnce()
 void FlowCoroutine::WhileRun()
 {
     prctl(PR_SET_NAME, this->name.c_str());
-    DRM_MEDIA_LOGI("flow-name %s", this->name.c_str());
+    DRM_MEDIA_LOGI("flow-name:[%s]", this->name.c_str());
 
     while (!flow->quit) {
         RunOnce();
@@ -193,7 +193,7 @@ void FlowCoroutine::WhileRunSleep()
     assert(interval > 0);
 
     prctl(PR_SET_NAME, this->name.c_str());
-    DRM_MEDIA_LOGI("flow-name %s", this->name.c_str());
+    DRM_MEDIA_LOGI("flow-name:[%s]", this->name.c_str());
 
     while (!flow->quit) {
         if (times == 0) {
@@ -743,7 +743,7 @@ bool Flow::SetAsSource(const std::vector<int> &output_slots, FunctionProcess f, 
     sm.mode_when_full = InputMode::DROPFRONT;
 
     if (!InstallSlotMap(sm, mark, 0)) {
-        DRM_MEDIA_LOGE("Fail to InstallSlotMap, read %s", mark.c_str());
+        DRM_MEDIA_LOGE("Fail to InstallSlotMap, read mark:[%s]", mark.c_str());
         return false;
     }
 
@@ -752,7 +752,7 @@ bool Flow::SetAsSource(const std::vector<int> &output_slots, FunctionProcess f, 
 
 bool Flow::InstallSlotMap(SlotMap &map, const std::string &mark, int exp_process_time)
 {
-    DRM_MEDIA_LOGI("%s, thread_model=%d, mode_when_full=%d", mark.c_str(), (int)map.thread_model, (int)map.mode_when_full);
+    DRM_MEDIA_LOGI("mark:[%s], thread_model:[%d], mode_when_full:[%d]", mark.c_str(), (int)map.thread_model, (int)map.mode_when_full);
 
     auto &in_slots = map.input_slots;
     if (in_slots.size() > 1 && map.thread_model == Model::SYNC) {

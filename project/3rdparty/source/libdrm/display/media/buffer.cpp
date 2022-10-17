@@ -39,7 +39,7 @@ static MediaBuffer alloc_common_memory(size_t size)
         return MediaBuffer();
     }
 
-    DRM_MEDIA_LOGD("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u", __func__, buffer, -1, 0, -1, (unsigned)size);
+    DRM_MEDIA_LOGD("func:[%s], ptr:[%p], fd:[%d], handle:[%u], dev_fd:[%d], size:[%u]", __func__, buffer, -1, 0, -1, (unsigned)size);
     return MediaBuffer(buffer, size, -1, 0, -1, buffer, free_common_memory);
 }
 
@@ -99,7 +99,7 @@ static int drm_device_open(const char *device = nullptr)
         return -1;
     }
 
-    DRM_MEDIA_LOGI("Opened DRM device %s: driver %s version %d.%d.%d", device, version->name, version->version_major, version->version_minor, version->version_patchlevel);
+    DRM_MEDIA_LOGI("Opened DRM device:[%s], driver:[%s], version:[%d.%d.%d]", device, version->name, version->version_major, version->version_minor, version->version_patchlevel);
     drmFreeVersion(version);
 
     if (drmGetCap(fd, DRM_CAP_DUMB_BUFFER, &has_dumb) < 0 || !has_dumb) {
@@ -256,7 +256,7 @@ static MediaBuffer alloc_drm_memory(size_t size, unsigned int flag, bool map = t
             break;
         }
 
-        DRM_MEDIA_LOGD("%s: ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%u", __func__, db->map_ptr, db->fd, db->handle, db->dev_fd, (unsigned)size);
+        DRM_MEDIA_LOGD("func:[%s], ptr:[%p], fd:[%d], handle:[%u], dev_fd:[%d], size:[%u]", __func__, db->map_ptr, db->fd, db->handle, db->dev_fd, (unsigned)size);
         return MediaBuffer(db->map_ptr, db->len, db->fd, db->handle, db->dev_fd, db, free_drm_memory);
     } while (false);
 
@@ -460,7 +460,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type)
         }
 
         mgb->SetBufferPool(this);
-        DRM_MEDIA_LOGD("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
+        DRM_MEDIA_LOGD("Create pool:[%p], mgb:[%p], ptr:[%p], fd:[%d], handle:[%u], dev_fd:[%d], size:[%zu]", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
         ready_buffers.push_back(mgb);
     }
 
@@ -469,13 +469,13 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type)
             ready_buffers.pop_front();
         }
 
-        DRM_MEDIA_LOGE("BufferPool: Create buffer pool failed! Please check space is enough");
+        DRM_MEDIA_LOGE("Create buffer pool failed! Please check space is enough");
         return;
     }
 
     buf_cnt = cnt;
     buf_size = size;
-    DRM_MEDIA_LOGD("BufferPool: Create buffer pool:%p, size:%d, cnt:%d", this, size, cnt);
+    DRM_MEDIA_LOGD("Create buffer pool:[%p], size:[%d], cnt:[%d]", this, size, cnt);
 }
 
 BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned int flag)
@@ -495,7 +495,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned in
         }
 
         mgb->SetBufferPool(this);
-        DRM_MEDIA_LOGD("Create: pool:%p, mgb:%p, ptr:%p, fd:%d, handle:%u, dev_fd:%d, size:%zu", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
+        DRM_MEDIA_LOGD("Create pool:[%p], mgb:[%p], ptr:[%p], fd:[%d], handle:[%u], dev_fd:[%d], size:[%zu]", this, mgb, mgb->GetPtr(), mgb->GetFD(), mgb->GetHandle(), mgb->GetDevFD(), mgb->GetSize());
         ready_buffers.push_back(mgb);
     }
 
@@ -510,7 +510,7 @@ BufferPool::BufferPool(int cnt, int size, MediaBuffer::MemType type, unsigned in
 
     buf_cnt = cnt;
     buf_size = size;
-    DRM_MEDIA_LOGD("BufferPool: Create buffer pool:%p, size:%d, cnt:%d", this, size, cnt);
+    DRM_MEDIA_LOGD("Create buffer pool:[%p], size:[%d], cnt:[%d]", this, size, cnt);
 }
 
 BufferPool::~BufferPool()
@@ -625,13 +625,13 @@ void BufferPool::DumpInfo()
     DRM_MEDIA_LOGI("\tsize:%d", buf_size);
     DRM_MEDIA_LOGI("\tready buffers(%zu):", ready_buffers.size());
     for (auto dev : ready_buffers) {
-        DRM_MEDIA_LOGI("\t  #%02d Pool:%p, mgb:%p, ptr:%p", id++, dev->pool, dev, dev->GetPtr());
+        DRM_MEDIA_LOGI("\t  #%02d Pool:[%p], mgb:[%p], ptr:[%p]", id++, dev->pool, dev, dev->GetPtr());
     }
     DRM_MEDIA_LOGI("\tbusy buffers(%zu):", busy_buffers.size());
 
     id = 0;
     for (auto dev : busy_buffers) {
-        DRM_MEDIA_LOGI("\t  #%02d Pool:%p, mgb:%p, ptr:%p", id++, dev->pool, dev, dev->GetPtr());
+        DRM_MEDIA_LOGI("\t  #%02d Pool:[%p], mgb:[%p], ptr:[%p]", id++, dev->pool, dev, dev->GetPtr());
     }
 }
 }

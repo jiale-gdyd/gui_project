@@ -1262,7 +1262,7 @@ int gx_drm_graphics_driver_exit()
     return -1;
 }
 
-int gx_drm_graphics_driver_setup(int channel, size_t width, size_t height, size_t xoffset, size_t yoffset, disp_image_type_e type, disp_plane_type_e dispLayer, int zpos)
+int gx_drm_graphics_driver_setup(int channel, size_t xoffset, size_t yoffset, int dispLayer, int zpos)
 {
     return -1;
 }
