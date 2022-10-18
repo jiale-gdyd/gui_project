@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 enum DRM_VO_CHANNELS {
-    DRM_VO_CHANNEL_0,
-    DRM_VO_CHANNEL_1,
+    DRM_VO_CHANNEL_00 = 0,
+    DRM_VO_CHANNEL_01,
     DRM_VO_CHANNEL_BUTT
 };
 
