@@ -1,3 +1,5 @@
+#include <linux/kconfig.h>
+
 #include <vector>
 #include <fcntl.h>
 #include <unistd.h>
@@ -5,6 +7,10 @@
 
 #include <libdrm/display/utils.h>
 #include <libdrm/display/buffer.h>
+
+#if defined(CONFIG_RKRGA)
+#include <libdrm/display/rga_filter.h>
+#endif
 
 #include "v4l2_stream.h"
 
@@ -563,7 +569,7 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
                 continue;
             }
 
-#if defined(CONFIG_RGA)
+#if defined(CONFIG_RKRGA)
             rga_info_t dst_info;
             memset(&dst_info, 0, sizeof(dst_info));
             dst_info.fd = ret_buf->GetFD();
@@ -582,7 +588,7 @@ std::shared_ptr<MediaBuffer> V4L2CaptureStream::Read()
         auto cur_osds = osds;
         param_mtx.unlock();
 
-#if defined(CONFIG_RGA)
+#if defined(CONFIG_RKRGA)
         for (auto &osd : cur_osds) {
             if (!osd.second.enable) {
                 continue;

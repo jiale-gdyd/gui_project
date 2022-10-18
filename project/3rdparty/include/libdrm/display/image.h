@@ -75,6 +75,16 @@ typedef struct {
     unsigned char  enable;
 } DrmOsdInfo;
 
+#define REGION_LUMA_MAX         64
+typedef struct {
+    int                priv;
+    unsigned int       region_num;
+    DrmImageRect       region[REGION_LUMA_MAX];
+    unsigned long long luma_data[REGION_LUMA_MAX];
+    int                ms;
+    int                offset;
+} DrmImageRegionLuma;
+
 #include "utils.h"
 
 void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den);

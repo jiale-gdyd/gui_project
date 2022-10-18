@@ -1,0 +1,14 @@
+#
+# rkrga Kconfig
+#
+
+menu "rockchip Raster Graphic Acceleration Unit"
+
+config RKRGA
+    bool "Raster Graphic Acceleration Unit"
+    default n
+    depends on ROCKCHIP
+    help
+      Raster Graphic Acceleration Unit
+
+endmenu

@@ -19,6 +19,7 @@ obj-y += media_config.o
 
 obj-y += flow/
 obj-y += guard/
+obj-$(CONFIG_RKRGA) += rkrga/
 
 obj-y += drm_media_vo.o
 obj-y += drm_media_api.o

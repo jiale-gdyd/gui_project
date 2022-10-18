@@ -19,52 +19,52 @@ typedef struct {
 } DrmImageConfig;
 
 typedef struct {
-  char       *type;
-  uint32_t   max_bps;
-  const char *rc_quality;
-  const char *rc_mode;
-  uint16_t   fps;
-  uint16_t   gop;
-  uint8_t    profile;
-  uint8_t    enc_levle;
+    char       *type;
+    uint32_t   max_bps;
+    const char *rc_quality;
+    const char *rc_mode;
+    uint16_t   fps;
+    uint16_t   gop;
+    uint8_t    profile;
+    uint8_t    enc_levle;
 } DrmVideoEncoderCfg;
 
 typedef struct {
-  int qp_init;
-  int qp_step;
-  int qp_min;
-  int qp_max;
-  int qp_min_i;
-  int qp_max_i;
-  int thrd_i[16];
-  int thrd_p[16];
-  int row_qp_delta_i;
-  int row_qp_delta_p;
-  int hier_qp_en;
-  int hier_qp_delta[4];
-  int hier_frame_num[4];
+    int qp_init;
+    int qp_step;
+    int qp_min;
+    int qp_max;
+    int qp_min_i;
+    int qp_max_i;
+    int thrd_i[16];
+    int thrd_p[16];
+    int row_qp_delta_i;
+    int row_qp_delta_p;
+    int hier_qp_en;
+    int hier_qp_delta[4];
+    int hier_frame_num[4];
 } DrmVideoEncoderQp;
 
 typedef struct {
-  DrmImageConfig    image_cfg;
-  DrmVideoEncoderQp encode_qp;
-  int               bit_rate;
-  int               bit_rate_max;
-  int               bit_rate_min;
-  int               frame_rate;
-  int               frame_rate_den;
-  int               frame_in_rate;
-  int               frame_in_rate_den;
-  int               trans_8x8;
-  int               level;
-  int               gop_size;
-  int               profile;
-  int               full_range;
-  int               ref_frm_cfg;
-  int               rotation;
-  const char        *rc_quality;
-  const char        *rc_mode;
-  int               scaling_list;
+    DrmImageConfig    image_cfg;
+    DrmVideoEncoderQp encode_qp;
+    int               bit_rate;
+    int               bit_rate_max;
+    int               bit_rate_min;
+    int               frame_rate;
+    int               frame_rate_den;
+    int               frame_in_rate;
+    int               frame_in_rate_den;
+    int               trans_8x8;
+    int               level;
+    int               gop_size;
+    int               profile;
+    int               full_range;
+    int               ref_frm_cfg;
+    int               rotation;
+    const char        *rc_quality;
+    const char        *rc_mode;
+    int               scaling_list;
 } DrmVideoConfig;
 
 typedef struct {

@@ -1,9 +1,16 @@
+#include <linux/kconfig.h>
 #include <assert.h>
+
 #include <libdrm/display/flow.h>
 #include <libdrm/display/image.h>
 #include <libdrm/display/buffer.h>
 #include <libdrm/display/filter.h>
 #include <libdrm/display/key_string.h>
+
+#if defined(CONFIG_RKRGA)
+#include <rkrga/rga.h>
+#include <rkrga/im2d.h>
+#endif
 
 namespace libdrm {
 static bool do_filters(Flow *f, MediaBufferVector &input_vector);
@@ -35,6 +42,38 @@ public:
             va_end(vl);
 
             switch (request) {
+                case G_RGA_REGION_LUMA: {
+                    DrmImageRegionLuma *p = (DrmImageRegionLuma *)arg;
+                    if (p->priv == i)
+                    ret |= filter->IoCtrl(request, arg);
+                    break;
+                }
+
+                case S_RGA_OSD_INFO: {
+                    DrmImageOsd *osd = (DrmImageOsd *)arg;
+                    if (osd->priv == i) {
+                        ret |= filter->IoCtrl(request, arg);
+                    }
+                    break;
+                }
+
+                case S_RGA_SHOW:
+                case S_RGA_HIDE: {
+                    int *chn = (int *)arg;
+                    if (*chn == i) {
+                        ret |= filter->IoCtrl(request, arg);
+                    }
+                    break;
+                }
+
+                case S_RGA_LINE_INFO: {
+                    DrmImageBorder *line = (DrmImageBorder *)arg;
+                    if (line->priv == i) {
+                        ret |= filter->IoCtrl(request, arg);
+                    }
+                    break;
+                }
+
                 default:
                     ret |= filter->IoCtrl(request, arg);
                     break;
