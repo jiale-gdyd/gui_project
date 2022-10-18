@@ -2,6 +2,8 @@
 #define _GNU_SOURCE
 #endif
 
+#include <linux/kconfig.h>
+
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -16,16 +18,19 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
 #include <libdrm/xf86drm.h>
 #include <libdrm/xf86drmMode.h>
 #include <libdrm/drm/drm_fourcc.h>
 #include <libdrm/drm_media_api.h>
+#endif
 
 #include <gx_api.h>
 #include <gx_display.h>
 
 #include "drm_display_driver.h"
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
 enum guixCachePingPong {
     CACHE_BUF_PING = 0,
     CACHE_BUF_PONG = 1,
@@ -263,9 +268,11 @@ static void _gx_copy_canvas_to_buffer_1555xrgb(void *dest, GX_CANVAS *canvas, GX
         read_row += width;
     }
 }
+#endif
 
 static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *dirty_area)
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
     GX_VALUE format;
     GX_VALUE width, height;
     GX_RECTANGLE limitRect, overLapArea;
@@ -333,10 +340,12 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
     } else {
         g_bufPingPong = CACHE_BUF_PING;
     }
+#endif
 }
 
 static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
     size_t width, height;
 
     width = display->gx_display_width;
@@ -361,6 +370,7 @@ static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
             memset(ptr, 0x00, size);
         }
     }
+#endif
 }
 
 UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
@@ -405,6 +415,7 @@ UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
 
 int gx_drm_graphics_driver_setup(int channel, size_t xoffset, size_t yoffset, int dispLayer, int zpos)
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
     g_dispZpos = zpos;
     g_dispXoffset = xoffset;
     g_dispYoffset = yoffset;
@@ -413,10 +424,14 @@ int gx_drm_graphics_driver_setup(int channel, size_t xoffset, size_t yoffset, in
     g_planeType = (drm_plane_type_e)dispLayer;
 
     return 0;
+#else
+    return -1;
+#endif
 }
 
 int gx_drm_graphics_driver_exit()
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
     for (int i = 0; i < CACHE_BUF_BUTT; i++) {
         if (g_canvasBuffer[i] != NULL) {
             drm_mpi_mb_release_buffer(g_canvasBuffer[i]);
@@ -425,4 +440,7 @@ int gx_drm_graphics_driver_exit()
 
     drm_destroy_video_output(g_dispVoChannel);
     return 0;
+#else
+    return -1;
+#endif
 }
