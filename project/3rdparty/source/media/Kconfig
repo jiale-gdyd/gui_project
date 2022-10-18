@@ -1,0 +1,20 @@
+#
+# media Kconfig
+#
+
+menu "Media application interface"
+
+config MEDIA_API
+    bool "Media application interface"
+    default n
+    select LIBDRM
+    help
+      Media application interface
+
+config LIBV4L2
+    bool "media tools v4l2"
+    default n
+    help
+      v4l2 libraries
+
+endmenu

@@ -7,4 +7,3 @@ obj-y += xf86drmRandom.o
 obj-$(CONFIG_TEGRA) += tegra/
 obj-$(CONFIG_ROCKCHIP) += rockchip/
 obj-$(CONFIG_LIBDRM_TOOLS) += tools/
-obj-$(CONFIG_LIBDRM_DISPLAY) += display/

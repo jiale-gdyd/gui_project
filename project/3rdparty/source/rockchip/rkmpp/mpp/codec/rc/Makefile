@@ -1,0 +1,12 @@
+obj-y += h264e_rc.o
+obj-y += h265e_rc.o
+obj-y += jpege_rc.o
+obj-y += rc_base.o
+obj-y += rc_data_base.o
+obj-y += rc_data_impl.o
+obj-y += rc_data.o
+obj-y += rc_impl.o
+obj-y += rc_model_v2_smt.o
+obj-y += rc_model_v2.o
+obj-y += rc.o
+obj-y += vp8e_rc.o

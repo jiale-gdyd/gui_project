@@ -1,0 +1,2 @@
+source "project/3rdparty/source/rockchip/rkrga/Kconfig"
+source "project/3rdparty/source/rockchip/rkmpp/Kconfig"

@@ -1,2 +1,3 @@
-source "project/3rdparty/source/rkrga/Kconfig"
+source "project/3rdparty/source/media/Kconfig"
 source "project/3rdparty/source/libdrm/Kconfig"
+source "project/3rdparty/source/rockchip/Kconfig"

@@ -21,7 +21,7 @@
 #include <libdrm/xf86drm.h>
 #include <libdrm/xf86drmMode.h>
 #include <libdrm/drm/drm_fourcc.h>
-#include <libdrm/drm_media_api.h>
+#include <media/drm_media_api.h>
 
 #include "private.h"
 

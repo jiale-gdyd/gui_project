@@ -11,11 +11,11 @@ choice
 
     config ROCKCHIP_RV11XX_LIBDRM
         bool "rockchip rv11xx unittest libdrm demo"
-        select LIBDRM_DISPLAY
+        select MEDIA_API
 
     config ROCKCHIP_RV11XX_CAMERA_LIBDRM
         bool "rockchip rv11xx unittest camera libdrm demo"
-        select LIBDRM_DISPLAY
+        select MEDIA_API
 
     config ROCKCHIP_RV11XX_UNKNOWN
         bool "rockchip rv11xx unittest unknow demo"

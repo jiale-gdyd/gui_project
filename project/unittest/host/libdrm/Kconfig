@@ -11,7 +11,7 @@ choice
 
     config HOST_LIBDRM_DISP
         bool "host libdrm display unittest demo"
-        select LIBDRM_DISPLAY
+        select MEDIA_API
 
     config HOST_LIBDRM_UNKNOWN
         bool "libdrm libdrm unittest unknow demo"

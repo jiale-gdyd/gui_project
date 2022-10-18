@@ -1,0 +1,12 @@
+obj-y += av1/
+obj-y += avs/
+obj-y += avs2/
+obj-y += dummy/
+obj-y += h263/
+obj-y += h264/
+obj-y += h265/
+obj-y += jpeg/
+obj-y += m2v/
+obj-y += mpg4/
+obj-y += vp8/
+obj-y += vp9/

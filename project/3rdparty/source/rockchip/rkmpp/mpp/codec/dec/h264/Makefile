@@ -1,0 +1,10 @@
+obj-y += h264d_api.o
+obj-y += h264d_dpb.o
+obj-y += h264d_fill.o
+obj-y += h264d_init.o
+obj-y += h264d_parse.o
+obj-y += h264d_pps.o
+obj-y += h264d_scalist.o
+obj-y += h264d_sei.o
+obj-y += h264d_slice.o
+obj-y += h264d_sps.o

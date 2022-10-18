@@ -1,0 +1,14 @@
+#
+# rkmpp Kconfig
+#
+
+menu "rockchip Media Process Platform"
+
+config RKMPP
+    bool "rockchip Media Process Platform"
+    default n
+    depends on ROCKCHIP
+    help
+      Media Process Platform
+
+endmenu

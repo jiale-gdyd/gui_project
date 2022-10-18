@@ -1,0 +1,10 @@
+obj-y += av1d/
+obj-y += common/
+obj-y += h263d/
+obj-y += h264e/
+obj-y += jpegd/
+obj-y += jpege/
+obj-y += m2vd/
+obj-y += mpg4d/
+obj-y += vp8d/
+obj-y += vp8e/

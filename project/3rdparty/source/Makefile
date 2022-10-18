@@ -1,2 +1,3 @@
-obj-$(CONFIG_RKRGA) += rkrga/
 obj-$(CONFIG_LIBDRM) += libdrm/
+obj-$(CONFIG_MEDIA_API) += media/
+obj-$(CONFIG_ROCKCHIP) += rockchip/
