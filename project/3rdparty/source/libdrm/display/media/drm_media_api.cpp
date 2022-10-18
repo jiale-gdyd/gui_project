@@ -473,7 +473,7 @@ int drm_mpi_system_init(void)
 
     drm_log_init();
 
-    for (int i = 0; i < MOD_ID_BUTT; i++) {
+    for (int i = MOD_ID_UNKNOW; i < MOD_ID_BUTT; i++) {
         g_level_list[i] = 3;
     }
 
@@ -481,7 +481,7 @@ int drm_mpi_system_init(void)
     reset_channel_table(g_vo_chns, DRM_VO_CHANNEL_BUTT, MOD_ID_VO);
     reset_channel_table(g_rga_chns, DRM_RGA_CHANNEL_BUTT, MOD_ID_RGA);
 
-    for (int i = 0; i < DRM_VMIX_DEVICE_BUTT; i++) {
+    for (int i = DRM_VMIX_DEVICE_00; i < DRM_VMIX_DEVICE_BUTT; i++) {
         g_vmix_dev[i].bInit = false;
         g_vmix_dev[i].u16ChnCnt = 0;
         g_vmix_dev[i].u16RefCnt = 0;
@@ -772,7 +772,7 @@ int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t 
 
     switch (enModID) {
         case MOD_ID_VO:
-            if ((s32ChnId < 0) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
+            if ((s32ChnId < DRM_VO_CHANNEL_00) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid channel id:[%d]", s32ChnId);
                 return -3;
             }
@@ -781,7 +781,7 @@ int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t 
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 return -4;
             }
             target_chn = &g_rga_chns[s32ChnId];
@@ -823,7 +823,7 @@ int drm_mpi_system_start_recv_frame(mod_id_e enModID, int s32ChnId, const drm_re
 
     switch (enModID) {
         case MOD_ID_VO:
-            if ((s32ChnId < 0) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
+            if ((s32ChnId < DRM_VO_CHANNEL_00) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid channel id:[%d]", s32ChnId);
                 return -2;
             }
@@ -832,7 +832,7 @@ int drm_mpi_system_start_recv_frame(mod_id_e enModID, int s32ChnId, const drm_re
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 return -3;
             }
             target_chn = &g_rga_chns[s32ChnId];
@@ -868,7 +868,7 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
 
     switch (enModID) {
         case MOD_ID_VI:
-            if (s32ChnId < 0 || s32ChnId >= DRM_VI_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_VI_CHANNEL_00) || (s32ChnId >= DRM_VI_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid vi channel:[%d]", s32ChnId);
                 return -1;
             }
@@ -877,7 +877,7 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channe:[%d]", s32ChnId);
                 return -2;
             }
@@ -887,7 +887,7 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
 
         case MOD_ID_VMIX: {
             int s32DevId = s32ChnId;
-            if (s32DevId < 0 || s32DevId >= DRM_VMIX_DEVICE_BUTT) {
+            if ((s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
                 return -3;
             }
             target_chn = &g_vmix_dev[s32DevId].VmixChns[0];
@@ -918,7 +918,7 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
 
     switch (enModID) {
         case MOD_ID_VO:
-            if ((s32ChnId < 0) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
+            if ((s32ChnId < DRM_VO_CHANNEL_00) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid channel id:[%d]", s32ChnId);
                 return -1;
             }
@@ -927,7 +927,7 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 return -2;
             }
             target_chn = &g_rga_chns[s32ChnId];
@@ -961,7 +961,7 @@ int drm_mpi_system_device_send_media_buffer(mod_id_e enModID, int s32DevId, int 
 
     switch (enModID) {
         case MOD_ID_VMIX:
-            if (s32ChnId < 0 || s32ChnId >= DRM_VMIX_CHANNEL_BUTT || s32DevId < 0 || s32DevId >= DRM_VMIX_DEVICE_BUTT) {
+            if ((s32ChnId < DRM_VMIX_CHANNEL_00) || (s32ChnId >= DRM_VMIX_CHANNEL_BUTT) || (s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
                 return -1;
             }
             target_chn = &g_vmix_dev[s32DevId].VmixChns[s32ChnId];
@@ -994,7 +994,7 @@ int drm_mpi_system_stop_get_media_buffer(mod_id_e enModID, int s32ChnId)
 
     switch (enModID) {
         case MOD_ID_VI:
-            if (s32ChnId < 0 || s32ChnId >= DRM_VI_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_VI_CHANNEL_00) || (s32ChnId >= DRM_VI_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid VI channel:[%d]", s32ChnId);
                 return -1;
             }
@@ -1003,7 +1003,7 @@ int drm_mpi_system_stop_get_media_buffer(mod_id_e enModID, int s32ChnId)
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channel:[%d]", s32ChnId);
                 return -2;
             }
@@ -1038,7 +1038,7 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
 
     switch (enModID) {
         case MOD_ID_VI:
-            if (s32ChnId < 0 || s32ChnId >= DRM_VI_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_VI_CHANNEL_00) || (s32ChnId >= DRM_VI_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid VI channel:[%d]", s32ChnId);
                 return -1;
             }
@@ -1047,7 +1047,7 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channel:[%d]", s32ChnId);
                 return -2;
             }
@@ -1057,7 +1057,7 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
 
         case MOD_ID_VMIX: {
             int s32DevId = s32ChnId;
-            if (s32DevId < 0 || s32DevId >= DRM_VMIX_DEVICE_BUTT) {
+            if ((s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
                 return -3;
             }
             target_chn = &g_vmix_dev[s32DevId].VmixChns[0];
@@ -1096,7 +1096,7 @@ media_buffer_t drm_mpi_system_get_media_buffer(mod_id_e enModID, int s32ChnId, i
 
     switch (enModID) {
         case MOD_ID_VI:
-            if (s32ChnId < 0 || s32ChnId >= DRM_VO_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_VO_CHANNEL_00) || (s32ChnId >= DRM_VO_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid vi channel:[%d]", s32ChnId);
                 return NULL;
             }
@@ -1104,7 +1104,7 @@ media_buffer_t drm_mpi_system_get_media_buffer(mod_id_e enModID, int s32ChnId, i
             break;
 
         case MOD_ID_RGA:
-            if (s32ChnId < 0 || s32ChnId >= DRM_RGA_CHANNEL_BUTT) {
+            if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channel:[%d]", s32ChnId);
                 return NULL;
             }
@@ -1113,7 +1113,7 @@ media_buffer_t drm_mpi_system_get_media_buffer(mod_id_e enModID, int s32ChnId, i
 
         case MOD_ID_VMIX: {
             int s32DevId = s32ChnId;
-            if (s32DevId < 0 || s32DevId >= DRM_VMIX_DEVICE_BUTT) {
+            if ((s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
                 DRM_MEDIA_LOGE("invalid vmix device:[%d]", s32DevId);
                 return NULL;
             }
@@ -1238,7 +1238,7 @@ int drm_mpi_system_register_event_callback(const drm_chn_t *pstChn, void *handle
 
 int drm_mpi_vi_get_channel_attribute(int channel, drm_vi_chn_attr_t *pstChnAttr)
 {
-    if ((channel < 0) || (channel >= DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1263,7 +1263,7 @@ int drm_mpi_vi_get_channel_attribute(int channel, drm_vi_chn_attr_t *pstChnAttr)
 
 int drm_mpi_vi_set_channel_attribute(int channel, const drm_vi_chn_attr_t *pstChnAttr)
 {
-    if ((channel < 0) || (channel >= DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1286,7 +1286,7 @@ int drm_mpi_vi_set_channel_attribute(int channel, const drm_vi_chn_attr_t *pstCh
 
 int drm_mpi_vi_enable_channel(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1356,7 +1356,7 @@ int drm_mpi_vi_enable_channel(int channel)
 
 int drm_mpi_vi_disable_channel(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1390,7 +1390,7 @@ int drm_mpi_vi_disable_channel(int channel)
 
 int drm_mpi_vi_get_status(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1420,7 +1420,7 @@ int drm_mpi_vi_get_status(int channel)
 
 int drm_mpi_vi_start_stream(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1443,7 +1443,7 @@ int drm_mpi_vi_start_stream(int channel)
 
 int drm_mpi_vi_enable_user_picture(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1466,7 +1466,7 @@ int drm_mpi_vi_enable_user_picture(int channel)
 
 int drm_mpi_vi_disable_user_picture(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1489,7 +1489,7 @@ int drm_mpi_vi_disable_user_picture(int channel)
 
 int drm_mpi_vi_set_user_picture(int channel, drm_vi_userpic_attr_t *pstUsrPicAttr)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1598,7 +1598,7 @@ static uint64_t calculate_media_region_luma(std::shared_ptr<libdrm::ImageBuffer>
 
 int drm_mpi_vi_stop_region_luma(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1624,7 +1624,7 @@ int drm_mpi_vi_stop_region_luma(int channel)
 
 int drm_mpi_vi_start_region_luma(int channel)
 {
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1654,13 +1654,7 @@ int drm_mpi_vi_start_region_luma(int channel)
 
 int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_t *pstRegionInfo, uint64_t *pu64LumaData, int s32MilliSec)
 {
-    int s32Ret = 0;
-    uint32_t u32XOffset = 0;
-    uint32_t u32YOffset = 0;
-    uint32_t u32ImgWidth = 0;
-    uint32_t u32ImgHeight = 0;
-
-    if ((channel < 0) || (channel > DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1668,6 +1662,11 @@ int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_
         return -2;
     }
 
+    int s32Ret = 0;
+    uint32_t u32XOffset = 0;
+    uint32_t u32YOffset = 0;
+    uint32_t u32ImgWidth = 0;
+    uint32_t u32ImgHeight = 0;
     std::shared_ptr<libdrm::ImageBuffer> media_mb;
     drm_media_channel_t *target_chn = &g_vi_chns[channel];
 
@@ -1730,7 +1729,7 @@ int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_
 
 int drm_mpi_vi_region_set_cover(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo)
 {
-    if ((channel < 0) || (channel >= DRM_VI_CHANNEL_BUTT))
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT))
         return -1;
 
     if (!pstRgnInfo) {
@@ -1783,7 +1782,7 @@ static DrmPixelFormat get_osd_pix_format(drm_osd_pixel_format_e f)
 
 int drm_mpi_vi_region_set_bitmap(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap)
 {
-    if ((channel < 0) || (channel >= DRM_VI_CHANNEL_BUTT)) {
+    if ((channel < DRM_VI_CHANNEL_00) || (channel >= DRM_VI_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1823,7 +1822,7 @@ int drm_mpi_vo_create_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
 {
     const char *pcPlaneType = NULL;
 
-    if (((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT)) || !pstAttr) {
+    if (((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) || !pstAttr) {
         DRM_MEDIA_LOGE("invalid channel id:[%d] or channel attribute null", channel);
         return -1;
     }
@@ -1969,7 +1968,7 @@ int drm_mpi_vo_create_channel(int channel, const drm_vo_chn_attr_t *pstAttr)
 
 int drm_mpi_vo_destroy_channel(int channel)
 {
-    if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -1988,7 +1987,7 @@ int drm_mpi_vo_destroy_channel(int channel)
 
 int drm_mpi_vo_get_channel_attribute(int channel, drm_vo_chn_attr_t *pstAttr)
 {
-    if ((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT))
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT))
         return -1;
 
     if (!pstAttr) {
@@ -2009,7 +2008,7 @@ int drm_mpi_vo_get_channel_attribute(int channel, drm_vo_chn_attr_t *pstAttr)
 
 int drm_mpi_vo_set_channel_attribute(int channel, const drm_vo_chn_attr_t *pstAttr)
 {
-    if ((channel < 0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2059,7 +2058,7 @@ int drm_mpi_vo_set_channel_attribute(int channel, const drm_vo_chn_attr_t *pstAt
 
 int drm_mpi_rga_destroy_channel(int channel)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2083,7 +2082,7 @@ int drm_mpi_rga_destroy_channel(int channel)
 
 int drm_mpi_rga_create_channel(int channel, drm_rga_attr_t *pstRgaAttr)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2097,8 +2096,8 @@ int drm_mpi_rga_create_channel(int channel, drm_rga_attr_t *pstRgaAttr)
     uint32_t u32InY = pstRgaAttr->stImgIn.u32Y;
     uint32_t u32InWidth = pstRgaAttr->stImgIn.u32Width;
     uint32_t u32InHeight = pstRgaAttr->stImgIn.u32Height;
-    //  uint32_t u32InVirWidth = pstRgaAttr->stImgIn.u32HorStride;
-    //  uint32_t u32InVirHeight = pstRgaAttr->stImgIn.u32VirStride;
+    // uint32_t u32InVirWidth = pstRgaAttr->stImgIn.u32HorStride;
+    // uint32_t u32InVirHeight = pstRgaAttr->stImgIn.u32VirStride;
     std::string InPixelFmt = ImageTypeToString(pstRgaAttr->stImgIn.imgType);
 
     uint32_t u32OutX = pstRgaAttr->stImgOut.u32X;
@@ -2176,7 +2175,7 @@ int drm_mpi_rga_create_channel(int channel, drm_rga_attr_t *pstRgaAttr)
 
 int drm_mpi_rga_get_channel_attribute(int channel, drm_rga_attr_t *pstAttr)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2221,7 +2220,7 @@ int drm_mpi_rga_get_channel_attribute(int channel, drm_rga_attr_t *pstAttr)
 
 int drm_mpi_rga_set_channel_attribute(int channel, const drm_rga_attr_t *pstAttr)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2260,7 +2259,7 @@ int drm_mpi_rga_set_channel_attribute(int channel, const drm_rga_attr_t *pstAttr
 
 int drm_mpi_rga_get_channel_region_luma(int channel, const drm_video_region_info_t *pstRegionInfo, uint64_t *pu64LumaData, int s32MilliSec)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2310,7 +2309,7 @@ int drm_mpi_rga_get_channel_region_luma(int channel, const drm_video_region_info
 
 int drm_mpi_rga_region_set_cover(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2353,7 +2352,7 @@ int drm_mpi_rga_region_set_cover(int channel, const drm_osd_region_info_t *pstRg
 
 int drm_mpi_rga_region_set_bitmap(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap)
 {
-    if ((channel < 0) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
+    if ((channel < DRM_RGA_CHANNEL_00) || (channel >= DRM_RGA_CHANNEL_BUTT)) {
         return -1;
     }
 
@@ -2395,7 +2394,7 @@ int drm_mpi_rga_region_set_bitmap(int channel, const drm_osd_region_info_t *pstR
 
 int drm_mpi_vmix_destroy_device(int device)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
@@ -2425,7 +2424,7 @@ int drm_mpi_vmix_create_device(int device, drm_vmix_dev_info_t *pstDevInfo)
     uint16_t u16Rotaion;
     drm_rga_flip_e enFlip;
 
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
@@ -2509,11 +2508,11 @@ int drm_mpi_vmix_create_device(int device, drm_vmix_dev_info_t *pstDevInfo)
 
 int drm_mpi_vmix_enable_channel(int device, int channel)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2542,11 +2541,11 @@ int drm_mpi_vmix_enable_channel(int device, int channel)
 
 int drm_mpi_vmix_disable_channel(int device, int channel)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2572,11 +2571,11 @@ int drm_mpi_vmix_disable_channel(int device, int channel)
 
 int drm_mpi_vmix_hide_channel(int device, int channel)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2594,11 +2593,11 @@ int drm_mpi_vmix_hide_channel(int device, int channel)
 
 int drm_mpi_vmix_show_channel(int device, int channel)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2616,11 +2615,11 @@ int drm_mpi_vmix_show_channel(int device, int channel)
 
 int drm_mpi_vmix_set_layout_line(int device, int channel, drm_vmix_line_info_t *pstVmixLine)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2657,11 +2656,11 @@ int drm_mpi_vmix_set_layout_line(int device, int channel, drm_vmix_line_info_t *
 
 static int vmix_get_channel_region_luma(int device, int channel, const drm_video_region_info_t *pstRegionInfo, uint64_t *pu64LumaData, int s32MilliSec, int offset)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2718,11 +2717,11 @@ int drm_mpi_vmix_get_channel_region_luma(int device, int channel, const drm_vide
 
 int drm_mpi_vmix_region_set_cover(int device, int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 
@@ -2762,11 +2761,11 @@ int drm_mpi_vmix_region_set_cover(int device, int channel, const drm_osd_region_
 
 int drm_mpi_vmix_region_set_bitmap(int device, int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap)
 {
-    if ((device < 0) || (device >= DRM_VMIX_DEVICE_BUTT)) {
+    if ((device < DRM_VMIX_DEVICE_00) || (device >= DRM_VMIX_DEVICE_BUTT)) {
         return -1;
     }
 
-    if ((channel < 0) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
+    if ((channel < DRM_VMIX_CHANNEL_00) || (channel >= DRM_VMIX_CHANNEL_BUTT)) {
         return -2;
     }
 

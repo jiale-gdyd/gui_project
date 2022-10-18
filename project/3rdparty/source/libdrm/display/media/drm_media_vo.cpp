@@ -13,8 +13,8 @@ static bool g_voChnStated[DRM_VO_CHANNEL_BUTT] = {false, };
 
 int drm_destroy_video_output(int channel)
 {
-    if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) {
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_00, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 
@@ -31,8 +31,8 @@ int drm_destroy_video_output(int channel)
 
 int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_t dispWidth, size_t dispHeight, size_t dispXoffset, size_t dispYoffset, drm_image_type_e imageType, const char *card)
 {
-    if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) {
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_00, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 
@@ -70,8 +70,8 @@ int drm_create_video_output(int channel, int zpos, drm_plane_type_e layer, size_
 
 int drm_send_frame_video_output(int channel, media_buffer_t frame)
 {
-    if ((channel < DRM_VO_CHANNEL_0) || (channel >= DRM_VO_CHANNEL_BUTT)) {
-        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_0, DRM_VO_CHANNEL_BUTT);
+    if ((channel < DRM_VO_CHANNEL_00) || (channel >= DRM_VO_CHANNEL_BUTT)) {
+        DRM_MEDIA_LOGE("vo channel:[%d] invalid , only:[%d, %d)", channel, DRM_VO_CHANNEL_00, DRM_VO_CHANNEL_BUTT);
         return -1;
     }
 

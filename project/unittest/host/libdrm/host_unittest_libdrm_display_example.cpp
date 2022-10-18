@@ -119,7 +119,7 @@ int host_unittest_libdrm_display_init(int argc, char *argv[])
 
             }
 
-            unittest_info("frame:[%04d] output 0x%02X, frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, u32FrameSize);
+            unittest_info("frame:[%04d] output:[0x%02X], frameSize:[%u]", frameCount, bSet0xFF ? 0xFF : 0x00, (unsigned int)u32FrameSize);
 
             bSet0xFF = !bSet0xFF;
             ret = drm_send_frame_video_output(g_voChannel, frame);
