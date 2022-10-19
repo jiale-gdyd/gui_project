@@ -17,10 +17,10 @@
 #ifndef __MPP_CLUSTER_H__
 #define __MPP_CLUSTER_H__
 
-#include "mpp_err.h"
-#include "mpp_list.h"
-#include "mpp_thread.h"
-#include "mpp_dev_defs.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "../../../osal/inc/mpp_thread.h"
+#include "../../../osal/inc/mpp_dev_defs.h"
 
 #define MAX_PRIORITY            1
 

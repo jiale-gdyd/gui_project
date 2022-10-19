@@ -18,8 +18,8 @@
 
 #include <string.h>
 
-#include "mpp_task.h"
-#include "mpp_task_impl.h"
+#include "rockchip/rkmpp/mpp_task.h"
+#include "inc/mpp_task_impl.h"
 
 MPP_RET mpp_task_meta_set_s32(MppTask task, MppMetaKey key, RK_S32 val)
 {

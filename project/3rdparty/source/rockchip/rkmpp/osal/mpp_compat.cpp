@@ -16,11 +16,11 @@
 
 #define MODULE_TAG "mpp_compat"
 
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
 
-#include "mpp_compat.h"
-#include "mpp_compat_impl.h"
+#include "rockchip/rkmpp/mpp_compat.h"
+#include "inc/mpp_compat_impl.h"
 
 static MppCompat compats[] = {
     {

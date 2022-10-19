@@ -20,10 +20,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #include "iep2.h"
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 #include "iep2_ff.h"
 
 void iep2_check_ffo(struct iep2_api_ctx *ctx)

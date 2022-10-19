@@ -21,15 +21,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
-#include "avsd_syntax.h"
-#include "avsd_api.h"
+#include "../../../common/avsd_syntax.h"
+#include "../../inc/avsd_api.h"
 #include "avsd_parse.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 RK_U32 avsd_parse_debug = 0;
 

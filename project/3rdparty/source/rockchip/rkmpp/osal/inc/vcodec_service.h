@@ -17,7 +17,7 @@
 #ifndef __VCODEC_SERVICE_H__
 #define __VCODEC_SERVICE_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define EXTRA_INFO_MAGIC                    (0x4C4A46)
 

@@ -28,7 +28,7 @@
 #define MODULE_TAG "H265SYNATX"
 
 #include "h265d_parser.h"
-#include "h265d_syntax.h"
+#include "../../../common/h265d_syntax.h"
 
 
 static void fill_picture_entry(DXVA_PicEntry_HEVC *pic,

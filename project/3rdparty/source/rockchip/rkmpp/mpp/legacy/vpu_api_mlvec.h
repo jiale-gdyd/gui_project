@@ -17,7 +17,7 @@
 #ifndef __VPU_API_MLVEC_H__
 #define __VPU_API_MLVEC_H__
 
-#include "rk_mpi.h"
+#include "rockchip/rkmpp/rk_mpi.h"
 
 #define MLVEC_MAGIC                     'M'
 #define MLVEC_VERSION                   '0'

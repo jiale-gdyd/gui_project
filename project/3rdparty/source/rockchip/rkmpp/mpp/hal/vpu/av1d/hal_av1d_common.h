@@ -18,12 +18,12 @@
 #ifndef __HAL_AV1D_GLOBAL_H__
 #define __HAL_AV1D_GLOBAL_H__
 
-#include "mpp_hal.h"
-#include "mpp_debug.h"
-#include "mpp_device.h"
-#include "hal_bufs.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../common/hal_bufs.h"
 
-#include "dxva_syntax.h"
+#include "../../../common/dxva_syntax.h"
 
 #define AV1D_DBG_ERROR             (0x00000001)
 #define AV1D_DBG_ASSERT            (0x00000002)

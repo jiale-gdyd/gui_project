@@ -17,8 +17,8 @@
 #ifndef __MPP_BITWRITER_H__
 #define __MPP_BITWRITER_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 /*
  * Mpp bitstream writer for H.264/H.265

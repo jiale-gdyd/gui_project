@@ -17,7 +17,7 @@
 #ifndef __RC_HAL_H__
 #define __RC_HAL_H__
 
-#include "mpp_platform.h"
+#include "../../../osal/inc/mpp_platform.h"
 
 #include "rc/rc_vepu.h"
 #include "rc/rc_vepu540.h"

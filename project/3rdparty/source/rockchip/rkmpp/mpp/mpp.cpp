@@ -19,24 +19,24 @@
 #include <errno.h>
 #include <string.h>
 
-#include "rk_mpi.h"
+#include "rockchip/rkmpp/rk_mpi.h"
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_time.h"
-#include "mpp_impl.h"
-#include "mpp_2str.h"
-#include "mpp_debug.h"
+#include "../osal/inc/mpp_mem.h"
+#include "../osal/inc/mpp_env.h"
+#include "../osal/inc/mpp_time.h"
+#include "inc/mpp_impl.h"
+#include "base/inc/mpp_2str.h"
+#include "../osal/inc/mpp_debug.h"
 
-#include "mpp.h"
-#include "mpp_hal.h"
+#include "inc/mpp.h"
+#include "hal/inc/mpp_hal.h"
 
-#include "mpp_task_impl.h"
-#include "mpp_buffer_impl.h"
-#include "mpp_frame_impl.h"
-#include "mpp_packet_impl.h"
+#include "base/inc/mpp_task_impl.h"
+#include "base/inc/mpp_buffer_impl.h"
+#include "base/inc/mpp_frame_impl.h"
+#include "base/inc/mpp_packet_impl.h"
 
-#include "mpp_dec_cfg_impl.h"
+#include "base/inc/mpp_dec_cfg_impl.h"
 
 #define MPP_TEST_FRAME_SIZE     SZ_1M
 #define MPP_TEST_PACKET_SIZE    SZ_512K

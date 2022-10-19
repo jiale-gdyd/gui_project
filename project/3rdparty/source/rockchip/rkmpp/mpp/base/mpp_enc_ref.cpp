@@ -18,14 +18,14 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_log.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
+#include "../../osal/inc/mpp_env.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_time.h"
 
-#include "mpp_rc_defs.h"
-#include "mpp_enc_ref.h"
-#include "mpp_enc_refs.h"
+#include "rockchip/rkmpp/mpp_rc_defs.h"
+#include "inc/mpp_enc_ref.h"
+#include "inc/mpp_enc_refs.h"
 
 #define setup_mpp_enc_ref_cfg(ref) \
     ((MppEncRefCfgImpl*)ref)->name = module_name;

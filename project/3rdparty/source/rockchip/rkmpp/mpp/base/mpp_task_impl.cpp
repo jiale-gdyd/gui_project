@@ -18,12 +18,12 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_debug.h"
 
-#include "mpp_task_impl.h"
-#include "mpp_meta_impl.h"
+#include "inc/mpp_task_impl.h"
+#include "inc/mpp_meta_impl.h"
 
 #define MAX_TASK_COUNT      8
 

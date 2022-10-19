@@ -21,16 +21,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_list.h"
-#include "mpp_time.h"
-#include "osal_2str.h"
-#include "mpp_common.h"
-#include "mpp_mem_pool.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_list.h"
+#include "../inc/mpp_time.h"
+#include "../inc/osal_2str.h"
+#include "../inc/mpp_common.h"
+#include "../inc/mpp_mem_pool.h"
 
-#include "mpp_device_debug.h"
-#include "mpp_service_impl.h"
-#include "mpp_server.h"
+#include "inc/mpp_device_debug.h"
+#include "inc/mpp_service_impl.h"
+#include "../inc/mpp_server.h"
 
 #define MAX_BATCH_TASK      8
 #define MAX_SESSION_TASK    4

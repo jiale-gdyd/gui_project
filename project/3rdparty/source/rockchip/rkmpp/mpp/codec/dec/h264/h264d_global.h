@@ -19,14 +19,14 @@
 #define __H264D_GLOBAL_H__
 
 #include <stdio.h>
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
-#include "mpp_mem_pool.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../../osal/inc/mpp_mem_pool.h"
 
-#include "h264d_syntax.h"
-#include "h264d_api.h"
+#include "../../../common/h264d_syntax.h"
+#include "../../inc/h264d_api.h"
 
 
 #define H264D_DBG_ERROR             (0x00000001)

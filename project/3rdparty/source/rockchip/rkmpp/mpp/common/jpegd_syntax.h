@@ -18,7 +18,7 @@
 #ifndef __JPEGD_SYNTAX__
 #define __JPEGD_SYNTAX__
 
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 #define JPEGDEC_YUV400                    (0)
 #define JPEGDEC_YUV420                    (2)

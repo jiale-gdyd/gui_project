@@ -1,7 +1,7 @@
 #include <string.h>
 #include "vp9d_codec.h"
 #include "vp9d_parser.h"
-#include "vp9d_syntax.h"
+#include "../../../common/vp9d_syntax.h"
 
 #define TRANS_TO_HW_STYLE(uv_mode)                          \
 do{                                                         \

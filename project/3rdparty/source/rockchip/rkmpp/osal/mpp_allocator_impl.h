@@ -17,7 +17,7 @@
 #ifndef __MPP_ALLOCATOR_IMPL_H__
 #define __MPP_ALLOCATOR_IMPL_H__
 
-#include "mpp_thread.h"
+#include "inc/mpp_thread.h"
 #include "os_allocator.h"
 
 typedef struct MppAllocatorImpl_t {

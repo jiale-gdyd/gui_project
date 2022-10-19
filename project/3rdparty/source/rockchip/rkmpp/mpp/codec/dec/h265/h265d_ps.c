@@ -27,8 +27,8 @@
 
 #define MODULE_TAG "H265PARSER_PS"
 
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
 #include "h265d_parser.h"
 
 static const RK_U8 default_scaling_list_intra[] = {

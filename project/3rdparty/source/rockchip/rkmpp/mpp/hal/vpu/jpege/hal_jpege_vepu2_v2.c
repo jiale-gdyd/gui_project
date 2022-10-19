@@ -18,16 +18,16 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_common.h"
-#include "mpp_mem.h"
-#include "mpp_platform.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
-#include "mpp_enc_hal.h"
-#include "vcodec_service.h"
+#include "../../inc/mpp_enc_hal.h"
+#include "../../../../osal/inc/vcodec_service.h"
 
 #include "hal_jpege_debug.h"
-#include "hal_jpege_api_v2.h"
+#include "../../inc/hal_jpege_api_v2.h"
 #include "hal_jpege_base.h"
 
 #define VEPU_JPEGE_VEPU2_NUM_REGS   184

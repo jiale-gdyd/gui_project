@@ -16,9 +16,9 @@
 
 #ifndef __H265E_SYNTAX_NEW_H__
 #define __H265E_SYNTAX_NEW_H__
-#include "mpp_rc.h"
+#include "../codec/inc/mpp_rc.h"
 #include "h265_syntax.h"
-#include "rc.h"
+#include "../codec/inc/rc.h"
 
 typedef struct H265PicEntry_t {
     RK_U8 slot_idx;

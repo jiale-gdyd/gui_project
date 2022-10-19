@@ -19,13 +19,13 @@
 
 #include <stdio.h>
 
-#include "mpp_hal.h"
-#include "mpp_buf_slot.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../base/inc/mpp_buf_slot.h"
+#include "../../../../osal/inc/mpp_device.h"
 
-#include "hal_dec_task.h"
+#include "../../inc/hal_dec_task.h"
 
-#include "vp8d_syntax.h"
+#include "../../../common/vp8d_syntax.h"
 
 #define VP8H_DBG_FUNCTION          (0x00000001)
 #define VP8H_DBG_REG               (0x00000002)

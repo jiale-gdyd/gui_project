@@ -22,18 +22,18 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_list.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_time.h"
+#include "../inc/mpp_list.h"
+#include "../inc/mpp_debug.h"
+#include "../inc/mpp_common.h"
 
-#include "vpu.h"
-#include "mpp_soc.h"
-#include "mpp_platform.h"
-#include "vcodec_service.h"
-#include "vcodec_service_api.h"
+#include "rockchip/rkmpp/vpu.h"
+#include "../inc/mpp_soc.h"
+#include "../inc/mpp_platform.h"
+#include "../inc/vcodec_service.h"
+#include "../inc/vcodec_service_api.h"
 
 #define MAX_REGS_COUNT      3
 #define MPX_EXTRA_INFO_NUM  16

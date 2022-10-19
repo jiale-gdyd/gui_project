@@ -17,7 +17,7 @@
 #ifndef __HAL_JPEGE_HDR_H__
 #define __HAL_JPEGE_HDR_H__
 
-#include "jpege_syntax.h"
+#include "../../../common/jpege_syntax.h"
 
 typedef void *JpegeBits;
 

@@ -19,8 +19,8 @@
 #ifndef __HAL_JPEGD_API_H__
 #define __HAL_JPEGD_API_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 #include "mpp_hal.h"
 
 

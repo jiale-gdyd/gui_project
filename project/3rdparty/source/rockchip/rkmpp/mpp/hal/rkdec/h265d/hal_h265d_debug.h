@@ -18,7 +18,7 @@
 #ifndef __HAL_H265D_DEBUG_H__
 #define __HAL_H265D_DEBUG_H__
 
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
 #define H265H_DBG_FUNCTION          (0x00000001)
 #define H265H_DBG_RPS               (0x00000002)

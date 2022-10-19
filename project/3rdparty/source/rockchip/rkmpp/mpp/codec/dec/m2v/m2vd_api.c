@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include "m2vd_api.h"
+#include "../../inc/m2vd_api.h"
 #include "m2vd_parser.h"
 #include "m2vd_codec.h"
 

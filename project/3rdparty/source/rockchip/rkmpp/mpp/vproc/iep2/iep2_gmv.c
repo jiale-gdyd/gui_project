@@ -20,9 +20,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_common.h"
 
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 #include "iep2_gmv.h"
 
 static void iep2_sort(uint32_t bin[], int map[], int size)

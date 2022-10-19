@@ -17,8 +17,8 @@
 #ifndef __MPP_FRAME_IMPL_H__
 #define __MPP_FRAME_IMPL_H__
 
-#include "mpp_time.h"
-#include "mpp_frame.h"
+#include "../../../osal/inc/mpp_time.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 typedef struct MppFrameImpl_t MppFrameImpl;
 

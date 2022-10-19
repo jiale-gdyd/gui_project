@@ -18,18 +18,18 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpp_enc_hal.h"
-#include "mpp_platform.h"
+#include "../../inc/mpp_enc_hal.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
 //#include "hal_vp8e_base.h"
 #include "hal_vp8e_vepu2_v2.h"
 #include "hal_vp8e_vepu1_v2.h"
 #include "hal_vp8e_debug.h"
-#include "hal_vp8e_api_v2.h"
+#include "../../inc/hal_vp8e_api_v2.h"
 
 typedef struct Halvp8eCtx_t {
     const MppEncHalApi  *api;

@@ -16,10 +16,10 @@
 
 #define MODULE_TAG "mpp_opt"
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_trie.h"
-#include "mpp_common.h"
+#include "../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../mpp/base/inc/mpp_trie.h"
+#include "../osal/inc/mpp_common.h"
 
 #include "mpp_opt.h"
 

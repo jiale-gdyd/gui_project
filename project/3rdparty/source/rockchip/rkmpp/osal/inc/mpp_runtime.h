@@ -17,7 +17,7 @@
 #ifndef __MPP_RUNTIME__
 #define __MPP_RUNTIME__
 
-#include "mpp_buffer.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
 #ifdef __cplusplus
 extern "C" {

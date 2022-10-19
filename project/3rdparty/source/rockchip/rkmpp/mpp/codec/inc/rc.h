@@ -17,9 +17,9 @@
 #ifndef __RC_H__
 #define __RC_H__
 
-#include "mpp_err.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
-#include "mpp_rc_api.h"
+#include "rockchip/rkmpp/mpp_rc_api.h"
 
 /*
  * Mpp rate control principle

@@ -18,7 +18,7 @@
 #ifndef __DXVA_SYNTAX_H__
 #define __DXVA_SYNTAX_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 enum __MIDL___MIDL_itf_dxva2api_0000_0000_0012 {
     DXVA2_PictureParametersBufferType         = 0,

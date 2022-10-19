@@ -18,15 +18,15 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_buffer.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_vp8e_base.h"
 #include "hal_vp8e_putbit.h"
 #include "hal_vp8e_table.h"
 #include "hal_vp8e_debug.h"
-#include "vepu_common.h"
+#include "../common/vepu_common.h"
 
 static MPP_RET set_frame_params(void *hal)
 {

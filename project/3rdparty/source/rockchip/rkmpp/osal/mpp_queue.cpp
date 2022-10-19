@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "mpp_err.h"
-#include "mpp_queue.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "inc/mpp_queue.h"
 
 MppQueue::MppQueue(node_destructor func)
     : mpp_list(func), mFlushFlag(0)

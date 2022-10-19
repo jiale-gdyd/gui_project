@@ -17,8 +17,8 @@
 #ifndef __HAL_INFO_H__
 #define __HAL_INFO_H__
 
-#include "mpp_enc_cfg.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_enc_cfg.h"
+#include "../../../osal/inc/mpp_device.h"
 
 typedef enum CodecInfoType_e {
     /* ENC info */

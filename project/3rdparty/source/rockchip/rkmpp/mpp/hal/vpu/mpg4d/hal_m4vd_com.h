@@ -17,10 +17,10 @@
 #ifndef __HAL_M4VD_COM_H__
 #define __HAL_M4VD_COM_H__
 
-#include "mpp_hal.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_device.h"
 
-#include "mpg4d_syntax.h"
+#include "../../../common/mpg4d_syntax.h"
 
 #define MPG4D_HAL_DBG_REG_PUT       (0x00000001)
 #define MPG4D_HAL_DBG_REG_GET       (0x00000002)

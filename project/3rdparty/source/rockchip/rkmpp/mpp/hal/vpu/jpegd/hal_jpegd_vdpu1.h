@@ -17,7 +17,7 @@
 #ifndef __HAL_JPEGD_VDPU1_H__
 #define __HAL_JPEGD_VDPU1_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 MPP_RET hal_jpegd_vdpu1_init(void *hal, MppHalCfg *cfg);
 MPP_RET hal_jpegd_vdpu1_deinit(void *hal);

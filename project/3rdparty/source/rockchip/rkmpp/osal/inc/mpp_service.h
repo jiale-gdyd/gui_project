@@ -17,7 +17,7 @@
 #ifndef __MPP_SERVICE_H__
 #define __MPP_SERVICE_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 #include <asm/ioctl.h>
 
 /* Use 'v' as magic number */

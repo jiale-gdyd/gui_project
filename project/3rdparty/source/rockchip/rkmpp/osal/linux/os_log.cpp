@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef linux
+#define linux
+#endif
 
 #if defined(linux) && !defined(__ANDROID__)
 #include <stdio.h>
 #include <stdarg.h>
 #include <syslog.h>
 
-#include "os_log.h"
-#include "os_env.h"
+#include "../os_log.h"
+#include "../os_env.h"
 
 #define LINE_SZ 1024
 

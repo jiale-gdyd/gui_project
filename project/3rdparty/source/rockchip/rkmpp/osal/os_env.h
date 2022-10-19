@@ -17,7 +17,7 @@
 #ifndef __OS_ENV_H__
 #define __OS_ENV_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #ifdef __cplusplus
 extern "C" {

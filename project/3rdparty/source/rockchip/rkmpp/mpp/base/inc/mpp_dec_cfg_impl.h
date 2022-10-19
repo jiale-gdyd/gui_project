@@ -18,7 +18,7 @@
 #define __MPP_DEC_CFG_IMPL_H__
 
 #include "mpp_trie.h"
-#include "mpp_dec_cfg.h"
+#include "../../inc/mpp_dec_cfg.h"
 
 typedef struct MppDecCfgImpl_t {
     RK_S32              size;

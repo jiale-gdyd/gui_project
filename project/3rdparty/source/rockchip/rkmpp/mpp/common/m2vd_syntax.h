@@ -17,7 +17,7 @@
 #ifndef __M2VD_SYNTAX_H__
 #define __M2VD_SYNTAX_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef struct _DXVA_PicEntry_M2V {
     union {

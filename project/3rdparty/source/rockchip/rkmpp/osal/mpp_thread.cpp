@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_log.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_thread.h"
 
 #define MPP_THREAD_DBG_FUNCTION     (0x00000001)
 

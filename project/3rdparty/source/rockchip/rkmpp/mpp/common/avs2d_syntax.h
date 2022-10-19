@@ -17,7 +17,7 @@
 #ifndef __AVS2D_SYNTAX_H__
 #define __AVS2D_SYNTAX_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 //!< avs2 decoder picture parameters structure
 typedef struct _DXVA_PicParams_AVS2 {

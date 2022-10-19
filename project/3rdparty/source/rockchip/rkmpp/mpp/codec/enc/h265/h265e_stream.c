@@ -16,8 +16,8 @@
 
 #define MODULE_TAG "h265e_stream"
 
-#include "mpp_common.h"
-#include "mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
 
 #include "h265e_stream.h"
 #include "h265e_codec.h"

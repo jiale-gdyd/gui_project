@@ -18,7 +18,7 @@
 #ifndef __HAL_H265D_COM_H__
 #define __HAL_H265D_COM_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define SCALING_LIST_SIZE       (81 * 1360)
 #define RPS_SIZE                (600 * 32)

@@ -17,7 +17,7 @@
 #ifndef __HAL_H264E_VPU_TBL_H__
 #define __HAL_H264E_VPU_TBL_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define H264E_CABAC_TABLE_BUF_SIZE  (52*2*464)
 

@@ -19,9 +19,9 @@
 
 #include <stdlib.h>
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_log.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "rockchip/rkmpp/mpp_log.h"
 
 #define MPP_DBG_TIMING                  (0x00000001)
 #define MPP_DBG_PTS                     (0x00000002)

@@ -18,10 +18,10 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
+#include "../../../../osal/inc/mpp_env.h"
 
 #include "hal_vp9d_debug.h"
-#include "hal_vp9d_api.h"
+#include "../../inc/hal_vp9d_api.h"
 #include "hal_vp9d_ctx.h"
 #include "hal_vp9d_rkv.h"
 #include "hal_vp9d_vdpu34x.h"

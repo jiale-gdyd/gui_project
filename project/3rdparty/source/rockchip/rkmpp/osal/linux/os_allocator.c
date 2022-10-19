@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifndef linux
+#define linux
+#endif
+#include <linux/kconfig.h>
 #if defined(linux) && !defined(__ANDROID__)
-#include "mpp_log.h"
-#include "mpp_runtime.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../inc/mpp_runtime.h"
 
-#include "allocator_dma_heap.h"
-#include "allocator_drm.h"
-#include "allocator_ext_dma.h"
-#include "allocator_ion.h"
-#include "allocator_std.h"
+#include "../allocator/allocator_dma_heap.h"
+#include "../allocator/allocator_drm.h"
+#include "../allocator/allocator_ext_dma.h"
+#include "../allocator/allocator_ion.h"
+#include "../allocator/allocator_std.h"
 
 /*
  * Linux only support MPP_BUFFER_TYPE_NORMAL so far
@@ -39,7 +42,7 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
     case MPP_BUFFER_TYPE_ION : {
         *api = (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_ION)) ? allocator_ion :
                (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DMA_HEAP)) ? allocator_dma_heap :
-#if HAVE_DRM
+#if defined(CONFIG_LIBDRM)
                (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DRM)) ? allocator_drm :
 #endif
                allocator_std;
@@ -49,7 +52,7 @@ MPP_RET os_allocator_get(os_allocator *api, MppBufferType type)
     } break;
     case MPP_BUFFER_TYPE_DRM : {
         *api = (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DMA_HEAP)) ? allocator_dma_heap :
-#if HAVE_DRM
+#if defined(CONFIG_LIBDRM)
                (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_DRM)) ? allocator_drm :
 #endif
                (mpp_rt_allcator_is_valid(MPP_BUFFER_TYPE_ION)) ? allocator_ion :

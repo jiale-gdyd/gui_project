@@ -17,17 +17,17 @@
 #ifndef __MPP_DEC_IMPL_H__
 #define __MPP_DEC_IMPL_H__
 
-#include "mpp_time.h"
-#include "mpp_mem_pool.h"
-#include "mpp_lock.h"
-#include "hal_info.h"
+#include "../../../osal/inc/mpp_time.h"
+#include "../../../osal/inc/mpp_mem_pool.h"
+#include "../../../osal/inc/mpp_lock.h"
+#include "../../hal/common/hal_info.h"
 
-#include "mpp.h"
-#include "mpp_dec_cfg.h"
-#include "mpp_callback.h"
+#include "../../inc/mpp.h"
+#include "../../inc/mpp_dec_cfg.h"
+#include "../../../osal/inc/mpp_callback.h"
 
 #include "mpp_parser.h"
-#include "mpp_hal.h"
+#include "../../hal/inc/mpp_hal.h"
 
 // for timing record
 typedef enum MppDecTimingType_e {

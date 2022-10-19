@@ -29,8 +29,8 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 
-#include "mpp_log.h"
-#include "mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../osal/inc/mpp_mem.h"
 #include "camera_source.h"
 
 typedef struct CamFrame_t {

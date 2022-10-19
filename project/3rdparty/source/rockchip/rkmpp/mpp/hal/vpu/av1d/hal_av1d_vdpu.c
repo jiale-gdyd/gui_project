@@ -20,19 +20,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_bitput.h"
-#include "mpp_hal.h"
-#include "mpp_dec_cb_param.h"
-#include "mpp_device.h"
-#include "hal_bufs.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_bitput.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../common/hal_bufs.h"
 
 #include "hal_av1d_vdpu_reg.h"
 #include "hal_av1d_common.h"
-#include "av1d_syntax.h"
+#include "../../../common/av1d_syntax.h"
 #include "film_grain_noise_table.h"
 #include "av1d_common.h"
 

@@ -17,8 +17,8 @@
 #ifndef __VP8E_SYNTAX_H__
 #define __VP8E_SYNTAX_H__
 
-#include "rk_type.h"
-#include "mpp_enc_cfg.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "../inc/mpp_enc_cfg.h"
 
 typedef struct {
     RK_S32  a1;

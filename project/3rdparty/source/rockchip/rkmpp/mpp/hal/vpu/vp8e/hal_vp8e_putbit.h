@@ -17,8 +17,8 @@
 #ifndef __HAL_VP8E_PUT_BIT_H__
 #define __HAL_VP8E_PUT_BIT_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 typedef struct {
     RK_U8 *data;

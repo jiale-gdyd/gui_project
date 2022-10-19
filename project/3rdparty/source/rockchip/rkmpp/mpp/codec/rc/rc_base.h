@@ -17,9 +17,9 @@
 #ifndef __RC_BASE_H__
 #define __RC_BASE_H__
 
-#include "mpp_list.h"
-#include "mpp_enc_cfg.h"
-#include "mpp_rc.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "../../inc/mpp_enc_cfg.h"
+#include "../inc/mpp_rc.h"
 
 /*
  * mpp rate control contain common caculation methd

@@ -17,7 +17,7 @@
 #ifndef __IEP2_FF_H__
 #define __IEP2_FF_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 struct iep2_ff_info {
     RK_S32 tff_offset;

@@ -17,8 +17,8 @@
 #ifndef __MPP_ALLOCATOR_H__
 #define __MPP_ALLOCATOR_H__
 
-#include "rk_type.h"
-#include "mpp_buffer.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
 typedef void *MppAllocator;
 

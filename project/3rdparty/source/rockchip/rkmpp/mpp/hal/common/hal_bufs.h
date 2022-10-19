@@ -17,7 +17,7 @@
 #ifndef __HAL_BUFS_H__
 #define __HAL_BUFS_H__
 
-#include "mpp_buffer.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
 /* HalBuf buffer set allocater */
 typedef struct HalBuf_t {

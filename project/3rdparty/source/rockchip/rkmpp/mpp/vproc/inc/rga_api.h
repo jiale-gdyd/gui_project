@@ -17,9 +17,9 @@
 #ifndef __RGA_API_H__
 #define __RGA_API_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 /*
  * NOTE: Normal rga usage should consider address align issue.
@@ -48,10 +48,10 @@ typedef void* RgaCtx;
 extern "C" {
 #endif
 
-MPP_RET rga_init(RgaCtx *ctx);
-MPP_RET rga_deinit(RgaCtx ctx);
+MPP_RET rkmpp_rga_init(RgaCtx *ctx);
+MPP_RET rkmpp_rga_deinit(RgaCtx ctx);
 
-MPP_RET rga_control(RgaCtx ctx, RgaCmd cmd, void *param);
+MPP_RET rkmpp_rga_control(RgaCtx ctx, RgaCmd cmd, void *param);
 
 #ifdef __cplusplus
 }

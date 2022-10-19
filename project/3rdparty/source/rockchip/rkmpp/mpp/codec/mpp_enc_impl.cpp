@@ -20,17 +20,17 @@
 #include <stdarg.h>
 #include <limits.h>
 
-#include "mpp_time.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_frame_impl.h"
-#include "mpp_packet_impl.h"
+#include "../base/inc/mpp_frame_impl.h"
+#include "../base/inc/mpp_packet_impl.h"
 
-#include "mpp.h"
+#include "../inc/mpp.h"
 #include "mpp_enc_debug.h"
-#include "mpp_enc_cfg_impl.h"
-#include "mpp_enc_impl.h"
-#include "mpp_enc_cb_param.h"
+#include "../base/inc/mpp_enc_cfg_impl.h"
+#include "inc/mpp_enc_impl.h"
+#include "../base/inc/mpp_enc_cb_param.h"
 
 typedef union EncAsyncWait_u {
     RK_U32          val;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -24,9 +24,9 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_buffer.h"
+#include "../../../osal/inc/mpp_env.h"
+#include "../../../osal/inc/mpp_debug.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
 #include "iep2_ff.h"
 #include "iep2_pd.h"
@@ -35,8 +35,8 @@
 #include "iep2_roi.h"
 
 #include "iep2.h"
-#include "mpp_service.h"
-#include "mpp_platform.h"
+#include "../../../osal/inc/mpp_service.h"
+#include "../../../osal/inc/mpp_platform.h"
 
 #define IEP2_TILE_W_MAX     120
 #define IEP2_TILE_H_MAX     480

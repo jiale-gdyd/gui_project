@@ -42,7 +42,7 @@ function rv1126_lvgl_gui()
     export SOC=rv11xx
     export Platform=rockchip
     export APP_NAME=lvgl_gui
-    export USE_STDCPP_VERSION=-std=c++14
+    export USE_STDCPP_VERSION=-std=gnu++14
     generate_gitcommit
 
     make ${RV11XX_LVGL_GUI_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
@@ -82,7 +82,7 @@ function rv1126_azure_gui()
     export SOC=rv11xx
     export Platform=rockchip
     export APP_NAME=azure_gui
-    export USE_STDCPP_VERSION=-std=c++11
+    export USE_STDCPP_VERSION=-std=gnu++11
     generate_gitcommit
 
     make ${RV11XX_AZURE_GUI_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]
@@ -122,7 +122,7 @@ function rv1126_unittest()
     export SOC=rv11xx
     export Platform=rockchip
     export APP_NAME=rv11xx_unittest
-    export USE_STDCPP_VERSION=-std=c++11
+    export USE_STDCPP_VERSION=-std=gnu++11
     generate_gitcommit
 
     make ${RV11XX_UNITTEST_CONFIG} && make ARCH=arm CROSS_COMPILE=${RV11XX_CROSS_COMPILE} -j$[$(nproc)-1]

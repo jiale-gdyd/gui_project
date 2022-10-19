@@ -17,7 +17,7 @@
 #ifndef __HAL_VP9D_REG_H__
 #define __HAL_VP9D_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef struct {
     struct {

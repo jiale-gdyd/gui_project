@@ -18,11 +18,11 @@
 #ifndef __HAL_ENC_TASK__
 #define __HAL_ENC_TASK__
 
-#include "mpp_time.h"
+#include "../../../osal/inc/mpp_time.h"
 
 #include "hal_task.h"
-#include "mpp_rc_defs.h"
-#include "mpp_enc_refs.h"
+#include "rockchip/rkmpp/mpp_rc_defs.h"
+#include "../../base/inc/mpp_enc_refs.h"
 
 #define HAL_ENC_TASK_ERR_INIT         0x00000001
 #define HAL_ENC_TASK_ERR_ALLOC        0x00000010

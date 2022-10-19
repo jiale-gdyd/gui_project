@@ -17,12 +17,12 @@
 #ifndef __HAL_AVSD_REG_H__
 #define __HAL_AVSD_REG_H__
 
-#include "mpp_debug.h"
-#include "mpp_device.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_device.h"
 
-#include "parser_api.h"
-#include "hal_avsd_api.h"
-#include "avsd_syntax.h"
+#include "../../../codec/inc/parser_api.h"
+#include "../../inc/hal_avsd_api.h"
+#include "../../../common/avsd_syntax.h"
 
 #define AVSD_HAL_DBG_ERROR             (0x00000001)
 #define AVSD_HAL_DBG_ASSERT            (0x00000002)

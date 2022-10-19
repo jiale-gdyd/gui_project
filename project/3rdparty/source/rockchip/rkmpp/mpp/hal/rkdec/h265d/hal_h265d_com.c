@@ -18,15 +18,15 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_bitread.h"
-#include "mpp_bitput.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_bitput.h"
 
 #include "hal_h265d_debug.h"
 #include "hal_h265d_ctx.h"
 #include "hal_h265d_com.h"
-#include "h265d_syntax.h"
+#include "../../../common/h265d_syntax.h"
 
 RK_U8 hal_hevc_diag_scan4x4_x[16] = {
     0, 0, 1, 0,

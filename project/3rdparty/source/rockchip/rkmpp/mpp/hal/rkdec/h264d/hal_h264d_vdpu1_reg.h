@@ -18,7 +18,7 @@
 #ifndef __HAL_H264D_VDPU1_REG_TBL_H__
 #define __HAL_H264D_VDPU1_REG_TBL_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 /* Number registers for the decoder */
 #define DEC_VDPU1_REGISTERS         (101)

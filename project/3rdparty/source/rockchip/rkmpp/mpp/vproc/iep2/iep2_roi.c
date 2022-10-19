@@ -20,7 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 void iep2_set_roi(struct iep2_api_ctx *ctx, struct iep2_rect *r,
                   enum ROI_MODE mode)

@@ -20,23 +20,23 @@
 #include <math.h>
 #include <limits.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_soc.h"
-#include "mpp_common.h"
-#include "mpp_frame_impl.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_soc.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_frame_impl.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
-#include "hal_h265e_debug.h"
-#include "h265e_syntax_new.h"
-#include "hal_bufs.h"
-#include "rkv_enc_def.h"
-#include "vepu541_common.h"
+#include "../../common/h265/hal_h265e_debug.h"
+#include "../../../common/h265e_syntax_new.h"
+#include "../../common/hal_bufs.h"
+#include "../common/rkv_enc_def.h"
+#include "../common/vepu541_common.h"
 #include "hal_h265e_vepu580.h"
 #include "hal_h265e_vepu580_reg.h"
-#include "mpp_enc_cb_param.h"
+#include "../../../base/inc/mpp_enc_cb_param.h"
 
-#include "mpp_service.h"
+#include "../../../../osal/inc/mpp_service.h"
 
 #define MAX_TILE_NUM 4
 

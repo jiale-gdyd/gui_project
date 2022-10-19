@@ -16,7 +16,7 @@
 #ifndef __HAL_JPEGD_RKV_H__
 #define __HAL_JPEGD_RKV_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 MPP_RET hal_jpegd_rkv_init(void *hal, MppHalCfg *cfg);
 MPP_RET hal_jpegd_rkv_deinit(void *hal);

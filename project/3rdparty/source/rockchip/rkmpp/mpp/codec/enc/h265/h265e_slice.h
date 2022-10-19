@@ -17,11 +17,11 @@
 #ifndef __H265E_SLICE_H__
 #define __H265E_SLICE_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_list.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_list.h"
 #include "h265e_dpb.h"
-#include "h265_syntax.h"
+#include "../../../common/h265_syntax.h"
 #include "h265e_enctropy.h"
 #include "h265e_context_table.h"
 

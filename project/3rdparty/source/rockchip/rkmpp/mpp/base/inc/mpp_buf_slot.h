@@ -17,7 +17,7 @@
 #ifndef __MPP_BUF_SLOT_H__
 #define __MPP_BUF_SLOT_H__
 
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 /*
  * mpp_dec will alloc 18 decoded picture buffer slot

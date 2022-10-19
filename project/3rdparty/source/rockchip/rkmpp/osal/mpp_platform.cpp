@@ -18,11 +18,11 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_platform.h"
-#include "mpp_service.h"
+#include "inc/mpp_env.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_platform.h"
+#include "inc/mpp_service.h"
 
 static MppKernelVersion check_kernel_version(void)
 {

@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpp_bitwrite.h"
-#include "mpp_packet_impl.h"
+#include "../../../base/inc/mpp_bitwrite.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 #include "h264e_debug.h"
 
-#include "h264_syntax.h"
+#include "../../../common/h264_syntax.h"
 #include "h264e_sei.h"
 
 MPP_RET h264e_sei_to_packet(MppPacket packet, RK_S32 *len, RK_S32 type,

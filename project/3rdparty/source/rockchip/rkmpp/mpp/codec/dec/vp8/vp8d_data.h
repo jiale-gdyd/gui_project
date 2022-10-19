@@ -16,7 +16,7 @@
  */
 
 #include <stdint.h>
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #ifndef __VP8D_DATA_H__
 #define __VP8D_DATA_H__

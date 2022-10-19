@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "rk_venc_cmd.h"
+#include "rockchip/rkmpp/rk_venc_cmd.h"
 
 typedef void* MppEncRoiCtx;
 

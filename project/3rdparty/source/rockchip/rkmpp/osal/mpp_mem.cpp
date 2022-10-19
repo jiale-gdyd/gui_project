@@ -18,11 +18,11 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_list.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "inc/mpp_env.h"
+#include "inc/mpp_mem.h"
+#include "inc/mpp_list.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
 
 #include "os_mem.h"
 

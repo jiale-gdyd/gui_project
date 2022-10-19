@@ -18,11 +18,11 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_list.h"
-#include "mpp_lock.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_list.h"
+#include "../../osal/inc/mpp_lock.h"
 
-#include "mpp_meta_impl.h"
+#include "inc/mpp_meta_impl.h"
 
 #define META_VAL_INVALID    (0x00000000)
 #define META_VAL_VALID      (0x00000001)

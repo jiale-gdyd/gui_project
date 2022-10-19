@@ -19,17 +19,17 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
-#include "mpp_bitput.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_bitput.h"
 
-#include "h265d_syntax.h"
+#include "../../../common/h265d_syntax.h"
 #include "hal_h265d_debug.h"
 #include "hal_h265d_ctx.h"
 #include "hal_h265d_com.h"
 #include "hal_h265d_vdpu34x.h"
-#include "vdpu34x_h265d.h"
+#include "../inc/vdpu34x_h265d.h"
 
 /* #define dump */
 #ifdef dump

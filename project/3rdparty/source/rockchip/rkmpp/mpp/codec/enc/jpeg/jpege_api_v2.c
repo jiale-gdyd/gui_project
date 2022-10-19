@@ -18,17 +18,17 @@
 
 #include <string.h>
 
-#include "mpp_err.h"
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_2str.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_2str.h"
 
 #include "jpege_debug.h"
-#include "jpege_api_v2.h"
-#include "jpege_syntax.h"
-#include "mpp_enc_cfg_impl.h"
-#include "mpp_bitwrite.h"
+#include "../../inc/jpege_api_v2.h"
+#include "../../../common/jpege_syntax.h"
+#include "../../../base/inc/mpp_enc_cfg_impl.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 
 typedef struct {
     MppEncCfgSet    *cfg;

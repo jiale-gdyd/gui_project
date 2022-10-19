@@ -17,7 +17,7 @@
 #ifndef __MPP_ENC_REF_H__
 #define __MPP_ENC_REF_H__
 
-#include "rk_venc_ref.h"
+#include "rockchip/rkmpp/rk_venc_ref.h"
 
 #define REF_MODE_IS_GLOBAL(mode)    ((mode >= REF_MODE_GLOBAL) && (mode < REF_MODE_GLOBAL_BUTT))
 #define REF_MODE_IS_LT_MODE(mode)   ((mode > REF_MODE_LT) && (mode < REF_MODE_LT_BUTT))

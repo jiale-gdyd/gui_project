@@ -19,10 +19,10 @@
 #include <math.h>
 #include <memory.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_rc.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_common.h"
+#include "inc/mpp_rc.h"
 
 #define MPP_RC_DBG_FUNCTION          (0x00000001)
 #define MPP_RC_DBG_BPS               (0x00000010)

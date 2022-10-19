@@ -17,7 +17,7 @@
 #ifndef __MPP_DEVICE_H__
 #define __MPP_DEVICE_H__
 
-#include "mpp_err.h"
+#include "rockchip/rkmpp/mpp_err.h"
 #include "mpp_dev_defs.h"
 #include "mpp_callback.h"
 

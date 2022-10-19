@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
 #define M2VD_DEMO_MODE         0
 

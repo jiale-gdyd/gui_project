@@ -28,9 +28,9 @@
 #ifndef __H265D_CODEC_H__
 #define __H265D_CODEC_H__
 
-#include "mpp_frame.h"
-#include "mpp_soc.h"
-#include "mpp_dec_cfg.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "../../../../osal/inc/mpp_soc.h"
+#include "../../../inc/mpp_dec_cfg.h"
 
 typedef struct MppRational {
     RK_S32 num; ///< numerator

@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
-#include "mpp_bitwrite.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 
 #include "h264e_debug.h"
 #include "h264e_slice.h"

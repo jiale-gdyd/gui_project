@@ -18,10 +18,10 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_rc.h"
-#include "mpp_common.h"
-#include "vp8e_syntax.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../codec/inc/mpp_rc.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../common/vp8e_syntax.h"
 
 #include "hal_vp8e_base.h"
 #include "hal_vp8e_vepu1_v2.h"

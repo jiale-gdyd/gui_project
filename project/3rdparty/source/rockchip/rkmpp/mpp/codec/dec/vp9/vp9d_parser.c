@@ -18,17 +18,17 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_bitread.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
 #include "vp9data.h"
 #include "vp9d_codec.h"
 #include "vp9d_parser.h"
-#include "mpp_frame_impl.h"
+#include "../../../base/inc/mpp_frame_impl.h"
 
 /**
  * Clip a signed integer into the -(2^p),(2^p-1) range.

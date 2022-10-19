@@ -16,10 +16,10 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_2str.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_mem.h"
+#include "../../base/inc/mpp_2str.h"
+#include "../../../osal/inc/mpp_debug.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #include "hal_info.h"
 

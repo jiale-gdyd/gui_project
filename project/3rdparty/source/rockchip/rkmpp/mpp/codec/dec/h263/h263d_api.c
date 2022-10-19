@@ -19,11 +19,11 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "h263d_api.h"
+#include "../../inc/h263d_api.h"
 #include "h263d_parser.h"
 
 #define h263d_INIT_STREAM_SIZE      SZ_64K

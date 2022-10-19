@@ -17,7 +17,7 @@
 #ifndef __HAL_H264E_VPU_TBL_H__
 #define __HAL_H264E_VPU_TBL_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 /* H.264 motion estimation parameters */
 extern const RK_U32 h264_prev_mode_favor[52];

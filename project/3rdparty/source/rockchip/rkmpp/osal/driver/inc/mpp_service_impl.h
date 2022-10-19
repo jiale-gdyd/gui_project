@@ -17,8 +17,8 @@
 #ifndef __MPP_SERVICE_IMPL_H__
 #define __MPP_SERVICE_IMPL_H__
 
-#include "mpp_device.h"
-#include "mpp_service.h"
+#include "../../inc/mpp_device.h"
+#include "../../inc/mpp_service.h"
 
 #define MAX_REG_OFFSET          32
 #define MAX_RCB_OFFSET          32

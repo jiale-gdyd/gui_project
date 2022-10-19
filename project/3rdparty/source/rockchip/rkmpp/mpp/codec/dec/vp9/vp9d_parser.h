@@ -19,14 +19,14 @@
 
 #include <stdlib.h>
 
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
 
-#include "parser_api.h"
+#include "../../inc/parser_api.h"
 #include "vpx_rac.h"
 #include "vp9.h"
 #include "vp9data.h"
-#include "vp9d_syntax.h"
+#include "../../../common/vp9d_syntax.h"
 
 extern RK_U32 vp9d_debug;
 

@@ -11,6 +11,20 @@ config MEDIA_API
     help
       Media application interface
 
+config RKMPP_HWOSD
+    bool "RKMPP interface use hardware osd"
+    default n
+    depends on RKRGA
+    help
+      rkmpp interface use hardware osd
+
+config RKMPP_RGA_OSD
+    bool "RKMPP interface use rga osd"
+    default n
+    depends on RKRGA
+    help
+      rkmpp interface use rga osd
+
 config LIBV4L2
     bool "media tools v4l2"
     default n

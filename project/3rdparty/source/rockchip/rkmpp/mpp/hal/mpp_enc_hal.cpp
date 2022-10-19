@@ -13,33 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <linux/kconfig.h>
 #define  MODULE_TAG "mpp_enc_hal"
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp.h"
-#include "mpp_enc_hal.h"
-#include "mpp_frame_impl.h"
+#include "../inc/mpp.h"
+#include "inc/mpp_enc_hal.h"
+#include "../base/inc/mpp_frame_impl.h"
 
-#include "hal_h264e_api_v2.h"
-#include "hal_h265e_api_v2.h"
-#include "hal_jpege_api_v2.h"
-#include "hal_vp8e_api_v2.h"
+#include "inc/hal_h264e_api_v2.h"
+#include "inc/hal_h265e_api_v2.h"
+#include "inc/hal_jpege_api_v2.h"
+#include "inc/hal_vp8e_api_v2.h"
 
 static const MppEncHalApi *hw_enc_apis[] = {
-#if HAVE_H264E
+#if defined(CONFIG_RKMPP_H264E)
     &hal_api_h264e_v2,
 #endif
-#if HAVE_H265E
+#if defined(CONFIG_RKMPP_H265E)
     &hal_api_h265e_v2,
 #endif
-#if HAVE_JPEGE
+#if defined(CONFIG_RKMPP_JPEGE)
     &hal_api_jpege_v2,
 #endif
-#if HAVE_VP8E
+#if defined(CONFIG_RKMPP_VP8E)
     &hal_api_vp8e_v2,
 #endif
 };

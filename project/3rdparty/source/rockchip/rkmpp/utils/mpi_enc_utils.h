@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "rk_venc_cmd.h"
+#include "rockchip/rkmpp/rk_venc_cmd.h"
 #include "iniparser.h"
 
 typedef struct MpiEncTestArgs_t {

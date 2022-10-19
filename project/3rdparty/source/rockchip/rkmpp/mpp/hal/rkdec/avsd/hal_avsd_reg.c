@@ -17,12 +17,12 @@
 
 #define MODULE_TAG "hal_avsd_reg"
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "avsd_syntax.h"
-#include "hal_avsd_api.h"
+#include "../../../common/avsd_syntax.h"
+#include "../../inc/hal_avsd_api.h"
 #include "hal_avsd_reg.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 static RK_S32 get_queue_pic(AvsdHalCtx_t *p_hal)
 {

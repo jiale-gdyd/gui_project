@@ -19,9 +19,9 @@
 
 #include <stdio.h>
 
-#include "vpu_api.h"
-#include "rk_mpi.h"
-#include "rk_venc_cfg.h"
+#include "rockchip/rkmpp/vpu_api.h"
+#include "rockchip/rkmpp/rk_mpi.h"
+#include "rockchip/rkmpp/rk_venc_cfg.h"
 
 #include "vpu_api_mlvec.h"
 

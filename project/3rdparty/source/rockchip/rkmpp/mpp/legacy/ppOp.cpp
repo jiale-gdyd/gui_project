@@ -16,7 +16,7 @@
 
 #define LOG_TAG "PpOp"
 
-#include "vpu.h"
+#include "rockchip/rkmpp/vpu.h"
 #include "ppOp.h"
 
 namespace android

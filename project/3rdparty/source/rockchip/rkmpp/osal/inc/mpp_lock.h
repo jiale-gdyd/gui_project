@@ -19,7 +19,7 @@
 
 #include <stdbool.h>
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define MPP_FETCH_ADD           __sync_fetch_and_add
 #define MPP_FETCH_SUB           __sync_fetch_and_sub

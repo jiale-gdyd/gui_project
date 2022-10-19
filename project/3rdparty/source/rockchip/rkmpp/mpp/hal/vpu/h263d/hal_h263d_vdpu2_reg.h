@@ -17,7 +17,7 @@
 #ifndef __HAL_H263D_VDPU2_REG_H__
 #define __HAL_H263D_VDPU2_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef struct  {
     RK_U32      reg00_49[50];

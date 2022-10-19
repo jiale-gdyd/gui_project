@@ -18,14 +18,14 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_m2vd_base.h"
 #include "hal_m2vd_vdpu2_reg.h"
 #include "hal_m2vd_vpu2.h"
-#include "hal_m2vd_api.h"
+#include "../../inc/hal_m2vd_api.h"
 
 MPP_RET hal_m2vd_vdpu2_init(void *hal, MppHalCfg *cfg)
 {

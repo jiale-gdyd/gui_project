@@ -18,24 +18,24 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_frame_impl.h"
-#include "mpp_packet_impl.h"
-#include "mpp_rc.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_frame_impl.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../codec/inc/mpp_rc.h"
 
-#include "h264e_sps.h"
-#include "h264e_pps.h"
-#include "h264e_dpb.h"
-#include "h264e_slice.h"
+#include "../../../codec/enc/h264/h264e_sps.h"
+#include "../../../codec/enc/h264/h264e_pps.h"
+#include "../../../codec/enc/h264/h264e_dpb.h"
+#include "../../../codec/enc/h264/h264e_slice.h"
 
-#include "hal_h264e_debug.h"
-#include "hal_bufs.h"
-#include "mpp_enc_hal.h"
-#include "vepu541_common.h"
+#include "../../common/h264/hal_h264e_debug.h"
+#include "../../common/hal_bufs.h"
+#include "../../inc/mpp_enc_hal.h"
+#include "../common/vepu541_common.h"
 #include "hal_h264e_vepu580_reg.h"
-#include "mpp_enc_cb_param.h"
+#include "../../../base/inc/mpp_enc_cb_param.h"
 
 #define DUMP_REG 0
 #define MAX_TASK_CNT        2

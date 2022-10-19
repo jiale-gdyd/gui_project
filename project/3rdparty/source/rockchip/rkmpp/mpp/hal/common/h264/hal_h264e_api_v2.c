@@ -20,18 +20,18 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_platform.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
 #include "hal_h264e_debug.h"
-#include "h264e_syntax.h"
-#include "vepu5xx.h"
-#include "hal_h264e_api_v2.h"
-#include "hal_h264e_vepu1_v2.h"
-#include "hal_h264e_vepu2_v2.h"
-#include "hal_h264e_vepu541.h"
-#include "hal_h264e_vepu580.h"
+#include "../../../common/h264e_syntax.h"
+#include "../../rkenc/common/vepu5xx.h"
+#include "../../inc/hal_h264e_api_v2.h"
+#include "../../vpu/h264e/hal_h264e_vepu1_v2.h"
+#include "../../vpu/h264e/hal_h264e_vepu2_v2.h"
+#include "../../rkenc/h264e/hal_h264e_vepu541.h"
+#include "../../rkenc/h264e/hal_h264e_vepu580.h"
 
 typedef struct HalH264eCtx_t {
     const MppEncHalApi  *api;

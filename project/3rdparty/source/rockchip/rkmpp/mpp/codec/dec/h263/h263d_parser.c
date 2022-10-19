@@ -17,13 +17,13 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
-#include "mpp_bitread.h"
+#include "../../../base/inc/mpp_bitread.h"
 #include "h263d_parser.h"
-#include "h263d_syntax.h"
+#include "../../../common/h263d_syntax.h"
 
 RK_U32 h263d_debug = 0;
 

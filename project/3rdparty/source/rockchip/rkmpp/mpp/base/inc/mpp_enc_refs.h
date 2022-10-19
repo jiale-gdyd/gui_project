@@ -17,7 +17,7 @@
 #ifndef __MPP_ENC_REFS_H__
 #define __MPP_ENC_REFS_H__
 
-#include "mpp_enc_cfg.h"
+#include "../../inc/mpp_enc_cfg.h"
 #include "mpp_enc_ref.h"
 
 /*

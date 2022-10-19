@@ -12,6 +12,8 @@ typedef enum MOD_ID_E {
     MOD_ID_UNKNOW = 0,
     MOD_ID_VB,
     MOD_ID_SYS,
+    MOD_ID_VDEC,
+    MOD_ID_VENC,
     MOD_ID_VO,
     MOD_ID_VI,
     MOD_ID_RGA,
@@ -77,6 +79,11 @@ typedef enum {
     DRM_SAMPLE_FMT_G711U,
     DRM_SAMPLE_FMT_NB
 } DrmSampleFormat, drm_sample_format_e;
+
+typedef struct rkSIZE_S {
+    uint32_t u32Width;
+    uint32_t u32Height;
+} drm_size_t;
 
 typedef struct rkRECT_S {
     int32_t  s32X;

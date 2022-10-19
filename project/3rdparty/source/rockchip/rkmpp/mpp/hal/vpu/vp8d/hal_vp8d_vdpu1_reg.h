@@ -16,7 +16,7 @@
 #ifndef __HAL_VP8D_VDPU1_REG_H__
 #define __HAL_VP8D_VDPU1_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define VP8HWD_VP7             1
 #define VP8HWD_VP8             2

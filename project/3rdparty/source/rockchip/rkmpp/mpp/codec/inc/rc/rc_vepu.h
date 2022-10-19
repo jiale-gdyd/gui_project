@@ -17,7 +17,7 @@
 #ifndef __RC_VEPU_H__
 #define __RC_VEPU_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define VEPU_BLK_RC_CTRL_LEVELS         7
 #define VEPU_BLK_RC_CHECK_POINTS_MAX    10

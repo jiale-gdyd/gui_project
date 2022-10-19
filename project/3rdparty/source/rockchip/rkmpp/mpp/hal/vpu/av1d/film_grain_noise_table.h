@@ -15,7 +15,7 @@
  */
 #ifndef __FILM_GRAIN_NOISE_TABLE_H__
 #define __FILM_GRAIN_NOISE_TABLE_H__
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 void GenerateLumaGrainBlock(RK_S32 luma_grain_block[][82], RK_S32 bitdepth,
                             RK_U8 num_y_points, RK_S32 grain_scale_shift,

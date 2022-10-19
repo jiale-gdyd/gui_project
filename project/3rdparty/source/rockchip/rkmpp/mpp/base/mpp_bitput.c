@@ -16,7 +16,7 @@
  */
 
 #include <string.h>
-#include "mpp_bitput.h"
+#include "inc/mpp_bitput.h"
 
 RK_S32 mpp_set_bitput_ctx(BitputCtx_t *bp, RK_U64 *data, RK_U32 len)
 {

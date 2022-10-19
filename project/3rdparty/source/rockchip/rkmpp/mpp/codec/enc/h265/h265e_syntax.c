@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "h265e_codec.h"
-#include "h265e_syntax_new.h"
+#include "../../../common/h265e_syntax_new.h"
 
 static void fill_picture_parameters(const H265eCtx *h,
                                     H265ePicParams *pp)

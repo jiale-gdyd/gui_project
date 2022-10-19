@@ -16,7 +16,7 @@
 #ifndef __HAL_JPEGD_VDPU1_REG_H__
 #define __HAL_JPEGD_VDPU1_REG_H__
 
-#include "vcodec_service.h"
+#include "../../../../osal/inc/vcodec_service.h"
 
 #define JPEGD_REG_NUM                       (101)
 

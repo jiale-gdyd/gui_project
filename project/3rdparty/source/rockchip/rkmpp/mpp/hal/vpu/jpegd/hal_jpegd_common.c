@@ -20,15 +20,15 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
-#include "mpp_bitput.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_bitput.h"
 
-#include "hal_dec_task.h"
-#include "jpegd_syntax.h"
-#include "jpegd_api.h"
+#include "../../inc/hal_dec_task.h"
+#include "../../../common/jpegd_syntax.h"
+#include "../../../codec/inc/jpegd_api.h"
 #include "hal_jpegd_common.h"
 
 static PpRgbCfg pp_rgb_cfgs[PP_RGB_CFG_LENTH] = {

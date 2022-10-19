@@ -16,15 +16,15 @@
 
 #define MODULE_TAG "mpp_allocator"
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_allocator.h"
+#include "inc/mpp_mem.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_allocator.h"
 #include "mpp_allocator_impl.h"
 
 #include "os_allocator.h"
 
-#include <linux/drm.h>
+#include "linux/drm.h"
 
 #define MPP_ALLOCATOR_LOCK(p)   pthread_mutex_lock(&(p)->lock);
 #define MPP_ALLOCATOR_UNLOCK(p) pthread_mutex_unlock(&(p)->lock);

@@ -23,11 +23,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_common.h"
-#include "iep_common.h"
+#include "../../../osal/inc/mpp_common.h"
+#include "../inc/iep_common.h"
 
 #include "iep2.h"
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 #define RKMIN(a, b)             (((a) < (b)) ? (a) : (b))
 #define RKMAX(a, b)             (((a) > (b)) ? (a) : (b))

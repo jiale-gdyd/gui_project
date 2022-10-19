@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #define DECLARE_ALIGNED(n,t,v)      t v
 

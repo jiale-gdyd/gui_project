@@ -16,9 +16,9 @@
 
 #include <stdio.h>
 
-#include "os_mem.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
+#include "../os_mem.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_debug.h"
 
 #include "allocator_std.h"
 

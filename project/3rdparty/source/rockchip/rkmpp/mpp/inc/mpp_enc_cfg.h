@@ -17,9 +17,9 @@
 #ifndef __MPP_ENC_CFG_H__
 #define __MPP_ENC_CFG_H__
 
-#include "rk_venc_cmd.h"
-#include "rk_venc_ref.h"
-#include "rc_data.h"
+#include "rockchip/rkmpp/rk_venc_cmd.h"
+#include "rockchip/rkmpp/rk_venc_ref.h"
+#include "../codec/inc/rc_data.h"
 
 /*
  * MppEncCfgSet shows the relationship between different configuration

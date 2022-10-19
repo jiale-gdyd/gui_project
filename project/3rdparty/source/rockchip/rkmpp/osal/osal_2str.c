@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "osal_2str.h"
+#include "inc/osal_2str.h"
 
 const char *strof_client_type(MppClientType type)
 {

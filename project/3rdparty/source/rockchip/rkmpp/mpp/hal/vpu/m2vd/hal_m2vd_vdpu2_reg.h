@@ -17,7 +17,7 @@
 #ifndef __HAL_M2VD_VDPU2_REG_H__
 #define __HAL_M2VD_VDPU2_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 extern RK_U32 m2vh_debug;
 

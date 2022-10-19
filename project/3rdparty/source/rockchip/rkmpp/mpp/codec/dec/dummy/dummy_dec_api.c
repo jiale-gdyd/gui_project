@@ -18,11 +18,11 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "dummy_dec_api.h"
+#include "../../inc/dummy_dec_api.h"
 
 #define DUMMY_DEC_FRAME_WIDTH       1280
 #define DUMMY_DEC_FRAME_HEIGHT      720

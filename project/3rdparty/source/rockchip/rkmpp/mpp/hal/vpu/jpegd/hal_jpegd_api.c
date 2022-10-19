@@ -18,12 +18,12 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "osal_2str.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/osal_2str.h"
 
-#include "mpp_hal.h"
-#include "mpp_platform.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_platform.h"
 #include "hal_jpegd_base.h"
 #include "hal_jpegd_vdpu2.h"
 #include "hal_jpegd_vdpu1.h"

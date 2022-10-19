@@ -17,10 +17,10 @@
 #ifndef __MPP_BUFFER_IMPL_H__
 #define __MPP_BUFFER_IMPL_H__
 
-#include "mpp_list.h"
-#include "mpp_hash.h"
-#include "mpp_common.h"
-#include "mpp_allocator.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "../../../osal/inc/mpp_hash.h"
+#include "../../../osal/inc/mpp_common.h"
+#include "../../../osal/inc/mpp_allocator.h"
 
 #define MPP_BUF_DBG_FUNCTION            (0x00000001)
 #define MPP_BUF_DBG_OPS_RUNTIME         (0x00000002)

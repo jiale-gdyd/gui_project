@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
 #include "m2vd_parser.h"
 #include "m2vd_codec.h"

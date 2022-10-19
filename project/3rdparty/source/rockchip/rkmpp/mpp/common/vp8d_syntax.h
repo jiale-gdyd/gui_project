@@ -18,7 +18,7 @@
 #ifndef __VP8D_SYNTAX_H__
 #define __VP8D_SYNTAX_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef struct _DXVA_PicEntry_VP8 {
     union {

@@ -20,13 +20,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_debug.h"
-#include "mpp_packet_impl.h"
-#include "hal_task.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../hal/inc/hal_task.h"
 
-#include "avs2d_api.h"
+#include "../../inc/avs2d_api.h"
 #include "avs2d_ps.h"
 
 static const RK_U32 wq_param_default[2][6] = {

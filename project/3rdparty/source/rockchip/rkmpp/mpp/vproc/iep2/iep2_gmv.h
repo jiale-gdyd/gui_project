@@ -18,7 +18,7 @@
 #define __IEP2_GMV_H__
 
 #include "iep2.h"
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 void iep2_update_gmv(struct iep2_api_ctx *ctx, struct mv_list *ls);
 

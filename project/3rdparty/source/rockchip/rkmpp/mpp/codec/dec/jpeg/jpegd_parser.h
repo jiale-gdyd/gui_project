@@ -21,9 +21,9 @@
 #include <limits.h>
 #include <string.h>
 
-#include "mpp_bitread.h"
+#include "../../../base/inc/mpp_bitread.h"
 
-#include "jpegd_syntax.h"
+#include "../../../common/jpegd_syntax.h"
 
 #define JPEG_IDENTIFIER(a, b, c, d) \
        ((RK_U32)(d) | ((RK_U32)(c) << 8) | \

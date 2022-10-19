@@ -17,10 +17,10 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_frame.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 #include "vepu_common.h"
 

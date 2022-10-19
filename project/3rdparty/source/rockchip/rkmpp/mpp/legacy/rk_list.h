@@ -2,7 +2,7 @@
 #define __RK_LIST_H__
 
 #include <pthread.h>
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 // desctructor of list node
 typedef void *(*node_destructor)(void *);
 

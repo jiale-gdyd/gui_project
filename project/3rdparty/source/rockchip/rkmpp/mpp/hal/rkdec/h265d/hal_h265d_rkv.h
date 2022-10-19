@@ -18,7 +18,7 @@
 #ifndef __HAL_H265D_RKV_H__
 #define __HAL_H265D_RKV_H__
 
-#include "mpp_hal.h"
+#include "../../inc/mpp_hal.h"
 
 #define HWID_VDPU345    (0xdbdc0701)
 

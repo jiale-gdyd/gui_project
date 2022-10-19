@@ -21,16 +21,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "vpu.h"
-#include "rk_mpi.h"
+#include "rockchip/rkmpp/vpu.h"
+#include "rockchip/rkmpp/rk_mpi.h"
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_platform.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
+#include "../../osal/inc/mpp_platform.h"
 
-#include "mpp_service.h"
-#include "vcodec_service.h"
+#include "../../osal/inc/mpp_service.h"
+#include "../../osal/inc/vcodec_service.h"
 
 #define VPU_EXTRA_INFO_SIZE                 12
 #define VPU_EXTRA_INFO_MAGIC                (0x4C4A46)

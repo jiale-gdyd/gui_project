@@ -18,16 +18,16 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_dec_impl.h"
+#include "../codec/inc/mpp_dec_impl.h"
 
-#include "mpp_frame_impl.h"
-#include "mpp_dec_vproc.h"
-#include "iep_api.h"
-#include "iep2_api.h"
+#include "../base/inc/mpp_frame_impl.h"
+#include "inc/mpp_dec_vproc.h"
+#include "inc/iep_api.h"
+#include "inc/iep2_api.h"
 
 #define dec_vproc_dbg(flag, fmt, ...) \
     do { \

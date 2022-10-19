@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_vp8e_base.h"
 #include "hal_vp8e_entropy.h"

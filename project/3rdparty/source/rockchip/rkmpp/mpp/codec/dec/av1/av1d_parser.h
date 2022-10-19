@@ -19,15 +19,15 @@
 
 #include <stdlib.h>
 
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
 
-#include "parser_api.h"
+#include "../../inc/parser_api.h"
 
 #include "av1.h"
 #include "av1d_codec.h"
 #include "av1d_cbs.h"
-#include "av1d_syntax.h"
+#include "../../../common/av1d_syntax.h"
 #include "av1d_common.h"
 #include "av1_entropymode.h"
 

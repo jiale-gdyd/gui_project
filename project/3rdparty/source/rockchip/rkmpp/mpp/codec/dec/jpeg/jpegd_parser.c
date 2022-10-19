@@ -19,14 +19,14 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_soc.h"
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_soc.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
-#include "jpegd_api.h"
+#include "../../inc/jpegd_api.h"
 #include "jpegd_parser.h"
 
 RK_U32 jpegd_debug = 0x0;

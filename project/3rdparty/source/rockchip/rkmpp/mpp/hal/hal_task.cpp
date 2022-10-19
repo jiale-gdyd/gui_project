@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_list.h"
-#include "mpp_lock.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_list.h"
+#include "../../osal/inc/mpp_lock.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "hal_task.h"
+#include "inc/hal_task.h"
 
 typedef struct HalTaskImpl_t        HalTaskImpl;
 typedef struct HalTaskGroupImpl_t   HalTaskGroupImpl;

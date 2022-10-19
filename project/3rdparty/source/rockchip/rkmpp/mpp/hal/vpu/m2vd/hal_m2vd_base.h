@@ -19,13 +19,13 @@
 
 #include <stdio.h>
 
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
-#include "mpp_hal.h"
-#include "mpp_buf_slot.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../base/inc/mpp_buf_slot.h"
+#include "../../../../osal/inc/mpp_device.h"
 
-#include "m2vd_syntax.h"
+#include "../../../common/m2vd_syntax.h"
 
 #define M2VD_BUF_SIZE_QPTAB            (256)
 #define DEC_LITTLE_ENDIAN                     1

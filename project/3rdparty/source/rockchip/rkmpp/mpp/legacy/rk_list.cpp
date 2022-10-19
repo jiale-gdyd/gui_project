@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "rk_list.h"
-#include "mpp_log.h"
+#include "rockchip/rkmpp/mpp_log.h"
 
 //#define _RK_LIST_DEUBG
 #define _RK_LIST_ERROR

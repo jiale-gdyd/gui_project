@@ -17,7 +17,7 @@
 #ifndef __AV1D_COMMON_H__
 #define __AV1D_COMMON_H__
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 // #include "hal_av1d_common.h"
 #define AV1_REF_SCALE_SHIFT 14
 

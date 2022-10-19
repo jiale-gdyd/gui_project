@@ -34,7 +34,7 @@ function host_azure_gui()
     export SOC=x86_64
     export Platform=host
     export APP_NAME=azure_gui
-    export USE_STDCPP_VERSION=-std=c++11
+    export USE_STDCPP_VERSION=-std=gnu++11
     generate_gitcommit
 
     make ${HOST_AZURE_GUI_CONFIG} && make ARCH=x86_64 -j$[$(nproc)-1]
@@ -74,7 +74,7 @@ function host_unittest()
     export SOC=x86_64
     export Platform=host
     export APP_NAME=host_unittest
-    export USE_STDCPP_VERSION=-std=c++11
+    export USE_STDCPP_VERSION=-std=gnu++11
     generate_gitcommit
 
     make ${HOST_UNITTEST_CONFIG} && make ARCH=x86_64 -j$[$(nproc)-1]

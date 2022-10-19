@@ -13,68 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <linux/kconfig.h>
 #define  MODULE_TAG "mpp_dec"
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_parser.h"
+#include "inc/mpp_parser.h"
 
-#include "h263d_api.h"
-#include "h264d_api.h"
-#include "h265d_api.h"
-#include "vp9d_api.h"
-#include "avsd_api.h"
-#include "avs2d_api.h"
-#include "m2vd_api.h"
-#include "mpg4d_api.h"
-#include "vp8d_api.h"
-#include "jpegd_api.h"
-#include "av1d_api.h"
+#include "inc/h263d_api.h"
+#include "inc/h264d_api.h"
+#include "inc/h265d_api.h"
+#include "inc/vp9d_api.h"
+#include "inc/avsd_api.h"
+#include "inc/avs2d_api.h"
+#include "inc/m2vd_api.h"
+#include "inc/mpg4d_api.h"
+#include "inc/vp8d_api.h"
+#include "inc/jpegd_api.h"
+#include "inc/av1d_api.h"
 
 // for test and demo
-#include "dummy_dec_api.h"
+#include "inc/dummy_dec_api.h"
 
 /*
  * all decoder static register here
  */
 static const ParserApi *parsers[] = {
-#if HAVE_AVSD
+#if defined(CONFIG_RKMPP_AVSD)
     &api_avsd_parser,
 #endif
-#if HAVE_AVS2D
+#if defined(CONFIG_RKMPP_AVS2D)
     &api_avs2d_parser,
 #endif
-#if HAVE_H263D
+#if defined(CONFIG_RKMPP_H263D)
     &api_h263d_parser,
 #endif
-#if HAVE_H264D
+#if defined(CONFIG_RKMPP_H264D)
     &api_h264d_parser,
 #endif
-#if HAVE_H265D
+#if defined(CONFIG_RKMPP_H265D)
     &api_h265d_parser,
 #endif
-#if HAVE_MPEG2D
+#if defined(CONFIG_RKMPP_MPEG2D)
     &api_m2vd_parser,
 #endif
-#if HAVE_MPEG4D
+#if defined(CONFIG_RKMPP_MPEG4D)
     &api_mpg4d_parser,
 #endif
-#if HAVE_VP8D
+#if defined(CONFIG_RKMPP_VP8D)
     &api_vp8d_parser,
 #endif
-#if HAVE_VP9D
+#if defined(CONFIG_RKMPP_VP9D)
     &api_vp9d_parser,
 #endif
-#if HAVE_JPEGD
+#if defined(CONFIG_RKMPP_JPEGD)
     &api_jpegd_parser,
 #endif
     &dummy_dec_parser,
-#if HAVE_AV1D
+#if defined(CONFIG_RKMPP_AV1D)
     &api_av1d_parser,
 #endif
 };

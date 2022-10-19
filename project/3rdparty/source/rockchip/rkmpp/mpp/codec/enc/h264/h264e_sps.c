@@ -18,10 +18,10 @@
 
 #include <string.h>
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpp_enc_ref.h"
-#include "mpp_bitwrite.h"
+#include "../../../base/inc/mpp_enc_ref.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 #include "h264e_debug.h"
 #include "h264e_sps.h"
 

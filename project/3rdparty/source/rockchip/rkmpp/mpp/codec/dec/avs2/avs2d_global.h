@@ -17,12 +17,12 @@
 #ifndef __AVS2D_GLOBAL_H__
 #define __AVS2D_GLOBAL_H__
 
-#include "mpp_list.h"
-#include "parser_api.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_list.h"
+#include "../../inc/parser_api.h"
+#include "../../../base/inc/mpp_bitread.h"
 
-#include "avs2d_syntax.h"
-#include "avs2d_api.h"
+#include "../../../common/avs2d_syntax.h"
+#include "../../inc/avs2d_api.h"
 
 #define AVS2D_DBG_ERROR             (0x00000001)
 #define AVS2D_DBG_ASSERT            (0x00000002)

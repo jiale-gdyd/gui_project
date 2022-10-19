@@ -4,6 +4,8 @@
 #include "drm_media_vi.h"
 #include "drm_media_vo.h"
 #include "drm_media_rga.h"
+#include "drm_media_vdec.h"
+#include "drm_media_venc.h"
 #include "drm_media_vmix.h"
 #include "drm_media_common.h"
 #include "drm_media_buffer.h"

@@ -21,12 +21,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
 #include "vp9d_codec.h"
 #include "vp9d_parser.h"
-#include "vp9d_api.h"
+#include "../../inc/vp9d_api.h"
 
 /*!
 ***********************************************************************

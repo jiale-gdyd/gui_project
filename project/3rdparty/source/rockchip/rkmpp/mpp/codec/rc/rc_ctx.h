@@ -16,7 +16,7 @@
 #ifndef __RC_CTX_H__
 #define __RC_CTX_H__
 
-#include "mpp_rc_api.h"
+#include "rockchip/rkmpp/mpp_rc_api.h"
 #include "rc_base.h"
 
 typedef struct RcModelV2Ctx_t {

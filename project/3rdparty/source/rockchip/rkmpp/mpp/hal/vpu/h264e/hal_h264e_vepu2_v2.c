@@ -18,20 +18,20 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_frame.h"
-#include "mpp_common.h"
-#include "mpp_device.h"
-#include "mpp_rc.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../../codec/inc/mpp_rc.h"
 
-#include "mpp_enc_hal.h"
-#include "h264e_debug.h"
-#include "h264e_sps.h"
-#include "h264e_pps.h"
-#include "h264e_slice.h"
+#include "../../inc/mpp_enc_hal.h"
+#include "../../../codec/enc/h264/h264e_debug.h"
+#include "../../../codec/enc/h264/h264e_sps.h"
+#include "../../../codec/enc/h264/h264e_pps.h"
+#include "../../../codec/enc/h264/h264e_slice.h"
 
-#include "hal_h264e_debug.h"
+#include "../../common/h264/hal_h264e_debug.h"
 #include "hal_h264e_vpu_tbl.h"
 #include "hal_h264e_vepu_v2.h"
 

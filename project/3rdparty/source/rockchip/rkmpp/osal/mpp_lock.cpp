@@ -16,8 +16,8 @@
 
 #define MODULE_TAG "mpp_lock"
 
-#include "mpp_log.h"
-#include "mpp_lock.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "inc/mpp_lock.h"
 
 #define LOCK_IDLE   0
 #define LOCK_BUSY   1

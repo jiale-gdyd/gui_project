@@ -19,18 +19,18 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_platform.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_platform.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
-#include "h264d_api.h"
+#include "../../inc/h264d_api.h"
 #include "h264d_global.h"
 #include "h264d_parse.h"
 #include "h264d_sps.h"
 #include "h264d_slice.h"
 #include "h264d_dpb.h"
 #include "h264d_init.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 RK_U32 rkv_h264d_parse_debug = 0;
 

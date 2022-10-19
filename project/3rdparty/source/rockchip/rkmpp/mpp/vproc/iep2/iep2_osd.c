@@ -20,10 +20,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_common.h"
-#include "mpp_buffer.h"
+#include "../../../osal/inc/mpp_common.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 void iep2_sort(uint32_t bin[], uint32_t map[], int size)
 {

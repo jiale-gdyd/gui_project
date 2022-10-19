@@ -22,12 +22,12 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_mem.h"
+#include "../../../osal/inc/mpp_debug.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #include "rga.h"
-#include "rga_api.h"
+#include "../inc/rga_api.h"
 
 static RK_U32 rga_debug = 0;
 
@@ -102,7 +102,7 @@ static RgaFormat rga_fmt_map(MppFrameFormat fmt)
     return ret;
 }
 
-MPP_RET rga_init(RgaCtx *ctx)
+MPP_RET rkmpp_rga_init(RgaCtx *ctx)
 {
     MPP_RET ret = MPP_OK;
     RgaCtxImpl *impl = NULL;
@@ -133,7 +133,7 @@ END:
     return ret;
 }
 
-MPP_RET rga_deinit(RgaCtx ctx)
+MPP_RET rkmpp_rga_deinit(RgaCtx ctx)
 {
     MPP_RET ret = MPP_OK;
     RgaCtxImpl *impl = NULL;
@@ -219,7 +219,7 @@ static MPP_RET config_rga_yuv2rgb_mode(RgaCtx ctx)
     return MPP_OK;
 }
 
-MPP_RET rga_control(RgaCtx ctx, RgaCmd cmd, void *param)
+MPP_RET rkmpp_rga_control(RgaCtx ctx, RgaCmd cmd, void *param)
 {
     if (NULL == ctx) {
         mpp_err_f("invalid NULL input\n");

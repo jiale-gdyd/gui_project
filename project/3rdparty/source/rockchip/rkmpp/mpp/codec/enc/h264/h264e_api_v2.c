@@ -18,26 +18,26 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpp_packet_impl.h"
-#include "mpp_enc_refs.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../base/inc/mpp_enc_refs.h"
 
 #include "h264e_debug.h"
-#include "h264e_syntax.h"
+#include "../../../common/h264e_syntax.h"
 #include "h264e_sps.h"
 #include "h264e_pps.h"
 #include "h264e_sei.h"
 #include "h264e_dpb.h"
 #include "h264e_slice.h"
-#include "h264e_api_v2.h"
-#include "rc.h"
-#include "mpp_rc.h"
+#include "../../inc/h264e_api_v2.h"
+#include "../../inc/rc.h"
+#include "../../inc/mpp_rc.h"
 
-#include "enc_impl_api.h"
-#include "mpp_enc_cfg_impl.h"
+#include "../../inc/enc_impl_api.h"
+#include "../../../base/inc/mpp_enc_cfg_impl.h"
 
 RK_U32 h264e_debug = 0;
 

@@ -21,9 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_compat_impl.h"
-#include "mpp_frame_impl.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_compat_impl.h"
+#include "../../../base/inc/mpp_frame_impl.h"
 
 #include "h264d_global.h"
 #include "h264d_init.h"

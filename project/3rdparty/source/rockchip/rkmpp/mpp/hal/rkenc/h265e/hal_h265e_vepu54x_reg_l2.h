@@ -17,7 +17,7 @@
 #ifndef __HAL_H265E_VEPU54X_REG_L2_H__
 #define __HAL_H265E_VEPU54X_REG_L2_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef struct {
     /* 0x48 - ATF_THD0 */

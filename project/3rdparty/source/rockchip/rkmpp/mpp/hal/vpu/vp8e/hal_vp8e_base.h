@@ -17,10 +17,10 @@
 #ifndef __HAL_VP8E_BASE_H__
 #define __HAL_VP8E_BASE_H__
 
-#include "mpp_device.h"
-#include "hal_enc_task.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../inc/hal_enc_task.h"
 
-#include "vp8e_syntax.h"
+#include "../../../common/vp8e_syntax.h"
 
 #include "hal_vp8e_entropy.h"
 

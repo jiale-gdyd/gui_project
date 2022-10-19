@@ -27,11 +27,11 @@
 #ifndef __M2VD_PARSER_H__
 #define __M2VD_PARSER_H__
 
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
 
-#include "parser_api.h"
-#include "m2vd_syntax.h"
+#include "../../inc/parser_api.h"
+#include "../../../common/m2vd_syntax.h"
 #include "m2vd_com.h"
 
 #define M2VD_SKIP_ERROR_FRAME_EN  1

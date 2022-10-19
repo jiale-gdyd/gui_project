@@ -19,8 +19,8 @@
 
 #include <stdlib.h>
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 #define mpp_malloc_with_caller(type, count, caller)  \
     (type*)mpp_osal_malloc(caller, sizeof(type) * (count))

@@ -15,9 +15,9 @@
  */
 
 #include "av1_entropymode.h"
-#include "av1d_syntax.h"
+#include "../../../common/av1d_syntax.h"
 #include <string.h>
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define AOM_ICDF ICDF
 #define AOM_CDF2(a0) AOM_ICDF(a0)

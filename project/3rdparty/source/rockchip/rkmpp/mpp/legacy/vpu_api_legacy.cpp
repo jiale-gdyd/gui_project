@@ -17,18 +17,18 @@
 #define MODULE_TAG "vpu_api_legacy"
 
 #include <fcntl.h>
-#include "string.h"
+#include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
 
 #include "vpu_api_legacy.h"
-#include "mpp_packet_impl.h"
-#include "mpp_buffer_impl.h"
-#include "mpp_frame.h"
+#include "../base/inc/mpp_packet_impl.h"
+#include "../base/inc/mpp_buffer_impl.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 #define VPU_API_ENC_INPUT_TIMEOUT 100
 

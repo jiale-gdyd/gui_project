@@ -17,7 +17,7 @@
 #ifndef __MPP_DEV_DEFS_H__
 #define __MPP_DEV_DEFS_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 /*
  * Platform video codec hardware feature

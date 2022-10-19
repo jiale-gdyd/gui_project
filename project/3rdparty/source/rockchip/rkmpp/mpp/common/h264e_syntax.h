@@ -17,7 +17,7 @@
 #ifndef __H264E_SYNTAX_H__
 #define __H264E_SYNTAX_H__
 
-#include "mpp_rc_api.h"
+#include "rockchip/rkmpp/mpp_rc_api.h"
 #include "h264_syntax.h"
 
 typedef enum H264eSyntaxType_e {

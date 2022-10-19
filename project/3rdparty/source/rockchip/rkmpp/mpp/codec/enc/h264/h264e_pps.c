@@ -16,9 +16,9 @@
 
 #define MODULE_TAG "h264e_sps"
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpp_bitwrite.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 #include "h264e_debug.h"
 #include "h264e_pps.h"
 

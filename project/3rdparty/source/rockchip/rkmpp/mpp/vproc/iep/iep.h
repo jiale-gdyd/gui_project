@@ -20,7 +20,7 @@
 #define __IEP_H__
 
 #include <sys/ioctl.h>
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 /* Capability for current iep version using by userspace to determine iep features */
 typedef struct IepHwCap_t {

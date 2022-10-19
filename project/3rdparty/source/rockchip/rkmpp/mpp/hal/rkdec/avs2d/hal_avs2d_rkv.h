@@ -17,13 +17,13 @@
 #ifndef __HAL_AVS2D_RKV_H__
 #define __HAL_AVS2D_RKV_H__
 
-#include "mpp_device.h"
+#include "../../../../osal/inc/mpp_device.h"
 
-#include "parser_api.h"
-#include "hal_avs2d_api.h"
+#include "../../../codec/inc/parser_api.h"
+#include "../../inc/hal_avs2d_api.h"
 #include "hal_avs2d_global.h"
-#include "avs2d_syntax.h"
-#include "vdpu34x_com.h"
+#include "../../../common/avs2d_syntax.h"
+#include "../inc/vdpu34x_com.h"
 
 #define AVS2D_REGISTERS     (278)
 

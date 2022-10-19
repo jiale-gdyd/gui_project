@@ -17,7 +17,7 @@
 #ifndef __MPP_TIME_H__
 #define __MPP_TIME_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 #include "mpp_thread.h"
 
 #if defined(_WIN32) && !defined(__MINGW32CE__)

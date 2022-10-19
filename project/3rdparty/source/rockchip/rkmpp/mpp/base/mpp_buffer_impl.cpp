@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_hash.h"
-#include "mpp_lock.h"
-#include "mpp_debug.h"
-#include "mpp_mem_pool.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_hash.h"
+#include "../../osal/inc/mpp_lock.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_mem_pool.h"
 
-#include "mpp_buffer_impl.h"
+#include "inc/mpp_buffer_impl.h"
 
 #define MAX_GROUP_BIT                   8
 #define MAX_MISC_GROUP_BIT              3
@@ -782,7 +782,7 @@ MppBufferService::MppBufferService()
         mpp_allocator_get(&mAllocator[i], &mAllocatorApi[i], (MppBufferType)i);
 }
 
-#include "mpp_time.h"
+#include "../../osal/inc/mpp_time.h"
 
 MppBufferService::~MppBufferService()
 {

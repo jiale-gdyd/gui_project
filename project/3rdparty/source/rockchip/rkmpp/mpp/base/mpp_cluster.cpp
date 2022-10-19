@@ -18,15 +18,15 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_lock.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_lock.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_cluster.h"
-#include "mpp_dev_defs.h"
+#include "inc/mpp_cluster.h"
+#include "../../osal/inc/mpp_dev_defs.h"
 
 #define MPP_CLUSTER_DBG_FLOW            (0x00000001)
 #define MPP_CLUSTER_DBG_LOCK            (0x00000002)

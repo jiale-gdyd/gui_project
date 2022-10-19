@@ -10,6 +10,7 @@ obj-y += mpp_env.o
 obj-y += mpp_eventfd.o
 obj-y += mpp_list.o
 obj-y += mpp_lock.o
+obj-y += mpp_log.o
 obj-y += mpp_mem_pool.o
 obj-y += mpp_mem.o
 obj-y += mpp_platform.o

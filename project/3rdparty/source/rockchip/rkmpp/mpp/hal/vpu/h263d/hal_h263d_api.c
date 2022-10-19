@@ -16,11 +16,11 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_platform.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
-#include "mpp_hal.h"
+#include "../../inc/mpp_hal.h"
 #include "hal_h263d_base.h"
 #include "hal_h263d_vdpu1.h"
 #include "hal_h263d_vdpu2.h"

@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_common.h"
-#include "mpp_buf_slot.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_buf_slot.h"
 
 #include "h264d_scalist.h"
 #include "h264d_dpb.h"

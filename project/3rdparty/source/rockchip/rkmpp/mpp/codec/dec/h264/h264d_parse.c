@@ -20,9 +20,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_mem.h"
-#include "mpp_packet_impl.h"
-#include "hal_dec_task.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../hal/inc/hal_dec_task.h"
 
 #include "h264d_global.h"
 #include "h264d_parse.h"

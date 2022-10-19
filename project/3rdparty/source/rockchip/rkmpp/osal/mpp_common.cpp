@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "mpp_common.h"
+#include "inc/mpp_common.h"
 
 static const RK_U8 log2_tab[256] = {
     0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,

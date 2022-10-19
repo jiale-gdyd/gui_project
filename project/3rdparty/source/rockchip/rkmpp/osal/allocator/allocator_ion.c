@@ -29,14 +29,14 @@
 #include "ion.h"
 #endif
 
-#include "os_mem.h"
+#include "../os_mem.h"
 #include "allocator_ion.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_debug.h"
+#include "../inc/mpp_common.h"
+#include "../inc/mpp_thread.h"
 
 static RK_U32 ion_debug = 0;
 static pthread_once_t once = PTHREAD_ONCE_INIT;

@@ -17,10 +17,10 @@
 #ifndef __H264E_PPS_H__
 #define __H264E_PPS_H__
 
-#include "mpp_packet.h"
-#include "mpp_enc_cfg.h"
+#include "rockchip/rkmpp/mpp_packet.h"
+#include "../../../inc/mpp_enc_cfg.h"
 
-#include "h264_syntax.h"
+#include "../../../common/h264_syntax.h"
 
 typedef struct H264ePps_t {
     RK_S32      pps_id;

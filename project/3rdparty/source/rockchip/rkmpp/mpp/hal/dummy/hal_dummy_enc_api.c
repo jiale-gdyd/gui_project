@@ -17,7 +17,7 @@
 
 #define MODULE_TAG "hal_dummy_enc"
 
-#include "hal_dummy_enc_api.h"
+#include "../inc/hal_dummy_enc_api.h"
 
 
 MPP_RET hal_dummy_enc_init(void *hal, MppHalCfg *cfg)

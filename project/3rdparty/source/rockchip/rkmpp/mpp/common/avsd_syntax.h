@@ -19,7 +19,7 @@
 #ifndef __AVSD_SYNTAX_H__
 #define __AVSD_SYNTAX_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 
 //!< cavs decoder picture parameters structure

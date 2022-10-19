@@ -19,18 +19,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_compat_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_compat_impl.h"
 
-#include "mpp_bitread.h"
-#include "mpp_packet_impl.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
 #include "av1d_parser.h"
-#include "mpp_dec_cb_param.h"
-#include "mpp_frame_impl.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_frame_impl.h"
 
 RK_U32 av1d_debug = 0;
 /**

@@ -17,7 +17,7 @@
 #ifndef __HAL_H264E_VEPU541_H__
 #define __HAL_H264E_VEPU541_H__
 
-#include "mpp_enc_hal.h"
+#include "../../inc/mpp_enc_hal.h"
 
 extern const MppEncHalApi hal_h264e_vepu541;
 

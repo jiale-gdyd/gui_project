@@ -21,11 +21,11 @@
 #include <sys/timerfd.h>
 #include <sys/epoll.h>
 
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
+#include "inc/mpp_mem.h"
+#include "inc/mpp_time.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_thread.h"
 
 #if _WIN32
 #include <sys/types.h>

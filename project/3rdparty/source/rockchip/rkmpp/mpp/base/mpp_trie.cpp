@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_log.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_env.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_trie.h"
+#include "inc/mpp_trie.h"
 
 #define MPP_TRIE_DBG_FUNC               (0x00000001)
 #define MPP_TRIE_DBG_SET                (0x00000002)

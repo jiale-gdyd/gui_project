@@ -18,25 +18,25 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_soc.h"
-#include "mpp_frame.h"
-#include "mpp_common.h"
-#include "mpp_device.h"
-#include "mpp_frame_impl.h"
-#include "mpp_rc.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_soc.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../../base/inc/mpp_frame_impl.h"
+#include "../../../codec/inc/mpp_rc.h"
 
-#include "hal_h264e_debug.h"
-#include "h264e_sps.h"
-#include "h264e_pps.h"
-#include "h264e_slice.h"
+#include "../../common/h264/hal_h264e_debug.h"
+#include "../../../codec/enc/h264/h264e_sps.h"
+#include "../../../codec/enc/h264/h264e_pps.h"
+#include "../../../codec/enc/h264/h264e_slice.h"
 
-#include "hal_bufs.h"
+#include "../../common/hal_bufs.h"
 #include "hal_h264e_vepu541.h"
 #include "hal_h264e_vepu541_reg.h"
 #include "hal_h264e_vepu541_reg_l2.h"
-#include "vepu541_common.h"
+#include "../common/vepu541_common.h"
 
 typedef struct HalH264eVepu541Ctx_t {
     MppEncCfgSet            *cfg;

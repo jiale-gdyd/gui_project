@@ -18,13 +18,13 @@
 #define __MPP_ENC_IMPL_H__
 
 #include "enc_impl.h"
-#include "mpp_enc_hal.h"
-#include "mpp_enc_ref.h"
-#include "mpp_enc_refs.h"
-#include "mpp_device.h"
+#include "../../hal/inc/mpp_enc_hal.h"
+#include "../../base/inc/mpp_enc_ref.h"
+#include "../../base/inc/mpp_enc_refs.h"
+#include "../../../osal/inc/mpp_device.h"
 
 #include "rc.h"
-#include "hal_info.h"
+#include "../../hal/common/hal_info.h"
 
 typedef union MppEncHeaderStatus_u {
     RK_U32 val;

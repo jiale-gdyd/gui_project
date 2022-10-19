@@ -20,18 +20,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_debug.h"
-#include "mpp_env.h"
-#include "mpp_packet_impl.h"
-#include "mpp_buffer_impl.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../base/inc/mpp_buffer_impl.h"
 
-#include "avs2d_syntax.h"
-#include "avs2d_api.h"
+#include "../../../common/avs2d_syntax.h"
+#include "../../inc/avs2d_api.h"
 #include "avs2d_parse.h"
 #include "avs2d_dpb.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 RK_U32 avs2d_parse_debug = 0;
 

@@ -18,8 +18,8 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_jpege_debug.h"
 #include "hal_jpege_base.h"

@@ -19,10 +19,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_debug.h"
-#include "hal_task.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../hal/inc/hal_task.h"
 
 #include "avs2d_dpb.h"
 

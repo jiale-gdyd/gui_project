@@ -17,9 +17,9 @@
 #ifndef __HAL_H264E_VEPU_V2_H__
 #define __HAL_H264E_VEPU_V2_H__
 
-#include "mpp_enc_cfg.h"
-#include "mpp_rc.h"
-#include "vepu_common.h"
+#include "../../../inc/mpp_enc_cfg.h"
+#include "../../../codec/inc/mpp_rc.h"
+#include "../common/vepu_common.h"
 
 #define H264E_HAL_SET_REG(reg, addr, val)                                    \
     do {                                                                     \

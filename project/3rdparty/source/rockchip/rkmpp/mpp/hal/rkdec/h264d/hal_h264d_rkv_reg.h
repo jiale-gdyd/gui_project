@@ -19,7 +19,7 @@
 #ifndef __HAL_H264D_RKV_REG_H__
 #define __HAL_H264D_RKV_REG_H__
 
-#include "mpp_hal.h"
+#include "../../inc/mpp_hal.h"
 
 typedef struct h264d_rkv_regs_t {
     struct {

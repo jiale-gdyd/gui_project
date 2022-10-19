@@ -16,7 +16,7 @@
 #ifndef _VPU_MEM_H_
 #define _VPU_MEM_H_
 
-#include "vpu_api.h"
+#include "rockchip/rkmpp/vpu_api.h"
 
 typedef struct vpu_display_mem_pool_impl {
     vpu_display_mem_pool_FIELDS

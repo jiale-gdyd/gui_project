@@ -20,22 +20,22 @@
 #include <math.h>
 #include <limits.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_soc.h"
-#include "mpp_common.h"
-#include "mpp_device.h"
-#include "mpp_frame_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_soc.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../../base/inc/mpp_frame_impl.h"
 
-#include "h265e_syntax_new.h"
-#include "hal_h265e_debug.h"
+#include "../../../common/h265e_syntax_new.h"
+#include "../../common/h265/hal_h265e_debug.h"
 #include "hal_h265e_vepu541_reg.h"
 #include "hal_h265e_vepu54x_reg_l2.h"
-#include "vepu541_common.h"
-#include "rkv_enc_def.h"
-#include "mpp_enc_hal.h"
-#include "hal_bufs.h"
-#include "mpp_enc_ref.h"
+#include "../common/vepu541_common.h"
+#include "../common/rkv_enc_def.h"
+#include "../../inc/mpp_enc_hal.h"
+#include "../../common/hal_bufs.h"
+#include "../../../base/inc/mpp_enc_ref.h"
 
 #define hal_h265e_err(fmt, ...) \
     do {\

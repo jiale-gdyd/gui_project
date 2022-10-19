@@ -17,11 +17,11 @@
 #ifndef __AV1D_CODEC_H__
 #define __AV1D_CODEC_H__
 
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 #include "av1d_cbs.h"
-#include "av1d_syntax.h"
-#include "mpp_bitread.h"
+#include "../../../common/av1d_syntax.h"
+#include "../../../base/inc/mpp_bitread.h"
 
 typedef struct AV1ParseContext {
     Av1UnitFragment temporal_unit;

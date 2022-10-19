@@ -16,7 +16,7 @@
 
 #define MODULE_TAG "mpp_callback"
 
-#include "mpp_callback.h"
+#include "inc/mpp_callback.h"
 
 MPP_RET mpp_callback_f(const char *caller, MppCbCtx *ctx, void *param)
 {

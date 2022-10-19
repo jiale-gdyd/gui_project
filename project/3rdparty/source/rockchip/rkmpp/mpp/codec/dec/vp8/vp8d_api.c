@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include "vp8d_api.h"
+#include "../../inc/vp8d_api.h"
 #include "vp8d_parser.h"
 #include "vp8d_codec.h"
 

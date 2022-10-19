@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
+#include "../../../../osal/inc/mpp_env.h"
 
-#include "mpp_platform.h"
+#include "../../../../osal/inc/mpp_platform.h"
 #include "hal_m2vd_base.h"
 #include "hal_m2vd_vpu1.h"
 #include "hal_m2vd_vpu2.h"

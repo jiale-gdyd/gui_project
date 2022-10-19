@@ -17,7 +17,7 @@
 #ifndef __MPP_PLATFORM__
 #define __MPP_PLATFORM__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 #include "mpp_soc.h"
 
 /*

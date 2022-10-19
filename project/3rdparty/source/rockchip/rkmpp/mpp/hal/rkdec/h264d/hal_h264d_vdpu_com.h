@@ -17,7 +17,7 @@
 #ifndef __HAL_H264D_VDPU_COM_H__
 #define __HAL_H264D_VDPU_COM_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #include "hal_h264d_global.h"
 

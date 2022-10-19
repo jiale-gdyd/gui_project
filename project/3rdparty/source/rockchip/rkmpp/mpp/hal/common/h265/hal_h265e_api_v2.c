@@ -20,15 +20,15 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
-#include "mpp_platform.h"
-#include "vepu5xx.h"
-#include "hal_h265e_api_v2.h"
-#include "hal_h265e_vepu541.h"
-#include "hal_h265e_vepu580.h"
+#include "../../../../osal/inc/mpp_platform.h"
+#include "../../rkenc/common/vepu5xx.h"
+#include "../../inc/hal_h265e_api_v2.h"
+#include "../../rkenc/h265e/hal_h265e_vepu541.h"
+#include "../../rkenc/h265e/hal_h265e_vepu580.h"
 
 typedef struct HalH265eV2Ctx_t {
     const MppEncHalApi  *api;

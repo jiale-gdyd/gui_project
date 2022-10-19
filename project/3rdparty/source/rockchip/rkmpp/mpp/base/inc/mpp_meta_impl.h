@@ -17,10 +17,10 @@
 #ifndef __MPP_META_IMPL_H__
 #define __MPP_META_IMPL_H__
 
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_common.h"
 
-#include "mpp_list.h"
-#include "mpp_meta.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "rockchip/rkmpp/mpp_meta.h"
 
 typedef struct MppMetaDef_t {
     MppMetaKey          key;

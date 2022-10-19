@@ -18,8 +18,8 @@
 #define __MPP_ENC_HAL_H__
 
 #include "hal_enc_task.h"
-#include "mpp_enc_cfg.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_enc_cfg.h"
+#include "../../../osal/inc/mpp_device.h"
 
 typedef struct MppEncHalCfg_t {
     // input for encoder

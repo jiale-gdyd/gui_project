@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 
-#include "parser_api.h"
-#include "vp8d_syntax.h"
+#include "../../inc/parser_api.h"
+#include "../../../common/vp8d_syntax.h"
 #include "vp8d_data.h"
 
 #define VP8HWD_VP7             1

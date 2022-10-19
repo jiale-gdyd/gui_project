@@ -16,12 +16,12 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_buffer.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 
-#include "vpu.h"
+#include "rockchip/rkmpp/vpu.h"
 #include "vpu_mem_legacy.h"
 
 #define VPU_MEM_DBG_FUNCTION            (0x00000001)

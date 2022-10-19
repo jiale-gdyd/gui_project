@@ -18,17 +18,17 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
 
-#include "rc.h"
-#include "mpp_enc_cfg_impl.h"
-#include "mpp_packet_impl.h"
+#include "../../inc/rc.h"
+#include "../../../base/inc/mpp_enc_cfg_impl.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
-#include "h265e_api.h"
+#include "../../inc/h265e_api.h"
 #include "h265e_slice.h"
 #include "h265e_codec.h"
-#include "h265e_syntax_new.h"
+#include "../../../common/h265e_syntax_new.h"
 #include "h265e_ps.h"
 #include "h265e_header_gen.h"
 

@@ -17,7 +17,7 @@
 #ifndef __HAL_H264E_VEPU2_REG_TBL_H__
 #define __HAL_H264E_VEPU2_REG_TBL_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define BIT(n)  (1<<(n))
 

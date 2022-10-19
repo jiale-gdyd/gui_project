@@ -18,14 +18,14 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_common.h"
 
-#include "mpp_platform.h"
-#include "mpp_device_debug.h"
-#include "mpp_service_api.h"
-#include "vcodec_service_api.h"
+#include "../inc/mpp_platform.h"
+#include "inc/mpp_device_debug.h"
+#include "../inc/mpp_service_api.h"
+#include "../inc/vcodec_service_api.h"
 
 typedef struct MppDevImpl_t {
     MppClientType   type;

@@ -32,14 +32,14 @@
 #include <limits.h>
 #include <string.h>
 
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
-#include "mpp_buf_slot.h"
-#include "mpp_mem_pool.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_buf_slot.h"
+#include "../../../../osal/inc/mpp_mem_pool.h"
 
-#include "hal_dec_task.h"
+#include "../../../hal/inc/hal_dec_task.h"
 #include "h265d_codec.h"
-#include "h265_syntax.h"
+#include "../../../common/h265_syntax.h"
 
 extern RK_U32 h265d_debug;
 

@@ -17,12 +17,12 @@
 #ifndef __HAL_AVS2D_GLOBAL_H__
 #define __HAL_AVS2D_GLOBAL_H__
 
-#include "mpp_device.h"
-#include "hal_bufs.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../common/hal_bufs.h"
 
-#include "parser_api.h"
-#include "hal_avs2d_api.h"
-#include "avs2d_syntax.h"
+#include "../../../codec/inc/parser_api.h"
+#include "../../inc/hal_avs2d_api.h"
+#include "../../../common/avs2d_syntax.h"
 
 #define AVS2D_HAL_DBG_ERROR             (0x00000001)
 #define AVS2D_HAL_DBG_ASSERT            (0x00000002)

@@ -17,8 +17,8 @@
 #ifndef __RC_IMPL_H__
 #define __RC_IMPL_H__
 
-#include "mpp_list.h"
-#include "mpp_rc_api.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "rockchip/rkmpp/mpp_rc_api.h"
 
 #define MAX_RC_API_COUNT        32
 

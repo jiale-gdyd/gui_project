@@ -17,7 +17,7 @@
 #ifndef __HAL_H264E_VEPU541_REG_H__
 #define __HAL_H264E_VEPU541_REG_H__
 
-#include "vepu541_common.h"
+#include "../common/vepu541_common.h"
 
 typedef struct Vepu541H264eRegSet_t {
     /*

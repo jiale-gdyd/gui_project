@@ -19,8 +19,8 @@
 
 #include <stdio.h>
 
-#include "mpp_hal.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_device.h"
 
 typedef struct PPInfo_t {
     /* PP parameters */

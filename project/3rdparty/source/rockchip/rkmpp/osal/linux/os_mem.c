@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#ifndef linux
+#define linux
+#endif
 #if defined(linux) && !defined(__ANDROID__)
 #include <stdlib.h>
-#include "os_mem.h"
+#include "../os_mem.h"
 
 int os_malloc(void **memptr, size_t alignment, size_t size)
 {

@@ -16,18 +16,18 @@
 
 #define MODULE_TAG "mpp_dec_cfg"
 
-#include "rk_vdec_cfg.h"
+#include "rockchip/rkmpp/rk_vdec_cfg.h"
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
+#include "../../osal/inc/mpp_thread.h"
 
-#include "mpp_cfg.h"
-#include "mpp_dec_cfg_impl.h"
+#include "../inc/mpp_cfg.h"
+#include "inc/mpp_dec_cfg_impl.h"
 
 #define MPP_DEC_CFG_DBG_FUNC            (0x00000001)
 #define MPP_DEC_CFG_DBG_INFO            (0x00000002)

@@ -17,10 +17,10 @@
 #ifndef __H265E_DPB_H__
 #define __H265E_DPB_H__
 
-#include "mpp_buffer.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
 #include "h265e_slice.h"
-#include "h265_syntax.h"
-#include "mpp_enc_cfg.h"
+#include "../../../common/h265_syntax.h"
+#include "../../../inc/mpp_enc_cfg.h"
 
 /*
  * H.265 encoder dpb structure info

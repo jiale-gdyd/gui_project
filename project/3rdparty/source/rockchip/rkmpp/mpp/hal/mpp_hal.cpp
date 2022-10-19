@@ -13,68 +13,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <linux/kconfig.h>
 #define  MODULE_TAG "mpp_hal"
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp.h"
-#include "mpp_hal.h"
-#include "mpp_frame_impl.h"
+#include "../inc/mpp.h"
+#include "inc/mpp_hal.h"
+#include "../base/inc/mpp_frame_impl.h"
 
-#include "hal_h263d_api.h"
-#include "hal_h264d_api.h"
-#include "hal_h265d_api.h"
-#include "hal_vp8d_api.h"
-#include "hal_vp9d_api.h"
-#include "hal_avsd_api.h"
-#include "hal_avs2d_api.h"
-#include "hal_m2vd_api.h"
-#include "hal_mpg4d_api.h"
-#include "hal_jpegd_api.h"
-#include "hal_av1d_api.h"
+#include "inc/hal_h263d_api.h"
+#include "inc/hal_h264d_api.h"
+#include "inc/hal_h265d_api.h"
+#include "inc/hal_vp8d_api.h"
+#include "inc/hal_vp9d_api.h"
+#include "inc/hal_avsd_api.h"
+#include "inc/hal_avs2d_api.h"
+#include "inc/hal_m2vd_api.h"
+#include "inc/hal_mpg4d_api.h"
+#include "inc/hal_jpegd_api.h"
+#include "inc/hal_av1d_api.h"
 
 // for test and demo
-#include "hal_dummy_dec_api.h"
-#include "hal_dummy_enc_api.h"
+#include "inc/hal_dummy_dec_api.h"
+#include "inc/hal_dummy_enc_api.h"
 
 /*
  * all hardware api static register here
  */
 static const MppHalApi *hw_apis[] = {
-#if HAVE_AVSD
+#if defined(CONFIG_RKMPP_AVSD)
     &hal_api_avsd,
 #endif
-#if HAVE_AVS2D
+#if defined(CONFIG_RKMPP_AVS2D)
     &hal_api_avs2d,
 #endif
-#if HAVE_H263D
+#if defined(CONFIG_RKMPP_H263D)
     &hal_api_h263d,
 #endif
-#if HAVE_H264D
+#if defined(CONFIG_RKMPP_H264D)
     &hal_api_h264d,
 #endif
-#if HAVE_H265D
+#if defined(CONFIG_RKMPP_H265D)
     &hal_api_h265d,
 #endif
-#if HAVE_MPEG2D
+#if defined(CONFIG_RKMPP_MPEG2D)
     &hal_api_m2vd,
 #endif
-#if HAVE_MPEG4D
+#if defined(CONFIG_RKMPP_MPEG4D)
     &hal_api_mpg4d,
 #endif
-#if HAVE_VP8D
+#if defined(CONFIG_RKMPP_VP8D)
     &hal_api_vp8d,
 #endif
-#if HAVE_VP9D
+#if defined(CONFIG_RKMPP_VP9D)
     &hal_api_vp9d,
 #endif
-#if HAVE_JPEGD
+#if defined(CONFIG_RKMPP_JPEGD)
     &hal_api_jpegd,
 #endif
-#if HAVE_AV1D
+#if defined(CONFIG_RKMPP_AV1D)
     &hal_api_av1d,
 #endif
     &hal_api_dummy_dec,

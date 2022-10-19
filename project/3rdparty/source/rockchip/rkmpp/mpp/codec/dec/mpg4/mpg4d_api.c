@@ -19,14 +19,14 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpg4d_api.h"
+#include "../../inc/mpg4d_api.h"
 #include "mpg4d_parser.h"
-#include "mpp_packet_impl.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_packet_impl.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 #define MPG4D_INIT_STREAM_SIZE      SZ_64K
 

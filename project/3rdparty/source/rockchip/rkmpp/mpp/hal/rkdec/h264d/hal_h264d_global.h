@@ -19,13 +19,13 @@
 #ifndef __HAL_H264D_GLOBAL_H__
 #define __HAL_H264D_GLOBAL_H__
 
-#include "mpp_hal.h"
-#include "mpp_debug.h"
-#include "mpp_device.h"
-#include "hal_bufs.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../common/hal_bufs.h"
 
-#include "dxva_syntax.h"
-#include "h264d_syntax.h"
+#include "../../../common/dxva_syntax.h"
+#include "../../../common/h264d_syntax.h"
 
 
 

@@ -17,11 +17,11 @@
 #ifndef __ENC_IMPL_API_H__
 #define __ENC_IMPL_API_H__
 
-#include "rk_mpi_cmd.h"
+#include "rockchip/rkmpp/rk_mpi_cmd.h"
 
-#include "hal_enc_task.h"
-#include "mpp_enc_cfg.h"
-#include "mpp_enc_refs.h"
+#include "../../hal/inc/hal_enc_task.h"
+#include "../../inc/mpp_enc_cfg.h"
+#include "../../base/inc/mpp_enc_refs.h"
 
 /*
  * the reset wait for extension

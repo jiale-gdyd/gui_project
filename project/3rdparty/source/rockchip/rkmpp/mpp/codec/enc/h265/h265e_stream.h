@@ -17,7 +17,7 @@
 #ifndef __H265E_STREAM_H__
 #define __H265E_STREAM_H__
 
-#include "mpp_bitwrite.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 
 typedef struct  H265eStream_t {
     RK_U8 *buf;

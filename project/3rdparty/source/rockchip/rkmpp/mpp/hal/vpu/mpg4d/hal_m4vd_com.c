@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_debug.h"
 #include "hal_m4vd_com.h"
 
 RK_U8 default_intra_matrix[64] = {

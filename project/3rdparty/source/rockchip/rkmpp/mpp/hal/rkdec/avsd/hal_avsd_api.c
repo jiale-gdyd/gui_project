@@ -22,13 +22,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "hal_avsd_api.h"
+#include "../../inc/hal_avsd_api.h"
 #include "hal_avsd_reg.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 RK_U32 avsd_hal_debug = 0;
 

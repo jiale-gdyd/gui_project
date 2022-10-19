@@ -17,7 +17,7 @@
 #ifndef __MPP_DEC_CB_PARAM_H__
 #define __MPP_DEC_CB_PARAM_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 typedef enum MppDecCbCmd_e {
     DEC_CALLBACK_NONE       = 0,

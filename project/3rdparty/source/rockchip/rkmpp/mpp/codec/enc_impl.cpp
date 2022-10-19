@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <linux/kconfig.h>
 #define  MODULE_TAG "enc_impl"
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_packet_impl.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
+#include "../base/inc/mpp_packet_impl.h"
 
-#include "h264e_api_v2.h"
-#include "jpege_api_v2.h"
-#include "h265e_api.h"
-#include "vp8e_api_v2.h"
-#include "enc_impl.h"
+#include "inc/h264e_api_v2.h"
+#include "inc/jpege_api_v2.h"
+#include "inc/h265e_api.h"
+#include "inc/vp8e_api_v2.h"
+#include "inc/enc_impl.h"
 
 /*
  * all encoder controller static register here
  */
 static const EncImplApi *enc_apis[] = {
-#if HAVE_H264E
+#if defined(CONFIG_RKMPP_H264E)
     &api_h264e,
 #endif
-#if HAVE_H265E
+#if defined(CONFIG_RKMPP_H265E)
     &api_h265e,
 #endif
-#if HAVE_JPEGE
+#if defined(CONFIG_RKMPP_JPEGE)
     &api_jpege,
 #endif
-#if HAVE_VP8E
+#if defined(CONFIG_RKMPP_VP8E)
     &api_vp8e,
 #endif
 };

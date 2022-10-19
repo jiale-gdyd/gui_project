@@ -19,19 +19,19 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_device.h"
-#include "mpp_hal.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../inc/mpp_hal.h"
 
-#include "hal_bufs.h"
+#include "../../common/hal_bufs.h"
 #include "hal_vp9d_debug.h"
 #include "hal_vp9d_com.h"
 #include "hal_vp9d_vdpu34x.h"
 #include "hal_vp9d_ctx.h"
-#include "vdpu34x_vp9d.h"
-#include "vp9d_syntax.h"
+#include "../inc/vdpu34x_vp9d.h"
+#include "../../../common/vp9d_syntax.h"
 
 #define HW_PROB 1
 #define VP9_CONTEXT 4

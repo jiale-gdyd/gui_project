@@ -17,9 +17,9 @@
 #ifndef __MPP_RC__
 #define __MPP_RC__
 
-#include "rk_venc_cmd.h"
+#include "rockchip/rkmpp/rk_venc_cmd.h"
 
-#include "mpp_list.h"
+#include "../../../osal/inc/mpp_list.h"
 
 /*
  * mpp rate control contain common caculation methd

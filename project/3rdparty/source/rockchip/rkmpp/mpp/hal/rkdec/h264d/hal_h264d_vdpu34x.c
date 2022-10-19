@@ -20,18 +20,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_bitput.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../base/inc/mpp_bitput.h"
 
-#include "mpp_device.h"
+#include "../../../../osal/inc/mpp_device.h"
 
 #include "hal_h264d_global.h"
 #include "hal_h264d_vdpu34x.h"
-#include "vdpu34x_h264d.h"
-#include "mpp_dec_cb_param.h"
+#include "../inc/vdpu34x_h264d.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 /* Number registers for the decoder */
 #define DEC_VDPU34X_REGISTERS       276

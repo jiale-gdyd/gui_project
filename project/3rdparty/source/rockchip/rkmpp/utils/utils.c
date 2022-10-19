@@ -20,11 +20,11 @@
 #include <limits.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_log.h"
-#include "mpp_lock.h"
-#include "mpp_time.h"
-#include "mpp_common.h"
+#include "../osal/inc/mpp_mem.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../osal/inc/mpp_lock.h"
+#include "../osal/inc/mpp_time.h"
+#include "../osal/inc/mpp_common.h"
 #include "utils.h"
 
 #define MAX_HALF_WORD_SUM_CNT \

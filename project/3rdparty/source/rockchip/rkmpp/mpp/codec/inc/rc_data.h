@@ -17,7 +17,7 @@
 #ifndef __RC_DATA_H__
 #define __RC_DATA_H__
 
-#include "mpp_rc_defs.h"
+#include "rockchip/rkmpp/mpp_rc_defs.h"
 #include "rc_hal.h"
 
 typedef enum RcDataIndexType_e {

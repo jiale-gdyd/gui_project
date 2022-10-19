@@ -17,7 +17,7 @@
 #ifndef __MPP_COMMON_H__
 #define __MPP_COMMON_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define MPP_TAG_SIZE            32
 

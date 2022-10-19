@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_env.h"
+#include "../../../osal/inc/mpp_mem.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #include "rc_debug.h"
 #include "rc_impl.h"

@@ -19,12 +19,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
-#include "h263d_syntax.h"
-#include "hal_h263d_api.h"
+#include "../../../common/h263d_syntax.h"
+#include "../../inc/hal_h263d_api.h"
 #include "hal_h263d_vdpu1.h"
 #include "hal_h263d_vdpu1_reg.h"
 #include "hal_h263d_base.h"

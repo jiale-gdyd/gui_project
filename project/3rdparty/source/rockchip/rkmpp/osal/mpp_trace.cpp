@@ -19,8 +19,8 @@
 #include <fcntl.h>
 #include <stdarg.h>
 
-#include "mpp_common.h"
-#include "mpp_trace.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_trace.h"
 
 #define ATRACE_MESSAGE_LENGTH 256
 

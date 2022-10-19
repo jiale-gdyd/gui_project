@@ -17,7 +17,7 @@
 #ifndef __CAMERA_SOURCE_H__
 #define __CAMERA_SOURCE_H__
 
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 typedef struct CamSource CamSource;
 

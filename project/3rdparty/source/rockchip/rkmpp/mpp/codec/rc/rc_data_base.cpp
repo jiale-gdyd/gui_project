@@ -16,9 +16,9 @@
 
 #define MODULE_TAG "rc_data_base"
 
-#include "mpp_mem.h"
+#include "../../../osal/inc/mpp_mem.h"
 
-#include "rc_data_base.h"
+#include "../inc/rc_data_base.h"
 
 MPP_RET node_group_init(NodeGroup **grp, RK_S32 node_size, RK_S32 node_count)
 {

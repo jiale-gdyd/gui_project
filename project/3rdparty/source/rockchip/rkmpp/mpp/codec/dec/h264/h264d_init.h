@@ -19,8 +19,8 @@
 #define _H264D_INIT_H_
 
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 #include "h264d_global.h"
 
 

@@ -17,7 +17,7 @@
 #ifndef __HAL_M2VD_VDPU1_REG_H__
 #define __HAL_M2VD_VDPU1_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define M2VD_VDPU1_REG_NUM    (101)
 

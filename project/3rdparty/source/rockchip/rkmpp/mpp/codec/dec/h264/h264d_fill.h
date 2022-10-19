@@ -18,10 +18,10 @@
 #ifndef _H264D_FILL_H_
 #define _H264D_FILL_H_
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "dxva_syntax.h"
-#include "h264d_syntax.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../common/dxva_syntax.h"
+#include "../../../common/h264d_syntax.h"
 #include "h264d_global.h"
 
 

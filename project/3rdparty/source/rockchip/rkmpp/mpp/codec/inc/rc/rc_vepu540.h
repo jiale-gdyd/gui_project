@@ -17,7 +17,7 @@
 #ifndef __RC_VEPU_540_H__
 #define __RC_VEPU_540_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define VEPU540_BLK_RC_CTRL_LEVELS      9
 

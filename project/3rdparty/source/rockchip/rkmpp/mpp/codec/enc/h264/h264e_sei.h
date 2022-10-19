@@ -17,7 +17,7 @@
 #ifndef __H264E_SEI_H__
 #define __H264E_SEI_H__
 
-#include "mpp_packet.h"
+#include "rockchip/rkmpp/mpp_packet.h"
 
 #ifdef __cplusplus
 extern "C" {

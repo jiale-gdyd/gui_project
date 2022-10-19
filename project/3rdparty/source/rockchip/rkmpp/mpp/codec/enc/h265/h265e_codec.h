@@ -16,15 +16,15 @@
 #ifndef __H265E_CODEC_H__
 #define __H265E_CODEC_H__
 
-#include "mpp_debug.h"
+#include "../../../../osal/inc/mpp_debug.h"
 
-#include "mpp_common.h"
-#include "mpp_rc.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../inc/mpp_rc.h"
 
-#include "h265e_syntax.h"
-#include "h265e_syntax_new.h"
+#include "../../../common/h265e_syntax.h"
+#include "../../../common/h265e_syntax_new.h"
 #include "h265e_dpb.h"
-#include "enc_impl_api.h"
+#include "../../inc/enc_impl_api.h"
 
 #define H265E_DBG_FUNCTION          (0x00000001)
 #define H265E_DBG_INPUT             (0x00000010)

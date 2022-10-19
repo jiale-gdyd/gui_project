@@ -17,8 +17,8 @@
 #ifndef __MPP_TASK_IMPL_H__
 #define __MPP_TASK_IMPL_H__
 
-#include "mpp_list.h"
-#include "mpp_task.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "rockchip/rkmpp/mpp_task.h"
 
 typedef void* MppPort;
 typedef void* MppTaskQueue;

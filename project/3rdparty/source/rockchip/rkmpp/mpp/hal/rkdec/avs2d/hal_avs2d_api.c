@@ -20,16 +20,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rk_type.h"
-#include "mpp_device.h"
-#include "mpp_platform.h"
-#include "mpp_log.h"
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_common.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../../../osal/inc/mpp_platform.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "hal_avs2d_api.h"
+#include "../../inc/hal_avs2d_api.h"
 #include "hal_avs2d_rkv.h"
 
 RK_U32 avs2d_hal_debug = 0;

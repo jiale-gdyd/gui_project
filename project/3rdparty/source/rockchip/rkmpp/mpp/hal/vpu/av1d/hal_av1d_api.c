@@ -22,12 +22,12 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_platform.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_platform.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "dxva_syntax.h"
+#include "../../../common/dxva_syntax.h"
 
 #include "hal_av1d_vdpu_reg.h"
 #include "hal_av1d_vdpu.h"

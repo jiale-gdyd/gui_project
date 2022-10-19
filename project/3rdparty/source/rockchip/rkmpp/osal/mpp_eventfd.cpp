@@ -19,7 +19,7 @@
 #include <poll.h>
 #include <sys/eventfd.h>
 
-#include "mpp_eventfd.h"
+#include "inc/mpp_eventfd.h"
 
 RK_S32 mpp_eventfd_get(RK_U32 init)
 {

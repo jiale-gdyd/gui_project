@@ -17,8 +17,8 @@
 #ifndef __MPP_CALLBACK_H__
 #define __MPP_CALLBACK_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 typedef MPP_RET (*MppCallBack)(const char *caller, void *ctx, RK_S32 cmd, void *param);
 

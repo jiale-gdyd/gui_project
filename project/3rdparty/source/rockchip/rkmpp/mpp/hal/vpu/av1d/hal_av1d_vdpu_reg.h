@@ -17,7 +17,7 @@
 #ifndef __HAL_AV1D_VDPU_REG_H__
 #define __HAL_AV1D_VDPU_REG_H__
 
-#include "mpp_device.h"
+#include "../../../../osal/inc/mpp_device.h"
 
 /* swreg64 - swreg183 */
 typedef struct VdpuAv1dBase_t {

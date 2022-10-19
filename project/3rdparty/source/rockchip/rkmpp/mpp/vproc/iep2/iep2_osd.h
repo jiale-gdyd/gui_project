@@ -18,7 +18,7 @@
 #define __IEP2_OSD_H__
 
 #include "iep2.h"
-#include "iep2_api.h"
+#include "../inc/iep2_api.h"
 
 struct iep2_api_ctx;
 

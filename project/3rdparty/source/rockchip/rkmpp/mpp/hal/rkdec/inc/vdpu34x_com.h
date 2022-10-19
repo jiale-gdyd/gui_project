@@ -17,8 +17,8 @@
 #ifndef __VDPU34X_COM_H__
 #define __VDPU34X_COM_H__
 
-#include "mpp_device.h"
-#include "mpp_buf_slot.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../../base/inc/mpp_buf_slot.h"
 #include "vdpu34x.h"
 
 #define OFFSET_COMMON_REGS          (8 * sizeof(RK_U32))

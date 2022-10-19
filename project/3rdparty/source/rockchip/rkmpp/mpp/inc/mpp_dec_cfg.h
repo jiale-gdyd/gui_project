@@ -17,8 +17,8 @@
 #ifndef __MPP_DEC_CFG_H__
 #define __MPP_DEC_CFG_H__
 
-#include "mpp_frame.h"
-#include "rk_vdec_cmd.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "rockchip/rkmpp/rk_vdec_cmd.h"
 
 typedef enum MppDecCfgChange_e {
     MPP_DEC_CFG_CHANGE_TYPE             = (1 << 0),

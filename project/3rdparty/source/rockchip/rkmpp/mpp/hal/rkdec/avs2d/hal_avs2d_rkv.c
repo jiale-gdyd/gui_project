@@ -19,16 +19,16 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "mpp_log.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_debug.h"
-#include "mpp_bitput.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitput.h"
 
-#include "avs2d_syntax.h"
-#include "hal_avs2d_api.h"
+#include "../../../common/avs2d_syntax.h"
+#include "../../inc/hal_avs2d_api.h"
 #include "hal_avs2d_rkv.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 #define VDPU34X_FAST_REG_SET_CNT    (3)
 #define MAX_REF_NUM                 (8)

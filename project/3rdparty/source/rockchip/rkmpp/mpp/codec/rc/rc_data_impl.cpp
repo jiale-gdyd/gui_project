@@ -18,14 +18,14 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_list.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_env.h"
+#include "../../../osal/inc/mpp_mem.h"
+#include "../../../osal/inc/mpp_list.h"
+#include "../../../osal/inc/mpp_debug.h"
+#include "../../../osal/inc/mpp_common.h"
 
-#include "rc_data.h"
-#include "rc_data_impl.h"
+#include "../inc/rc_data.h"
+#include "../inc/rc_data_impl.h"
 
 #define RC_LIST_HEAD            1
 #define RC_LIST_TAIL            0

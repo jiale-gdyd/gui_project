@@ -17,12 +17,12 @@
 #ifndef __HAL_JPEGE_BASE_H__
 #define __HAL_JPEGE_BASE_H__
 
-#include "mpp_device.h"
-#include "hal_enc_task.h"
+#include "../../../../osal/inc/mpp_device.h"
+#include "../../inc/hal_enc_task.h"
 
-#include "vepu_common.h"
+#include "../common/vepu_common.h"
 
-#include "jpege_syntax.h"
+#include "../../../common/jpege_syntax.h"
 #include "hal_jpege_hdr.h"
 
 #define QUANTIZE_TABLE_SIZE 64

@@ -18,12 +18,12 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_rc.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../inc/mpp_rc.h"
 
-#include "vp8e_syntax.h"
+#include "../../../common/vp8e_syntax.h"
 #include "vp8e_debug.h"
 #include "vp8e_rc.h"
 
@@ -34,6 +34,8 @@
 #define RC_ERROR_RESET       0x7fffffff
 #define BIT_COUNT_MAX        0x1fffffff
 #define BIT_COUNT_MIN        (-BIT_COUNT_MAX)
+
+RK_U32 vp8e_rc_debug = 0;
 
 static const RK_S32 ac_q_lookup_tbl[QINDEX_RANGE] = {
     4,   5,   6,   7,   8,   9,   10,  11,  12,  13,

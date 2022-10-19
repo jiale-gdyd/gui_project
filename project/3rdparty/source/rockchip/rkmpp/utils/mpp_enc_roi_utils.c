@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_soc.h"
-#include "mpp_common.h"
-#include "mpp_debug.h"
+#include "../osal/inc/mpp_env.h"
+#include "../osal/inc/mpp_mem.h"
+#include "../osal/inc/mpp_soc.h"
+#include "../osal/inc/mpp_common.h"
+#include "../osal/inc/mpp_debug.h"
 
 #include "mpp_enc_roi_utils.h"
 

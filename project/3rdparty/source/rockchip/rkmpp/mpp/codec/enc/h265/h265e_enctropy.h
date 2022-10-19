@@ -17,7 +17,7 @@
 #ifndef __H265E_ENCTROPY_H__
 #define __H265E_ENCTROPY_H__
 
-#include "mpp_bitwrite.h"
+#include "../../../base/inc/mpp_bitwrite.h"
 
 typedef struct H265eContextModel {
     RK_U8 m_state;  ///< internal state variable

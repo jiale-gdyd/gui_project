@@ -18,17 +18,17 @@
 
 #include <string.h>
 
-#include "rk_venc_cfg.h"
+#include "rockchip/rkmpp/rk_venc_cfg.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
+#include "../../osal/inc/mpp_thread.h"
 
-#include "mpp_cfg.h"
-#include "mpp_enc_cfg_impl.h"
+#include "../inc/mpp_cfg.h"
+#include "inc/mpp_enc_cfg_impl.h"
 
 #define MPP_ENC_CFG_DBG_FUNC            (0x00000001)
 #define MPP_ENC_CFG_DBG_INFO            (0x00000002)

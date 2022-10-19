@@ -17,7 +17,7 @@
 #ifndef __HAL_VP8E_ENTROPY_H__
 #define __HAL_VP8E_ENTROPY_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #include "hal_vp8e_putbit.h"
 

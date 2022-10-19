@@ -17,7 +17,7 @@
 #ifndef __HAL_H265E_VEPU580_REG_H__
 #define __HAL_H265E_VEPU580_REG_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define VEPU580_CTL_OFFSET          (0 * sizeof(RK_U32))
 #define VEPU580_BASE_OFFSET         (160 * sizeof(RK_U32))

@@ -17,8 +17,8 @@
 #ifndef __MPP_LIST_H__
 #define __MPP_LIST_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 #include "mpp_thread.h"
 

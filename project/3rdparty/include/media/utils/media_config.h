@@ -91,19 +91,19 @@ typedef enum {
     REGION_TYPE_MOSAIC,
     REGION_TYPE_OVERLAY_EX,
     REGION_TYPE_COVER_EX,
-} DRM_REGION_TYPE;
+} drm_region_type_e;
 
 typedef struct {
-    uint8_t         *buffer;
-    uint32_t        pos_x;
-    uint32_t        pos_y;
-    uint32_t        width;
-    uint32_t        height;
-    uint32_t        inverse;
-    uint32_t        region_id;
-    uint8_t         enable;
-    DRM_REGION_TYPE region_type;
-    uint32_t        cover_color;
+    uint8_t           *buffer;
+    uint32_t          pos_x;
+    uint32_t          pos_y;
+    uint32_t          width;
+    uint32_t          height;
+    uint32_t          inverse;
+    uint32_t          region_id;
+    uint8_t           enable;
+    drm_region_type_e region_type;
+    uint32_t          cover_color;
 } DrmOsdRegionData;
 
 typedef struct {

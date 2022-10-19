@@ -19,7 +19,7 @@
 
 #include <stdbool.h>
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #ifdef __cplusplus
 extern "C" {

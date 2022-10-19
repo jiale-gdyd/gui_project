@@ -18,15 +18,15 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_enc_hal.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../inc/mpp_enc_hal.h"
 #include "hal_vp8e_base.h"
 #include "hal_vp8e_vepu2_v2.h"
 #include "hal_vp8e_vepu2_reg.h"
 
-#include "mpp_rc.h"
-#include "vp8e_syntax.h"
+#include "../../../codec/inc/mpp_rc.h"
+#include "../../../common/vp8e_syntax.h"
 #include "hal_vp8e_debug.h"
 
 #define SWREG_AMOUNT_VEPU2  (184)

@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_err.h"
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_list.h"
-#include "mpp_debug.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "inc/mpp_env.h"
+#include "inc/mpp_mem.h"
+#include "inc/mpp_list.h"
+#include "inc/mpp_debug.h"
 
-#include "mpp_mem_pool.h"
+#include "inc/mpp_mem_pool.h"
 
 #define MPP_MEM_POOL_DBG_FLOW           (0x00000001)
 

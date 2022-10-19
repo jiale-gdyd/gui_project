@@ -19,13 +19,13 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_bitread.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../base/inc/mpp_bitread.h"
 
 #include "mpg4d_parser.h"
-#include "mpg4d_syntax.h"
+#include "../../../common/mpg4d_syntax.h"
 
 RK_U32 mpg4d_debug = 0;
 

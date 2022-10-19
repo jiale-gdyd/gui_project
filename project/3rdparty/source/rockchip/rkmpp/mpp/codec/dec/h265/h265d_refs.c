@@ -27,7 +27,7 @@
 
 #define MODULE_TAG  "H265_PARSER_REF"
 
-#include "mpp_compat_impl.h"
+#include "../../../../osal/inc/mpp_compat_impl.h"
 
 #include "h265d_parser.h"
 

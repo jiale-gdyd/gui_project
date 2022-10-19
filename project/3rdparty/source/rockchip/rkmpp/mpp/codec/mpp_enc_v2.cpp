@@ -18,17 +18,17 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_info.h"
-#include "mpp_common.h"
-#include "mpp_2str.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../inc/mpp_info.h"
+#include "../../osal/inc/mpp_common.h"
+#include "../base/inc/mpp_2str.h"
 
-#include "mpp.h"
+#include "../inc/mpp.h"
 #include "mpp_enc_debug.h"
-#include "mpp_enc_cfg_impl.h"
-#include "mpp_enc_impl.h"
-#include "mpp_enc_cb_param.h"
+#include "../base/inc/mpp_enc_cfg_impl.h"
+#include "inc/mpp_enc_impl.h"
+#include "../base/inc/mpp_enc_cb_param.h"
 
 RK_U32 mpp_enc_debug = 0;
 

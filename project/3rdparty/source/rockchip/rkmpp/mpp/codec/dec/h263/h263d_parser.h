@@ -18,9 +18,9 @@
 #ifndef __H263D_PARSER_H__
 #define __H263D_PARSER_H__
 
-#include "mpp_packet.h"
-#include "mpp_buf_slot.h"
-#include "hal_dec_task.h"
+#include "rockchip/rkmpp/mpp_packet.h"
+#include "../../../base/inc/mpp_buf_slot.h"
+#include "../../../hal/inc/hal_dec_task.h"
 
 #define H263D_DBG_FUNCTION          (0x00000001)
 #define H263D_DBG_STARTCODE         (0x00000002)

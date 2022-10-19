@@ -18,7 +18,7 @@
 #define __MPP_ENC_CFG_IMPL_H__
 
 #include "mpp_trie.h"
-#include "mpp_enc_cfg.h"
+#include "../../inc/mpp_enc_cfg.h"
 
 typedef struct MppEncCfgImpl_t {
     RK_S32              size;

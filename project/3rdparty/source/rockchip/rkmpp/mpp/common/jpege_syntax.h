@@ -17,8 +17,8 @@
 #ifndef __JPEGE_SYNTAX_H__
 #define __JPEGE_SYNTAX_H__
 
-#include "mpp_frame.h"
-#include "rk_venc_cmd.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "rockchip/rkmpp/rk_venc_cmd.h"
 
 typedef struct JpegeSyntax_t {
     RK_U32              width;

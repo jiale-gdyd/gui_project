@@ -18,6 +18,8 @@
 #include <media/drm_media_vi.h>
 #include <media/drm_media_vo.h>
 #include <media/drm_media_rga.h>
+#include <media/drm_media_venc.h>
+#include <media/drm_media_vdec.h>
 #include <media/drm_media_vmix.h>
 
 #include <media/drm_media_api.h>
@@ -54,6 +56,14 @@ typedef enum CHN_STATUS {
     CHN_STATUS_BIND,
 } chn_status_e;
 
+typedef struct venc_channel_attr {
+    drm_venc_chn_attr_t  attr;
+    drm_venc_chn_param_t param;
+    drm_venc_rc_param_t  stRcPara;
+    drm_venc_roi_attr_t  astRoiAttr[8];
+    bool                 bFullFunc;
+} venc_channel_attr_t;
+
 typedef struct drm_media_channel {
     mod_id_e                                 mode_id;
     uint16_t                                 chn_id;
@@ -69,6 +79,8 @@ typedef struct drm_media_channel {
     union {
         drm_vi_chn_attr_t                    vi_attr;
         drm_vo_chn_attr_t                    vo_attr;
+        drm_vdec_chn_attr_t                  vdec_attr;
+        venc_channel_attr_t                  venc_attr;
     };
 
     uint16_t                                 chn_ref_cnt;
@@ -105,16 +117,20 @@ typedef struct video_mix_device {
     uint16_t                      u16RefCnt;
     std::mutex                    VmixMtx;
     drm_media_channel_t           VmixChns[DRM_VMIX_CHANNEL_BUTT];
-} video_mix_device_t;
+} video_mix_devices_t;
 
 static std::mutex g_vi_mtx;
 static std::mutex g_vo_mtx;
 static std::mutex g_rga_mtx;
+static std::mutex g_venc_mtx;
+static std::mutex g_vdec_mtx;
 
 static drm_media_channel_t g_vi_chns[DRM_VI_CHANNEL_BUTT];
 static drm_media_channel_t g_vo_chns[DRM_VO_CHANNEL_BUTT];
-static video_mix_device_t g_vmix_dev[DRM_VMIX_DEVICE_BUTT];
+static video_mix_devices_t g_vmix_dev[DRM_VMIX_DEVICE_BUTT];
 static drm_media_channel_t g_rga_chns[DRM_RGA_CHANNEL_BUTT];
+static drm_media_channel_t g_venc_chns[DRM_VENC_CHANNEL_BUTT];
+static drm_media_channel_t g_vdec_chns[DRM_VDEC_CHANNEL_BUTT];
 
 static unsigned char g_sys_init = 0;
 
@@ -122,7 +138,7 @@ extern std::mutex g_handle_mb_mutex;
 extern std::list<handle_mb_t *> g_handle_mb;
 
 static const char *mod_tag_list[MOD_ID_BUTT] = {
-    "UNKNOW", "VB", "SYS", "VO", "VI", "RGA", "VMIX",
+    "UNKNOW", "VB", "SYS", "VDEC", "VENC", "VO", "VI", "RGA", "VMIX",
 };
 
 static const char *ModIdToString(mod_id_e mod_id)
@@ -175,8 +191,21 @@ static mb_type_e get_buffer_type(drm_media_channel_t *target_chn)
     switch (target_chn->mode_id) {
         case MOD_ID_VI:
         case MOD_ID_RGA:
+        case MOD_ID_VDEC:
         case MOD_ID_VMIX:
             type = MB_TYPE_IMAGE;
+            break;
+
+        case MOD_ID_VENC:
+            if (target_chn->venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_H264) {
+                type = MB_TYPE_H264;
+            } else if (target_chn->venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_H265) {
+                type = MB_TYPE_H265;
+            } else if (target_chn->venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+                type = MB_TYPE_MJPEG;
+            } else if (target_chn->venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_JPEG) {
+                type = MB_TYPE_JPEG;
+            }
             break;
 
         default:
@@ -428,7 +457,7 @@ static void flow_output_callback(void *handle, std::shared_ptr<libdrm::MediaBuff
     mb->timestamp = (uint64_t)media_mb->GetUSTimeStamp();
     mb->type = mb_type;
     if ((mb_type == MB_TYPE_H264) || (mb_type == MB_TYPE_H265)) {
-        mb->flag = (media_mb->GetUserFlag() & libdrm::MediaBuffer::kIntra) ? 4 : 2;
+        mb->flag = (media_mb->GetUserFlag() & libdrm::MediaBuffer::kIntra) ? VENC_NALU_IDRSLICE : VENC_NALU_PSLICE;
         mb->tsvc_level = media_mb->GetTsvcLevel();
     } else {
         mb->flag = 0;
@@ -481,6 +510,8 @@ int drm_mpi_system_init(void)
     reset_channel_table(g_vi_chns, DRM_VI_CHANNEL_BUTT, MOD_ID_VI);
     reset_channel_table(g_vo_chns, DRM_VO_CHANNEL_BUTT, MOD_ID_VO);
     reset_channel_table(g_rga_chns, DRM_RGA_CHANNEL_BUTT, MOD_ID_RGA);
+    reset_channel_table(g_venc_chns, DRM_VENC_CHANNEL_BUTT, MOD_ID_VENC);
+    reset_channel_table(g_vdec_chns, DRM_VDEC_CHANNEL_BUTT, MOD_ID_VDEC);
 
     for (int i = DRM_VMIX_DEVICE_00; i < DRM_VMIX_DEVICE_BUTT; i++) {
         g_vmix_dev[i].bInit = false;
@@ -517,6 +548,18 @@ int drm_mpi_system_bind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn)
             src_mutex = &g_vi_mtx;
             break;
 
+        case MOD_ID_VENC:
+            src = g_venc_chns[pstSrcChn->s32ChnId].media_flow;
+            src_chn = &g_venc_chns[pstSrcChn->s32ChnId];
+            src_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            src = g_vdec_chns[pstSrcChn->s32ChnId].media_flow;
+            src_chn = &g_vdec_chns[pstSrcChn->s32ChnId];
+            src_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             src = g_rga_chns[pstSrcChn->s32ChnId].media_flow;
             src_chn = &g_rga_chns[pstSrcChn->s32ChnId];
@@ -542,6 +585,18 @@ int drm_mpi_system_bind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn)
             sink = g_vo_chns[pstDstChn->s32ChnId].media_flow;
             dst_chn = &g_vo_chns[pstDstChn->s32ChnId];
             dst_mutex = &g_vo_mtx;
+            break;
+
+        case MOD_ID_VENC:
+            sink = g_venc_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_venc_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            sink = g_vdec_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_vdec_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_vdec_mtx;
             break;
 
         case MOD_ID_RGA:
@@ -632,6 +687,18 @@ int drm_mpi_system_unbind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn
             src_mutex = &g_vi_mtx;
             break;
 
+        case MOD_ID_VENC:
+            src = g_venc_chns[pstSrcChn->s32ChnId].media_flow;
+            src_chn = &g_venc_chns[pstSrcChn->s32ChnId];
+            src_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            src = g_vdec_chns[pstSrcChn->s32ChnId].media_flow;
+            src_chn = &g_vdec_chns[pstSrcChn->s32ChnId];
+            src_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             src = g_rga_chns[pstSrcChn->s32ChnId].media_flow;
             src_chn = &g_rga_chns[pstSrcChn->s32ChnId];
@@ -674,6 +741,18 @@ int drm_mpi_system_unbind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn
             sink = g_vo_chns[pstDstChn->s32ChnId].media_flow;
             dst_chn = &g_vo_chns[pstDstChn->s32ChnId];
             dst_mutex = &g_vo_mtx;
+            break;
+
+        case MOD_ID_VENC:
+            sink = g_venc_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_venc_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            sink = g_vdec_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_vdec_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_vdec_mtx;
             break;
 
         case MOD_ID_RGA:
@@ -789,16 +868,32 @@ int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t 
             target_mutex = &g_rga_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                return -5;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                return -6;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         default:
             DRM_MEDIA_LOGE("unsupport mod");
-            return -5;
+            return -7;
     }
 
     target_mutex->lock();
     if (target_chn->status < CHN_STATUS_OPEN) {
         DRM_MEDIA_LOGE("channel:[%d] in status:[%d], this operation is not allowed", s32ChnId, target_chn->status);
         target_mutex->unlock();
-        return -5;
+        return -8;
     }
 
     int ret = 0;
@@ -806,7 +901,7 @@ int drm_mpi_system_set_framerate(mod_id_e enModID, int s32ChnId, drm_fps_attr_t 
     target_mutex->unlock();
     if (ret) {
         DRM_MEDIA_LOGE("SetInputFpsControl failed, return:[%d]", ret);
-        return -6;
+        return -9;
     }
 
     return 0;
@@ -840,23 +935,39 @@ int drm_mpi_system_start_recv_frame(mod_id_e enModID, int s32ChnId, const drm_re
             target_mutex = &g_rga_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                return -4;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                return -5;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         default:
             DRM_MEDIA_LOGE("unsupport mod");
-            return -4;
+            return -6;
     }
 
     target_mutex->lock();
     if (target_chn->status < CHN_STATUS_OPEN) {
         DRM_MEDIA_LOGE("channel:[%d] in status:[%d], this operation is not allowed", s32ChnId, target_chn->status);
         target_mutex->unlock();
-        return -5;
+        return -7;
     }
 
     int ret = target_chn->media_flow->SetRunTimes(pstRecvParam->s32RecvPicNum);
     target_mutex->unlock();
     if (ret != pstRecvParam->s32RecvPicNum) {
         DRM_MEDIA_LOGE("SetRunTimes failed, return:[%d]", ret);
-        return -6;
+        return -8;
     }
 
     return 0;
@@ -877,10 +988,28 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
             target_mutex = &g_vi_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid venc channel:[%d]", s32ChnId);
+                return -2;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid vdec channel:[%d]", s32ChnId);
+                return -3;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channe:[%d]", s32ChnId);
-                return -2;
+                return -4;
             }
             target_chn = &g_rga_chns[s32ChnId];
             target_mutex = &g_rga_mtx;
@@ -889,7 +1018,7 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
         case MOD_ID_VMIX: {
             int s32DevId = s32ChnId;
             if ((s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
-                return -3;
+                return -5;
             }
             target_chn = &g_vmix_dev[s32DevId].VmixChns[0];
             target_mutex = &g_vmix_dev[s32DevId].VmixMtx;
@@ -898,11 +1027,11 @@ int drm_mpi_system_set_media_buffer_depth(mod_id_e enModID, int s32ChnId, int de
 
         default:
             DRM_MEDIA_LOGE("invalid mode:[%d]", enModID);
-            return -4;
+            return -6;
     }
 
     if (target_chn->status < CHN_STATUS_OPEN) {
-        return -5;
+        return -7;
     }
 
     target_mutex->lock();
@@ -927,9 +1056,25 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
             target_mutex = &g_vo_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                return -2;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                return -3;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
-                return -2;
+                return -4;
             }
             target_chn = &g_rga_chns[s32ChnId];
             target_mutex = &g_rga_mtx;
@@ -937,7 +1082,7 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
 
         default:
             DRM_MEDIA_LOGE("unsupport mod");
-            return -3;
+            return -5;
     }
 
     media_buffer_impl_t *mb = (media_buffer_impl_t *)buffer;
@@ -947,7 +1092,7 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
     } else {
         target_mutex->unlock();
         DRM_MEDIA_LOGE("media flow null");
-        return -4;
+        return -6;
     }
 
     target_mutex->unlock();
@@ -1003,10 +1148,28 @@ int drm_mpi_system_stop_get_media_buffer(mod_id_e enModID, int s32ChnId)
             target_mutex = &g_vi_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid venc channel:[%d]", s32ChnId);
+                return -2;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid vdec channel:[%d]", s32ChnId);
+                return -3;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channel:[%d]", s32ChnId);
-                return -2;
+                return -4;
             }
             target_chn = &g_rga_chns[s32ChnId];
             target_mutex = &g_rga_mtx;
@@ -1014,11 +1177,11 @@ int drm_mpi_system_stop_get_media_buffer(mod_id_e enModID, int s32ChnId)
 
         default:
             DRM_MEDIA_LOGE("invalid mode:[%d]", enModID);
-            return -3;
+            return -5;
     }
 
     if (target_chn->status < CHN_STATUS_OPEN) {
-        return -4;
+        return -6;
     }
 
     clear_media_channel_buffer(target_chn);
@@ -1047,10 +1210,28 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
             target_mutex = &g_vi_mtx;
             break;
 
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid vecn channel:[%d]", s32ChnId);
+                return -2;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            target_mutex = &g_venc_mtx;
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid vdec channel:[%d]", s32ChnId);
+                return -3;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
+            target_mutex = &g_vdec_mtx;
+            break;
+
         case MOD_ID_RGA:
             if ((s32ChnId < DRM_RGA_CHANNEL_00) || (s32ChnId >= DRM_RGA_CHANNEL_BUTT)) {
                 DRM_MEDIA_LOGE("invalid RGA channel:[%d]", s32ChnId);
-                return -2;
+                return -4;
             }
             target_chn = &g_rga_chns[s32ChnId];
             target_mutex = &g_rga_mtx;
@@ -1059,7 +1240,7 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
         case MOD_ID_VMIX: {
             int s32DevId = s32ChnId;
             if ((s32DevId < DRM_VMIX_DEVICE_00) || (s32DevId >= DRM_VMIX_DEVICE_BUTT)) {
-                return -3;
+                return -5;
             }
             target_chn = &g_vmix_dev[s32DevId].VmixChns[0];
             target_mutex = &g_vmix_dev[s32DevId].VmixMtx;
@@ -1068,11 +1249,11 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
 
         default:
             DRM_MEDIA_LOGE("invalid mode:[%d]", enModID);
-            return -4;
+            return -6;
     }
 
     if (target_chn->status < CHN_STATUS_OPEN) {
-        return -5;
+        return -7;
     }
 
     init_media_channel_buffer(target_chn);
@@ -1102,6 +1283,22 @@ media_buffer_t drm_mpi_system_get_media_buffer(mod_id_e enModID, int s32ChnId, i
                 return NULL;
             }
             target_chn = &g_vi_chns[s32ChnId];
+            break;
+
+        case MOD_ID_VENC:
+            if ((s32ChnId < DRM_VENC_CHANNEL_00) || (s32ChnId >= DRM_VENC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid venc channel:[%d]", s32ChnId);
+                return NULL;
+            }
+            target_chn = &g_venc_chns[s32ChnId];
+            break;
+
+        case MOD_ID_VDEC:
+            if ((s32ChnId < DRM_VDEC_CHANNEL_00) || (s32ChnId >= DRM_VDEC_CHANNEL_BUTT)) {
+                DRM_MEDIA_LOGE("invalid vdec channel:[%d]", s32ChnId);
+                return NULL;
+            }
+            target_chn = &g_vdec_chns[s32ChnId];
             break;
 
         case MOD_ID_RGA:
@@ -1154,6 +1351,14 @@ int drm_mpi_system_register_output_callback(const drm_chn_t *pstChn, OutCallback
             target_chn = &g_rga_chns[pstChn->s32ChnId];
             break;
 
+        case MOD_ID_VENC:
+            target_chn = &g_venc_chns[pstChn->s32ChnId];
+            break;
+
+        case MOD_ID_VDEC:
+            target_chn = &g_vdec_chns[pstChn->s32ChnId];
+            break;
+
         default:
             DRM_MEDIA_LOGE("unsupport mod");
             return -1;
@@ -1191,6 +1396,14 @@ int drm_mpi_system_register_output_callbackEx(const drm_chn_t *pstChn, OutCallba
 
         case MOD_ID_RGA:
             target_chn = &g_rga_chns[pstChn->s32ChnId];
+            break;
+
+        case MOD_ID_VENC:
+            target_chn = &g_venc_chns[pstChn->s32ChnId];
+            break;
+
+        case MOD_ID_VDEC:
+            target_chn = &g_vdec_chns[pstChn->s32ChnId];
             break;
 
         default:

@@ -18,13 +18,13 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_enc_ref.h"
-#include "mpp_enc_refs.h"
+#include "inc/mpp_enc_ref.h"
+#include "inc/mpp_enc_refs.h"
 
 #define MAX_CPB_ST_FRM          16
 #define MAX_CPB_LT_FRM          16

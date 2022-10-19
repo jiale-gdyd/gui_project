@@ -18,12 +18,12 @@
 
 #include <string.h>
 
-#include "mpp_log.h"
-#include "mpp_buffer.h"
-#include "mpp_common.h"
-#include "mpp_compat_impl.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
+#include "../../../osal/inc/mpp_common.h"
+#include "../../../osal/inc/mpp_compat_impl.h"
 
-#include "vdpu34x_com.h"
+#include "inc/vdpu34x_com.h"
 
 static RK_U32 rcb_coeff[RCB_BUF_COUNT] = {
     [RCB_INTRA_ROW]     = 6,   /* RCB_INTRA_ROW_COEF */

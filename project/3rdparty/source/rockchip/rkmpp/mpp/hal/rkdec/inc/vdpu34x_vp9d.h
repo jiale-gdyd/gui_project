@@ -17,7 +17,7 @@
 #ifndef __HAL_VDPU34X_VP9D_H__
 #define __HAL_VDPU34X_VP9D_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 #include "vdpu34x_com.h"
 
 

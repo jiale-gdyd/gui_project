@@ -17,7 +17,7 @@
 #ifndef __HAL_JPEGE_VEPU1_V2_H__
 #define __HAL_JPEGE_VEPU1_V2_H__
 
-#include "mpp_enc_hal.h"
+#include "../../inc/mpp_enc_hal.h"
 
 extern const MppEncHalApi hal_jpege_vepu1;
 

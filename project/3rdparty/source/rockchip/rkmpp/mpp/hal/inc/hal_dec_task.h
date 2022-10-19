@@ -19,7 +19,7 @@
 #define __HAL_DEC_TASK__
 
 #include "hal_task.h"
-#include "mpp_callback.h"
+#include "../../../osal/inc/mpp_callback.h"
 
 #define MAX_DEC_REF_NUM     17
 

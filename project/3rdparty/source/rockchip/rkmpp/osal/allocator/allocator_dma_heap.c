@@ -23,16 +23,16 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include "os_mem.h"
+#include "../os_mem.h"
 #include "allocator_dma_heap.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_lock.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "mpp_thread.h"
-#include "mpp_runtime.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_lock.h"
+#include "../inc/mpp_debug.h"
+#include "../inc/mpp_common.h"
+#include "../inc/mpp_thread.h"
+#include "../inc/mpp_runtime.h"
 
 #define DMA_HEAP_VALID_FD_FLAGS         (O_CLOEXEC | O_ACCMODE)
 #define DMA_HEAP_VALID_HEAP_FLAGS       (0)

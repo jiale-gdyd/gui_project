@@ -18,21 +18,21 @@
 
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_time.h"
+#include "../../osal/inc/mpp_debug.h"
 
-#include "mpp.h"
+#include "../inc/mpp.h"
 
-#include "mpp_dec_impl.h"
-#include "mpp_buffer_impl.h"
-#include "mpp_packet_impl.h"
-#include "mpp_frame_impl.h"
-#include "mpp_dec_cfg_impl.h"
+#include "inc/mpp_dec_impl.h"
+#include "../base/inc/mpp_buffer_impl.h"
+#include "../base/inc/mpp_packet_impl.h"
+#include "../base/inc/mpp_frame_impl.h"
+#include "../base/inc/mpp_dec_cfg_impl.h"
 
-#include "mpp_dec_vproc.h"
-#include "mpp_dec_cb_param.h"
+#include "../vproc/inc/mpp_dec_vproc.h"
+#include "../base/inc/mpp_dec_cb_param.h"
 
 static RK_U32 mpp_dec_debug = 0;
 

@@ -16,7 +16,7 @@
 #ifndef __H265E_RC_H__
 #define __H265E_RC_H__
 
-#include "mpp_rc_api.h"
+#include "rockchip/rkmpp/mpp_rc_api.h"
 
 #ifdef  __cplusplus
 extern "C" {

@@ -16,7 +16,7 @@
 #ifndef __VEPU_COMMON_H__
 #define __VEPU_COMMON_H__
 
-#include "mpp_frame.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 typedef enum VepuFormat_e {
     VEPU_FMT_YUV420PLANAR,          //0

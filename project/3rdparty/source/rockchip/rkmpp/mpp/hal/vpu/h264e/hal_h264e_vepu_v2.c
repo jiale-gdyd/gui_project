@@ -17,15 +17,15 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_buffer.h"
-#include "mpp_enc_ref.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
+#include "../../../base/inc/mpp_enc_ref.h"
 
-#include "vepu_common.h"
+#include "../common/vepu_common.h"
 
-#include "h264e_slice.h"
-#include "hal_h264e_debug.h"
+#include "../../../codec/enc/h264/h264e_slice.h"
+#include "../../common/h264/hal_h264e_debug.h"
 #include "hal_h264e_vepu_v2.h"
 #include "hal_h264e_vpu_tbl_v2.h"
 

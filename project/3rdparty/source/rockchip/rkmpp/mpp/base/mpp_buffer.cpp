@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_buffer_impl.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "inc/mpp_buffer_impl.h"
 
 MPP_RET mpp_buffer_import_with_tag(MppBufferGroup group, MppBufferInfo *info, MppBuffer *buffer,
                                    const char *tag, const char *caller)

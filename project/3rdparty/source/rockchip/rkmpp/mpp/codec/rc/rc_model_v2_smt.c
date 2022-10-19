@@ -19,14 +19,14 @@
 #include <string.h>
 #include <math.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../osal/inc/mpp_env.h"
+#include "../../../osal/inc/mpp_mem.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #include "rc_base.h"
 #include "rc_debug.h"
 #include "rc_model_v2_smt.h"
-#include "mpp_rc.h"
+#include "../inc/mpp_rc.h"
 
 #define MAD_THDI 20
 #define LIMIT_QP_MORE_MOVE 30

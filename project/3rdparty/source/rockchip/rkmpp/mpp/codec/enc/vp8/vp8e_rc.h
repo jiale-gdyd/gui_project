@@ -17,8 +17,8 @@
 #ifndef __VP8E_RC_H__
 #define __VP8E_RC_H__
 
-#include "mpp_enc_cfg.h"
-#include "vp8e_syntax.h"
+#include "../../../inc/mpp_enc_cfg.h"
+#include "../../../common/vp8e_syntax.h"
 
 #ifdef  __cplusplus
 extern "C" {

@@ -21,16 +21,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
-#include "osal_2str.h"
+#include "../inc/mpp_env.h"
+#include "../inc/mpp_mem.h"
+#include "../inc/mpp_debug.h"
+#include "../inc/mpp_common.h"
+#include "../inc/osal_2str.h"
 
-#include "mpp_device_debug.h"
-#include "mpp_service_api.h"
-#include "mpp_service_impl.h"
-#include "mpp_server.h"
+#include "inc/mpp_device_debug.h"
+#include "../inc/mpp_service_api.h"
+#include "inc/mpp_service_impl.h"
+#include "../inc/mpp_server.h"
 
 typedef struct MppServiceQueryCfg_t {
     RK_U32      cmd_butt;

@@ -17,9 +17,9 @@
 #ifndef __H264E_SLICE_H__
 #define __H264E_SLICE_H__
 
-#include "mpp_enc_cfg.h"
+#include "../../../inc/mpp_enc_cfg.h"
 
-#include "h264e_syntax.h"
+#include "../../../common/h264e_syntax.h"
 #include "h264e_sps.h"
 #include "h264e_pps.h"
 

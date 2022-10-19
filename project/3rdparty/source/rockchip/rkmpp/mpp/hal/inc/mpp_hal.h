@@ -17,14 +17,14 @@
 #ifndef __MPP_HAL_H__
 #define __MPP_HAL_H__
 
-#include "rk_mpi_cmd.h"
+#include "rockchip/rkmpp/rk_mpi_cmd.h"
 
-#include "mpp_buf_slot.h"
-#include "mpp_platform.h"
+#include "../../base/inc/mpp_buf_slot.h"
+#include "../../../osal/inc/mpp_platform.h"
 
 #include "hal_dec_task.h"
-#include "mpp_dec_cfg.h"
-#include "mpp_device.h"
+#include "../../inc/mpp_dec_cfg.h"
+#include "../../../osal/inc/mpp_device.h"
 
 typedef enum VpuHwMode_e {
     MODE_NULL   = 0,

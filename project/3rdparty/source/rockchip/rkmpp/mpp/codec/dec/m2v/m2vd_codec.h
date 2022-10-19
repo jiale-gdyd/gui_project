@@ -17,7 +17,7 @@
 #ifndef __M2VD_CODEC_H__
 #define __M2VD_CODEC_H__
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 typedef struct M2VDContext_t {
     void        *parse_ctx;

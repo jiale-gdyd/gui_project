@@ -20,14 +20,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_platform.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
-#include "mpp_enc_hal.h"
+#include "../../inc/mpp_enc_hal.h"
 
 #include "hal_jpege_debug.h"
-#include "hal_jpege_api_v2.h"
+#include "../../inc/hal_jpege_api_v2.h"
 #include "hal_jpege_vepu1_v2.h"
 #include "hal_jpege_vepu2_v2.h"
 

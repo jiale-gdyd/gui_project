@@ -22,16 +22,16 @@
 #include <sys/types.h>
 #include <sys/syscall.h>
 
-#include "rk_mpi_cmd.h"
+#include "rockchip/rkmpp/rk_mpi_cmd.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_time.h"
-#include "mpp_debug.h"
-#include "mpp_thread.h"
-#include "mpp_common.h"
+#include "../osal/inc/mpp_env.h"
+#include "../osal/inc/mpp_mem.h"
+#include "../osal/inc/mpp_time.h"
+#include "../osal/inc/mpp_debug.h"
+#include "../osal/inc/mpp_thread.h"
+#include "../osal/inc/mpp_common.h"
 
-#include "mpp_impl.h"
+#include "inc/mpp_impl.h"
 
 #define MAX_FILE_NAME_LEN   512
 #define MAX_DUMP_WIDTH      960

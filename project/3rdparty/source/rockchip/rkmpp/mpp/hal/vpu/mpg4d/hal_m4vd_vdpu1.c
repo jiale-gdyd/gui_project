@@ -19,18 +19,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_buffer.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "rockchip/rkmpp/mpp_buffer.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "mpg4d_syntax.h"
-#include "hal_mpg4d_api.h"
+#include "../../../common/mpg4d_syntax.h"
+#include "../../inc/hal_mpg4d_api.h"
 #include "hal_m4vd_com.h"
 #include "hal_m4vd_vdpu1.h"
 #include "hal_m4vd_vdpu1_reg.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 static void vdpu1_mpg4d_setup_regs_by_syntax(hal_mpg4_ctx *ctx, MppSyntax syntax)
 {

@@ -17,10 +17,10 @@
 #ifndef __MPP_DEC_H__
 #define __MPP_DEC_H__
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "rk_mpi_cmd.h"
-#include "mpp_dec_cfg.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "rockchip/rkmpp/rk_mpi_cmd.h"
+#include "../../inc/mpp_dec_cfg.h"
 
 typedef enum MppDecEvent_e {
     MPP_DEC_EVENT_ON_PKT_RELEASE,

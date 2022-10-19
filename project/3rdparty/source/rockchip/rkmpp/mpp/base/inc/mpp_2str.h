@@ -18,8 +18,8 @@
 #ifndef __MPP_2STR_H__
 #define __MPP_2STR_H__
 
-#include "rk_type.h"
-#include "rk_venc_rc.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/rk_venc_rc.h"
 
 #ifdef  __cplusplus
 extern "C" {

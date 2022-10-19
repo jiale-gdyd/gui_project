@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #include "iep2_pd.h"
 #include "iep2_ff.h"

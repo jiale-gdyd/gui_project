@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "vepu580_tune.h"
+#include "../common/vepu580_tune.h"
 
 #define HAL_H264E_DBG_CONTENT           (0x00000200)
 #define hal_h264e_dbg_content(fmt, ...) hal_h264e_dbg_f(HAL_H264E_DBG_CONTENT, fmt, ## __VA_ARGS__)

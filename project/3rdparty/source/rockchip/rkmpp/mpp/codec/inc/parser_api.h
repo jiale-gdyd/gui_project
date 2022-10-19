@@ -17,12 +17,12 @@
 #ifndef __PARSER_API_H__
 #define __PARSER_API_H__
 
-#include "rk_mpi_cmd.h"
-#include "mpp_packet.h"
-#include "mpp_buf_slot.h"
-#include "mpp_dec_cfg.h"
-#include "hal_dec_task.h"
-#include "mpp_soc.h"
+#include "rockchip/rkmpp/rk_mpi_cmd.h"
+#include "rockchip/rkmpp/mpp_packet.h"
+#include "../../base/inc/mpp_buf_slot.h"
+#include "../../inc/mpp_dec_cfg.h"
+#include "../../hal/inc/hal_dec_task.h"
+#include "../../../osal/inc/mpp_soc.h"
 
 /*
  * slots    - all decoder need a slots interface to sync its internal dpb management

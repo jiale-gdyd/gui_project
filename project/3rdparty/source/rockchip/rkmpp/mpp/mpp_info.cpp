@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mpp_log.h"
-#include "mpp_env.h"
-#include "mpp_info.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../osal/inc/mpp_env.h"
+#include "inc/mpp_info.h"
 
 #include "version.h"
 

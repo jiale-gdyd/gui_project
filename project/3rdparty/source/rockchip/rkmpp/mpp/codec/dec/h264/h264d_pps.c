@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include "mpp_err.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 #include "h264d_pps.h"
 #include "h264d_scalist.h"

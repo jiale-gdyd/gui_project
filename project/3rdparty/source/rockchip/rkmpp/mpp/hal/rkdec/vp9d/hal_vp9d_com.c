@@ -16,10 +16,10 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_bitput.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitput.h"
 
-#include "vp9d_syntax.h"
+#include "../../../common/vp9d_syntax.h"
 #include "hal_vp9d_com.h"
 
 typedef struct {

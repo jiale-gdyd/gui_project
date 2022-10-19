@@ -24,17 +24,17 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_platform.h"
-#include "mpp_common.h"
-#include "osal_2str.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_platform.h"
+#include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/osal_2str.h"
 
-#include "dxva_syntax.h"
-#include "h264d_syntax.h"
+#include "../../../common/dxva_syntax.h"
+#include "../../../common/h264d_syntax.h"
 
 #include "hal_h264d_global.h"
-#include "hal_h264d_api.h"
+#include "../../inc/hal_h264d_api.h"
 
 #include "hal_h264d_rkv_reg.h"
 #include "hal_h264d_vdpu34x.h"

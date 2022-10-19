@@ -18,12 +18,12 @@
 
 #include <string.h>
 
-#include "mpp_log.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
-#include "mpp_frame_impl.h"
-#include "mpp_meta_impl.h"
-#include "mpp_mem_pool.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_common.h"
+#include "inc/mpp_frame_impl.h"
+#include "inc/mpp_meta_impl.h"
+#include "../../osal/inc/mpp_mem_pool.h"
 
 static const char *module_name = MODULE_TAG;
 static MppMemPool mpp_frame_pool = mpp_mem_pool_init_f(module_name, sizeof(MppFrameImpl));

@@ -19,13 +19,13 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_frame.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "rockchip/rkmpp/mpp_frame.h"
+#include "../../../../osal/inc/mpp_common.h"
 
-#include "jpegd_syntax.h"
+#include "../../../common/jpegd_syntax.h"
 #include "hal_jpegd_common.h"
 #include "hal_jpegd_rkv.h"
 #include "hal_jpegd_rkv_reg.h"

@@ -17,8 +17,8 @@
 #ifndef __HAL_TASK__
 #define __HAL_TASK__
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 
 typedef enum HalTaskStatus_e {
     TASK_IDLE,

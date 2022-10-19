@@ -17,7 +17,7 @@
 #ifndef __MPP_OPT_H__
 #define __MPP_OPT_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 /*
  * return zero or positive for option parser aproach step

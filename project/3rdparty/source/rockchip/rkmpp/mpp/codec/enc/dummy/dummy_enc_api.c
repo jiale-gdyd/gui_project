@@ -16,7 +16,7 @@
 */
 #define MODULE_TAG "dummy_enc_api"
 
-#include "dummy_enc_api.h"
+#include "../../inc/dummy_enc_api.h"
 
 
 

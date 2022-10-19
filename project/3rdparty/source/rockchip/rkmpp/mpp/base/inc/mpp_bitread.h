@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "mpp_err.h"
-#include "mpp_common.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../osal/inc/mpp_common.h"
 
 #define   __BITREAD_ERR   __bitread_error
 

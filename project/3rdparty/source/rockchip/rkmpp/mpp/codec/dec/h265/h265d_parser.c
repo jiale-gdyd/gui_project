@@ -27,14 +27,14 @@
 
 #define MODULE_TAG "H265D_PARSER"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
-#include "mpp_packet_impl.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../base/inc/mpp_bitread.h"
+#include "../../../base/inc/mpp_packet_impl.h"
 
 #include "h265d_parser.h"
-#include "h265d_syntax.h"
-#include "h265d_api.h"
+#include "../../../common/h265d_syntax.h"
+#include "../../inc/h265d_api.h"
 
 #define START_CODE 0x000001 ///< start_code_prefix_one_3bytes
 

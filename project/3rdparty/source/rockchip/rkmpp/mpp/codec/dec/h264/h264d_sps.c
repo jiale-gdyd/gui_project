@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
+#include "../../../../osal/inc/mpp_mem.h"
 
 #include "h264d_global.h"
 #include "h264d_sps.h"

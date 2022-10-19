@@ -19,8 +19,8 @@
 #ifndef _H264D_SCALIST_H_
 #define _H264D_SCALIST_H_
 
-#include "rk_type.h"
-#include "mpp_err.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
 #include "h264d_global.h"
 
 

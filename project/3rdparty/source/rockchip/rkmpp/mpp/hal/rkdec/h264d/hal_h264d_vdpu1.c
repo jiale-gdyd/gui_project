@@ -21,17 +21,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rk_type.h"
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_h264d_global.h"
-#include "hal_h264d_api.h"
+#include "../../inc/hal_h264d_api.h"
 #include "hal_h264d_vdpu_com.h"
 #include "hal_h264d_vdpu1.h"
 #include "hal_h264d_vdpu1_reg.h"
-#include "mpp_dec_cb_param.h"
+#include "../../../base/inc/mpp_dec_cb_param.h"
 
 const RK_U32 vdpu1_ref_idx[16] = {
     14, 15, 16, 17, 18, 19, 20, 21,

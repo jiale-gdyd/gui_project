@@ -17,7 +17,7 @@
 #ifndef __H265E_CONTEXT_TABLE_H__
 #define __H265E_CONTEXT_TABLE_H__
 
-#include "rk_type.h"
+#include "rockchip/rkmpp/rk_type.h"
 
 #define NUM_SPLIT_FLAG_CTX          3       ///< number of context models for split flag
 #define NUM_SKIP_FLAG_CTX           3       ///< number of context models for skip flag

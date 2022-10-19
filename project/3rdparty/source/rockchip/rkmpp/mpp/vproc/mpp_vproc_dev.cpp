@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "iep_common.h"
+#include "inc/iep_common.h"
 
-#include "mpp_common.h"
-#include "mpp_log.h"
+#include "../../osal/inc/mpp_common.h"
+#include "rockchip/rkmpp/mpp_log.h"
 
-#include "iep_api.h"
-#include "iep2_api.h"
+#include "inc/iep_api.h"
+#include "inc/iep2_api.h"
 
 struct dev_compatible dev_comp[] = {
     {

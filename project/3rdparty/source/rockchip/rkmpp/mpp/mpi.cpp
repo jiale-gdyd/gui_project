@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <linux/kconfig.h>
 #define MODULE_TAG "mpi"
 
 #include <string.h>
 
-#include "rk_mpi.h"
+#include "rockchip/rkmpp/rk_mpi.h"
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../osal/inc/mpp_env.h"
+#include "../osal/inc/mpp_mem.h"
+#include "../osal/inc/mpp_debug.h"
+#include "../osal/inc/mpp_common.h"
 
-#include "mpi_impl.h"
-#include "mpp_info.h"
+#include "inc/mpi_impl.h"
+#include "inc/mpp_info.h"
 
 RK_U32 mpi_debug = 0;
 
@@ -38,49 +38,49 @@ typedef struct {
 } MppCodingTypeInfo;
 
 static MppCodingTypeInfo support_list[] = {
-#if HAVE_MPEG2D
+#if defined(CONFIG_RKMPP_MPEG2D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMPEG2,      "dec",  "mpeg2",        },
 #endif
-#if HAVE_MPEG4D
+#if defined(CONFIG_RKMPP_MPEG4D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMPEG4,      "dec",  "mpeg4",        },
 #endif
-#if HAVE_H263D
+#if defined(CONFIG_RKMPP_H263D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingH263,       "dec",  "h.263",        },
 #endif
-#if HAVE_H264D
+#if defined(CONFIG_RKMPP_H264D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVC,        "dec",  "h.264/AVC",    },
 #endif
-#if HAVE_H265D
+#if defined(CONFIG_RKMPP_H265D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingHEVC,       "dec",  "h.265/HEVC",   },
 #endif
-#if HAVE_VP8D
+#if defined(CONFIG_RKMPP_VP8D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingVP8,        "dec",  "vp8",          },
 #endif
-#if HAVE_VP9D
+#if defined(CONFIG_RKMPP_VP9D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingVP9,        "dec",  "VP9",          },
 #endif
-#if HAVE_AVSD
+#if defined(CONFIG_RKMPP_AVSD)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVSPLUS,    "dec",  "avs+",         },
 #endif
-#if HAVE_AVS2D
+#if defined(CONFIG_RKMPP_AVS2D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVS2,       "dec",  "avs2",         },
 #endif
-#if HAVE_JPEGD
+#if defined(CONFIG_RKMPP_JPEGD)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMJPEG,      "dec",  "jpeg",         },
 #endif
-#if HAVE_AV1D
+#if defined(CONFIG_RKMPP_AV1D)
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAV1,        "dec",  "av1",          },
 #endif
-#if HAVE_H264E
+#if defined(CONFIG_RKMPP_H264E)
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingAVC,        "enc",  "h.264/AVC",    },
 #endif
-#if HAVE_JPEGE
+#if defined(CONFIG_RKMPP_JPEGE)
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingMJPEG,      "enc",  "jpeg",         },
 #endif
-#if HAVE_H265E
+#if defined(CONFIG_RKMPP_H265E)
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingHEVC,       "enc",  "h265",         },
 #endif
-#if HAVE_VP8E
+#if defined(CONFIG_RKMPP_VP8E)
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingVP8,        "enc",  "vp8",          }
 #endif
 };

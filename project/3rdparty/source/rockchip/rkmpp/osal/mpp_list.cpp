@@ -21,9 +21,9 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#include "mpp_log.h"
-#include "mpp_list.h"
-#include "mpp_common.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "inc/mpp_list.h"
+#include "inc/mpp_common.h"
 
 
 #define LIST_DEBUG(fmt, ...) mpp_log(fmt, ## __VA_ARGS__)

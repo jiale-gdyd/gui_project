@@ -21,11 +21,11 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "inc/mpp_debug.h"
+#include "inc/mpp_common.h"
 
-#include "mpp_soc.h"
-#include "mpp_platform.h"
+#include "inc/mpp_soc.h"
+#include "inc/mpp_platform.h"
 
 #define MAX_SOC_NAME_LENGTH     128
 

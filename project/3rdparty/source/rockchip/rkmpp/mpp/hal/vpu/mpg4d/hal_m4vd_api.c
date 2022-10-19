@@ -22,13 +22,13 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-#include "mpp_err.h"
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_debug.h"
-#include "mpp_platform.h"
+#include "rockchip/rkmpp/mpp_err.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_debug.h"
+#include "../../../../osal/inc/mpp_platform.h"
 
-#include "hal_mpg4d_api.h"
+#include "../../inc/hal_mpg4d_api.h"
 #include "hal_m4vd_com.h"
 
 #include "hal_m4vd_vdpu1.h"

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include "mpp_2str.h"
-#include "h264_syntax.h"
-#include "h265_syntax.h"
+#include "inc/mpp_2str.h"
+#include "../common/h264_syntax.h"
+#include "../common/h265_syntax.h"
 
 const char *strof_ctx_type(MppCtxType type)
 {

@@ -19,8 +19,8 @@
 
 #include <stdio.h>
 
-#include "mpp_debug.h"
-#include "mpp_frame.h"
+#include "../osal/inc/mpp_debug.h"
+#include "rockchip/rkmpp/mpp_frame.h"
 
 typedef struct OptionInfo_t {
     const char*     name;

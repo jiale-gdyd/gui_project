@@ -19,10 +19,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "mpp_env.h"
-#include "mpp_log.h"
-#include "mpp_common.h"
-#include "mpp_runtime.h"
+#include "inc/mpp_env.h"
+#include "rockchip/rkmpp/mpp_log.h"
+#include "inc/mpp_common.h"
+#include "inc/mpp_runtime.h"
 
 #define MAX_DTS_PATH_LEN        256
 

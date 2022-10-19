@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_common.h"
 #include "hal_h264d_vdpu_com.h"
 
 const RK_U32 vdpu_cabac_table[VDPU_CABAC_TAB_SIZE / 4] = {

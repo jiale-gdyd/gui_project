@@ -17,7 +17,7 @@
 #ifndef __HAL_AV1D_VDPU_H__
 #define __HAL_AV1D_VDPU_H__
 
-#include "mpp_hal.h"
+#include "../../inc/mpp_hal.h"
 
 #ifdef __cplusplus
 extern "C" {

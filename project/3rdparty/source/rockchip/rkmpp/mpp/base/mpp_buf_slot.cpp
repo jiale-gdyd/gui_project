@@ -18,14 +18,14 @@
 
 #include <string.h>
 
-#include "mpp_mem.h"
-#include "mpp_env.h"
-#include "mpp_list.h"
-#include "mpp_debug.h"
-#include "mpp_common.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "../../osal/inc/mpp_env.h"
+#include "../../osal/inc/mpp_list.h"
+#include "../../osal/inc/mpp_debug.h"
+#include "../../osal/inc/mpp_common.h"
 
-#include "mpp_frame_impl.h"
-#include "mpp_buf_slot.h"
+#include "inc/mpp_frame_impl.h"
+#include "inc/mpp_buf_slot.h"
 
 
 #define BUF_SLOT_DBG_FUNCTION           (0x00000001)

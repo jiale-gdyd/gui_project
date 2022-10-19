@@ -19,16 +19,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mpp_env.h"
-#include "mpp_mem.h"
-#include "mpp_common.h"
+#include "../../../../osal/inc/mpp_env.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_common.h"
 
 #include "hal_vp9d_debug.h"
 #include "hal_vp9d_ctx.h"
 #include "hal_vp9d_com.h"
 #include "hal_vp9d_rkv.h"
 #include "hal_vp9d_rkv_reg.h"
-#include "vp9d_syntax.h"
+#include "../../../common/vp9d_syntax.h"
 
 
 typedef struct Vp9dRkvCtx_t {

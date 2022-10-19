@@ -17,7 +17,7 @@
 #ifndef __OS_ALLOCATOR_H__
 #define __OS_ALLOCATOR_H__
 
-#include "mpp_allocator.h"
+#include "inc/mpp_allocator.h"
 
 typedef MPP_RET (*OsAllocatorFunc)(void *ctx, MppBufferInfo *info);
 

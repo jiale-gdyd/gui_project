@@ -18,9 +18,9 @@
 
 #include <string.h>
 
-#include "rk_type.h"
-#include "mpp_hal.h"
-#include "mpp_platform.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "../../inc/mpp_hal.h"
+#include "../../../../osal/inc/mpp_platform.h"
 #include "hal_vp8d_vdpu1.h"
 #include "hal_vp8d_vdpu2.h"
 

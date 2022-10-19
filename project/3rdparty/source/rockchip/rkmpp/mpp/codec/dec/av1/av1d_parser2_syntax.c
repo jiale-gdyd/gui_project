@@ -19,7 +19,7 @@
 #include <string.h>
 
 #include "av1d_parser.h"
-#include "av1d_syntax.h"
+#include "../../../common/av1d_syntax.h"
 
 static int av1d_fill_picparams(Av1CodecContext *ctx, DXVA_PicParams_AV1 *pp)
 {

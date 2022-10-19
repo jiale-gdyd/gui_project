@@ -17,9 +17,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "rk_type.h"
-#include "mpp_mem.h"
-#include "mpp_bitread.h"
+#include "rockchip/rkmpp/rk_type.h"
+#include "../../osal/inc/mpp_mem.h"
+#include "inc/mpp_bitread.h"
 
 static MPP_RET update_curbyte_default(BitReadCtx_t *bitctx)
 {
