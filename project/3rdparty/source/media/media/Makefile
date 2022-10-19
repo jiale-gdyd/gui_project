@@ -22,6 +22,8 @@ obj-y += guard/
 obj-$(CONFIG_RKMPP) += rkmpp/
 obj-$(CONFIG_RKRGA) += rkrga/
 
+obj-y += osd/
+
 obj-y += drm_media_vo.o
 obj-y += drm_media_api.o
 obj-y += drm_media_buffer.o

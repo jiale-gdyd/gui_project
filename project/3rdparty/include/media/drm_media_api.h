@@ -95,6 +95,23 @@ int drm_mpi_vmix_get_channel_region_luma(int device, int channel, const drm_vide
 int drm_mpi_vmix_region_set_cover(int device, int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo);
 int drm_mpi_vmix_region_set_bitmap(int device, int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap);
 
+int drm_mpi_vdec_destroy_channel(int channel);
+int drm_mpi_vdec_create_channel(int channel, const drm_vdec_chn_attr_t *pstAttr);
+
+int drm_mpi_venc_destroy_channel(int channel);
+int drm_mpi_venc_create_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr);
+
+int drm_mpi_venc_set_gop_mode(int channel, drm_venc_gop_attr_t *pstGopModeAttr);
+int drm_mpi_venc_set_fps(int channel, uint8_t u8OutNum, uint8_t u8OutDen, uint8_t u8InNum, uint8_t u8InDen);
+int drm_mpi_venc_set_bitrate(int channel, uint32_t u32BitRate, uint32_t u32MinBitRate, uint32_t u32MaxBitRate);
+int drm_mpi_venc_set_avc_profile(int channel, uint32_t u32Profile, uint32_t u32Level);
+int drm_mpi_venc_set_resolution(int channel, drm_venc_resolution_param_t stResolutionParam);
+int drm_mpi_venc_set_rotation(int channel, drm_venc_rotation_e rotation_rate);
+int drm_mpi_venc_set_rc_mode(int channel, drm_venc_rc_mode_e RcMode);
+
+int drm_mpi_venc_get_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr);
+int drm_mpi_venc_set_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr);
+
 #ifdef __cplusplus
 }
 #endif

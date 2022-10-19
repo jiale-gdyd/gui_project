@@ -36,6 +36,7 @@
 #include <media/utils/media_config.h>
 
 #include "media_utils.h"
+#include "osd/color_table.h"
 #include "drm_media_buffer_impl.h"
 
 #ifdef __cplusplus
@@ -3009,6 +3010,1572 @@ int drm_mpi_vmix_region_set_bitmap(int device, int channel, const drm_osd_region
     g_vmix_dev[device].VmixMtx.unlock();
 
     return 0;
+}
+
+static int parse_split_attribute(drm_video_mode_e enVideoMode)
+{
+    int split = 0;
+
+    switch (enVideoMode) {
+        case VIDEO_MODE_STREAM:
+            split = 1;
+            break;
+
+        case VIDEO_MODE_FRAME:
+            split = 0;
+            break;
+
+        case VIDEO_MODE_COMPAT:
+        default:
+            split = -1;
+    }
+
+    return split;
+}
+
+int drm_mpi_vdec_destroy_channel(int channel)
+{
+    if ((channel < DRM_VDEC_CHANNEL_00) || (channel >= DRM_VDEC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vdec_mtx.lock();
+    if (g_vdec_chns[channel].status == CHN_STATUS_BIND) {
+        g_vdec_mtx.unlock();
+        return -2;
+    }
+
+    g_vdec_chns[channel].media_flow.reset();
+    clear_media_channel_buffer(&g_vdec_chns[channel]);
+    g_vdec_chns[channel].status = CHN_STATUS_CLOSED;
+    g_vdec_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_vdec_create_channel(int channel, const drm_vdec_chn_attr_t *pstAttr)
+{
+    if ((channel < DRM_VDEC_CHANNEL_00) || (channel >= DRM_VDEC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstAttr) {
+        return -2;
+    }
+
+    int split = 0;
+    int timeout = 0;
+    std::string flow_name;
+    std::string flow_param;
+    std::shared_ptr<libdrm::Flow> video_decoder_flow;
+
+    flow_name = "video_dec";
+    flow_param = "";
+
+    if (pstAttr->enDecodecMode == VIDEO_DECODEC_HADRWARE) {
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+    } else if (pstAttr->enDecodecMode == VIDEO_DECODEC_SOFTWARE) {
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkaudio_vid");
+        PARAM_STRING_APPEND(flow_param, DRM_KEK_THREAD_SYNC_MODEL, DRM_KEY_SYNC);
+    } else {
+        return -3;
+    }
+
+    switch (pstAttr->enCodecType) {
+        case DRM_CODEC_TYPE_H264:
+        case DRM_CODEC_TYPE_H265:
+            split = parse_split_attribute(pstAttr->enMode);
+            break;
+
+        case DRM_CODEC_TYPE_JPEG:
+        case DRM_CODEC_TYPE_MJPEG:
+            if (pstAttr->enMode == VIDEO_MODE_STREAM) {
+                DRM_MEDIA_LOGE("JPEG/MJPEG only support VIDEO_MODE_FRAME");
+                return -4;
+            }
+            split = parse_split_attribute(pstAttr->enMode);
+            break;
+
+        default:
+            DRM_MEDIA_LOGE("Not support CodecType:[%d]", pstAttr->enCodecType);
+            return -5;
+    }
+
+    if (split < 0) {
+        DRM_MEDIA_LOGE("Not support split mode:[%d]", pstAttr->enMode);
+        return -6;
+    } else if (split == 0) {
+        timeout = -1;
+    }
+
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, CodecToString(pstAttr->enCodecType));
+    // PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, ImageTypeToString(pstAttr->enImageType));
+
+    std::string dec_param = "";
+    PARAM_STRING_APPEND(dec_param, DRM_KEY_INPUTDATATYPE, CodecToString(pstAttr->enCodecType));
+
+    PARAM_STRING_APPEND_TO(dec_param, DRM_KEY_MPP_SPLIT_MODE, split);
+    PARAM_STRING_APPEND_TO(dec_param, DRM_KEY_OUTPUT_TIMEOUT, timeout);
+
+    g_vdec_mtx.lock();
+    if (g_vdec_chns[channel].status != CHN_STATUS_CLOSED) {
+        g_vdec_mtx.unlock();
+        return -7;
+    }
+
+    DRM_MEDIA_LOGI("Enable vdec channel:[%d] starting......", channel);
+
+    memcpy(&g_vdec_chns[channel].vdec_attr, pstAttr, sizeof(drm_vdec_chn_attr_t));
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, dec_param);
+    DRM_MEDIA_LOGD("VDEC: flow param:[%s]", flow_param.c_str());
+
+    video_decoder_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+    if (!video_decoder_flow) {
+        DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+
+        g_vdec_mtx.unlock();
+        g_vdec_chns[channel].status = CHN_STATUS_CLOSED;
+
+        return -8;
+    }
+
+    g_vdec_chns[channel].media_flow = video_decoder_flow;
+    init_media_channel_buffer(&g_vdec_chns[channel]);
+    g_vdec_chns[channel].status = CHN_STATUS_OPEN;
+    g_vdec_chns[channel].media_flow->SetOutputCallBack(&g_vdec_chns[channel], flow_output_callback);
+    g_vdec_mtx.unlock();
+
+    DRM_MEDIA_LOGI("Enable vdec channel:[%d] finished......", channel);
+
+    return 0;
+}
+
+static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
+{
+    std::shared_ptr<libdrm::Flow> video_rga_flow;
+    std::shared_ptr<libdrm::Flow> video_jpeg_flow;
+    std::shared_ptr<libdrm::Flow> video_encoder_flow;
+    std::shared_ptr<libdrm::Flow> video_decoder_flow;
+
+    int s32ZoomWidth = 0;
+    int s32ZoomHeight = 0;
+    int s32ZoomVirWidth = 0;
+    int s32ZoomVirHeight = 0;
+    bool bEnableRga = false;
+    bool bSupportDcf = false;
+    bool bEnableH265 = false;
+    uint32_t u32InFpsNum = 1;
+    uint32_t u32InFpsDen = 1;
+    uint32_t u32OutFpsNum = 1;
+    uint32_t u32OutFpsDen = 1;
+    const char *pcRkmediaRcMode = nullptr;
+    const char *pcRkmediaCodecType = nullptr;
+    VENC_CHN_ATTR_S *stVencChnAttr = &VenChn->venc_attr.attr;
+    VENC_CHN_PARAM_S *stVencChnParam = &VenChn->venc_attr.param;
+    VENC_ROTATION_E enRotation = stVencChnAttr->stVencAttr.enRotation;
+
+    int mjpeg_bps = 0;
+    int pre_enc_bps = 2000000;
+    int video_width = stVencChnAttr->stVencAttr.u32PicWidth;
+    int video_height = stVencChnAttr->stVencAttr.u32PicHeight;
+    int vir_width = stVencChnAttr->stVencAttr.u32VirWidth;
+    int vir_height = stVencChnAttr->stVencAttr.u32VirHeight;
+
+    std::string pixel_format = ImageTypeToString(stVencChnAttr->stVencAttr.imageType);
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegCbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen;
+            pcRkmediaRcMode = DRM_KEY_CBR;
+        } else if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGVBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegVbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateDen;
+            pcRkmediaRcMode = DRM_KEY_VBR;
+        } else {
+            DRM_MEDIA_LOGE("Invalid RcMode:[%d]", stVencChnAttr->stRcAttr.enRcMode);
+            return -1;
+        }
+
+        if ((mjpeg_bps < 2000) || (mjpeg_bps > 100000000)) {
+            DRM_MEDIA_LOGE("Invalid BitRate[%d], should be:[2000, 100000000]", mjpeg_bps);
+            return -2;
+        }
+
+        if (!u32InFpsNum) {
+            DRM_MEDIA_LOGE("Invalid src frame rate:[%d/%d]", u32InFpsNum, u32InFpsDen);
+            return -3;
+        }
+
+        if (!u32OutFpsNum) {
+            DRM_MEDIA_LOGE("Invalid dst frame rate:[%d/%d]", u32OutFpsNum, u32OutFpsDen);
+            return -4;
+        }
+
+        pcRkmediaCodecType = DRM_VIDEO_MJPEG;
+        s32ZoomWidth = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomWidth;
+        s32ZoomHeight = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomHeight;
+        s32ZoomVirWidth = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomVirWidth;
+        s32ZoomVirHeight = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomVirHeight;
+    } else {
+        pcRkmediaCodecType = DRM_IMAGE_JPEG;
+        s32ZoomWidth = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomWidth;
+        s32ZoomHeight = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomHeight;
+        s32ZoomVirWidth = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomVirWidth;
+        s32ZoomVirHeight = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomVirHeight;
+        bSupportDcf = stVencChnAttr->stVencAttr.stAttrJpege.bSupportDCF;
+    }
+
+    std::string enc_param = "";
+    std::string flow_param = "";
+    std::string flow_name = "video_enc";
+
+    std::string str_fps_in;
+    str_fps_in.append(std::to_string(u32InFpsNum)).append("/").append(std::to_string(u32InFpsDen));
+
+    std::string str_fps_out;
+    str_fps_out.append(std::to_string(u32OutFpsNum)).append("/").append(std::to_string(u32OutFpsDen));
+
+    if ((stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_FBC0)
+        || (stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_FBC2)
+        || (stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_NV16))
+    {
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, pixel_format);
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, DRM_VIDEO_H265);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, video_width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, video_height);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, vir_width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_HEIGHT, vir_height);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, video_width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, video_height);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, pre_enc_bps);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, pre_enc_bps);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MIN, pre_enc_bps);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_VIDEO_GOP, "1");
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps_out);
+ 
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_FIXQP);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_QP_INIT, "15");
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ROTATION, enRotation);
+
+        flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
+        DRM_MEDIA_LOGD("JPEG: Pre encoder flow param:[%s]", flow_param.c_str());
+
+        video_encoder_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+        if (!video_encoder_flow) {
+            DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+            return -5;
+        }
+
+        flow_name = "video_dec";
+        flow_param = "";
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, DRM_VIDEO_H265);
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, DRM_IMAGE_NV12);
+
+        std::string dec_param = "";
+        PARAM_STRING_APPEND(dec_param, DRM_KEY_INPUTDATATYPE, DRM_VIDEO_H265);
+        PARAM_STRING_APPEND_TO(dec_param, DRM_KEY_MPP_SPLIT_MODE, 0);
+        PARAM_STRING_APPEND_TO(dec_param, DRM_KEY_OUTPUT_TIMEOUT, -1);
+
+        flow_param = libdrm::JoinFlowParam(flow_param, 1, dec_param);
+        DRM_MEDIA_LOGD("JPEG: Pre decoder flow param:[%s]", flow_param.c_str());
+
+        video_decoder_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+        if (!video_decoder_flow) {
+            DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+            return -6;
+        }
+
+        bEnableH265 = true;
+    }
+
+    int jpeg_width = video_width;
+    int jpeg_height = video_height;
+    int s32RgaWidth = s32ZoomWidth;
+    int s32RgaHeight = s32ZoomHeight;
+    int s32RgaVirWidht = DRM_UPALIGNTO16(s32ZoomVirWidth);
+    int s32RgaVirHeight = DRM_UPALIGNTO16(s32ZoomVirHeight);
+
+    if ((enRotation == VENC_ROTATION_90) || (enRotation == VENC_ROTATION_270)) {
+        jpeg_width = video_height;
+        jpeg_height = video_width;
+        s32RgaWidth = s32ZoomHeight;
+        s32RgaHeight = s32ZoomWidth;
+        s32RgaVirWidht = DRM_UPALIGNTO16(s32ZoomVirHeight);
+        s32RgaVirHeight = DRM_UPALIGNTO16(s32ZoomVirWidth);
+    }
+
+    int jpeg_vir_height = DRM_UPALIGNTO(jpeg_height, 8);
+    int jpeg_vir_width = DRM_UPALIGNTO(jpeg_width, 256);
+    if (((jpeg_vir_width / 256) % 2) == 0) {
+        jpeg_vir_width += 256;
+    }
+
+    if ((s32RgaWidth > 0) && (s32RgaHeight > 0) && (s32RgaVirWidht > 0)
+        && (s32RgaVirHeight > 0)
+        && ((s32RgaWidth != video_width) || (s32RgaHeight != video_height)
+        || (s32RgaVirWidht != vir_width) || (s32RgaVirHeight != vir_height)))
+    {
+        flow_name = "filter";
+        flow_param = "";
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkrga");
+
+        if (!bEnableH265) {
+            PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, pixel_format);
+        } else {
+            PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, DRM_IMAGE_NV12);
+        }
+
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, DRM_IMAGE_NV12);
+        PARAM_STRING_APPEND_TO(flow_param, DRM_KEY_BUFFER_WIDTH, s32RgaWidth);
+        PARAM_STRING_APPEND_TO(flow_param, DRM_KEY_BUFFER_HEIGHT, s32RgaHeight);
+        PARAM_STRING_APPEND_TO(flow_param, DRM_KEY_BUFFER_VIR_WIDTH, s32RgaVirWidht);
+        PARAM_STRING_APPEND_TO(flow_param, DRM_KEY_BUFFER_VIR_HEIGHT, s32RgaVirHeight);
+        PARAM_STRING_APPEND(flow_param, DRM_KEY_MEM_TYPE, DRM_KEY_MEM_HARDWARE);
+        PARAM_STRING_APPEND_TO(flow_param, DRM_KEY_MEM_CNT, 2);
+
+        std::string filter_param = "";
+        DrmImageRect src_rect = {0, 0, jpeg_width, jpeg_height};
+        DrmImageRect dst_rect = {0, 0, s32RgaWidth, s32RgaHeight};
+
+        std::vector<DrmImageRect> rect_vect;
+        rect_vect.push_back(src_rect);
+        rect_vect.push_back(dst_rect);
+
+        PARAM_STRING_APPEND(filter_param, DRM_KEY_BUFFER_RECT, libdrm::TwoImageRectToString(rect_vect).c_str());
+        PARAM_STRING_APPEND_TO(filter_param, DRM_KEY_BUFFER_ROTATE, 0);
+
+        flow_param = libdrm::JoinFlowParam(flow_param, 1, filter_param);
+        DRM_MEDIA_LOGD("JPEG: Pre process flow param:[%s]", flow_param.c_str());
+
+        video_rga_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+        if (!video_rga_flow) {
+            DRM_MEDIA_LOGE("Create flow filter:rga failed");
+            return -7;
+        }
+
+        bEnableRga = true;
+        jpeg_width = s32RgaWidth;
+        jpeg_height = s32RgaHeight;
+        jpeg_vir_width = s32RgaVirWidht;
+        jpeg_vir_height = s32RgaVirHeight;
+    }
+
+    flow_name = "video_enc";
+    flow_param = "";
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, DRM_IMAGE_NV12);
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcRkmediaCodecType);
+
+    enc_param = "";
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, jpeg_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, jpeg_height);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, jpeg_vir_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_HEIGHT, jpeg_vir_height);
+
+    if (stVencChnParam->stCropCfg.bEnable) {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, stVencChnParam->stCropCfg.stRect.s32X);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, stVencChnParam->stCropCfg.stRect.s32Y);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, stVencChnParam->stCropCfg.stRect.u32Width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, stVencChnParam->stCropCfg.stRect.u32Height);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, jpeg_width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, jpeg_height);
+    }
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, mjpeg_bps);
+        } else {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, mjpeg_bps);
+        }
+
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps_out);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_out);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcRkmediaRcMode);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_QFACTOR, 50);
+
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ENABLE_JPEG_DCF, bSupportDcf);
+        if (stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum > 0) {
+            PARAM_STRING_APPEND_TO( enc_param, DRM_KEY_JPEG_MPF_CNT, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF0_W, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[0].u32Width);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF0_H, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[0].u32Height);
+        }
+
+        if (stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum > 1) {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF1_W, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[1].u32Width);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF1_H, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[1].u32Height);
+        }
+    }
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
+    DRM_MEDIA_LOGD("JPEG: Type:[%s] encoder flow param:[%s]", pcRkmediaCodecType, flow_param.c_str());
+
+    video_jpeg_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+    if (!video_jpeg_flow) {
+        DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+        return -8;
+    }
+
+    if (bEnableH265) {
+        video_encoder_flow->SetFlowTag("JpegPreEncoder");
+        video_decoder_flow->SetFlowTag("JpegPreDecoder");
+    }
+
+    video_jpeg_flow->SetFlowTag("JpegEncoder");
+    if (bEnableRga) {
+        video_rga_flow->SetFlowTag("JpegRgaFilter");
+    }
+
+    if (bEnableRga) {
+        video_rga_flow->AddDownFlow(video_jpeg_flow, 0, 0);
+        if (bEnableH265) {
+            video_decoder_flow->AddDownFlow(video_rga_flow, 0, 0);
+        }
+    } else {
+        video_decoder_flow->AddDownFlow(video_jpeg_flow, 0, 0);
+    }
+
+    if (bEnableH265) {
+        video_encoder_flow->AddDownFlow(video_decoder_flow, 0, 0);
+    }
+
+    init_media_channel_buffer(VenChn);
+    video_jpeg_flow->SetOutputCallBack(VenChn, flow_output_callback);
+
+    if (bEnableH265) {
+        VenChn->media_flow = video_encoder_flow;
+        VenChn->media_flow_list.push_back(video_decoder_flow);
+    } else {
+        VenChn->media_flow = video_rga_flow;
+    }
+
+    if (bEnableRga) {
+        VenChn->media_flow_list.push_back(video_rga_flow);
+    }
+    VenChn->media_flow_list.push_back(video_jpeg_flow);
+
+    if (pipe2(VenChn->wake_fd, O_CLOEXEC) == -1) {
+        VenChn->wake_fd[0] = 0;
+        VenChn->wake_fd[1] = 0;
+        DRM_MEDIA_LOGW("Create pipe failed");
+    }
+
+    VenChn->status = CHN_STATUS_OPEN;
+    VenChn->venc_attr.bFullFunc = true;
+
+    return 0;
+}
+
+static int create_media_jpeg_light(drm_media_channel_t *VenChn)
+{
+    VENC_CHN_ATTR_S *stVencChnAttr = &VenChn->venc_attr.attr;
+    VENC_CHN_PARAM_S *stVencChnParam = &VenChn->venc_attr.param;
+
+    if ((stVencChnAttr->stVencAttr.enType != DRM_CODEC_TYPE_JPEG) && (stVencChnAttr->stVencAttr.enType != DRM_CODEC_TYPE_MJPEG)) {
+        return -1;
+    }
+
+    int mjpeg_bps = 0;
+    uint32_t u32InFpsNum = 1;
+    uint32_t u32InFpsDen = 1;
+    uint32_t u32OutFpsNum = 1;
+    uint32_t u32OutFpsDen = 1;
+    bool bSupprtDcf = false;
+    const char *pcRkmediaRcMode = nullptr;
+    const char *pcRkmediaCodecType = nullptr;
+    std::shared_ptr<libdrm::Flow> video_jpeg_flow;
+    int video_width = stVencChnAttr->stVencAttr.u32PicWidth;
+    int video_height = stVencChnAttr->stVencAttr.u32PicHeight;
+    int vir_width = stVencChnAttr->stVencAttr.u32VirWidth;
+    int vir_height = stVencChnAttr->stVencAttr.u32VirHeight;
+    std::string pixel_format = ImageTypeToString(stVencChnAttr->stVencAttr.imageType);
+    VENC_ROTATION_E enRotation = stVencChnAttr->stVencAttr.enRotation;
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegCbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen;
+            pcRkmediaRcMode = DRM_KEY_CBR;
+        } else if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGVBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegVbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateDen;
+            pcRkmediaRcMode = DRM_KEY_VBR;
+        } else {
+            DRM_MEDIA_LOGE("Invalid RcMode:[%d]", stVencChnAttr->stRcAttr.enRcMode);
+            return -2;
+        }
+
+        if ((mjpeg_bps < 2000) || (mjpeg_bps > 100000000)) {
+            DRM_MEDIA_LOGE("Invalid BitRate:[%d], should be:[2000, 100000000]", mjpeg_bps);
+            return -3;
+        }
+
+        if (!u32InFpsNum) {
+            DRM_MEDIA_LOGE("Invalid src frame rate:[%d/%d]", u32InFpsNum, u32InFpsDen);
+            return -4;
+        }
+
+        if (!u32OutFpsNum) {
+            DRM_MEDIA_LOGE("Invalid dst frame rate:[%d/%d]", u32OutFpsNum, u32OutFpsDen);
+            return -5;
+        }
+
+        pcRkmediaCodecType = DRM_VIDEO_MJPEG;
+    } else {
+        bSupprtDcf = stVencChnAttr->stVencAttr.stAttrJpege.bSupportDCF;
+        pcRkmediaCodecType = DRM_IMAGE_JPEG;
+    }
+
+    std::string enc_param = "";
+    std::string flow_param = "";
+    std::string flow_name = "video_enc";
+
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, pixel_format);
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcRkmediaCodecType);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, video_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, video_height);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, vir_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_HEIGHT, vir_height);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ROTATION, enRotation);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ENABLE_JPEG_DCF, bSupprtDcf);
+
+    if (stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum > 0) {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF_CNT, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF0_W, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[0].u32Width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF0_H, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[0].u32Height);
+    }
+
+    if (stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.u8LargeThumbNailNum > 1) {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF1_W, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[1].u32Width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_MPF1_H, stVencChnAttr->stVencAttr.stAttrJpege.stMPFCfg.astLargeThumbNailSize[1].u32Height);
+    }
+
+    if (stVencChnParam->stCropCfg.bEnable) {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, stVencChnParam->stCropCfg.stRect.s32X);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, stVencChnParam->stCropCfg.stRect.s32Y);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, stVencChnParam->stCropCfg.stRect.u32Width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, stVencChnParam->stCropCfg.stRect.u32Height);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, video_width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, video_height);
+    }
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        std::string str_fps_in;
+        str_fps_in.append(std::to_string(u32InFpsNum)).append("/").append(std::to_string(u32InFpsDen));
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+        std::string str_fps_out;
+        str_fps_out.append(std::to_string(u32OutFpsNum)).append("/").append(std::to_string(u32OutFpsDen));
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps_out);
+
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, mjpeg_bps);
+        } else {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, mjpeg_bps);
+        }
+
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcRkmediaRcMode);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_QFACTOR, 50);
+    }
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
+    DRM_MEDIA_LOGD("JPEG-LT: Type:[%s] encoder flow param:[%s]", pcRkmediaCodecType, flow_param.c_str());
+
+    video_jpeg_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+    if (!video_jpeg_flow) {
+        DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+        g_venc_mtx.unlock();
+        return -6;
+    }
+
+    video_jpeg_flow->SetFlowTag("JpegLightEncoder");
+    init_media_channel_buffer(VenChn);
+    video_jpeg_flow->SetOutputCallBack(VenChn, flow_output_callback);
+
+    VenChn->media_flow = video_jpeg_flow;
+    VenChn->media_flow_list.push_back(video_jpeg_flow);
+    if (pipe2(VenChn->wake_fd, O_CLOEXEC) == -1) {
+        VenChn->wake_fd[0] = 0;
+        VenChn->wake_fd[1] = 0;
+
+        DRM_MEDIA_LOGW("Create pipe failed");
+    }
+
+    VenChn->status = CHN_STATUS_OPEN;
+    VenChn->venc_attr.bFullFunc = false;
+
+    return 0;
+}
+
+int drm_mpi_venc_destroy_channel(int channel)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status == CHN_STATUS_BIND) {
+        g_venc_mtx.unlock();
+        return -2;
+    }
+
+    while (g_venc_chns[channel].chn_ref_cnt) {
+        g_venc_mtx.unlock();
+        DRM_MEDIA_LOGI("wait ven channel:[%d] chn_ref_cnt to be zero...", channel);
+
+        libdrm::msleep(100);
+        g_venc_mtx.lock();
+    }
+
+    DRM_MEDIA_LOGI("Disable venc channel:[%d] starting......", channel);
+
+    std::shared_ptr<libdrm::Flow> ptrFlowHead = NULL;
+    while (!g_venc_chns[channel].media_flow_list.empty()) {
+        auto ptrRkmediaFlow0 = g_venc_chns[channel].media_flow_list.back();
+        g_venc_chns[channel].media_flow_list.pop_back();
+
+        if (!g_venc_chns[channel].media_flow_list.empty()) {
+            auto ptrRkmediaFlow1 = g_venc_chns[channel].media_flow_list.back();
+            ptrRkmediaFlow1->RemoveDownFlow(ptrRkmediaFlow0);
+        } else {
+            ptrFlowHead = ptrRkmediaFlow0;
+            break;
+        }
+
+        ptrRkmediaFlow0.reset();
+    }
+
+    if (g_venc_chns[channel].media_flow) {
+        if (ptrFlowHead) {
+            g_venc_chns[channel].media_flow->RemoveDownFlow(ptrFlowHead);
+            ptrFlowHead.reset();
+        }
+
+        g_venc_chns[channel].media_flow.reset();
+    }
+
+    clear_media_channel_buffer(&g_venc_chns[channel]);
+    g_venc_chns[channel].status = CHN_STATUS_CLOSED;
+
+    if (g_venc_chns[channel].wake_fd[0] > 0) {
+        close(g_venc_chns[channel].wake_fd[0]);
+        g_venc_chns[channel].wake_fd[0] = 0;
+    }
+
+    if (g_venc_chns[channel].wake_fd[1] > 0) {
+        close(g_venc_chns[channel].wake_fd[1]);
+        g_venc_chns[channel].wake_fd[1] = 0;
+    }
+    g_venc_mtx.unlock();
+
+    DRM_MEDIA_LOGI("Disable venc channl:[%d] finished......", channel);
+
+    return 0;
+}
+
+int drm_mpi_venc_create_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!stVencChnAttr) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status != CHN_STATUS_CLOSED) {
+        g_venc_mtx.unlock();
+        return -3;
+    }
+
+    DRM_MEDIA_LOGI("Enable venc channel:[%d], type:[%d] starting......", channel, stVencChnAttr->stVencAttr.enType);
+
+    if ((stVencChnAttr->stVencAttr.enRotation != VENC_ROTATION_0)
+        && (stVencChnAttr->stVencAttr.enRotation != VENC_ROTATION_90)
+        && (stVencChnAttr->stVencAttr.enRotation != VENC_ROTATION_180)
+        && (stVencChnAttr->stVencAttr.enRotation != VENC_ROTATION_270))
+    {
+        DRM_MEDIA_LOGW("venc channel:[%d] rotation invalid, use default 0", channel);
+        stVencChnAttr->stVencAttr.enRotation = VENC_ROTATION_0;
+    }
+
+    memset(&g_venc_chns[channel].venc_attr, 0x00, sizeof(venc_channel_attr_t));
+    memcpy(&g_venc_chns[channel].venc_attr.attr, stVencChnAttr, sizeof(drm_venc_chn_attr_t));
+
+    if ((stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_JPEG) || (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG)) {
+        int ret;
+        if ((stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_FBC0)
+            || (stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_FBC2)
+            || (stVencChnAttr->stVencAttr.imageType == DRM_IMAGE_TYPE_NV16)
+            || ((stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomWidth)
+            && (stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomWidth != stVencChnAttr->stVencAttr.u32PicWidth)))
+        {
+            ret = create_media_jpeg_snap_pipeline(&g_venc_chns[channel]);
+        } else {
+            ret = create_media_jpeg_light(&g_venc_chns[channel]);
+        }
+        g_venc_mtx.unlock();
+
+        DRM_MEDIA_LOGI("Enable venc channel:[%d], type:[%d] finished......", channel, stVencChnAttr->stVencAttr.enType);
+        return ret;
+    }
+
+    std::string flow_param;
+    std::string flow_name = "video_enc";
+
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, ImageTypeToString(stVencChnAttr->stVencAttr.imageType));
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, CodecToString(stVencChnAttr->stVencAttr.enType));
+
+    std::string enc_param;
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, stVencChnAttr->stVencAttr.u32PicWidth);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, stVencChnAttr->stVencAttr.u32PicHeight);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, stVencChnAttr->stVencAttr.u32VirWidth);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_HEIGHT, stVencChnAttr->stVencAttr.u32VirHeight);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ROTATION, stVencChnAttr->stVencAttr.enRotation);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_FULL_RANGE, stVencChnAttr->stVencAttr.bFullRange);
+
+    if (g_venc_chns[channel].venc_attr.param.stCropCfg.bEnable) {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, g_venc_chns[channel].venc_attr.param.stCropCfg.stRect.s32X);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, g_venc_chns[channel].venc_attr.param.stCropCfg.stRect.s32Y);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, g_venc_chns[channel].venc_attr.param.stCropCfg.stRect.u32Width);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, g_venc_chns[channel].venc_attr.param.stCropCfg.stRect.u32Height);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_X, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_Y, 0);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_W, stVencChnAttr->stVencAttr.u32PicWidth);
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_RECT_H, stVencChnAttr->stVencAttr.u32PicHeight);
+    }
+
+    switch (stVencChnAttr->stVencAttr.enType) {
+        case DRM_CODEC_TYPE_H264:
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_PROFILE, stVencChnAttr->stVencAttr.u32Profile);
+            break;
+
+        case DRM_CODEC_TYPE_H265:
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_SCALING_LIST, stVencChnAttr->stVencAttr.stAttrH265e.bScaleList);
+
+        default:
+            break;
+    }
+
+    std::string str_fps_in, str_fps;
+
+    switch (stVencChnAttr->stRcAttr.enRcMode) {
+        case VENC_RC_MODE_H264CBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_CBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH264Cbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, stVencChnAttr->stRcAttr.stH264Cbr.u32BitRate);
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH264Cbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Cbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH264Cbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Cbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_H264VBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_VBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH264Vbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, stVencChnAttr->stRcAttr.stH264Vbr.u32MaxBitRate);
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_H264AVBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_AVBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH264Avbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, stVencChnAttr->stRcAttr.stH264Avbr.u32MaxBitRate);
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH264Avbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Avbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH264Vbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_H265CBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_CBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH265Cbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, stVencChnAttr->stRcAttr.stH265Cbr.u32BitRate);
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH265Cbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Cbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH265Cbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Cbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_H265VBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_VBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH265Vbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, stVencChnAttr->stRcAttr.stH265Vbr.u32MaxBitRate);
+
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH265Vbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Vbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH265Vbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Vbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_H265AVBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_AVBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_VIDEO_GOP, stVencChnAttr->stRcAttr.stH265Avbr.u32Gop);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, stVencChnAttr->stRcAttr.stH265Avbr.u32MaxBitRate);
+
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stH265Avbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Avbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stH265Avbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stH265Avbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        case VENC_RC_MODE_MJPEGCBR:
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, DRM_KEY_CBR);
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, stVencChnAttr->stRcAttr.stMjpegCbr.u32BitRate);
+            str_fps_in.append(std::to_string(stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+            str_fps.append(std::to_string(stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum)).append("/").append(std::to_string(stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen));
+            PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps);
+            break;
+
+        default:
+            break;
+    }
+
+    // PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_REF_FRM_CFG, stVencChnAttr->stGopAttr.enGopMode);
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
+    g_venc_chns[channel].media_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>("video_enc", flow_param.c_str());
+    if (!g_venc_chns[channel].media_flow) {
+        g_venc_mtx.unlock();
+        return -4;
+    }
+
+    init_media_channel_buffer(&g_venc_chns[channel]);
+    g_venc_chns[channel].media_flow->SetOutputCallBack(&g_venc_chns[channel], flow_output_callback);
+    if (pipe2(g_venc_chns[channel].wake_fd, O_CLOEXEC) == -1) {
+        g_venc_chns[channel].wake_fd[0] = 0;
+        g_venc_chns[channel].wake_fd[1] = 0;
+
+        DRM_MEDIA_LOGW("Create pipe failed");
+    }
+
+    g_venc_chns[channel].status = CHN_STATUS_OPEN;
+    g_venc_mtx.unlock();
+    if (stVencChnAttr->stGopAttr.enGopMode > VENC_GOPMODE_NORMALP) {
+        drm_mpi_venc_set_gop_mode(channel, &stVencChnAttr->stGopAttr);
+    }
+
+    DRM_MEDIA_LOGI("Enable venc channel:[%d], type:[%d] finished......", channel, stVencChnAttr->stVencAttr.enType);
+
+    return 0;
+}
+
+int drm_mpi_venc_set_gop_mode(int channel, drm_venc_gop_attr_t *pstGopModeAttr)
+{
+    if (!pstGopModeAttr) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    DrmEncGopModeParam media_param;
+    memset(&media_param, 0x00, sizeof(media_param));
+
+    switch (pstGopModeAttr->enGopMode) {
+        case VENC_GOPMODE_NORMALP:
+            media_param.mode = GOP_MODE_NORMALP;
+            media_param.ip_qp_delta = pstGopModeAttr->s32IPQpDelta;
+            break;
+
+        case VENC_GOPMODE_TSVC:
+            media_param.mode = GOP_MODE_TSVC3;
+            break;
+
+        case VENC_GOPMODE_SMARTP:
+            media_param.mode = GOP_MODE_SMARTP;
+            media_param.ip_qp_delta = pstGopModeAttr->s32IPQpDelta;
+            media_param.interval = pstGopModeAttr->u32BgInterval;
+            media_param.gop_size = pstGopModeAttr->u32GopSize;
+            media_param.vi_qp_delta = pstGopModeAttr->s32ViQpDelta;
+            break;
+
+        default:
+            DRM_MEDIA_LOGE("invalid gop mode:[%d]", pstGopModeAttr->enGopMode);
+            return -4;
+    }
+
+    g_venc_mtx.lock();
+    int ret = libdrm::video_encoder_set_gop_mode(g_venc_chns[channel].media_flow, &media_param);
+    if (!ret) {
+        memcpy(&g_venc_chns[channel].venc_attr.attr.stGopAttr, pstGopModeAttr, sizeof(drm_venc_gop_attr_t));
+    }
+    g_venc_mtx.unlock();
+
+    return ret;
+}
+
+int drm_mpi_venc_set_bitrate(int channel, uint32_t u32BitRate, uint32_t u32MinBitRate, uint32_t u32MaxBitRate)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    std::shared_ptr<libdrm::Flow> target_flow;
+
+    if (!g_venc_chns[channel].media_flow_list.empty()) {
+        target_flow = g_venc_chns[channel].media_flow_list.back();
+    } else if (g_venc_chns[channel].media_flow) {
+        target_flow = g_venc_chns[channel].media_flow;
+    }
+
+    int ret = video_encoder_set_bps(target_flow, u32BitRate, u32MinBitRate, u32MaxBitRate);
+    if (!ret) {
+        switch (g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+            case VENC_RC_MODE_H264CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32BitRate = u32BitRate;
+                break;
+
+            case VENC_RC_MODE_H264VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32MaxBitRate = u32MaxBitRate;
+                break;
+
+            case VENC_RC_MODE_H264AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.u32MaxBitRate = u32MaxBitRate;
+                break;
+
+            case VENC_RC_MODE_MJPEGCBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.u32BitRate = u32BitRate;
+                break;
+
+            case VENC_RC_MODE_MJPEGVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.u32BitRate = u32MaxBitRate;
+                break;
+
+            case VENC_RC_MODE_H265CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32BitRate = u32BitRate;
+                break;
+
+            case VENC_RC_MODE_H265VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32MaxBitRate = u32MaxBitRate;
+                break;
+
+            case VENC_RC_MODE_H265AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32MaxBitRate = u32MaxBitRate;
+                break;
+
+            case VENC_RC_MODE_BUTT:
+                break;
+        }
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_fps(int channel, uint8_t u8OutNum, uint8_t u8OutDen, uint8_t u8InNum, uint8_t u8InDen)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    int ret = video_encoder_set_fps(g_venc_chns[channel].media_flow, u8OutNum, u8OutDen, u8InNum, u8InDen);
+    if (!ret) {
+        switch (g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+            case VENC_RC_MODE_H264CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_H264VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_H264AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_MJPEGCBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_MJPEGVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_H265CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_H265VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_H265AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32SrcFrameRateNum = u8InNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32SrcFrameRateDen = u8InDen;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.fr32DstFrameRateNum = u8OutNum;
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.fr32DstFrameRateDen = u8OutDen;
+                break;
+
+            case VENC_RC_MODE_BUTT:
+                break;
+        }
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_avc_profile(int channel, uint32_t u32Profile, uint32_t u32Level)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType != DRM_CODEC_TYPE_H264) {
+        return -3;
+    }
+
+    g_venc_mtx.lock();
+    int ret = video_encoder_set_avc_profile(g_venc_chns[channel].media_flow, u32Profile, u32Level);
+    if (!ret) {
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.u32Profile = u32Profile;
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.stAttrH264e.u32Level = u32Level;
+    }
+    g_venc_mtx.unlock();
+
+    return ret;
+}
+
+int drm_mpi_venc_set_resolution(int channel, drm_venc_resolution_param_t stResolutionParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].venc_attr.bFullFunc) {
+        return -3;
+    }
+
+    g_venc_mtx.lock();
+    DrmVideoResolutionCfg vid_cfg;
+    vid_cfg.width = stResolutionParam.u32Width;
+    vid_cfg.height = stResolutionParam.u32Height;
+    vid_cfg.vir_width = stResolutionParam.u32VirWidth;
+    vid_cfg.vir_height = stResolutionParam.u32VirHeight;
+    vid_cfg.x = 0;
+    vid_cfg.y = 0;
+    vid_cfg.w = vid_cfg.width;
+    vid_cfg.h = vid_cfg.height;
+
+    int ret = video_encoder_set_resolution(g_venc_chns[channel].media_flow, &vid_cfg);
+    if (!ret) {
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirWidth = stResolutionParam.u32VirWidth;
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirHeight = stResolutionParam.u32VirHeight;
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicWidth = stResolutionParam.u32Width;
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicHeight = stResolutionParam.u32Height;
+        g_venc_chns[channel].venc_attr.param.stCropCfg.bEnable = false;
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_rotation(int channel, drm_venc_rotation_e rotation_rate)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].venc_attr.bFullFunc) {
+        return -3;
+    }
+
+    g_venc_mtx.lock();
+    int ret = video_encoder_set_rotation(g_venc_chns[channel].media_flow, rotation_rate);
+    if (!ret) {
+        g_venc_chns[channel].venc_attr.attr.stVencAttr.enRotation = rotation_rate;
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_rc_mode(int channel, drm_venc_rc_mode_e RcMode)
+{
+    int ret = 0;
+    const char *key_value = NULL;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    switch (RcMode) {
+        case VENC_RC_MODE_H264CBR:
+        case VENC_RC_MODE_MJPEGCBR:
+        case VENC_RC_MODE_H265CBR:
+            key_value = DRM_KEY_CBR;
+            break;
+
+        case VENC_RC_MODE_H264VBR:
+        case VENC_RC_MODE_H265VBR:
+        case VENC_RC_MODE_MJPEGVBR:
+            key_value = DRM_KEY_VBR;
+            break;
+
+        case VENC_RC_MODE_H264AVBR:
+        case VENC_RC_MODE_H265AVBR:
+            key_value = DRM_KEY_AVBR;
+            break;
+
+        default:
+            break;
+    }
+
+    if (!key_value) {
+        return -3;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].media_flow) {
+        ret = video_encoder_set_rc_mode(g_venc_chns[channel].media_flow, key_value);
+        ret = ret ? -4 : 0;
+    } else {
+        ret = -5;
+    }
+
+    if (!ret) {
+        g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode = RcMode;
+    }
+    g_venc_mtx.unlock();
+
+    return ret;
+}
+
+int drm_mpi_venc_get_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr)
+{
+    if (!stVencChnAttr) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        g_venc_mtx.unlock();
+        return -3;
+    }
+
+    memcpy(stVencChnAttr, &g_venc_chns[channel].venc_attr.attr, sizeof(drm_venc_chn_attr_t));
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+static int venc_set_avc_profile_if_change(int channel, drm_venc_attr_t *stVencAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType != DRM_CODEC_TYPE_H264) {
+        return ret;
+    }
+
+    if (stVencAttr->u32Profile != g_venc_chns[channel].venc_attr.attr.stVencAttr.u32Profile
+        || stVencAttr->stAttrH264e.u32Level != g_venc_chns[channel].venc_attr.attr.stVencAttr.stAttrH264e.u32Level)
+    {
+        ret = drm_mpi_venc_set_avc_profile(channel, stVencAttr->u32Profile, stVencAttr->stAttrH264e.u32Level);
+    }
+
+    return ret;
+}
+
+static int venc_set_resolution_if_change(int channel, drm_venc_attr_t *stVencAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirWidth != stVencAttr->u32VirWidth
+        || g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirHeight != stVencAttr->u32VirHeight
+        || g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicWidth != stVencAttr->u32PicWidth
+        || g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicHeight != stVencAttr->u32PicHeight)
+    {
+        drm_venc_resolution_param_t solution_attr;
+        solution_attr.u32VirWidth = stVencAttr->u32VirWidth;
+        solution_attr.u32VirHeight = stVencAttr->u32VirHeight;
+        solution_attr.u32Width = stVencAttr->u32PicWidth;
+        solution_attr.u32Height = stVencAttr->u32PicHeight;
+
+        ret = drm_mpi_venc_set_resolution(channel, solution_attr);
+        if (ret) {
+            return ret;
+        }
+    }
+
+    return ret;
+}
+
+static int venc_set_rotation_if_change(int channel, drm_venc_attr_t *stVencAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enRotation != stVencAttr->enRotation) {
+        ret = drm_mpi_venc_set_rotation(channel, stVencAttr->enRotation);
+    }
+
+    return ret;
+}
+
+static int venc_set_rc_mode_if_change(int channel, drm_venc_rc_attr_t *stRcAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_JPEG) {
+        return ret;
+    }
+
+    if (stRcAttr->enRcMode != g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+        ret = drm_mpi_venc_set_rc_mode(channel, stRcAttr->enRcMode);
+    }
+
+    return ret;
+}
+
+static int venc_set_bitrate_if_change(int channel, drm_venc_rc_attr_t *stRcAttr)
+{
+    int ret = 0;
+    uint32_t u32BitRate = 0;
+    bool bRateChange = false;
+    uint32_t u32MinBitRate = 0;
+    uint32_t u32MaxBitRate = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_JPEG) {
+        return ret;
+    }
+
+    switch (g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+        case VENC_RC_MODE_H264CBR:
+            u32BitRate = stRcAttr->stH264Cbr.u32BitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_H264VBR:
+            u32MaxBitRate = stRcAttr->stH264Vbr.u32MaxBitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_H264AVBR:
+            u32MaxBitRate = stRcAttr->stH264Avbr.u32MaxBitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_MJPEGCBR:
+            u32BitRate = stRcAttr->stMjpegCbr.u32BitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_MJPEGVBR:
+            u32MaxBitRate = stRcAttr->stMjpegVbr.u32BitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_H265CBR:
+            u32BitRate = stRcAttr->stH265Cbr.u32BitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_H265VBR:
+            u32MaxBitRate = stRcAttr->stH265Vbr.u32MaxBitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_H265AVBR:
+            u32MaxBitRate = stRcAttr->stH265Avbr.u32MaxBitRate;
+            bRateChange = true;
+            break;
+
+        case VENC_RC_MODE_BUTT:
+            break;
+    }
+
+    if (u32BitRate != 0 || u32MinBitRate != 0 || u32MaxBitRate != 0) {
+        ret = drm_mpi_venc_set_bitrate(channel, u32BitRate, u32MinBitRate, u32MaxBitRate);
+    } else if (bRateChange) {
+        return -1;
+    }
+
+    return ret;
+}
+
+static int RK_MPI_VENC_SetFps_If_Change(int channel, drm_venc_rc_attr_t *stRcAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_JPEG) {
+        return ret;
+    }
+
+    switch (g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+        case VENC_RC_MODE_H264CBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32SrcFrameRateNum != stRcAttr->stH264Cbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32SrcFrameRateDen != stRcAttr->stH264Cbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.fr32DstFrameRateNum != stRcAttr->stH264Cbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.fr32DstFrameRateDen != stRcAttr->stH264Cbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH264Cbr.fr32DstFrameRateNum, stRcAttr->stH264Cbr.fr32DstFrameRateDen, stRcAttr->stH264Cbr.u32SrcFrameRateNum, stRcAttr->stH264Cbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_H264VBR:
+            if (g_venc_chns[channel] .venc_attr.attr.stRcAttr.stH264Vbr.u32SrcFrameRateNum != stRcAttr->stH264Vbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32SrcFrameRateDen != stRcAttr->stH264Vbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.fr32DstFrameRateNum != stRcAttr->stH264Vbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.fr32DstFrameRateDen != stRcAttr->stH264Vbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH264Vbr.fr32DstFrameRateNum, stRcAttr->stH264Vbr.fr32DstFrameRateDen, stRcAttr->stH264Vbr.u32SrcFrameRateNum, stRcAttr->stH264Vbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_H264AVBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.u32SrcFrameRateNum != stRcAttr->stH264Avbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.u32SrcFrameRateDen != stRcAttr->stH264Avbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.fr32DstFrameRateNum != stRcAttr->stH264Avbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Avbr.fr32DstFrameRateDen != stRcAttr->stH264Avbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH264Avbr.fr32DstFrameRateNum, stRcAttr->stH264Avbr.fr32DstFrameRateDen, stRcAttr->stH264Avbr.u32SrcFrameRateNum, stRcAttr->stH264Avbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_MJPEGCBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.u32SrcFrameRateNum != stRcAttr->stMjpegCbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.u32SrcFrameRateDen != stRcAttr->stMjpegCbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.fr32DstFrameRateNum != stRcAttr->stMjpegCbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegCbr.fr32DstFrameRateDen != stRcAttr->stMjpegCbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stMjpegCbr.fr32DstFrameRateNum, stRcAttr->stMjpegCbr.fr32DstFrameRateDen, stRcAttr->stMjpegCbr.u32SrcFrameRateNum, stRcAttr->stMjpegCbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_MJPEGVBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.u32SrcFrameRateNum != stRcAttr->stMjpegVbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.u32SrcFrameRateDen != stRcAttr->stMjpegVbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.fr32DstFrameRateNum != stRcAttr->stMjpegVbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stMjpegVbr.fr32DstFrameRateDen != stRcAttr->stMjpegVbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stMjpegVbr.fr32DstFrameRateNum, stRcAttr->stMjpegVbr.fr32DstFrameRateDen, stRcAttr->stMjpegVbr.u32SrcFrameRateNum, stRcAttr->stMjpegVbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_H265CBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32SrcFrameRateNum != stRcAttr->stH265Cbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32SrcFrameRateDen != stRcAttr->stH265Cbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.fr32DstFrameRateNum != stRcAttr->stH265Cbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.fr32DstFrameRateDen != stRcAttr->stH265Cbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH265Cbr.fr32DstFrameRateNum, stRcAttr->stH265Cbr.fr32DstFrameRateDen, stRcAttr->stH265Cbr.u32SrcFrameRateNum, stRcAttr->stH265Cbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_H265VBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32SrcFrameRateNum != stRcAttr->stH265Vbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32SrcFrameRateDen != stRcAttr->stH265Vbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.fr32DstFrameRateNum != stRcAttr->stH265Vbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.fr32DstFrameRateDen != stRcAttr->stH265Vbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH265Vbr.fr32DstFrameRateNum, stRcAttr->stH265Vbr.fr32DstFrameRateDen, stRcAttr->stH265Vbr.u32SrcFrameRateNum, stRcAttr->stH265Vbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_H265AVBR:
+            if (g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32SrcFrameRateNum != stRcAttr->stH265Avbr.u32SrcFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32SrcFrameRateDen != stRcAttr->stH265Avbr.u32SrcFrameRateDen
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.fr32DstFrameRateNum != stRcAttr->stH265Avbr.fr32DstFrameRateNum
+                || g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.fr32DstFrameRateDen != stRcAttr->stH265Avbr.fr32DstFrameRateDen)
+            {
+                ret = drm_mpi_venc_set_fps(channel, stRcAttr->stH265Avbr.fr32DstFrameRateNum, stRcAttr->stH265Avbr.fr32DstFrameRateDen, stRcAttr->stH265Avbr.u32SrcFrameRateNum, stRcAttr->stH265Avbr.u32SrcFrameRateDen);
+                if (ret) {
+                    return ret;
+                }
+            }
+            break;
+
+        case VENC_RC_MODE_BUTT:
+            break;
+    }
+
+    return ret;
+}
+
+static int venc_set_gop_mode_if_change(int channel, drm_venc_gop_attr_t *stGopAttr)
+{
+    int ret = 0;
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType == DRM_CODEC_TYPE_JPEG) {
+        return ret;
+    }
+
+    if (stGopAttr->enGopMode != g_venc_chns[channel].venc_attr.attr.stGopAttr.enGopMode
+        || stGopAttr->u32GopSize != g_venc_chns[channel].venc_attr.attr.stGopAttr.u32GopSize
+        || stGopAttr->s32IPQpDelta != g_venc_chns[channel].venc_attr.attr.stGopAttr.s32IPQpDelta
+        || stGopAttr->u32BgInterval != g_venc_chns[channel].venc_attr.attr.stGopAttr.u32BgInterval
+        || stGopAttr->s32ViQpDelta != g_venc_chns[channel].venc_attr.attr.stGopAttr.s32ViQpDelta)
+    {
+        ret = drm_mpi_venc_set_gop_mode(channel, stGopAttr);
+    }
+
+    return ret;
+}
+
+int drm_mpi_venc_set_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr)
+{
+    if (!stVencChnAttr) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    int ret = venc_set_avc_profile_if_change(channel, &stVencChnAttr->stVencAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = venc_set_resolution_if_change(channel, &stVencChnAttr->stVencAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = venc_set_rotation_if_change(channel, &stVencChnAttr->stVencAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = venc_set_rc_mode_if_change(channel, &stVencChnAttr->stRcAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = venc_set_bitrate_if_change(channel, &stVencChnAttr->stRcAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = RK_MPI_VENC_SetFps_If_Change(channel, &stVencChnAttr->stRcAttr);
+    if (ret) {
+        return ret;
+    }
+
+    ret = venc_set_gop_mode_if_change(channel, &stVencChnAttr->stGopAttr);
+    if (ret) {
+        return ret;
+    }
+
+    return ret;
 }
 
 #ifdef __cplusplus
