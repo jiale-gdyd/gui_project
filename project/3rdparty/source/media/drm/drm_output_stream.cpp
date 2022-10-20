@@ -289,7 +289,11 @@ int DRMOutPutStream::Open()
 
 #if USING_ASYNC_COMMIT
     uint32_t async_commit = 1;
-    drmModeAtomicReq *req = drmModeAtomicAlloc();
+    drmModeAtomicReqPtr req = drmModeAtomicAlloc();
+    if (!req) {
+        DRM_MEDIA_LOGE("drmModeAtomicAlloc failed, errstr:[%m]");
+        return -1;
+    }
 
     drmModeAtomicAddProperty(req, plane_id, plane_prop_ids.async_commit, async_commit);
     ret = drmModeAtomicCommit(fd, req, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);

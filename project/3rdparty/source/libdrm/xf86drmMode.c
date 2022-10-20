@@ -1384,6 +1384,7 @@ drm_public int drmModeAtomicCommit(int fd, const drmModeAtomicReqPtr req, uint32
     uint64_t *prop_values_ptr = NULL;
 
     if (!req) {
+        printf("input parameter req handle null\n");
         return -EINVAL;
     }
 
