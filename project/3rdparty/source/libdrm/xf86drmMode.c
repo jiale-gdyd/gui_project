@@ -26,6 +26,10 @@
 static inline int DRM_IOCTL(int fd, unsigned long cmd, void *arg)
 {
     int ret = drmIoctl(fd, cmd, arg);
+    if (ret < 0) {
+        printf("drmIoctl failed, return:[%d], errno:[%d], errstr:[%m]\n", ret, errno);
+    }
+
     return ret < 0 ? -errno : ret;
 }
 
@@ -1216,8 +1220,9 @@ drm_public drmModeAtomicReqPtr drmModeAtomicAlloc(void)
 {
     drmModeAtomicReqPtr req;
 
-    req = (drmModeAtomicReqPtr)drmMalloc(sizeof *req);
+    req = drmMalloc(sizeof(drmModeAtomicReq));
     if (!req) {
+        printf("drmMalloc failed\n");
         return NULL;
     }
 

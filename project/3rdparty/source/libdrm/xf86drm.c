@@ -532,7 +532,7 @@ drm_public int drmIoctl(int fd, unsigned long request, void *arg)
 
     do {
         ret = ioctl(fd, request, arg);
-    } while (ret == -1 && (errno == EINTR || errno == EAGAIN));
+    } while ((ret == -1) && ((errno == EINTR) || (errno == EAGAIN)));
 
     return ret;
 }

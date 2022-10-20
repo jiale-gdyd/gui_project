@@ -222,6 +222,11 @@ int DRMOutPutStream::Open()
         drmModeCreatePropertyBlob(fd, &cur_mode, sizeof(cur_mode), &blob_id);
 
         req = drmModeAtomicAlloc();
+        if (!req) {
+            DRM_MEDIA_LOGE("drmModeAtomicAlloc failed, errstr:[%m]");
+            return -1;
+        }
+
         drmModeAtomicAddProperty(req, crtc_id, property_active, 1);
         drmModeAtomicAddProperty(req, crtc_id, property_mode_id, blob_id);
         drmModeAtomicAddProperty(req, connector_id, property_crtc_id, crtc_id);
