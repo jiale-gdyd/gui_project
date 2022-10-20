@@ -19,11 +19,14 @@
 /**                                                                       */
 /**************************************************************************/
 /**************************************************************************/
-
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 
 #define TX_SOURCE_CODE
 #define TX_THREAD_SMP_SOURCE_CODE
-
+#define TX_LINUX_MULTI_CORE
+#define TX_LINUX_DEBUG_ENABLE
 
 /* Include necessary system files.  */
 
@@ -33,7 +36,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
-
+#include <sched.h>
 
 /* Define various Linux objects used by the ThreadX port.  */
 
@@ -230,6 +233,9 @@ extern VOID     *_tx_initialize_unused_memory;
 /*  09-30-2020     William E. Lamie         Initial Version 6.1           */
 /*                                                                        */
 /**************************************************************************/
+static void *_tx_linux_thread_resume_handler_thread(void *arg);
+static void *_tx_linux_thread_suspend_handler_thread(void *arg);
+
 VOID   _tx_initialize_low_level(VOID)
 {
 UINT i;
@@ -294,8 +300,10 @@ cpu_set_t mask;
     /* Create semaphore for ISR thread. */
     sem_init(&_tx_linux_isr_semaphore, 0, 0);
 
+    printf("create _tx_linux_timer_interrupt thread\n");
+
     /* Setup periodic timer interrupt.  */
-    if(pthread_create(&_tx_linux_timer_id, NULL, _tx_linux_timer_interrupt, /*(void *)&_tx_linux_timer_id*/NULL))
+    if(pthread_create(&_tx_linux_timer_id, NULL, _tx_linux_timer_interrupt, (void *)&_tx_linux_timer_id/*NULL*/))
     {
 
         /* Error creating the timer interrupt.  */
@@ -312,19 +320,80 @@ cpu_set_t mask;
     pthread_setschedparam(_tx_linux_timer_id, SCHED_FIFO, &sp);
 
     /* Done, return to caller.  */
+    // pthread_t resumeThreadId, suspendThreadId;
+    // pthread_create(&resumeThreadId, NULL, _tx_linux_thread_resume_handler_thread, NULL);
+    // pthread_create(&suspendThreadId, NULL, _tx_linux_thread_suspend_handler_thread, NULL);
 }
 
-
+static int g_enterTimerInterrupt = 0;
 /* This routine is called after initialization is complete in order to start
    all interrupt threads.  Interrupt threads in addition to the timer may
    be added to this routine as well.  */
 
 void    _tx_initialize_start_interrupts(void)
 {
-
+    g_enterTimerInterrupt = 1;
     /* Kick the timer thread off to generate the ThreadX periodic interrupt
        source.  */
     tx_linux_sem_post(&_tx_linux_timer_semaphore);
+}
+
+// 获取自系统启动的单调递增时间
+unsigned long get_time_conv_seconds(struct timespec *curTime, unsigned int factor)
+{
+    clock_gettime(CLOCK_MONOTONIC, curTime);
+    return (unsigned long)(curTime->tv_sec) * factor;
+}
+
+// 获取自系统启动的单例递增时间 -- 转换为微妙
+unsigned long get_monnotonic_time(void)
+{
+    struct timespec curTime;
+    unsigned long result = get_time_conv_seconds(&curTime, 1000000);
+    result += (unsigned int)(curTime.tv_nsec) / 1000;
+
+    return result;
+}
+
+#undef MIN
+#define MIN(x, y)   (x < y ? x : y)
+
+// sem_trywait + usleep方式实现延时。如果信号量大于0，则减少信号量并立即返回1；如果信号量小于0，则阻塞等待，当阻塞超时时返回0
+int wait_timeout(sem_t *sem, long timeoutUs)
+{
+    unsigned long delayUs = 0;
+    unsigned long timeWait = 1;
+    unsigned long elapsedUs = 0;
+    const unsigned long maxTimeWait = 10000;
+    const unsigned long startUs = get_monnotonic_time();
+
+    do {
+        // 如果信号量大于0，则减少信号量并立即返回1
+        if (sem_trywait(sem) == 0) {
+            return 1;
+        }
+
+        // 系统信号则立即返回0
+        if (errno != EAGAIN) {
+            return 0;
+        }
+
+        delayUs = timeoutUs - elapsedUs;
+        timeWait = MIN(delayUs, timeWait);
+
+        int ret = usleep(timeWait);
+        if (ret != 0) {
+            return 0;
+        }
+
+        timeWait *= 2;
+        timeWait = MIN(timeWait, maxTimeWait);
+
+        // 开始计算时间到现在的运行时间
+        elapsedUs = get_monnotonic_time() - startUs;
+    } while (elapsedUs < timeoutUs);
+
+    return 0;
 }
 
 
@@ -345,10 +414,12 @@ int err;
 
     /* Wait startup semaphore. */
     tx_linux_sem_wait(&_tx_linux_timer_semaphore);
+    // do {
+    //     usleep(1);
+    // } while (g_enterTimerInterrupt == 0);
 
     while(1)
     {
-
         clock_gettime(CLOCK_REALTIME, &ts);
         ts.tv_nsec += timer_periodic_nsec;
         if (ts.tv_nsec > 1000000000)
@@ -356,6 +427,8 @@ int err;
             ts.tv_nsec -= 1000000000;
             ts.tv_sec++;
         }
+
+        // printf("======%d\n", wait_timeout(&_tx_linux_timer_semaphore, (ts.tv_sec * 1000000 + ts.tv_nsec / 1000)));
         do
         {
             if (sem_timedwait(&_tx_linux_timer_semaphore, &ts) == 0)
@@ -375,6 +448,47 @@ int err;
         _tx_thread_context_restore();
     }
 }
+
+// void *_tx_linux_thread_resume_handler_thread(void *arg)
+// {
+//     while (1) {
+//         usleep(10000);
+//     }
+
+//     return NULL;
+// }
+
+// static int g_startSuspend = 0;
+// static pthread_t g_suspend_threadId;
+
+// void *_tx_linux_thread_suspend_handler_thread(void *arg)
+// {
+//     while (1) {
+//         if (g_startSuspend != 0) {
+//             g_startSuspend = 0;
+//             printf("g_suspend_threadId:[%lu], _tx_linux_timer_id:[%lu]", g_suspend_threadId, _tx_linux_timer_id);
+//             if(pthread_equal(g_suspend_threadId, _tx_linux_timer_id))
+//                 tx_linux_sem_post(&_tx_linux_thread_timer_wait);
+//             else
+//                 tx_linux_sem_post(&_tx_linux_thread_other_wait);
+
+//             if(_tx_linux_thread_suspended) {
+//                 printf("111111111111111111111111111\n");
+//                 continue;
+//             }
+
+//             _tx_linux_thread_suspended = 1;
+//             sigsuspend(&_tx_linux_thread_wait_mask);
+//             _tx_linux_thread_suspended = 0;
+//         } else {
+//             usleep(1000);
+//         }
+
+//         printf("=======================\n");
+//     }
+
+//     return NULL;
+// }
 
 /* Define functions for linux thread. */
 void    _tx_linux_thread_resume_handler(int sig)
@@ -402,6 +516,8 @@ void    _tx_linux_thread_suspend(pthread_t thread_id)
     /* Send signal. */
     _tx_linux_mutex_obtain(&_tx_linux_mutex);
     pthread_kill(thread_id, SUSPEND_SIG);
+    // g_startSuspend = 1;
+    // g_suspend_threadId = thread_id;
     _tx_linux_mutex_release(&_tx_linux_mutex);
 
     /* Wait until signal is received. */

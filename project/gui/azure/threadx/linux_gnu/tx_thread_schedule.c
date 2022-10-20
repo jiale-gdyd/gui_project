@@ -351,6 +351,7 @@ UINT            i;
 
         /* Get the Linux mutex.  */
         pthread_mutex_lock(&mutex -> tx_linux_mutex);
+        //pthread_mutex_trylock(&mutex -> tx_linux_mutex);
 
         /* At this point we have the mutex.  */
 

@@ -31,7 +31,7 @@ subdir-ccflags-y  :=
 subdir-cxxflags-y :=
 
 ifeq ($(USE_STDCPP_VERSION),)
-BUILD_STDCPP_VERSION ?= -std=c++11
+BUILD_STDCPP_VERSION ?= -std=gnu++11
 else
 BUILD_STDCPP_VERSION ?= $(USE_STDCPP_VERSION)
 endif

@@ -214,10 +214,8 @@ static void _gx_copy_canvas_to_buffer_24xrgb(char *dest, GX_CANVAS *canvas, GX_R
     int x, y;
     int width;
     int height;
-    GX_COLOR *put;
-    GX_COLOR *read;
-    GX_COLOR *put_row;
-    GX_COLOR *read_row;
+    GX_COLOR *put_row, *put_ptr;
+    GX_COLOR *read_row, *read_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -232,10 +230,10 @@ static void _gx_copy_canvas_to_buffer_24xrgb(char *dest, GX_CANVAS *canvas, GX_R
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            *put++ = *read++;
+            *put_ptr++ = *read_ptr++;
         }
 
         put_row += width;
@@ -264,13 +262,11 @@ static void _gx_copy_canvas_to_buffer_565rgb(char *dest, GX_CANVAS *canvas, GX_R
     int x, y;
     int width;
     int height;
-    USHORT *read;
     GX_UBYTE red;
     GX_UBYTE blue;
-    GX_COLOR *put;
     GX_UBYTE green;
-    USHORT *read_row;
-    GX_COLOR *put_row;
+    USHORT *read_row, *read_ptr;
+    GX_COLOR *put_row, *put_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -285,27 +281,27 @@ static void _gx_copy_canvas_to_buffer_565rgb(char *dest, GX_CANVAS *canvas, GX_R
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = REDVAL_16BPP(*read) << 3;
+            red = REDVAL_16BPP(*read_ptr) << 3;
             if (red & 0x08) {
                 red |= 0x07;
             }
     
-            green = GREENVAL_16BPP(*read) << 2;
+            green = GREENVAL_16BPP(*read_ptr) << 2;
             if (green & 0x04) {
                 green |= 0x03;
             }
 
-            blue = BLUEVAL_16BPP(*read) << 3;
+            blue = BLUEVAL_16BPP(*read_ptr) << 3;
             if (blue & 0x08) {
                 blue |= 0x07;
             }
 
-            *put++ = ASSEMBLECOLOR_32BPP(red, green, blue);
-            read++;
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
         }
 
         put_row += width;
@@ -318,13 +314,11 @@ static void _gx_copy_canvas_to_buffer_1555xrgb(char *dest, GX_CANVAS *canvas, GX
     int x, y;
     int width;
     int height;
-    USHORT *read;
     GX_UBYTE red;
-    GX_COLOR *put;
     GX_UBYTE blue;
     GX_UBYTE green;
-    USHORT *read_row;
-    GX_COLOR *put_row;
+    USHORT *read_row, *read_ptr;
+    GX_COLOR *put_row, *put_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -339,27 +333,27 @@ static void _gx_copy_canvas_to_buffer_1555xrgb(char *dest, GX_CANVAS *canvas, GX
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = ((*read) & 0x7c00) >> 7;
+            red = ((*read_ptr) & 0x7c00) >> 7;
             if (red & 0x08) {
                 red |= 0x07;
             }
 
-            green = ((*read) & 0x03e0) >> 2;
+            green = ((*read_ptr) & 0x03e0) >> 2;
             if (green & 0x08) {
                 green |= 0x03;
             }
 
-            blue = ((*read) & 0x1f) << 3;
+            blue = ((*read_ptr) & 0x1f) << 3;
             if (blue & 0x08) {
                 blue |= 0x07;
             }
 
-            *put++ = ASSEMBLECOLOR_32BPP(red, green, blue);
-            read++;
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
         }
 
         put_row += width;
@@ -372,13 +366,11 @@ static void _gx_copy_canvas_to_buffer_4444argb(char *dest, GX_CANVAS *canvas, GX
     int x, y;
     int width;
     int height;
-    USHORT *read;
     GX_UBYTE red;
-    GX_COLOR *put;
     GX_UBYTE blue;
     GX_UBYTE green;
-    USHORT *read_row;
-    GX_COLOR *put_row;
+    USHORT *read_row, *read_ptr;
+    GX_COLOR *put_row, *put_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -393,21 +385,21 @@ static void _gx_copy_canvas_to_buffer_4444argb(char *dest, GX_CANVAS *canvas, GX
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = ((*read) & 0x0f00) >> 4;
+            red = ((*read_ptr) & 0x0f00) >> 4;
             red |= red >> 4;
 
-            green = (*read) & 0xf0;
+            green = (*read_ptr) & 0xf0;
             green |= green >> 4;
 
-            blue = ((*read) & 0x0f);
+            blue = ((*read_ptr) & 0x0f);
             blue |= blue << 4;
     
-            *put++ = ASSEMBLECOLOR_32BPP(red, green, blue);
-            read++;
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
         }
 
         put_row += width;
@@ -421,12 +413,10 @@ static void _gx_copy_canvas_to_buffer_332rgb(char *dest, GX_CANVAS *canvas, GX_R
     int width;
     int height;
     GX_UBYTE red;
-    GX_COLOR *put;
     GX_UBYTE blue;
-    GX_UBYTE *read;
     GX_UBYTE green;
-    GX_COLOR *put_row;
-    GX_UBYTE *read_row;
+    GX_COLOR *put_row, *put_ptr;
+    GX_UBYTE *read_row, *read_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -441,27 +431,27 @@ static void _gx_copy_canvas_to_buffer_332rgb(char *dest, GX_CANVAS *canvas, GX_R
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            red = (*read) & 0xe0;
+            red = (*read_ptr) & 0xe0;
             if (red & 0x20) {
                 red |= 0x1f;
             }
 
-            green = ((*read) & 0x1c) << 3;
+            green = ((*read_ptr) & 0x1c) << 3;
             if (green & 0x20) {
                 green |= 0x1f;
             }
 
-            blue = ((*read) & 0x03) << 6;
+            blue = ((*read_ptr) & 0x03) << 6;
             if (blue & 0x40) {
                 blue |= 0x3f;
             }
 
-            *put++ = ASSEMBLECOLOR_32BPP(red, green, blue);
-            read++;
+            *put_ptr++ = ASSEMBLECOLOR_32BPP(red, green, blue);
+            read_ptr++;
         }
 
         put_row += width;
@@ -474,11 +464,9 @@ static void _gx_copy_canvas_to_buffer_8bit_palette(char *dest, GX_CANVAS *canvas
     int x, y;
     int width;
     int height;
-    GX_COLOR *put;
-    GX_UBYTE *read;
-    GX_COLOR *put_row;
-    GX_UBYTE *read_row;
     GX_COLOR *palette_table;
+    GX_COLOR *put_row, *put_ptr;
+    GX_UBYTE *read_row, *read_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -494,11 +482,11 @@ static void _gx_copy_canvas_to_buffer_8bit_palette(char *dest, GX_CANVAS *canvas
     read_row += dirty_area->gx_rectangle_top * width + dirty_area->gx_rectangle_left;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            *put++ = palette_table[*read++];
+            *put_ptr++ = palette_table[*read_ptr++];
         }
 
         put_row += width;
@@ -511,12 +499,10 @@ static void _gx_copy_canvas_to_buffer_4bit_grayscale(char *dest, GX_CANVAS *canv
     int x, y;
     int width;
     int height;
-    GX_COLOR *put;
-    GX_UBYTE *read;
-    GX_COLOR *put_row;
-    GX_UBYTE *read_row;
     GX_UBYTE read_mask;
     GX_UBYTE read_pixel;
+    GX_COLOR *put_row, *put_ptr;
+    GX_UBYTE *read_row, *read_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -532,8 +518,8 @@ static void _gx_copy_canvas_to_buffer_4bit_grayscale(char *dest, GX_CANVAS *canv
     read_row += (dirty_area->gx_rectangle_left + 1 )>> 1;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         if (dirty_area->gx_rectangle_left & 1) {
             read_mask = 0x0f;
@@ -542,7 +528,7 @@ static void _gx_copy_canvas_to_buffer_4bit_grayscale(char *dest, GX_CANVAS *canv
         }
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            read_pixel = read_mask & (*read);
+            read_pixel = read_mask & (*read_ptr);
 
             if (read_mask == 0xf0) {
                 read_pixel |= read_pixel >> 4;
@@ -550,10 +536,10 @@ static void _gx_copy_canvas_to_buffer_4bit_grayscale(char *dest, GX_CANVAS *canv
             } else {
                 read_pixel |= read_pixel << 4;
                 read_mask = 0xf0;
-                read++;
+                read_ptr++;
             }
 
-            *put++ = read_pixel | (read_pixel << 8) | (read_pixel << 16) | 0xff000000;
+            *put_ptr++ = read_pixel | (read_pixel << 8) | (read_pixel << 16) | 0xff000000;
         }
 
         put_row += width;
@@ -566,11 +552,9 @@ static void _gx_copy_canvas_to_buffer_monochrome(char *dest, GX_CANVAS *canvas, 
     int x, y;
     int width;
     int height;
-    GX_COLOR *put;
-    GX_UBYTE *read;
-    GX_COLOR *put_row;
-    GX_UBYTE *read_row;
     GX_UBYTE read_mask;
+    GX_COLOR *put_row, *put_ptr;
+    GX_UBYTE *read_row, *read_ptr;
 
     width = canvas->gx_canvas_x_resolution;
     height = canvas->gx_canvas_y_resolution;
@@ -586,22 +570,22 @@ static void _gx_copy_canvas_to_buffer_monochrome(char *dest, GX_CANVAS *canvas, 
     read_row += (dirty_area->gx_rectangle_left + 7) >> 3;
 
     for (y = dirty_area->gx_rectangle_top; y < dirty_area->gx_rectangle_bottom; y++) {
-        put = put_row;
-        read = read_row;
+        put_ptr = put_row;
+        read_ptr = read_row;
 
         read_mask = 0x80 >> (dirty_area->gx_rectangle_left & 0x07);
 
         for (x = dirty_area->gx_rectangle_left; x < dirty_area->gx_rectangle_right; x++) {
-            if (read_mask & (*read)) {
-                *put++ = 0xffffffff;
+            if (read_mask & (*read_ptr)) {
+                *put_ptr++ = 0xffffffff;
             } else {
-                *put++ = 0;
+                *put_ptr++ = 0;
             }
 
             read_mask >>= 1;
             if (read_mask == 0) {
                 read_mask = 0x80;
-                read++;
+                read_ptr++;
             }
         }
 
