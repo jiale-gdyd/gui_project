@@ -70,7 +70,7 @@ static GX_CHAR slider_val_text[MAX_SLIDER_VAL_TEXT_LENGTH + 1];
 int azure_guix_widget_types_demo_init(int argc, char *argv[])
 {
 #if defined(CONFIG_DRM_DISP_DRIVER)
-    gx_drm_graphics_driver_setup(1, 0, 0, 1, 1);
+    gx_drm_graphics_driver_setup(0, 0, 0, 0, 1);
 #endif
 
     tx_kernel_enter();

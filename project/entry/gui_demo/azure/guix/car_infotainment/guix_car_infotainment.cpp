@@ -47,7 +47,7 @@ static INT MPH_value_index = 0;
 int azure_guix_car_infotainment_demo_init(int argc, char *argv[])
 {
 #if defined(CONFIG_DRM_DISP_DRIVER)
-    gx_drm_graphics_driver_setup(1, 0, 0, 1, 1);
+    gx_drm_graphics_driver_setup(0, 0, 0, 0, 1);
 #endif
 
     tx_kernel_enter();
