@@ -96,7 +96,7 @@ int DRMStream::Open()
     }
 
     if (device.empty()) {
-        DRM_MEDIA_LOGE("DrmDisp: missing device path");
+        DRM_MEDIA_LOGE("missing device path");
         return -EINVAL;
     }
 
@@ -118,14 +118,14 @@ int DRMStream::Open()
     if (DRM_ID_ISVALID(connector_id)) {
         auto dmc = get_connector_by_id(res, connector_id);
         if (!dmc || dmc->connection != DRM_MODE_CONNECTED || dmc->count_modes <= 0) {
-            DRM_MEDIA_LOGE("connector[%d] is not ready", connector_id);
+            DRM_MEDIA_LOGE("connector id:[%d] is not ready", connector_id);
             return -1;
         }
 
         assert(dmc->count_encoders > 0);
 
         if (!reserve_ids_by_connector(res, connector_id)) {
-            DRM_MEDIA_LOGE("connector[%d] is unapplicable", connector_id);
+            DRM_MEDIA_LOGE("connector id:[%d] is unapplicable", connector_id);
             return -1;
         }
     } else {
@@ -136,17 +136,17 @@ int DRMStream::Open()
     }
 
     if (DRM_ID_ISVALID(encoder_id) && !reserve_ids_by_encoder(res, encoder_id)) {
-        DRM_MEDIA_LOGE("encoder[%d] is unapplicable", encoder_id);
+        DRM_MEDIA_LOGE("encoder id:[%d] is unapplicable", encoder_id);
         return -1;
     }
 
     if (DRM_ID_ISVALID(crtc_id) && !reserve_ids_by_crtc(res, crtc_id)) {
-        DRM_MEDIA_LOGE("crtc[%d] is unapplicable", crtc_id);
+        DRM_MEDIA_LOGE("crtc id:[%d] is unapplicable", crtc_id);
         return -1;
     }
 
     if (DRM_ID_ISVALID(plane_id) && !reserve_ids_by_plane(res, plane_id)) {
-        DRM_MEDIA_LOGE("plane[%d] is unapplicable", plane_id);
+        DRM_MEDIA_LOGE("plane id:[%d] is unapplicable", plane_id);
         return -1;
     }
 
@@ -156,19 +156,19 @@ int DRMStream::Open()
     }
 
     if (fps != 0 && !filter_ids_by_fps(res, fps)) {
-        DRM_MEDIA_LOGE("specified fps [%d] is unacceptable", fps);
+        DRM_MEDIA_LOGE("specified fps:[%d] is unacceptable", fps);
         return -1;
     }
 
     drm_fmt = GetDRMFmtByString(data_type.c_str());
     img_info.pix_fmt = StringToPixFmt(data_type.c_str());
     if (!data_type.empty() && !filter_ids_by_data_type(res, data_type)) {
-        DRM_MEDIA_LOGE("data type [%s] is unacceptable", data_type.c_str());
+        DRM_MEDIA_LOGE("data type:[%s] is unacceptable", data_type.c_str());
         return -1;
     }
 
     if (!plane_type.empty() && !filter_ids_by_plane_type(res, plane_type)) {
-        DRM_MEDIA_LOGE("plane type [%s] is unacceptable", plane_type.c_str());
+        DRM_MEDIA_LOGE("plane type:[%s] is unacceptable", plane_type.c_str());
         return -1;
     }
 
@@ -178,12 +178,12 @@ int DRMStream::Open()
         find_strict_match_wh = find_connector_ids_by_wh(res, ivw, ivh);
         if (find_strict_match_wh) {
             if (!filter_ids_by_wh(res, ivw, ivh)) {
-                DRM_MEDIA_LOGW("strict widthxheight [%dx%d] is unacceptable", ivw, ivh);
+                DRM_MEDIA_LOGW("strict width*heigh: [%dx%d] is unacceptable", ivw, ivh);
                 assert(0);
                 return -1;
             }
         } else if (!accept_scale) {
-            DRM_MEDIA_LOGW("strict widthxheight [%dx%d] is unacceptable", ivw, ivh);
+            DRM_MEDIA_LOGW("strict width*height:[%dx%d] is unacceptable", ivw, ivh);
             return -1;
         }
 #undef ivw
@@ -233,7 +233,7 @@ bool DRMStream::GetAgreeableIDSet()
                 continue;
             }
 
-            DRM_MEDIA_LOGE("connector's encoder is not ready, try first possible encoder<%d>", dmc->encoder_id);
+            DRM_MEDIA_LOGE("connector's encoder is not ready, try first possible encoder id:[%d]", dmc->encoder_id);
         }
     
         connector_id = connid;

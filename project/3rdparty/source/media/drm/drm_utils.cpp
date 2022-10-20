@@ -1028,12 +1028,12 @@ struct resources *DRMDevice::get_resources()
     }
 
     if (drmSetClientCap(fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1)) {
-        DRM_MEDIA_LOGE("Failed to set universal planes cap %m");
+        DRM_MEDIA_LOGE("failed to set universal planes cap, errstr:[%m]");
         return nullptr;
     }
 
     if (drmSetClientCap(fd, DRM_CLIENT_CAP_ATOMIC, 1)) {
-        DRM_MEDIA_LOGE("Failed set drm atomic cap %m");
+        DRM_MEDIA_LOGE("failed set drm atomic cap, errstr:[%m]");
         return nullptr;
     }
 
@@ -1046,7 +1046,7 @@ struct resources *DRMDevice::get_resources()
     res->drm_fd = -1;
     res->res = drmModeGetResources(fd);
     if (!res->res) {
-        DRM_MEDIA_LOGE("drmModeGetResources failed: %m");
+        DRM_MEDIA_LOGE("drmModeGetResources failed, errstr:[%m]");
         goto error;
     }
 
@@ -1089,7 +1089,7 @@ struct resources *DRMDevice::get_resources()
 
         int ret = asprintf(&sconnector->name, "%s-%u", lookup_drm_connector_type_name(conn->connector_type), conn->connector_type_id);
         if (ret < 0) {
-            DRM_MEDIA_LOGE("asprintf failed");
+            DRM_MEDIA_LOGE("asprintf failed, errstr:[%m]");
         }
     }
 
@@ -1122,7 +1122,7 @@ struct resources *DRMDevice::get_resources()
 
     res->plane_res = drmModeGetPlaneResources(fd);
     if (!res->plane_res) {
-        DRM_MEDIA_LOGE("drmModeGetPlaneResources failed: %m");
+        DRM_MEDIA_LOGE("drmModeGetPlaneResources failed, errstr:[%m]");
         goto error;
     }
 
