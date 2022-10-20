@@ -101,6 +101,9 @@ int drm_mpi_vdec_create_channel(int channel, const drm_vdec_chn_attr_t *pstAttr)
 int drm_mpi_venc_destroy_channel(int channel);
 int drm_mpi_venc_create_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr);
 
+int drm_mpi_venc_create_jpeg_light_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr);
+
+int drm_mpi_venc_set_gop(int channel, uint32_t u32Gop);
 int drm_mpi_venc_set_gop_mode(int channel, drm_venc_gop_attr_t *pstGopModeAttr);
 int drm_mpi_venc_set_fps(int channel, uint8_t u8OutNum, uint8_t u8OutDen, uint8_t u8InNum, uint8_t u8InDen);
 int drm_mpi_venc_set_bitrate(int channel, uint32_t u32BitRate, uint32_t u32MinBitRate, uint32_t u32MaxBitRate);
@@ -108,9 +111,40 @@ int drm_mpi_venc_set_avc_profile(int channel, uint32_t u32Profile, uint32_t u32L
 int drm_mpi_venc_set_resolution(int channel, drm_venc_resolution_param_t stResolutionParam);
 int drm_mpi_venc_set_rotation(int channel, drm_venc_rotation_e rotation_rate);
 int drm_mpi_venc_set_rc_mode(int channel, drm_venc_rc_mode_e RcMode);
+int drm_mpi_venc_set_rc_quality(int channel, drm_venc_rc_quality_e RcQuality);
+
+int drm_mpi_venc_request_idr(int channel, bool bInstant);
 
 int drm_mpi_venc_get_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr);
 int drm_mpi_venc_set_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr);
+
+int drm_mpi_venc_get_channel_parameter(int channel, drm_venc_chn_param_t *stVencChnParam);
+int drm_mpi_venc_set_channel_parameter(int channel, drm_venc_chn_param_t *stVencChnParam);
+
+int drm_mpi_venc_get_rc_parameter(int channel, drm_venc_rc_param_t *pstRcParam);
+int drm_mpi_venc_set_rc_parameter(int channel, drm_venc_rc_param_t *pstRcParam);
+
+int drm_mpi_venc_set_jpeg_parameter(int channel, drm_venc_jpeg_param_t *pstJpegParam);
+
+int drm_mpi_venc_insert_userdata(int channel, uint8_t *pu8Data, uint32_t u32Len);
+
+int drm_mpi_venc_get_roi_attribute(int channel, drm_venc_roi_attr_t *pstRoiAttr, int roi_index07);
+int drm_mpi_venc_set_roi_attribute(int channel, const drm_venc_roi_attr_t *pstRoiAttr, int region_cnt);
+
+int drm_mpi_venc_get_fd(int channel);
+int drm_mpi_venc_query_status(int channel, drm_venc_chn_status_t *pstStatus);
+
+int drm_mpi_venc_get_super_frame_strategy(int channel, drm_venc_superframe_cfg_t *pstSuperFrmParam);
+int drm_mpi_venc_set_super_frame_strategy(int channel, const drm_venc_superframe_cfg_t *pstSuperFrmParam);
+
+int drm_mpi_venc_start_recv_frame(int channel, const drm_recv_pic_param_t *pstRecvParam);
+
+int drm_mpi_venc_region_init(int channel, drm_venc_color_tbl_t *stColorTbl);
+
+int drm_mpi_venc_region_set_bitmap(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap);
+int drm_mpi_venc_region_set_cover(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo);
+int drm_mpi_venc_region_set_coverEx(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo);
+int drm_mpi_venc_region_set_palette_id(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_osd_color_palette_buf_t *pstColPalBuf);
 
 #ifdef __cplusplus
 }

@@ -105,7 +105,7 @@ typedef struct drm_media_channel {
     std::condition_variable                  luma_buf_cond;
     bool                                     luma_buf_quit;
     bool                                     luma_buf_start;
-    std::shared_ptr<libdrm::MediaBuffer>     luma_rkmedia_buf;
+    std::shared_ptr<libdrm::MediaBuffer>     luma_media_buf;
 } drm_media_channel_t;
 
 typedef struct video_mix_device {
@@ -432,7 +432,7 @@ static void flow_output_callback(void *handle, std::shared_ptr<libdrm::MediaBuff
     if (target_chn->mode_id == MOD_ID_VI) {
         std::unique_lock<std::mutex> lck(target_chn->luma_buf_mtx);
         if (!target_chn->luma_buf_quit && target_chn->luma_buf_start) {
-            target_chn->luma_rkmedia_buf = media_mb;
+            target_chn->luma_media_buf = media_mb;
         }
         target_chn->luma_buf_cond.notify_all();
 
@@ -466,12 +466,12 @@ static void flow_output_callback(void *handle, std::shared_ptr<libdrm::MediaBuff
     }
 
     if (mb_type == MB_TYPE_IMAGE) {
-        libdrm::ImageBuffer *rkmedia_ib = static_cast<libdrm::ImageBuffer *>(media_mb.get());
-        mb->stImageInfo.u32Width = rkmedia_ib->GetWidth();
-        mb->stImageInfo.u32Height = rkmedia_ib->GetHeight();
-        mb->stImageInfo.u32HorStride = rkmedia_ib->GetVirWidth();
-        mb->stImageInfo.u32VerStride = rkmedia_ib->GetVirHeight();
-        std::string strPixFmt = PixFmtToString(rkmedia_ib->GetPixelFormat());
+        libdrm::ImageBuffer *media_ib = static_cast<libdrm::ImageBuffer *>(media_mb.get());
+        mb->stImageInfo.u32Width = media_ib->GetWidth();
+        mb->stImageInfo.u32Height = media_ib->GetHeight();
+        mb->stImageInfo.u32HorStride = media_ib->GetVirWidth();
+        mb->stImageInfo.u32VerStride = media_ib->GetVirHeight();
+        std::string strPixFmt = PixFmtToString(media_ib->GetPixelFormat());
         mb->stImageInfo.enImgType = StringToImageType(strPixFmt);
     }
 
@@ -641,7 +641,7 @@ int drm_mpi_system_bind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn)
             }
 
             if ((src_chn->media_out_cb_status == CHN_OUT_CB_INIT) || (src_chn->media_out_cb_status == CHN_OUT_CB_CLOSE)) {
-                DRM_MEDIA_LOGD("disable rkmedia flow output callback");
+                DRM_MEDIA_LOGD("disable media flow output callback");
 
                 src_chn->media_out_cb_status = CHN_OUT_CB_CLOSE;
                 src->SetOutputCallBack(NULL, NULL);
@@ -1190,7 +1190,7 @@ int drm_mpi_system_stop_get_media_buffer(mod_id_e enModID, int s32ChnId)
     target_mutex->lock();
     target_chn->media_out_cb_status = CHN_OUT_CB_CLOSE;
     target_chn->media_flow->SetOutputCallBack(NULL, NULL);
-    DRM_MEDIA_LOGD("disable rkmedia output callback");
+    DRM_MEDIA_LOGD("disable media output callback");
     target_mutex->unlock();
 
     return 0;
@@ -1264,7 +1264,7 @@ int drm_mpi_system_start_get_media_buffer(mod_id_e enModID, int s32ChnId)
         target_mutex->unlock();
         return 0;
     } else if (target_chn->media_out_cb_status == CHN_OUT_CB_CLOSE) {
-        DRM_MEDIA_LOGD("enable rkmedia output callback");
+        DRM_MEDIA_LOGD("enable media output callback");
         target_chn->media_flow->SetOutputCallBack(target_chn, flow_output_callback);
     }
     target_chn->media_out_cb_status = CHN_OUT_CB_USER;
@@ -1586,7 +1586,7 @@ int drm_mpi_vi_disable_channel(int channel)
     clear_media_channel_buffer(&g_vi_chns[channel]);
     g_vi_chns[channel].status = CHN_STATUS_CLOSED;
     g_vi_chns[channel].luma_buf_mtx.lock();
-    g_vi_chns[channel].luma_rkmedia_buf.reset();
+    g_vi_chns[channel].luma_media_buf.reset();
     g_vi_chns[channel].luma_buf_cond.notify_all();
     g_vi_chns[channel].luma_buf_quit = true;
     g_vi_chns[channel].luma_buf_mtx.unlock();
@@ -1823,12 +1823,12 @@ int drm_mpi_vi_stop_region_luma(int channel)
 
     g_vi_chns[channel].luma_buf_mtx.lock();
     g_vi_chns[channel].luma_buf_start = false;
-    g_vi_chns[channel].luma_rkmedia_buf.reset();
+    g_vi_chns[channel].luma_media_buf.reset();
     g_vi_chns[channel].luma_buf_mtx.unlock();
 
     g_vi_mtx.lock();
     if (g_vi_chns[channel].media_out_cb_status == CHN_OUT_CB_LUMA) {
-        DRM_MEDIA_LOGD("luma mode: disable rkmedia out callback");
+        DRM_MEDIA_LOGD("luma mode: disable media out callback");
         g_vi_chns[channel].media_out_cb_status = CHN_OUT_CB_CLOSE;
         g_vi_chns[channel].media_flow->SetOutputCallBack(&g_vi_chns[channel], flow_output_callback);
     }
@@ -1912,7 +1912,7 @@ int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_
     {
         std::unique_lock<std::mutex> lck(target_chn->luma_buf_mtx);
 
-        if (!target_chn->luma_rkmedia_buf) {
+        if (!target_chn->luma_media_buf) {
             if ((s32MilliSec < 0) && !target_chn->luma_buf_quit) {
                 target_chn->luma_buf_cond.wait(lck);
             } else if (s32MilliSec > 0) {
@@ -1924,11 +1924,11 @@ int drm_mpi_vi_get_channel_region_luma(int channel, const drm_video_region_info_
             }
         }
 
-        if (target_chn->luma_rkmedia_buf) {
-            media_mb = std::static_pointer_cast<libdrm::ImageBuffer>(target_chn->luma_rkmedia_buf);
+        if (target_chn->luma_media_buf) {
+            media_mb = std::static_pointer_cast<libdrm::ImageBuffer>(target_chn->luma_media_buf);
         }
 
-        target_chn->luma_rkmedia_buf.reset();
+        target_chn->luma_media_buf.reset();
     }
 
     if (!media_mb) {
@@ -2371,7 +2371,7 @@ int drm_mpi_rga_create_channel(int channel, drm_rga_attr_t *pstRgaAttr)
     PARAM_STRING_APPEND_TO(filter_param, DRM_KEY_BUFFER_FLIP, enFlip);
 
     flow_param = libdrm::JoinFlowParam(flow_param, 1, filter_param);
-    DRM_MEDIA_LOGD("Rkrga Filter flow param:[%s]", flow_param.c_str());
+    DRM_MEDIA_LOGD("rkrga filter flow param:[%s]", flow_param.c_str());
 
     g_rga_chns[channel].media_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
     if (!g_rga_chns[channel].media_flow) {
@@ -3169,11 +3169,11 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
     uint32_t u32InFpsDen = 1;
     uint32_t u32OutFpsNum = 1;
     uint32_t u32OutFpsDen = 1;
-    const char *pcRkmediaRcMode = nullptr;
-    const char *pcRkmediaCodecType = nullptr;
+    const char *pcMediaRcMode = nullptr;
+    const char *pcMediaCodecType = nullptr;
     VENC_CHN_ATTR_S *stVencChnAttr = &VenChn->venc_attr.attr;
     VENC_CHN_PARAM_S *stVencChnParam = &VenChn->venc_attr.param;
-    VENC_ROTATION_E enRotation = stVencChnAttr->stVencAttr.enRotation;
+    drm_venc_rotation_e enRotation = stVencChnAttr->stVencAttr.enRotation;
 
     int mjpeg_bps = 0;
     int pre_enc_bps = 2000000;
@@ -3191,14 +3191,14 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
             u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen;
             u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum;
             u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen;
-            pcRkmediaRcMode = DRM_KEY_CBR;
+            pcMediaRcMode = DRM_KEY_CBR;
         } else if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGVBR) {
             mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegVbr.u32BitRate;
             u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateNum;
             u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateDen;
             u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateNum;
             u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateDen;
-            pcRkmediaRcMode = DRM_KEY_VBR;
+            pcMediaRcMode = DRM_KEY_VBR;
         } else {
             DRM_MEDIA_LOGE("Invalid RcMode:[%d]", stVencChnAttr->stRcAttr.enRcMode);
             return -1;
@@ -3219,13 +3219,13 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
             return -4;
         }
 
-        pcRkmediaCodecType = DRM_VIDEO_MJPEG;
+        pcMediaCodecType = DRM_VIDEO_MJPEG;
         s32ZoomWidth = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomWidth;
         s32ZoomHeight = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomHeight;
         s32ZoomVirWidth = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomVirWidth;
         s32ZoomVirHeight = stVencChnAttr->stVencAttr.stAttrMjpege.u32ZoomVirHeight;
     } else {
-        pcRkmediaCodecType = DRM_IMAGE_JPEG;
+        pcMediaCodecType = DRM_IMAGE_JPEG;
         s32ZoomWidth = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomWidth;
         s32ZoomHeight = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomHeight;
         s32ZoomVirWidth = stVencChnAttr->stVencAttr.stAttrJpege.u32ZoomVirWidth;
@@ -3377,7 +3377,7 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
     flow_param = "";
     PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
     PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, DRM_IMAGE_NV12);
-    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcRkmediaCodecType);
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcMediaCodecType);
 
     enc_param = "";
     PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, jpeg_width);
@@ -3406,7 +3406,7 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
 
         PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps_out);
         PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_out);
-        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcRkmediaRcMode);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcMediaRcMode);
     } else {
         PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_QFACTOR, 50);
 
@@ -3424,7 +3424,7 @@ static int create_media_jpeg_snap_pipeline(drm_media_channel_t *VenChn)
     }
 
     flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
-    DRM_MEDIA_LOGD("JPEG: Type:[%s] encoder flow param:[%s]", pcRkmediaCodecType, flow_param.c_str());
+    DRM_MEDIA_LOGD("JPEG: Type:[%s] encoder flow param:[%s]", pcMediaCodecType, flow_param.c_str());
 
     video_jpeg_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
     if (!video_jpeg_flow) {
@@ -3497,15 +3497,15 @@ static int create_media_jpeg_light(drm_media_channel_t *VenChn)
     uint32_t u32OutFpsNum = 1;
     uint32_t u32OutFpsDen = 1;
     bool bSupprtDcf = false;
-    const char *pcRkmediaRcMode = nullptr;
-    const char *pcRkmediaCodecType = nullptr;
+    const char *pcMediaRcMode = nullptr;
+    const char *pcMediaCodecType = nullptr;
     std::shared_ptr<libdrm::Flow> video_jpeg_flow;
     int video_width = stVencChnAttr->stVencAttr.u32PicWidth;
     int video_height = stVencChnAttr->stVencAttr.u32PicHeight;
     int vir_width = stVencChnAttr->stVencAttr.u32VirWidth;
     int vir_height = stVencChnAttr->stVencAttr.u32VirHeight;
     std::string pixel_format = ImageTypeToString(stVencChnAttr->stVencAttr.imageType);
-    VENC_ROTATION_E enRotation = stVencChnAttr->stVencAttr.enRotation;
+    drm_venc_rotation_e enRotation = stVencChnAttr->stVencAttr.enRotation;
 
     if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
         if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
@@ -3514,14 +3514,14 @@ static int create_media_jpeg_light(drm_media_channel_t *VenChn)
             u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen;
             u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum;
             u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen;
-            pcRkmediaRcMode = DRM_KEY_CBR;
+            pcMediaRcMode = DRM_KEY_CBR;
         } else if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGVBR) {
             mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegVbr.u32BitRate;
             u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateNum;
             u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateDen;
             u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateNum;
             u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateDen;
-            pcRkmediaRcMode = DRM_KEY_VBR;
+            pcMediaRcMode = DRM_KEY_VBR;
         } else {
             DRM_MEDIA_LOGE("Invalid RcMode:[%d]", stVencChnAttr->stRcAttr.enRcMode);
             return -2;
@@ -3542,10 +3542,10 @@ static int create_media_jpeg_light(drm_media_channel_t *VenChn)
             return -5;
         }
 
-        pcRkmediaCodecType = DRM_VIDEO_MJPEG;
+        pcMediaCodecType = DRM_VIDEO_MJPEG;
     } else {
         bSupprtDcf = stVencChnAttr->stVencAttr.stAttrJpege.bSupportDCF;
-        pcRkmediaCodecType = DRM_IMAGE_JPEG;
+        pcMediaCodecType = DRM_IMAGE_JPEG;
     }
 
     std::string enc_param = "";
@@ -3554,7 +3554,7 @@ static int create_media_jpeg_light(drm_media_channel_t *VenChn)
 
     PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
     PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, pixel_format);
-    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcRkmediaCodecType);
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcMediaCodecType);
     PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, video_width);
     PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, video_height);
     PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, vir_width);
@@ -3600,13 +3600,13 @@ static int create_media_jpeg_light(drm_media_channel_t *VenChn)
             PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, mjpeg_bps);
         }
 
-        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcRkmediaRcMode);
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcMediaRcMode);
     } else {
         PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_QFACTOR, 50);
     }
 
     flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
-    DRM_MEDIA_LOGD("JPEG-LT: Type:[%s] encoder flow param:[%s]", pcRkmediaCodecType, flow_param.c_str());
+    DRM_MEDIA_LOGD("JPEG-LT: Type:[%s] encoder flow param:[%s]", pcMediaCodecType, flow_param.c_str());
 
     video_jpeg_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
     if (!video_jpeg_flow) {
@@ -3658,18 +3658,18 @@ int drm_mpi_venc_destroy_channel(int channel)
 
     std::shared_ptr<libdrm::Flow> ptrFlowHead = NULL;
     while (!g_venc_chns[channel].media_flow_list.empty()) {
-        auto ptrRkmediaFlow0 = g_venc_chns[channel].media_flow_list.back();
+        auto ptrMediaFlow0 = g_venc_chns[channel].media_flow_list.back();
         g_venc_chns[channel].media_flow_list.pop_back();
 
         if (!g_venc_chns[channel].media_flow_list.empty()) {
-            auto ptrRkmediaFlow1 = g_venc_chns[channel].media_flow_list.back();
-            ptrRkmediaFlow1->RemoveDownFlow(ptrRkmediaFlow0);
+            auto ptrMediaFlow1 = g_venc_chns[channel].media_flow_list.back();
+            ptrMediaFlow1->RemoveDownFlow(ptrMediaFlow0);
         } else {
-            ptrFlowHead = ptrRkmediaFlow0;
+            ptrFlowHead = ptrMediaFlow0;
             break;
         }
 
-        ptrRkmediaFlow0.reset();
+        ptrMediaFlow0.reset();
     }
 
     if (g_venc_chns[channel].media_flow) {
@@ -3897,6 +3897,60 @@ int drm_mpi_venc_create_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr)
     }
 
     DRM_MEDIA_LOGI("Enable venc channel:[%d], type:[%d] finished......", channel, stVencChnAttr->stVencAttr.enType);
+
+    return 0;
+}
+
+int drm_mpi_venc_set_gop(int channel, uint32_t u32Gop)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    int ret = video_encoder_set_gop_size(g_venc_chns[channel].media_flow, u32Gop);
+    if (!ret) {
+        g_venc_chns[channel].venc_attr.attr.stGopAttr.u32GopSize = u32Gop;
+        switch (g_venc_chns[channel].venc_attr.attr.stRcAttr.enRcMode) {
+            case VENC_RC_MODE_H264CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Cbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_H264VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_H264AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH264Vbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_MJPEGCBR:
+                break;
+
+            case VENC_RC_MODE_MJPEGVBR:
+                break;
+
+            case VENC_RC_MODE_H265CBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Cbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_H265VBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Vbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_H265AVBR:
+                g_venc_chns[channel].venc_attr.attr.stRcAttr.stH265Avbr.u32Gop = u32Gop;
+                break;
+
+            case VENC_RC_MODE_BUTT:
+                break;
+        }
+    }
+    g_venc_mtx.unlock();
 
     return 0;
 }
@@ -4235,6 +4289,70 @@ int drm_mpi_venc_set_rc_mode(int channel, drm_venc_rc_mode_e RcMode)
     return ret;
 }
 
+int drm_mpi_venc_set_rc_quality(int channel, drm_venc_rc_quality_e RcQuality)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN)
+        return -2;
+
+    g_venc_mtx.lock();
+    switch (RcQuality) {
+        case VENC_RC_QUALITY_HIGHEST:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_HIGHEST);
+            break;
+
+        case VENC_RC_QUALITY_HIGHER:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_HIGHER);
+            break;
+
+        case VENC_RC_QUALITY_HIGH:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_HIGH);
+            break;
+
+        case VENC_RC_QUALITY_MEDIUM:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_MEDIUM);
+            break;
+
+        case VENC_RC_QUALITY_LOW:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_LOW);
+            break;
+
+        case VENC_RC_QUALITY_LOWER:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_LOWER);
+            break;
+
+        case VENC_RC_QUALITY_LOWEST:
+            video_encoder_set_rc_quality(g_venc_chns[channel].media_flow, DRM_KEY_LOWEST);
+            break;
+
+        default:
+            break;
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_request_idr(int channel, bool bInstant)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    video_encoder_force_idr(g_venc_chns[channel].media_flow);
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
 int drm_mpi_venc_get_channel_attribute(int channel, drm_venc_chn_attr_t *stVencChnAttr)
 {
     if (!stVencChnAttr) {
@@ -4390,7 +4508,7 @@ static int venc_set_bitrate_if_change(int channel, drm_venc_rc_attr_t *stRcAttr)
     return ret;
 }
 
-static int RK_MPI_VENC_SetFps_If_Change(int channel, drm_venc_rc_attr_t *stRcAttr)
+static int venc_set_fps_if_change(int channel, drm_venc_rc_attr_t *stRcAttr)
 {
     int ret = 0;
 
@@ -4565,7 +4683,7 @@ int drm_mpi_venc_set_channel_attribute(int channel, drm_venc_chn_attr_t *stVencC
         return ret;
     }
 
-    ret = RK_MPI_VENC_SetFps_If_Change(channel, &stVencChnAttr->stRcAttr);
+    ret = venc_set_fps_if_change(channel, &stVencChnAttr->stRcAttr);
     if (ret) {
         return ret;
     }
@@ -4573,6 +4691,1102 @@ int drm_mpi_venc_set_channel_attribute(int channel, drm_venc_chn_attr_t *stVencC
     ret = venc_set_gop_mode_if_change(channel, &stVencChnAttr->stGopAttr);
     if (ret) {
         return ret;
+    }
+
+    return ret;
+}
+
+int drm_mpi_venc_create_jpeg_light_channel(int channel, drm_venc_chn_attr_t *stVencChnAttr)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!stVencChnAttr) {
+        return -2;
+    }
+
+    if ((stVencChnAttr->stVencAttr.enType != DRM_CODEC_TYPE_JPEG) && (stVencChnAttr->stVencAttr.enType != DRM_CODEC_TYPE_MJPEG)) {
+        return -3;
+    }
+
+    if (g_venc_chns[channel].status != CHN_STATUS_CLOSED) {
+        return -4;
+    }
+
+    DRM_MEDIA_LOGI("Enable venc channel:[%d], type:[%d] starting......", channel, stVencChnAttr->stVencAttr.enType);
+
+    uint32_t u32InFpsNum = 1;
+    uint32_t u32InFpsDen = 1;
+    uint32_t u32OutFpsNum = 1;
+    uint32_t u32OutFpsDen = 1;
+    const char *pcMediaRcMode = nullptr;
+    const char *pcMediaCodecType = nullptr;
+    std::shared_ptr<libdrm::Flow> video_jpeg_flow;
+
+    int mjpeg_bps = 0;
+    int video_width = stVencChnAttr->stVencAttr.u32PicWidth;
+    int video_height = stVencChnAttr->stVencAttr.u32PicHeight;
+    int vir_width = stVencChnAttr->stVencAttr.u32VirWidth;
+    int vir_height = stVencChnAttr->stVencAttr.u32VirHeight;
+    std::string pixel_format = ImageTypeToString(stVencChnAttr->stVencAttr.imageType);
+    drm_venc_rotation_e enRotation = stVencChnAttr->stVencAttr.enRotation;
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegCbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegCbr.fr32DstFrameRateDen;
+            pcMediaRcMode = DRM_KEY_CBR;
+        } else if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGVBR) {
+            mjpeg_bps = stVencChnAttr->stRcAttr.stMjpegVbr.u32BitRate;
+            u32InFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateNum;
+            u32InFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.u32SrcFrameRateDen;
+            u32OutFpsNum = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateNum;
+            u32OutFpsDen = stVencChnAttr->stRcAttr.stMjpegVbr.fr32DstFrameRateDen;
+            pcMediaRcMode = DRM_KEY_VBR;
+        } else {
+            DRM_MEDIA_LOGE("Invalid RcMode:[%d]", stVencChnAttr->stRcAttr.enRcMode);
+            return -5;
+        }
+
+        if ((mjpeg_bps < 2000) || (mjpeg_bps > 100000000)) {
+            DRM_MEDIA_LOGE("Invalid BitRate:[%d], should be:[2000, 100000000]", mjpeg_bps);
+            return -6;
+        }
+
+        if (!u32InFpsNum) {
+            DRM_MEDIA_LOGE("Invalid src frame rate:[%d/%d]", u32InFpsNum, u32InFpsDen);
+            return -7;
+        }
+
+        if (!u32OutFpsNum) {
+            DRM_MEDIA_LOGE("Invalid dst frame rate:[%d/%d]", u32OutFpsNum, u32OutFpsDen);
+            return -8;
+        }
+
+        pcMediaCodecType = DRM_VIDEO_MJPEG;
+    } else {
+        pcMediaCodecType = DRM_IMAGE_JPEG;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status != CHN_STATUS_CLOSED) {
+        g_venc_mtx.unlock();
+        return -9;
+    }
+
+    memcpy(&g_venc_chns[channel].venc_attr.attr, stVencChnAttr, sizeof(drm_venc_chn_attr_t));
+
+    std::string enc_param = "";
+    std::string flow_param = "";
+    std::string flow_name = "video_enc";
+
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "rkmpp");
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_INPUTDATATYPE, DRM_IMAGE_NV12);
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_OUTPUTDATATYPE, pcMediaCodecType);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_WIDTH, video_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_HEIGHT, video_height);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_WIDTH, vir_width);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_BUFFER_VIR_HEIGHT, vir_height);
+    PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_ROTATION, enRotation);
+
+    if (stVencChnAttr->stVencAttr.enType == DRM_CODEC_TYPE_MJPEG) {
+        std::string str_fps_in;
+        str_fps_in.append(std::to_string(u32InFpsNum)).append("/").append(std::to_string(u32InFpsDen));
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS_IN, str_fps_in);
+
+        std::string str_fps_out;
+        str_fps_out.append(std::to_string(u32OutFpsNum)).append("/").append(std::to_string(u32OutFpsDen));
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_FPS, str_fps_out);
+
+        if (stVencChnAttr->stRcAttr.enRcMode == VENC_RC_MODE_MJPEGCBR) {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE, mjpeg_bps);
+        } else {
+            PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_COMPRESS_BITRATE_MAX, mjpeg_bps);
+        }
+
+        PARAM_STRING_APPEND(enc_param, DRM_KEY_COMPRESS_RC_MODE, pcMediaRcMode);
+    } else {
+        PARAM_STRING_APPEND_TO(enc_param, DRM_KEY_JPEG_QFACTOR, 50);
+    }
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, enc_param);
+    DRM_MEDIA_LOGD("JPEG-LT: Type:[%s] encoder flow param:[%s]", pcMediaCodecType, flow_param.c_str());
+
+    video_jpeg_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+    if (!video_jpeg_flow) {
+        DRM_MEDIA_LOGE("Create flow:[%s] failed", flow_name.c_str());
+        g_venc_mtx.unlock();
+        return -10;
+    }
+
+    video_jpeg_flow->SetFlowTag("JpegLightEncoder");
+
+    init_media_channel_buffer(&g_venc_chns[channel]);
+    video_jpeg_flow->SetOutputCallBack(&g_venc_chns[channel], flow_output_callback);
+
+    g_venc_chns[channel].media_flow = video_jpeg_flow;
+    g_venc_chns[channel].media_flow_list.push_back(video_jpeg_flow);
+
+    if (pipe2(g_venc_chns[channel].wake_fd, O_CLOEXEC) == -1) {
+        g_venc_chns[channel].wake_fd[0] = 0;
+        g_venc_chns[channel].wake_fd[1] = 0;
+        DRM_MEDIA_LOGW("Create pipe failed");
+    }
+    g_venc_chns[channel].status = CHN_STATUS_OPEN;
+    g_venc_mtx.unlock();
+
+    g_venc_chns[channel].venc_attr.bFullFunc = false;
+    return 0;
+}
+
+int drm_mpi_venc_get_channel_parameter(int channel, drm_venc_chn_param_t *stVencChnParam)
+{
+    if (!stVencChnParam) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    memcpy(stVencChnParam, &g_venc_chns[channel].venc_attr.param, sizeof(drm_venc_chn_param_t));
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_channel_parameter(int channel, drm_venc_chn_param_t *stVencChnParam)
+{
+    if (!stVencChnParam) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status == CHN_STATUS_CLOSED) {
+        g_venc_mtx.unlock();
+        return -3;
+    }
+
+    memcpy(&g_venc_chns[channel].venc_attr.param, stVencChnParam, sizeof(drm_venc_chn_param_t));
+
+    DrmVideoResolutionCfg vid_cfg;
+    std::shared_ptr<libdrm::Flow> flow;
+    drm_codec_type_e enCodecType = g_venc_chns[channel].venc_attr.attr.stVencAttr.enType;
+
+    if (((enCodecType == DRM_CODEC_TYPE_MJPEG) || (enCodecType == DRM_CODEC_TYPE_JPEG)) && (g_venc_chns[channel].venc_attr.bFullFunc)) {
+        vid_cfg.width = g_venc_chns[channel].venc_attr.attr.stVencAttr.stAttrJpege.u32ZoomWidth;
+        vid_cfg.height = g_venc_chns[channel].venc_attr.attr.stVencAttr.stAttrJpege.u32ZoomHeight;
+        vid_cfg.vir_width = g_venc_chns[channel].venc_attr.attr.stVencAttr.stAttrJpege.u32ZoomVirWidth;
+        vid_cfg.vir_height = g_venc_chns[channel] .venc_attr.attr.stVencAttr.stAttrJpege.u32ZoomVirHeight;
+        flow = g_venc_chns[channel].media_flow_list.back();
+    } else {
+        vid_cfg.width = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicWidth;
+        vid_cfg.height = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicHeight;
+        vid_cfg.vir_width = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirWidth;
+        vid_cfg.vir_height = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32VirHeight;
+        flow = g_venc_chns[channel].media_flow;
+    }
+
+    vid_cfg.x = stVencChnParam->stCropCfg.stRect.s32X;
+    vid_cfg.y = stVencChnParam->stCropCfg.stRect.s32Y;
+    vid_cfg.w = stVencChnParam->stCropCfg.stRect.u32Width;
+    vid_cfg.h = stVencChnParam->stCropCfg.stRect.u32Height;
+
+    int ret = video_encoder_set_resolution(flow, &vid_cfg);
+    if (ret) {
+        g_venc_mtx.unlock();
+        return -4;
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_get_rc_parameter(int channel, drm_venc_rc_param_t *pstRcParam)
+{
+    if (!pstRcParam) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    DrmVideoEncoderQp stVencQp;
+
+    g_venc_mtx.lock();
+    int ret = video_encoder_get_qp(g_venc_chns[channel].media_flow, stVencQp);
+    if (!ret) {
+        memcpy(pstRcParam->u32ThrdI, stVencQp.thrd_i, RC_TEXTURE_THR_SIZE * sizeof(uint32_t));
+        memcpy(pstRcParam->u32ThrdP, stVencQp.thrd_p, RC_TEXTURE_THR_SIZE * sizeof(uint32_t));
+        pstRcParam->u32RowQpDeltaI = stVencQp.row_qp_delta_i;
+        pstRcParam->u32RowQpDeltaP = stVencQp.row_qp_delta_p;
+
+        pstRcParam->bEnableHierQp = (bool)stVencQp.hier_qp_en;
+        memcpy(pstRcParam->s32HierQpDelta, stVencQp.hier_qp_delta, RC_HEIR_SIZE * sizeof(int));
+        memcpy(pstRcParam->s32HierFrameNum, stVencQp.hier_frame_num, RC_HEIR_SIZE * sizeof(int));
+
+        pstRcParam->s32FirstFrameStartQp = stVencQp.qp_init;
+        switch (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType) {
+            case DRM_CODEC_TYPE_H264:
+                pstRcParam->stParamH264.u32MaxQp = stVencQp.qp_max;
+                pstRcParam->stParamH264.u32MinQp = stVencQp.qp_min;
+                pstRcParam->stParamH264.u32MaxIQp = stVencQp.qp_max_i;
+                pstRcParam->stParamH264.u32MinIQp = stVencQp.qp_min_i;
+                break;
+
+            case DRM_CODEC_TYPE_H265:
+                pstRcParam->stParamH265.u32MaxQp = stVencQp.qp_max;
+                pstRcParam->stParamH265.u32MinQp = stVencQp.qp_min;
+                pstRcParam->stParamH265.u32MaxIQp = stVencQp.qp_max_i;
+                pstRcParam->stParamH265.u32MinIQp = stVencQp.qp_min_i;
+                break;
+
+            case DRM_CODEC_TYPE_JPEG:
+                break;
+
+            default:
+                break;
+        }
+    } else {
+        memcpy(pstRcParam, &g_venc_chns[channel].venc_attr.stRcPara, sizeof(drm_venc_rc_param_t));
+    }
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_rc_parameter(int channel, drm_venc_rc_param_t *pstRcParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    DrmVideoEncoderQp stVencQp;
+
+    memcpy(stVencQp.thrd_i, pstRcParam->u32ThrdI, RC_TEXTURE_THR_SIZE * sizeof(uint32_t));
+    memcpy(stVencQp.thrd_p, pstRcParam->u32ThrdP, RC_TEXTURE_THR_SIZE * sizeof(uint32_t));
+    stVencQp.row_qp_delta_i = pstRcParam->u32RowQpDeltaI;
+    stVencQp.row_qp_delta_p = pstRcParam->u32RowQpDeltaP;
+
+    stVencQp.hier_qp_en = (bool)pstRcParam->bEnableHierQp;
+    memcpy(stVencQp.hier_qp_delta, pstRcParam->s32HierQpDelta, RC_HEIR_SIZE * sizeof(int));
+    memcpy(stVencQp.hier_frame_num, pstRcParam->s32HierFrameNum, RC_HEIR_SIZE * sizeof(int));
+
+    stVencQp.qp_init = pstRcParam->s32FirstFrameStartQp;
+    switch (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType) {
+        case DRM_CODEC_TYPE_H264:
+            stVencQp.qp_step = pstRcParam->stParamH264.u32StepQp;
+            stVencQp.qp_max = pstRcParam->stParamH264.u32MaxQp;
+            stVencQp.qp_min = pstRcParam->stParamH264.u32MinQp;
+            stVencQp.qp_max_i = pstRcParam->stParamH264.u32MaxIQp;
+            stVencQp.qp_min_i = pstRcParam->stParamH264.u32MinIQp;
+            break;
+
+        case DRM_CODEC_TYPE_H265:
+            stVencQp.qp_step = pstRcParam->stParamH265.u32StepQp;
+            stVencQp.qp_max = pstRcParam->stParamH265.u32MaxQp;
+            stVencQp.qp_min = pstRcParam->stParamH265.u32MinQp;
+            stVencQp.qp_max_i = pstRcParam->stParamH265.u32MaxIQp;
+            stVencQp.qp_min_i = pstRcParam->stParamH265.u32MinIQp;
+            break;
+
+        case DRM_CODEC_TYPE_JPEG:
+            break;
+
+        default:
+            break;
+    }
+
+    int ret = video_encoder_set_qp(g_venc_chns[channel].media_flow, stVencQp);
+    if (!ret) {
+        memcpy(&g_venc_chns[channel].venc_attr.stRcPara, pstRcParam, sizeof(drm_venc_rc_param_t));
+    }
+    g_venc_mtx.unlock();
+
+    return ret;
+}
+
+int drm_mpi_venc_set_jpeg_parameter(int channel, drm_venc_jpeg_param_t *pstJpegParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstJpegParam) {
+        return -2;
+    }
+
+    if (pstJpegParam->u32Qfactor > 99 || !pstJpegParam->u32Qfactor) {
+        DRM_MEDIA_LOGE("u32Qfactor:[%d] is invalid, should be:[1, 99]", pstJpegParam->u32Qfactor);
+        return -3;
+    }
+
+    if ((g_venc_chns[channel].status < CHN_STATUS_OPEN) || g_venc_chns[channel].media_flow_list.empty()) {
+        return -4;
+    }
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType != DRM_CODEC_TYPE_JPEG) {
+        return -5;
+    }
+
+    std::shared_ptr<libdrm::Flow> media_flow = g_venc_chns[channel].media_flow_list.back();
+    int ret = libdrm::jpeg_encoder_set_qfactor(media_flow, pstJpegParam->u32Qfactor);
+
+    return ret;
+}
+
+int drm_mpi_venc_insert_userdata(int channel, uint8_t *pu8Data, uint32_t u32Len)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    video_encoder_set_userdata(g_venc_chns[channel].media_flow, pu8Data, u32Len);
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_get_roi_attribute(int channel, drm_venc_roi_attr_t *pstRoiAttr, int roi_index07)
+{
+    if (!pstRoiAttr) {
+        return -1;
+    }
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    if ((roi_index07 < 0) || (roi_index07 > 7)) {
+        return -4;
+    }
+
+    g_venc_mtx.lock();
+    memcpy(pstRoiAttr, &g_venc_chns[channel].venc_attr.astRoiAttr[roi_index07], sizeof(drm_venc_roi_attr_t));
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_set_roi_attribute(int channel, const drm_venc_roi_attr_t *pstRoiAttr, int region_cnt)
+{
+    int ret = 0;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (((pstRoiAttr == nullptr) && (region_cnt > 0)) || (region_cnt > 8)) {
+        return -3;
+    }
+
+    if (g_venc_chns[channel].venc_attr.attr.stVencAttr.enType != DRM_CODEC_TYPE_H264
+        && g_venc_chns[channel].venc_attr.attr.stVencAttr.enType != DRM_CODEC_TYPE_H265)
+    {
+        return -4;
+    }
+
+    int img_width;
+    int img_height;
+    int x_offset = 0;
+    int y_offset = 0;
+    int valid_rgn_cnt = 0;
+    DrmEncROIRegion regions[region_cnt];
+
+    if ((g_venc_chns[channel].venc_attr.attr.stVencAttr.enRotation == VENC_ROTATION_90)
+        || (g_venc_chns[channel].venc_attr.attr.stVencAttr.enRotation == VENC_ROTATION_270))
+    {
+        img_width = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicHeight;
+        img_height = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicWidth;
+    } else {
+        img_width = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicWidth;
+        img_height = g_venc_chns[channel].venc_attr.attr.stVencAttr.u32PicHeight;
+    }
+
+    memset(regions, 0x00, sizeof(DrmEncROIRegion) * region_cnt);
+    for (int i = 0; i < region_cnt; i++) {
+        if (!pstRoiAttr[i].bEnable) {
+            continue;
+        }
+
+        regions[valid_rgn_cnt].x = pstRoiAttr[i].stRect.s32X;
+        regions[valid_rgn_cnt].y = pstRoiAttr[i].stRect.s32Y;
+        regions[valid_rgn_cnt].w = pstRoiAttr[i].stRect.u32Width;
+        regions[valid_rgn_cnt].h = pstRoiAttr[i].stRect.u32Height;
+        regions[valid_rgn_cnt].intra = pstRoiAttr[i].bIntra;
+        regions[valid_rgn_cnt].abs_qp_en = pstRoiAttr[i].bAbsQp;
+        regions[valid_rgn_cnt].qp_area_idx = pstRoiAttr[i].u32Index;
+        regions[valid_rgn_cnt].quality = pstRoiAttr[i].s32Qp;
+        regions[valid_rgn_cnt].area_map_en = 1;
+
+        x_offset = pstRoiAttr[i].stRect.s32X + pstRoiAttr[i].stRect.u32Width;
+        y_offset = pstRoiAttr[i].stRect.s32Y + pstRoiAttr[i].stRect.u32Height;
+        if ((x_offset > img_width) || (y_offset > img_height)) {
+            return -5;
+        }
+
+        valid_rgn_cnt++;
+    }
+
+    g_venc_mtx.lock();
+    ret = video_encoder_set_roi_regions(g_venc_chns[channel].media_flow, regions, valid_rgn_cnt);
+    if (!ret) {
+        for (int i = 0; i < region_cnt; i++) {
+            memcpy(&g_venc_chns[channel].venc_attr.astRoiAttr[i], &pstRoiAttr[i], sizeof(drm_venc_roi_attr_t));
+        }
+    }
+    g_venc_mtx.unlock();
+
+    return ret ? -6 : 0;
+}
+
+int drm_mpi_venc_get_fd(int channel)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    int rcv_fd = 0;
+
+    g_venc_mtx.lock();
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        g_venc_mtx.unlock();
+        return -2;
+    }
+    rcv_fd = g_venc_chns[channel].wake_fd[0];
+    g_venc_mtx.unlock();
+
+    return rcv_fd;
+}
+
+int drm_mpi_venc_query_status(int channel, drm_venc_chn_status_t *pstStatus)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstStatus) {
+        return -2;
+    }
+
+    g_venc_mtx.lock();
+    if ((g_venc_chns[channel].status < CHN_STATUS_OPEN) || (!g_venc_chns[channel].media_flow)) {
+        g_venc_mtx.unlock();
+        return -3;
+    }
+
+    uint32_t u32BufferUsedCnt = 0;
+    uint32_t u32BufferTotalCnt = 0;
+
+    g_venc_chns[channel].media_flow->GetCachedBufferNum(u32BufferTotalCnt, u32BufferUsedCnt);
+    g_venc_mtx.unlock();
+
+    pstStatus->u32LeftFrames = u32BufferUsedCnt;
+    pstStatus->u32TotalFrames = u32BufferTotalCnt;
+
+    g_venc_chns[channel].buffer_list_mtx.lock();
+    pstStatus->u32TotalPackets = g_venc_chns[channel].buffer_depth;
+    pstStatus->u32LeftPackets = g_venc_chns[channel].buffer_list.size();
+    g_venc_chns[channel].buffer_list_mtx.unlock();
+
+    return 0;
+}
+
+int drm_mpi_venc_get_super_frame_strategy(int channel, drm_venc_superframe_cfg_t *pstSuperFrmParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstSuperFrmParam) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].status != CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    if (!g_venc_chns[channel].media_flow) {
+        return -4;
+    }
+
+    // TODO:
+
+    return 0;
+}
+
+int drm_mpi_venc_set_super_frame_strategy(int channel, const drm_venc_superframe_cfg_t *pstSuperFrmParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstSuperFrmParam) {
+        return -2;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -3;
+    }
+
+    if (!g_venc_chns[channel].media_flow) {
+        return -4;
+    }
+
+    DrmVencSuperFrmCfg media_super_frm_cfg;
+    switch (pstSuperFrmParam->enSuperFrmMode) {
+        case SUPERFRM_NONE:
+            media_super_frm_cfg.SuperFrmMode = DRM_MEDIA_SUPERFRM_NONE;
+            break;
+
+        case SUPERFRM_DISCARD:
+            media_super_frm_cfg.SuperFrmMode = DRM_MEDIA_SUPERFRM_DISCARD;
+            break;
+
+        case SUPERFRM_REENCODE:
+            media_super_frm_cfg.SuperFrmMode = DRM_MEDIA_SUPERFRM_REENCODE;
+            break;
+
+        default:
+            return -5;
+    }
+
+    switch (pstSuperFrmParam->enRcPriority) {
+        case VENC_RC_PRIORITY_BITRATE_FIRST:
+            media_super_frm_cfg.RcPriority = DRM_MEDIA_VENC_RC_PRIORITY_BITRATE_FIRST;
+            break;
+
+        case VENC_RC_PRIORITY_FRAMEBITS_FIRST:
+            media_super_frm_cfg.RcPriority = DRM_MEDIA_VENC_RC_PRIORITY_FRAMEBITS_FIRST;
+            break;
+
+        default:
+            return -6;
+    }
+
+    media_super_frm_cfg.SuperIFrmBitsThr = pstSuperFrmParam->u32SuperIFrmBitsThr;
+    media_super_frm_cfg.SuperPFrmBitsThr = pstSuperFrmParam->u32SuperPFrmBitsThr;
+
+    int ret = libdrm::video_encoder_set_super_frame(g_venc_chns[channel].media_flow, &media_super_frm_cfg);
+    if (ret) {
+        ret = -7;
+    }
+
+    return 0;
+}
+
+int drm_mpi_venc_start_recv_frame(int channel, const drm_recv_pic_param_t *pstRecvParam)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstRecvParam) {
+        return -2;
+    }
+
+    if (!g_venc_chns[channel].media_flow) {
+        return -3;
+    }
+
+    g_venc_chns[channel].media_flow->SetRunTimes(pstRecvParam->s32RecvPicNum);
+    return 0;
+}
+
+int drm_mpi_venc_region_set_palette_id(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_osd_color_palette_buf_t *pstColPalBuf)
+{
+    int ret = 0;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if ((g_venc_chns[channel].status < CHN_STATUS_OPEN) || (g_venc_chns[channel].bColorTblInit == false)) {
+        return -2;
+    }
+
+    drm_codec_type_e enCodecType = g_venc_chns[channel].venc_attr.attr.stVencAttr.enType;
+    if (((enCodecType == DRM_CODEC_TYPE_MJPEG) || (enCodecType == DRM_CODEC_TYPE_JPEG)) && (!g_venc_chns[channel].venc_attr.bFullFunc)) {
+        DRM_MEDIA_LOGE("Jpeg lt don't support SetPaletteId");
+        return -3;
+    }
+
+    if (pstRgnInfo && !pstRgnInfo->u8Enable) {
+        DrmOsdRegionData media_osd_rgn;
+
+        memset(&media_osd_rgn, 0x00, sizeof(media_osd_rgn));
+        media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+        media_osd_rgn.enable = pstRgnInfo->u8Enable;
+        media_osd_rgn.region_type = REGION_TYPE_OVERLAY;
+
+        ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn);
+        if (ret) {
+            ret = -4;
+        }
+
+        return ret;
+    }
+
+    if (!pstColPalBuf || !pstColPalBuf->pIdBuf) {
+        return -5;
+    }
+
+    if (!pstRgnInfo || !pstRgnInfo->u32Width || !pstRgnInfo->u32Height) {
+        return -6;
+    }
+
+    if ((pstRgnInfo->u32PosX % 16) || (pstRgnInfo->u32PosY % 16) || (pstRgnInfo->u32Width % 16) || (pstRgnInfo->u32Height % 16)) {
+        DRM_MEDIA_LOGE("<x, y, w, h> = <%d, %d, %d, %d> must be 16 aligned", pstRgnInfo->u32PosX, pstRgnInfo->u32PosY, pstRgnInfo->u32Width, pstRgnInfo->u32Height);
+        return -7;
+    }
+
+    if ((pstRgnInfo->u32Width != pstColPalBuf->u32Width) || (pstRgnInfo->u32Height != pstColPalBuf->u32Height)) {
+        DRM_MEDIA_LOGE("RgnInfo:[%dx%d] and ColorPaletteBuf:[%dx%d] not equal", pstRgnInfo->u32Width, pstRgnInfo->u32Height, pstColPalBuf->u32Width, pstColPalBuf->u32Height);
+        return -8;
+    }
+
+    DrmOsdRegionData media_osd_rgn;
+
+    media_osd_rgn.buffer = (uint8_t *)pstColPalBuf->pIdBuf;
+    media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+    media_osd_rgn.pos_x = pstRgnInfo->u32PosX;
+    media_osd_rgn.pos_y = pstRgnInfo->u32PosY;
+    media_osd_rgn.width = pstRgnInfo->u32Width;
+    media_osd_rgn.height = pstRgnInfo->u32Height;
+    media_osd_rgn.inverse = pstRgnInfo->u8Inverse;
+    media_osd_rgn.enable = pstRgnInfo->u8Enable;
+    media_osd_rgn.region_type = REGION_TYPE_OVERLAY;
+
+    ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn);
+    if (ret) {
+        ret = -9;
+    }
+
+    return ret;
+}
+
+int drm_mpi_venc_region_init(int channel, drm_venc_color_tbl_t *stColorTbl)
+{
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        DRM_MEDIA_LOGE("venc should be opened before init osd");
+        return -2;
+    }
+
+    drm_codec_type_e enCodecType = g_venc_chns[channel].venc_attr.attr.stVencAttr.enType;
+    if (((enCodecType == DRM_CODEC_TYPE_MJPEG) || (enCodecType == DRM_CODEC_TYPE_JPEG))) {
+        g_venc_mtx.lock();
+        g_venc_chns[channel].bColorTblInit = true;
+        g_venc_mtx.unlock();
+
+        return 0;
+    }
+
+    int ret = 0;
+    const uint32_t *pu32ArgbColorTbl = NULL;
+    uint32_t u32AVUYColorTbl[VENC_RGN_COLOR_NUM] = {0};
+
+    if (stColorTbl) {
+        if (stColorTbl->bColorDichotomyEnable) {
+            DRM_MEDIA_LOGI("venc channel:[%d] user define color table(Dichotomy:[true])", channel);
+
+            std::sort(stColorTbl->u32ArgbTbl, stColorTbl->u32ArgbTbl + VENC_RGN_COLOR_NUM);
+            g_venc_chns[channel].bColorDichotomyEnable = true;
+        } else {
+            DRM_MEDIA_LOGI("venc channel:[%d] user define color table(Dichotomy:[false])", channel);
+            g_venc_chns[channel].bColorDichotomyEnable = false;
+        }
+
+        pu32ArgbColorTbl = stColorTbl->u32ArgbTbl;
+    } else {
+        DRM_MEDIA_LOGI("venc channel:[%d] default color table(Dichotomy:[true])", channel);
+
+        g_venc_chns[channel].bColorDichotomyEnable = true;
+        pu32ArgbColorTbl = u32DftARGB8888ColorTbl;
+    }
+
+    color_tbl_argb_to_avuy(pu32ArgbColorTbl, u32AVUYColorTbl);
+
+    g_venc_mtx.lock();
+    ret = libdrm::video_encoder_set_osd_plt(g_venc_chns[channel].media_flow, u32AVUYColorTbl);
+    if (ret) {
+        g_venc_mtx.unlock();
+        return -3;
+    }
+
+    memcpy(g_venc_chns[channel].u32ArgbColorTbl, pu32ArgbColorTbl, VENC_RGN_COLOR_NUM * 4);
+    g_venc_chns[channel].bColorTblInit = true;
+    g_venc_mtx.unlock();
+
+    return 0;
+}
+
+static void argb8888_to_region_data(int channel, const drm_bitmap_t *pstBitmap, uint8_t *data, uint32_t canvasWidth, uint32_t canvasHeight)
+{
+    uint32_t ColorValue;
+    uint8_t *CanvasLineStart;
+    uint8_t TransColorId = 0;
+    uint32_t *BitmapLineStart;
+    uint32_t TransColor = 0x00000000;
+    uint32_t TargetWidth, TargetHeight;
+
+    TargetWidth = (pstBitmap->u32Width > canvasWidth) ? canvasWidth : pstBitmap->u32Width;
+    TargetHeight = (pstBitmap->u32Height > canvasHeight) ? canvasHeight : pstBitmap->u32Height;
+
+    DRM_MEDIA_LOGD("bitmap:[%d, %d] -> canvas:[%d, %d], target:[%d, %d]", pstBitmap->u32Width, pstBitmap->u32Height, canvasWidth, canvasHeight, TargetWidth, TargetHeight);
+
+    memset(data, TransColorId, canvasWidth * canvasHeight);
+
+    for (uint32_t i = 0; i < TargetHeight; i++) {
+        CanvasLineStart = data + i * canvasWidth;
+        BitmapLineStart = (uint32_t *)pstBitmap->pData + i * pstBitmap->u32Width;
+
+        for (uint32_t j = 0; j < TargetWidth; j++) {
+            ColorValue = *(BitmapLineStart + j);
+
+            if (ColorValue == TransColor) {
+                continue;
+            }
+
+            if (g_venc_chns[channel].bColorDichotomyEnable) {
+                *(CanvasLineStart + j) = find_argb_color_tbl_by_dichotomy(g_venc_chns[channel].u32ArgbColorTbl, PALETTE_TABLE_LEN, ColorValue);
+            } else {
+                *(CanvasLineStart + j) = find_argb_color_tbl_by_order(g_venc_chns[channel].u32ArgbColorTbl, PALETTE_TABLE_LEN, ColorValue);
+            }
+        }
+    }
+}
+
+int drm_mpi_venc_region_set_bitmap(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_bitmap_t *pstBitmap)
+{
+    int ret = 0;
+    uint8_t *media_osd_data = NULL;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_venc_mtx.lock();
+    if ((g_venc_chns[channel].status < CHN_STATUS_OPEN) || (g_venc_chns[channel].bColorTblInit == false)) {
+        g_venc_mtx.unlock();
+        return -2;
+    } else {
+        g_venc_chns[channel].chn_ref_cnt++;
+    }
+    g_venc_mtx.unlock();
+
+    uint8_t u8Align = 16;
+    uint8_t u8PlaneCnt = 1;
+    bool bIsJpegLight = false;
+    drm_region_type_e region_type = REGION_TYPE_OVERLAY;
+    drm_codec_type_e enCodecType = g_venc_chns[channel].venc_attr.attr.stVencAttr.enType;
+
+    if (((enCodecType == DRM_CODEC_TYPE_MJPEG) || (enCodecType == DRM_CODEC_TYPE_JPEG))) {
+        bIsJpegLight = true;
+        u8Align = 2;
+        u8PlaneCnt = 4;
+        region_type = REGION_TYPE_OVERLAY_EX;
+    }
+
+    if (pstRgnInfo && !pstRgnInfo->u8Enable) {
+        DrmOsdRegionData media_osd_rgn;
+
+        memset(&media_osd_rgn, 0x00, sizeof(media_osd_rgn));
+        media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+        media_osd_rgn.enable = pstRgnInfo->u8Enable;
+        media_osd_rgn.region_type = region_type;
+
+        if (g_venc_chns[channel].venc_attr.bFullFunc) {
+            ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow_list.back(), &media_osd_rgn, u8PlaneCnt);
+        } else {
+            ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn);
+        }
+
+        if (ret) {
+            ret = -3;
+        }
+
+        goto deref;
+    }
+
+    if (!pstBitmap || !pstBitmap->pData || !pstBitmap->u32Width || !pstBitmap->u32Height) {
+        ret = -4;
+        goto deref;
+    }
+
+    if (!pstRgnInfo || !pstRgnInfo->u32Width || !pstRgnInfo->u32Height) {
+        ret = -5;
+        goto deref;
+    }
+
+    if ((pstRgnInfo->u32PosX % u8Align) || (pstRgnInfo->u32PosY % u8Align) || (pstRgnInfo->u32Width % u8Align) || (pstRgnInfo->u32Height % u8Align)) {
+        DRM_MEDIA_LOGE("<x, y, w, h> = <%d, %d, %d, %d> must be %u aligned", pstRgnInfo->u32PosX, pstRgnInfo->u32PosY, pstRgnInfo->u32Width, pstRgnInfo->u32Height, u8Align);
+
+        ret = -6;
+        goto deref;
+    }
+
+    if (!bIsJpegLight) {
+        uint32_t total_pix_num = pstRgnInfo->u32Width * pstRgnInfo->u32Height;
+        media_osd_data = (uint8_t *)malloc(total_pix_num);
+        if (!media_osd_data) {
+            DRM_MEDIA_LOGE("no space left, RgnInfo pixels:[%d]", total_pix_num);
+
+            ret = -7;
+            goto deref;
+        }
+
+        switch (pstBitmap->enPixelFormat) {
+            case PIXEL_FORMAT_ARGB_8888:
+                argb8888_to_region_data(channel, pstBitmap, media_osd_data, pstRgnInfo->u32Width, pstRgnInfo->u32Height);
+                break;
+
+            default:
+                DRM_MEDIA_LOGE("not support bitmap pixel format:[%d]", pstBitmap->enPixelFormat);
+                ret = -8;
+                goto deref;
+        }
+    } else {
+        if ((pstBitmap->u32Width != pstRgnInfo->u32Width) || (pstBitmap->u32Height != pstRgnInfo->u32Height)) {
+            DRM_MEDIA_LOGE("JpegLight:RgnInfo:[%ux%u] should be equal to BitMap:[%ux%u]", pstRgnInfo->u32Width, pstRgnInfo->u32Height, pstBitmap->u32Width, pstBitmap->u32Height);
+            ret = -9;
+            goto deref;
+        }
+
+        media_osd_data = (uint8_t *)pstBitmap->pData;
+    }
+
+    DrmOsdRegionData media_osd_rgn;
+    media_osd_rgn.buffer = media_osd_data;
+    media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+    media_osd_rgn.pos_x = pstRgnInfo->u32PosX;
+    media_osd_rgn.pos_y = pstRgnInfo->u32PosY;
+    media_osd_rgn.width = pstRgnInfo->u32Width;
+    media_osd_rgn.height = pstRgnInfo->u32Height;
+    media_osd_rgn.inverse = pstRgnInfo->u8Inverse;
+    media_osd_rgn.enable = pstRgnInfo->u8Enable;
+    media_osd_rgn.region_type = region_type;
+
+    if (g_venc_chns[channel].venc_attr.bFullFunc) {
+        ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow_list.back(), &media_osd_rgn, u8PlaneCnt);
+    } else {
+        ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn, u8PlaneCnt);
+    }
+
+    if (ret) {
+        ret = -10;
+    }
+
+    if (!bIsJpegLight && media_osd_data) {
+        free(media_osd_data);
+    }
+
+deref:
+    g_venc_mtx.lock();
+    g_venc_chns[channel].chn_ref_cnt--;
+    g_venc_mtx.unlock();
+
+    return ret;
+}
+
+int drm_mpi_venc_region_set_cover(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo)
+{
+    int ret = 0;
+    uint8_t color_id = 0xFF;
+    uint32_t total_pix_num = 0;
+    uint8_t *media_cover_data = NULL;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if ((g_venc_chns[channel].status < CHN_STATUS_OPEN) || (g_venc_chns[channel].bColorTblInit == false)) {
+        return -2;
+    }
+
+    uint8_t u8Align = 16;
+    uint8_t u8PlaneCnt = 1;
+    bool bIsJpegLight = false;
+    drm_region_type_e region_type = REGION_TYPE_OVERLAY;
+    drm_codec_type_e enCodecType = g_venc_chns[channel].venc_attr.attr.stVencAttr.enType;
+
+    if (((enCodecType == DRM_CODEC_TYPE_MJPEG) || (enCodecType == DRM_CODEC_TYPE_JPEG)) && (!g_venc_chns[channel].venc_attr.bFullFunc)) {
+        bIsJpegLight = true;
+        u8Align = 2;
+        u8PlaneCnt = 0;
+        region_type = REGION_TYPE_COVER_EX;
+    }
+
+    if (pstRgnInfo && !pstRgnInfo->u8Enable) {
+        DrmOsdRegionData media_osd_rgn;
+
+        memset(&media_osd_rgn, 0x00, sizeof(media_osd_rgn));
+        media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+        media_osd_rgn.enable = pstRgnInfo->u8Enable;
+        media_osd_rgn.region_type = region_type;
+
+        ret = libdrm::video_encoder_set_osd_region( g_venc_chns[channel].media_flow, &media_osd_rgn);
+        if (ret) {
+            ret = -3;
+        }
+
+        return ret;
+    }
+
+    if (!pstCoverInfo) {
+        return -4;
+    }
+
+    if (!pstRgnInfo || !pstRgnInfo->u32Width || !pstRgnInfo->u32Height) {
+        return -5;
+    }
+
+    if ((pstRgnInfo->u32PosX % u8Align) || (pstRgnInfo->u32PosY % u8Align) || (pstRgnInfo->u32Width % u8Align) || (pstRgnInfo->u32Height % u8Align)) {
+        DRM_MEDIA_LOGE("<x, y, w, h> = <%d, %d, %d, %d> must be %d aligned", pstRgnInfo->u32PosX, pstRgnInfo->u32PosY, pstRgnInfo->u32Width, pstRgnInfo->u32Height, u8Align);
+        return -6;
+    }
+
+    if (pstCoverInfo->enPixelFormat != PIXEL_FORMAT_ARGB_8888) {
+        DRM_MEDIA_LOGE("not support cover pixel format:[%d]", pstCoverInfo->enPixelFormat);
+        return -7;
+    }
+
+    if (!bIsJpegLight) {
+        total_pix_num = pstRgnInfo->u32Width * pstRgnInfo->u32Height;
+        media_cover_data = (uint8_t *)malloc(total_pix_num);
+        if (!media_cover_data) {
+            DRM_MEDIA_LOGE("no space left, RgnInfo pixels:[%d]", total_pix_num);
+            return -8;
+        }
+
+        color_id = find_argb_color_tbl_by_order(g_venc_chns[channel].u32ArgbColorTbl, PALETTE_TABLE_LEN, pstCoverInfo->u32Color);
+        memset(media_cover_data, color_id, total_pix_num);
+    }
+
+    DrmOsdRegionData media_osd_rgn;
+    media_osd_rgn.buffer = media_cover_data;
+    media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+    media_osd_rgn.pos_x = pstRgnInfo->u32PosX;
+    media_osd_rgn.pos_y = pstRgnInfo->u32PosY;
+    media_osd_rgn.width = pstRgnInfo->u32Width;
+    media_osd_rgn.height = pstRgnInfo->u32Height;
+    media_osd_rgn.inverse = pstRgnInfo->u8Inverse;
+    media_osd_rgn.enable = pstRgnInfo->u8Enable;
+    media_osd_rgn.region_type = region_type;
+    media_osd_rgn.cover_color = pstCoverInfo->u32Color;
+
+    ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn, u8PlaneCnt);
+    if (ret) {
+        ret = -9;
+    }
+
+    if (media_cover_data) {
+        free(media_cover_data);
+    }
+
+    return ret;
+}
+
+int drm_mpi_venc_region_set_coverEx(int channel, const drm_osd_region_info_t *pstRgnInfo, const drm_cover_info_t *pstCoverInfo)
+{
+    int ret = 0;
+
+    if ((channel < DRM_VENC_CHANNEL_00) || (channel >= DRM_VENC_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (g_venc_chns[channel].status < CHN_STATUS_OPEN) {
+        return -2;
+    }
+
+    if (pstRgnInfo && !pstRgnInfo->u8Enable) {
+        DrmOsdRegionData media_osd_rgn;
+
+        memset(&media_osd_rgn, 0x00, sizeof(media_osd_rgn));
+        media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+        media_osd_rgn.enable = pstRgnInfo->u8Enable;
+        media_osd_rgn.region_type = REGION_TYPE_COVER_EX;
+
+        ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn);
+        if (ret) {
+            ret = -3;
+        }
+
+        return ret;
+    }
+
+    if (!pstCoverInfo) {
+        return -4;
+    }
+
+    if (!pstRgnInfo || !pstRgnInfo->u32Width || !pstRgnInfo->u32Height) {
+        return -5;
+    }
+
+    uint8_t u8Align = 2;
+    uint8_t u8PlaneCnt = 0;
+
+    if ((pstRgnInfo->u32PosX % u8Align) || (pstRgnInfo->u32PosY % u8Align) || (pstRgnInfo->u32Width % u8Align) || (pstRgnInfo->u32Height % u8Align)) {
+        DRM_MEDIA_LOGE("<x, y, w, h> = <%d, %d, %d, %d> must be %d aligned", pstRgnInfo->u32PosX, pstRgnInfo->u32PosY, pstRgnInfo->u32Width, pstRgnInfo->u32Height, u8Align);
+        return -6;
+    }
+
+    if (pstCoverInfo->enPixelFormat != PIXEL_FORMAT_ARGB_8888) {
+        DRM_MEDIA_LOGE("Not support cover pixel format:[%d]", pstCoverInfo->enPixelFormat);
+        return -7;
+    }
+
+    DrmOsdRegionData media_osd_rgn;
+
+    media_osd_rgn.buffer = NULL;
+    media_osd_rgn.region_id = pstRgnInfo->enRegionId;
+    media_osd_rgn.pos_x = pstRgnInfo->u32PosX;
+    media_osd_rgn.pos_y = pstRgnInfo->u32PosY;
+    media_osd_rgn.width = pstRgnInfo->u32Width;
+    media_osd_rgn.height = pstRgnInfo->u32Height;
+    media_osd_rgn.inverse = pstRgnInfo->u8Inverse;
+    media_osd_rgn.enable = pstRgnInfo->u8Enable;
+    media_osd_rgn.region_type = REGION_TYPE_COVER_EX;
+    media_osd_rgn.cover_color = pstCoverInfo->u32Color;
+
+    ret = libdrm::video_encoder_set_osd_region(g_venc_chns[channel].media_flow, &media_osd_rgn, u8PlaneCnt);
+    if (ret) {
+        ret = -8;
     }
 
     return ret;

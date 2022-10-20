@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "../common/vepu580_tune.h"
+#include "hal_h265e_vepu580_private.h"
 
 #define HAL_H265E_DBG_CONTENT           (0x00200000)
 #define hal_h264e_dbg_content(fmt, ...) hal_h264e_dbg_f(HAL_H264E_DBG_CONTENT, fmt, ## __VA_ARGS__)
@@ -199,6 +199,23 @@ static RK_S32 rime_multi[4][3] = {
     {4, 16, 64},
     {4, 32, 128},
     {4, 4, 4},
+};
+
+static RK_S32 ctu_madp_cnt_thd[6][8] = {
+    {50, 100, 130, 50, 100, 550, 500, 550},
+    {100, 150, 200, 80, 120, 500, 450, 550},
+    {150, 200, 250, 100, 150, 450, 400, 450},
+    {50, 100, 130, 50, 100, 550, 500, 550},
+    {100, 150, 200, 80, 120, 500, 450, 550},
+    {150, 200, 250, 100, 150, 450, 400, 450}
+};
+
+static RK_S32 madp_num_map[5][4] = {
+    {0, 0, 0, 1},
+    {0, 0, 1, 0},
+    {0, 0, 1, 1},
+    {1, 0, 0, 0},
+    {1, 1, 1, 1},
 };
 
 static HalH265eVepu580Tune *vepu580_h265e_tune_init(H265eV580HalContext *ctx)

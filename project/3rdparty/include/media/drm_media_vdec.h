@@ -42,7 +42,7 @@ typedef struct VDEC_ATTR_VIDEO_S {
 
 } drm_video_vdec_attr_t;
 
-typedef struct rkVDEC_CHN_ATTR_S {
+typedef struct VDEC_CHN_ATTR_S {
     drm_codec_type_e          enCodecType;
     drm_video_mode_e          enMode;
     drm_video_decodec_mode_e  enDecodecMode;

@@ -80,12 +80,12 @@ typedef enum {
     DRM_SAMPLE_FMT_NB
 } DrmSampleFormat, drm_sample_format_e;
 
-typedef struct rkSIZE_S {
+typedef struct SIZE_S {
     uint32_t u32Width;
     uint32_t u32Height;
 } drm_size_t;
 
-typedef struct rkRECT_S {
+typedef struct RECT_S {
     int32_t  s32X;
     int32_t  s32Y;
     uint32_t u32Width;

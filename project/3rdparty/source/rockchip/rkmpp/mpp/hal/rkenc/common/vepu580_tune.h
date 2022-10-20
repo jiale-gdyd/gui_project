@@ -31,7 +31,7 @@ typedef enum MotionLevel_e {
     MOTION_LEVEL_UNKNOW_SCENE       = 3,
 } MotionLevel;
 
-extern RK_S32 ctu_madp_cnt_thd[6][8];
-extern RK_S32 madp_num_map[5][4];
+//extern RK_S32 ctu_madp_cnt_thd[6][8];
+//extern RK_S32 madp_num_map[5][4];
 
 #endif
