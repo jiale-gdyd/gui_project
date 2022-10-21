@@ -343,7 +343,7 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
 #endif
 }
 
-static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
+static void _gx_drm_graphics_driver_setup(GX_DISPLAY *display)
 {
 #if defined(CONFIG_DRM_DISP_DRIVER)
     size_t width, height;
@@ -376,7 +376,7 @@ static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
 UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
 {
     _gx_display_driver_24xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 }
@@ -384,7 +384,7 @@ UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
 UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display)
 {
     _gx_display_driver_565rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 }
@@ -392,7 +392,7 @@ UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display)
 UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
 {
     _gx_display_driver_332rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 }
@@ -400,7 +400,7 @@ UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
 UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
 {
     _gx_display_driver_1555xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 }
@@ -408,7 +408,7 @@ UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
 UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
 {
     _gx_display_driver_4444argb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 }

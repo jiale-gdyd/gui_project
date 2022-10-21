@@ -214,6 +214,7 @@ int DRMOutPutStream::Open()
         uint32_t property_active;
         uint32_t property_crtc_id;
         uint32_t property_mode_id;
+        uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_ALLOW_MODESET;
 
         property_crtc_id = get_property_id(res, DRM_MODE_OBJECT_CONNECTOR, connector_id, "CRTC_ID");
         property_active = get_property_id(res, DRM_MODE_OBJECT_CRTC, crtc_id, "ACTIVE");
@@ -227,14 +228,25 @@ int DRMOutPutStream::Open()
             return -1;
         }
 
-        drmModeAtomicAddProperty(req, crtc_id, property_active, 1);
-        drmModeAtomicAddProperty(req, crtc_id, property_mode_id, blob_id);
-        drmModeAtomicAddProperty(req, connector_id, property_crtc_id, crtc_id);
+        ret = drmModeAtomicAddProperty(req, crtc_id, property_active, 1);
+        if (ret < 0) {
+            DRM_MEDIA_LOGE("drmModeAtomicAddProperty crtc_id:[%u], property_active:[%u] failed, errstr:[%m]", crtc_id, property_active);
+        }
 
-        ret = drmModeAtomicCommit(fd, req, DRM_MODE_ATOMIC_ALLOW_MODESET, NULL);
+        ret = drmModeAtomicAddProperty(req, crtc_id, property_mode_id, blob_id);
+        if (ret < 0) {
+            DRM_MEDIA_LOGE("drmModeAtomicAddProperty crtc_id:[%u], property_mode_id:[%u] failed, errstr:[%m]", crtc_id, property_mode_id);
+        }
+
+        ret = drmModeAtomicAddProperty(req, connector_id, property_crtc_id, crtc_id);
+        if (ret < 0) {
+            DRM_MEDIA_LOGE("drmModeAtomicAddProperty connector_id:[%u], property_crtc_id:[%u] failed, errstr:[%m]", crtc_id, property_crtc_id);
+        }
+
+        ret = drmModeAtomicCommit(fd, req, flags, NULL);
         drmModeAtomicFree(req);
         if (ret) {
-            DRM_MEDIA_LOGE("set crtc failed, drmModeAtomicCommit failed, return:[%d], errstr:[%m]", ret);
+            DRM_MEDIA_LOGE("drmModeAtomicCommit failed, return:[%d], errstr:[%m]", ret);
             return ret;
         }
     }

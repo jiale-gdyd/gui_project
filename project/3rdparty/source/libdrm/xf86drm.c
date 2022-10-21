@@ -228,6 +228,7 @@ static char *drmGetFormatModifierNameFromArm(uint64_t modifier)
 
     fp = open_memstream(&modifier_name, &size);
     if (!fp) {
+        libdrm_error("open_memstream failed, errstr:[%m]");
         return NULL;
     }
 
@@ -371,6 +372,7 @@ static char *drmGetFormatModifierNameFromAmd(uint64_t modifier)
 
     fp = open_memstream(&mod_amd, &size);
     if (!fp) {
+        libdrm_error("open_memstream failed, errstr:[%m]");
         return NULL;
     }
 
@@ -620,7 +622,7 @@ static int chown_check_return(const char *path, uid_t owner, gid_t group)
 
     do {
         rv = chown(path, owner, group);
-    } while (rv != 0 && errno == EINTR);
+    } while ((rv != 0) && (errno == EINTR));
 
     if (rv == 0) {
         return 0;
@@ -1244,7 +1246,7 @@ drm_public int drmAddBufs(int fd, int count, int size, drmBufDescFlags flags, in
     memclear(request);
     request.count = count;
     request.size = size;
-    request.flags = /*(int)*/flags;
+    request.flags = (int)flags;
     request.agp_start = agp_offset;
 
     if (drmIoctl(fd, DRM_IOCTL_ADD_BUFS, &request)) {

@@ -106,8 +106,10 @@ RECENT REVISION HISTORY:
 #ifndef STBI_INCLUDE_STB_IMAGE_H
 #define STBI_INCLUDE_STB_IMAGE_H
 
+#if defined(__ARM_NEON) || defined(__ARM_NEON__)
 #ifndef STBI_NEON
 #define STBI_NEON
+#endif
 #endif
 
 // DOCUMENTATION

@@ -16,9 +16,9 @@
 #ifndef linux
 #define linux
 #endif
-
 #if defined(linux) && !defined(__ANDROID__)
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <syslog.h>
 
@@ -60,42 +60,90 @@ SyslogWrapper::~SyslogWrapper()
 void os_log_trace(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[4;34m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_NOTICE, line, list);
 }
 
 void os_log_debug(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[1;34m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_DEBUG, line, list);
 }
 
 void os_log_info(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[1;32m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_INFO, line, list);
 }
 
 void os_log_warn(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[1;33m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_WARNING, line, list);
 }
 
 void os_log_error(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[1;31m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_ERR, line, list);
 }
 
 void os_log_fatal(const char* tag, const char* msg, va_list list)
 {
     char line[LINE_SZ] = {0};
-    snprintf(line, sizeof(line) - 1, "%s: %s", tag, msg);
+    char temp[LINE_SZ] = {0};
+    size_t msg_len = strlen(msg);
+
+    sprintf(temp, msg);
+    if (temp[msg_len - 1] == '\n') {
+        temp[msg_len - 1] = '\0';
+    }
+
+    snprintf(line, sizeof(line) - 1, "\033[5;31m%s: %s\033[0m\n", tag, temp);
     vsyslog(LOG_CRIT, line, list);
 }
 

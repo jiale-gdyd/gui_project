@@ -25,11 +25,12 @@
 #include "../osal/inc/mpp_mem.h"
 #include "../osal/inc/mpp_lock.h"
 #include "../osal/inc/mpp_time.h"
+#include "../osal/inc/mpp_debug.h"
 #include "../osal/inc/mpp_common.h"
 #include "rockchip/rkmpp/mpp_buffer.h"
 
-#include "mpp_opt.h"
-#include "mpi_dec_utils.h"
+#include "rockchip/rkmpp/utils/mpp_opt.h"
+#include "rockchip/rkmpp/utils/mpi_dec_utils.h"
 
 #define IVF_HEADER_LENGTH           32
 #define IVF_FRAME_HEADER_LENGTH     12

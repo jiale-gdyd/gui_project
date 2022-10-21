@@ -1,6 +1,6 @@
 obj-y += stb/
-obj-y += pixman/
 obj-y += freetype/
+obj-$(CONFIG_CORTEX_A7) += pixman/
 
 obj-y += vrle.o
 obj-y += vpath.o

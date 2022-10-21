@@ -11,6 +11,10 @@
    ```shell
    ./build.sh host_unittest             最终生成host_unittest可执行文件，可通过修改build.config.host中对应名字的版本号
    ```
++ 构建基于主机的LVGL项目
+   ```shell
+   ./build.sh host_lvgl_gui             最终生成lvgl_gui可执行文件，可通过修改build.config.host中对应名字的版本号
+   ```
 + 构建主机azure-rtos threadx+gui项目
    ```shell
    ./build.sh host_azure_gui            最终生成azure_gui可执行文件，可通过修改build.config.host中对应名字的版本号

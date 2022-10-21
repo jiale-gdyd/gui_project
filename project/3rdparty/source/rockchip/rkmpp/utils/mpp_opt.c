@@ -21,7 +21,7 @@
 #include "../mpp/base/inc/mpp_trie.h"
 #include "../osal/inc/mpp_common.h"
 
-#include "mpp_opt.h"
+#include "rockchip/rkmpp/utils/mpp_opt.h"
 
 typedef struct MppOptImpl_t {
     void        *ctx;

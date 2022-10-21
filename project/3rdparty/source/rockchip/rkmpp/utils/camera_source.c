@@ -31,7 +31,7 @@
 
 #include "rockchip/rkmpp/mpp_log.h"
 #include "../osal/inc/mpp_mem.h"
-#include "camera_source.h"
+#include "rockchip/rkmpp/utils/camera_source.h"
 
 typedef struct CamFrame_t {
     void        *start;

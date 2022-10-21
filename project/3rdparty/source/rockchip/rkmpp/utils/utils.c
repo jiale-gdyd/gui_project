@@ -21,11 +21,12 @@
 #include <string.h>
 
 #include "../osal/inc/mpp_mem.h"
+#include "../osal/inc/mpp_debug.h"
 #include "rockchip/rkmpp/mpp_log.h"
 #include "../osal/inc/mpp_lock.h"
 #include "../osal/inc/mpp_time.h"
 #include "../osal/inc/mpp_common.h"
-#include "utils.h"
+#include "rockchip/rkmpp/utils/utils.h"
 
 #define MAX_HALF_WORD_SUM_CNT \
     ((RK_ULONG)((0-1) / ((1UL << ((__SIZEOF_POINTER__ * 8) / 2)) - 1)))

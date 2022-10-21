@@ -50,11 +50,11 @@
 #endif
 
 #ifndef drm_error
-#define drm_error(msg, ...)                 drm_print("[DRM][E]: " msg "\n", ##__VA_ARGS__)
+#define drm_error(msg, ...)                 drm_print("\033[1;31m[DRM][E]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
 #ifndef drm_info
-#define drm_info(msg, ...)                  drm_print("[DRM][I]: " msg "\n", ##__VA_ARGS__)
+#define drm_info(msg, ...)                  drm_print("\033[1;32m[DRM][I]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
 #ifndef drm_debug
@@ -1136,7 +1136,7 @@ static GX_BOOL _gx_allocate_x_canvas(GX_VALUE width, GX_VALUE height)
     return GX_TRUE;
 }
 
-static void _gx_x11_graphics_driver_setup(GX_DISPLAY *display)
+static void _gx_drm_graphics_driver_setup(GX_DISPLAY *display)
 {
     GX_VALUE width, height;
 
@@ -1161,7 +1161,7 @@ UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_24xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 #else
@@ -1183,7 +1183,7 @@ UINT gx_drm_graphics_driver_setup_565rgb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_565rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 #else
@@ -1205,7 +1205,7 @@ UINT gx_drm_graphics_driver_setup_332rgb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_332rgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 #else
@@ -1227,7 +1227,7 @@ UINT gx_drm_graphics_driver_setup_4444argb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_4444argb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 #else
@@ -1249,7 +1249,7 @@ UINT gx_drm_graphics_driver_setup_1555xrgb(GX_DISPLAY *display)
     }
 
     _gx_display_driver_1555xrgb_setup(display, GX_NULL, gx_drm_buffer_toggle);
-    _gx_x11_graphics_driver_setup(display);
+    _gx_drm_graphics_driver_setup(display);
 
     return GX_SUCCESS;
 #else

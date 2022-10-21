@@ -23,11 +23,11 @@
 #include "rockchip/rkmpp/mpp_buffer.h"
 
 #include "rockchip/rkmpp/rk_mpi.h"
-#include "utils.h"
+#include "rockchip/rkmpp/utils/utils.h"
 #include "../osal/inc/mpp_common.h"
 
-#include "mpp_opt.h"
-#include "mpi_enc_utils.h"
+#include "rockchip/rkmpp/utils/mpp_opt.h"
+#include "rockchip/rkmpp/utils/mpi_enc_utils.h"
 
 #define MAX_FILE_NAME_LENGTH        256
 

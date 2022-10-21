@@ -14,6 +14,15 @@ choice
 
     config LVGL_STRESS_TEST
         bool "LittlevGL stress test"
+
+    config LVGL_WIDGET_TEST
+        bool "LittlevGL widget test"
+
+    config LVGL_MUSIC_TEST
+        bool "LittlevGL music test"
+
+    config LVGL_KEYPAD_ENCODER_TEST
+        bool "LittlevGL keypad test"
 endchoice
 
 endmenu

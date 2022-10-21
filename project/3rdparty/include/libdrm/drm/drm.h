@@ -10,6 +10,26 @@ typedef unsigned int drm_handle_t;
 extern "C" {
 #endif
 
+#ifndef libdrm_print
+#define libdrm_print(msg, ...)                              fprintf(stderr, msg, ##__VA_ARGS__);
+#endif
+
+#ifndef libdrm_error
+#define libdrm_error(msg, ...)                              libdrm_print("\033[1;31m[LIBDRM][E]: " msg "\033[0m\n", ##__VA_ARGS__)
+#endif
+
+#ifndef libdrm_warn
+#define libdrm_warn(msg, ...)                               libdrm_print("\033[1;33m[LIBDRM][W]: " msg "\033[0m\n", ##__VA_ARGS__)
+#endif
+
+#ifndef libdrm_info
+#define libdrm_info(msg, ...)                               libdrm_print("\033[1;32m[LIBDRM][I]: " msg "\033[0m\n", ##__VA_ARGS__)
+#endif
+
+#ifndef libdrm_debug
+#define libdrm_debug(msg, ...)                              libdrm_print("\033[1;34m[LIBDRM][D]: " msg "\033[0m\n", ##__VA_ARGS__)
+#endif
+
 #define DRM_NAME                                            "drm"
 #define DRM_MIN_ORDER                                       5
 #define DRM_MAX_ORDER                                       22

@@ -13,7 +13,7 @@
 /*---------------------------------------------------------------------------
                                 Includes
  ---------------------------------------------------------------------------*/
-#include "dictionary.h"
+#include "rockchip/rkmpp/utils/dictionary.h"
 
 #include <stdio.h>
 #include <stdlib.h>

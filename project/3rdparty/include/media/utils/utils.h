@@ -51,25 +51,25 @@ extern short g_level_list[MOD_ID_BUTT];
 #define DRM_MEDIA_LOGE(format, ...)                                                                                     \
     do {                                                                                                                \
         DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
-        fprintf(stderr, "\033[1;31m[DRMMEDIA][E]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+        fprintf(stderr, "\033[1;31m[MEDIA][E]: " format "\033[0m\n", ##__VA_ARGS__);                                    \
     } while (0);
 
 #define DRM_MEDIA_LOGW(format, ...)                                                                                     \
     do {                                                                                                                \
         DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
-        fprintf(stderr, "\033[1;33m[DRMMEDIA][W]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+        fprintf(stderr, "\033[1;33m[MEDIA][W]: " format "\033[0m\n", ##__VA_ARGS__);                                    \
     } while (0);
 
 #define DRM_MEDIA_LOGI(format, ...)                                                                                     \
     do {                                                                                                                \
         DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
-        fprintf(stderr, "\033[1;32m[DRMMEDIA][I]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+        fprintf(stderr, "\033[1;32m[MEDIA][I]: " format "\033[0m\n", ##__VA_ARGS__);                                    \
     } while (0);
 
 #define DRM_MEDIA_LOGD(format, ...)                                                                                     \
     do {                                                                                                                \
         DRM_LOG_LEVEL_JUDGE(DRM_LOG_LEVEL_ERR);                                                                         \
-        fprintf(stderr, "\033[1;34m[DRMMEDIA][D]: " format "\033[0m\n", ##__VA_ARGS__);                                 \
+        fprintf(stderr, "\033[1;34m[MEDIA][D]: " format "\033[0m\n", ##__VA_ARGS__);                                    \
     } while (0);
 
 void drm_log_init();

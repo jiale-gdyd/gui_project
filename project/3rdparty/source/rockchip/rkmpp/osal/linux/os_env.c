@@ -16,7 +16,6 @@
 #ifndef linux
 #define linux
 #endif
-
 #if defined(linux) && !defined(__ANDROID__)
 #include <stdio.h>
 #include <stdlib.h>

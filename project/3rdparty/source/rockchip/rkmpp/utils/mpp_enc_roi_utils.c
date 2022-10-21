@@ -26,7 +26,7 @@
 #include "../osal/inc/mpp_common.h"
 #include "../osal/inc/mpp_debug.h"
 
-#include "mpp_enc_roi_utils.h"
+#include "rockchip/rkmpp/utils/mpp_enc_roi_utils.h"
 
 #define VEPU541_MAX_ROI_NUM     8
 #define CU_BASE_CFG_BYTE        64
