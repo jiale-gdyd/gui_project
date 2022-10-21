@@ -111,10 +111,24 @@ int V4L2Stream::Open()
     }
 
     if (!sub_device.empty()) {
-
+        // TODO:
     }
 
-    devname = device;
+    if (!strcmp(device.c_str(), MB_ENTITY_NAME)
+      || !strcmp(device.c_str(), S0_ENTITY_NAME)
+      || !strcmp(device.c_str(), S1_ENTITY_NAME)
+      || !strcmp(device.c_str(), S2_ENTITY_NAME))
+    {
+#if defined(CONFIG_RKAIQ)
+        devname = v4l2_medctl->media_ctl_infos.GetVideoNode(camera_id, device.c_str());
+#else
+        DRM_MEDIA_LOGE("V4l2Stream: videoNode:[%s] is invalid without librkaiq", device.c_str());
+        return -EINVAL;
+#endif
+    } else {
+        devname = device;
+    }
+
     DRM_MEDIA_LOGI("V4l2Stream: camera id:[%d], videoNode:[%s]", camera_id, devname.c_str());
 
     v4l2_ctx = std::make_shared<V4L2Context>(capture_type, vio, devname);

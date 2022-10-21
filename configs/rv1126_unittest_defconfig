@@ -14,6 +14,7 @@ CONFIG_RKMPP=y
 CONFIG_LIBDRM=y
 CONFIG_RKMPP_HWOSD=y
 CONFIG_RKMPP_RGA_OSD=y
+# CONFIG_RKAIQ is not set
 
 #
 # hardware platform

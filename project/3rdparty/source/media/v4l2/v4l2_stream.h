@@ -44,6 +44,10 @@ public:
 
     int InitHwInfos();
     int SetupLink(std::string devname, bool enable);
+
+#if defined(CONFIG_RKAIQ)
+    RKAiqMedia media_ctl_infos;
+#endif
 };
 
 class V4L2Stream : public Stream {

@@ -31,4 +31,11 @@ config LIBV4L2
     help
       v4l2 libraries
 
+config RKAIQ
+    bool "enable rockchip aiq"
+    default n
+    depends on ROCKCHIP
+    help
+      rockchip aiq
+
 endmenu

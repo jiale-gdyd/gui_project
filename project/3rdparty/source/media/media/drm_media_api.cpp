@@ -17,6 +17,7 @@
 
 #include <media/drm_media_vi.h>
 #include <media/drm_media_vo.h>
+#include <media/drm_media_vp.h>
 #include <media/drm_media_rga.h>
 #include <media/drm_media_venc.h>
 #include <media/drm_media_vdec.h>
@@ -79,6 +80,7 @@ typedef struct drm_media_channel {
 
     union {
         drm_vi_chn_attr_t                    vi_attr;
+        drm_vp_chn_attr_t                    vp_attr;
         drm_vo_chn_attr_t                    vo_attr;
         drm_vdec_chn_attr_t                  vdec_attr;
         venc_channel_attr_t                  venc_attr;
@@ -122,11 +124,13 @@ typedef struct video_mix_device {
 
 static std::mutex g_vi_mtx;
 static std::mutex g_vo_mtx;
+static std::mutex g_vp_mtx;
 static std::mutex g_rga_mtx;
 static std::mutex g_venc_mtx;
 static std::mutex g_vdec_mtx;
 
 static drm_media_channel_t g_vi_chns[DRM_VI_CHANNEL_BUTT];
+static drm_media_channel_t g_vp_chns[DRM_VP_CHANNEL_BUTT];
 static drm_media_channel_t g_vo_chns[DRM_VO_CHANNEL_BUTT];
 static video_mix_devices_t g_vmix_dev[DRM_VMIX_DEVICE_BUTT];
 static drm_media_channel_t g_rga_chns[DRM_RGA_CHANNEL_BUTT];
@@ -139,7 +143,7 @@ extern std::mutex g_handle_mb_mutex;
 extern std::list<handle_mb_t *> g_handle_mb;
 
 static const char *mod_tag_list[MOD_ID_BUTT] = {
-    "UNKNOW", "VB", "SYS", "VDEC", "VENC", "VO", "VI", "RGA", "VMIX",
+    "UNKNOW", "VB", "SYS", "VDEC", "VENC", "VO", "VI", "VP", "RGA", "VMIX",
 };
 
 static const char *ModIdToString(mod_id_e mod_id)
@@ -191,6 +195,7 @@ static mb_type_e get_buffer_type(drm_media_channel_t *target_chn)
 
     switch (target_chn->mode_id) {
         case MOD_ID_VI:
+        case MOD_ID_VP:
         case MOD_ID_RGA:
         case MOD_ID_VDEC:
         case MOD_ID_VMIX:
@@ -509,6 +514,7 @@ int drm_mpi_system_init(void)
     }
 
     reset_channel_table(g_vi_chns, DRM_VI_CHANNEL_BUTT, MOD_ID_VI);
+    reset_channel_table(g_vp_chns, DRM_VP_CHANNEL_BUTT, MOD_ID_VP);
     reset_channel_table(g_vo_chns, DRM_VO_CHANNEL_BUTT, MOD_ID_VO);
     reset_channel_table(g_rga_chns, DRM_RGA_CHANNEL_BUTT, MOD_ID_RGA);
     reset_channel_table(g_venc_chns, DRM_VENC_CHANNEL_BUTT, MOD_ID_VENC);
@@ -611,6 +617,12 @@ int drm_mpi_system_bind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn)
             dst_chn = &g_vmix_dev[pstDstChn->s32DevId].VmixChns[pstDstChn->s32ChnId];
             dst_mutex = &g_vmix_dev[pstDstChn->s32DevId].VmixMtx;
             dst_in_idx = pstDstChn->s32ChnId;
+            break;
+
+        case MOD_ID_VP:
+            sink = g_vp_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_vp_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_vp_mtx;
             break;
 
         default:
@@ -766,6 +778,12 @@ int drm_mpi_system_unbind(const drm_chn_t *pstSrcChn, const drm_chn_t *pstDstChn
             sink = g_vmix_dev[pstDstChn->s32DevId].VmixChns[pstDstChn->s32ChnId].media_flow;
             dst_chn = &g_vmix_dev[pstDstChn->s32DevId].VmixChns[pstDstChn->s32ChnId];
             dst_mutex = &g_vmix_dev[pstDstChn->s32DevId].VmixMtx;
+            break;
+
+        case MOD_ID_VP:
+            sink = g_vp_chns[pstDstChn->s32ChnId].media_flow;
+            dst_chn = &g_vp_chns[pstDstChn->s32ChnId];
+            dst_mutex = &g_vp_mtx;
             break;
 
         default:
@@ -1081,9 +1099,17 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
             target_mutex = &g_rga_mtx;
             break;
 
+        case MOD_ID_VP:
+            if ((s32ChnId < DRM_VP_CHANNEL_00) || (s32ChnId >= DRM_VP_CHANNEL_BUTT)) {
+                return -5;
+            }
+            target_chn = &g_vp_chns[s32ChnId];
+            target_mutex = &g_vp_mtx;
+            break;
+
         default:
             DRM_MEDIA_LOGE("unsupport mod");
-            return -5;
+            return -6;
     }
 
     media_buffer_impl_t *mb = (media_buffer_impl_t *)buffer;
@@ -1093,7 +1119,7 @@ int drm_mpi_system_send_media_buffer(mod_id_e enModID, int s32ChnId, media_buffe
     } else {
         target_mutex->unlock();
         DRM_MEDIA_LOGE("media flow null");
-        return -6;
+        return -7;
     }
 
     target_mutex->unlock();
@@ -1447,6 +1473,123 @@ int drm_mpi_system_register_event_callback(const drm_chn_t *pstChn, void *handle
     target_chn->event_cb = callback;
     target_chn->event_handle = handle;
     flow->SetEventCallBack(target_chn, flow_event_callback);
+
+    return 0;
+}
+
+int drm_mpi_vp_enable_channel(int channel)
+{
+    if ((channel < DRM_VP_CHANNEL_00) || (channel >= DRM_VP_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vp_mtx.lock();
+    if (g_vp_chns[channel].status != CHN_STATUS_READY) {
+        g_vp_mtx.unlock();
+        return (g_vp_chns[channel].status > CHN_STATUS_READY) ? -2 : -3;
+    }
+
+    DRM_MEDIA_LOGI("Enable vp channel:[%d]-[%s], wxh:[%dx%d] starting......", channel, g_vp_chns[channel].vp_attr.pcVideoNode, g_vp_chns[channel].vp_attr.u32Width, g_vp_chns[channel].vp_attr.u32Height);
+
+    std::string flow_param;
+    std::string flow_name = "output_stream";
+
+    PARAM_STRING_APPEND(flow_param, DRM_KEY_NAME, "v4l2_output_stream");
+
+    std::string stream_param;
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_CAMERA_ID, 0);
+    PARAM_STRING_APPEND(stream_param, DRM_KEY_DEVICE, g_vp_chns[channel].vp_attr.pcVideoNode);
+    PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_CAP_TYPE, DRM_KEY_V4L2_C_TYPE(VIDEO_OUTPUT));
+
+    bool bDbgFlag = false;
+    if (bDbgFlag) {
+        PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 0);
+        PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_DMABUF));
+    } else {
+        PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 1);
+        if (g_vp_chns[channel].vp_attr.enBufType == VP_CHN_BUF_TYPE_MMAP) {
+            PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_MMAP));
+        } else {
+            PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_DMABUF));
+        }
+    }
+
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_FRAMES, g_vp_chns[channel].vp_attr.u32BufCnt);
+    PARAM_STRING_APPEND(stream_param, DRM_KEY_INPUTDATATYPE, ImageTypeToString(g_vp_chns[channel].vp_attr.enPixFmt));
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_BUFFER_WIDTH, g_vp_chns[channel].vp_attr.u32Width);
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_BUFFER_HEIGHT, g_vp_chns[channel].vp_attr.u32Height);
+
+    flow_param = libdrm::JoinFlowParam(flow_param, 1, stream_param);
+    DRM_MEDIA_LOGD("VP: v4l2 output flow param:[%s]", flow_param.c_str());
+
+    char s8RetryCnt = 3;
+    while (s8RetryCnt > 0) {
+        g_vp_chns[channel].media_flow = libdrm::REFLECTOR(Flow)::Create<libdrm::Flow>(flow_name.c_str(), flow_param.c_str());
+        if (g_vp_chns[channel].media_flow) {
+            break;
+        }
+
+        DRM_MEDIA_LOGW("vp channe:[%d]-[%s] buffer may be occupied by other modules or apps, try again......", channel, g_vp_chns[channel].vp_attr.pcVideoNode);
+
+        s8RetryCnt--;
+        libdrm::msleep(50);
+    }
+
+    if (!g_vp_chns[channel].media_flow) {
+        g_vp_mtx.unlock();
+        return -4;
+    }
+
+    g_vp_chns[channel].status = CHN_STATUS_OPEN;
+    g_vp_mtx.unlock();
+
+    DRM_MEDIA_LOGI("Enable vp channel:[%d]-[%s], wxh:[%dx%d] finished......", channel, g_vp_chns[channel].vp_attr.pcVideoNode, g_vp_chns[channel].vp_attr.u32Width, g_vp_chns[channel].vp_attr.u32Height);
+
+    return 0;
+}
+
+int drm_mpi_vp_disable_channel(int channel)
+{
+    if ((channel < DRM_VP_CHANNEL_00) || (channel >= DRM_VP_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    g_vp_mtx.lock();
+    if (g_vp_chns[channel].status == CHN_STATUS_BIND) {
+        g_vp_mtx.unlock();
+        return -2;
+    }
+
+    DRM_MEDIA_LOGI("Disable vo channel:[%d]-[%s], wxh:[%dx%d] starting......", channel, g_vp_chns[channel].vp_attr.pcVideoNode, g_vp_chns[channel].vp_attr.u32Width, g_vp_chns[channel].vp_attr.u32Height);
+
+    g_vp_chns[channel].status = CHN_STATUS_CLOSED;
+    g_vp_chns[channel].media_flow.reset();
+    g_vp_mtx.unlock();
+
+    DRM_MEDIA_LOGI("Disable vo channel:[%d]-[%s], wxh:[%dx%d] finished......", channel, g_vp_chns[channel].vp_attr.pcVideoNode, g_vp_chns[channel].vp_attr.u32Width, g_vp_chns[channel].vp_attr.u32Height);
+
+    return 0;
+}
+
+int drm_mpi_vp_set_channel_attribute(int channel, const drm_vp_chn_attr_t *pstChnAttr)
+{
+    if ((channel < DRM_VP_CHANNEL_00) || (channel >= DRM_VP_CHANNEL_BUTT)) {
+        return -1;
+    }
+
+    if (!pstChnAttr || !pstChnAttr->pcVideoNode) {
+        return -2;
+    }
+
+    g_vp_mtx.lock();
+    if (g_vp_chns[channel].status != CHN_STATUS_CLOSED) {
+        g_vp_mtx.unlock();
+        return -3;
+    }
+
+    memcpy(&g_vp_chns[channel].vp_attr, pstChnAttr, sizeof(drm_vp_chn_attr_t));
+    g_vp_chns[channel].status = CHN_STATUS_READY;
+    g_vp_mtx.unlock();
 
     return 0;
 }

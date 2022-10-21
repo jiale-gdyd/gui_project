@@ -1,3 +1,6 @@
+obj-y += mediactl/
+obj-$(CONFIG_RKAIQ) += rkaiq/
+
 obj-y += v4l2_utils.o
 obj-y += v4l2_stream.o
 obj-y += v4l2_output_stream.o

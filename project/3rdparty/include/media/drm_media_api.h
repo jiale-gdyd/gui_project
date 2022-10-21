@@ -3,6 +3,7 @@
 
 #include "drm_media_vi.h"
 #include "drm_media_vo.h"
+#include "drm_media_vp.h"
 #include "drm_media_rga.h"
 #include "drm_media_vdec.h"
 #include "drm_media_venc.h"
@@ -35,6 +36,10 @@ int drm_mpi_system_register_output_callback(const drm_chn_t *pstChn, OutCallback
 int drm_mpi_system_register_output_callbackEx(const drm_chn_t *pstChn, OutCallbackFunctionEx callback, void *handle);
 
 int drm_mpi_system_register_event_callback(const drm_chn_t *pstChn, void *handle, EventCallbackFunction callback);
+
+int drm_mpi_vp_enable_channel(int channel);
+int drm_mpi_vp_disable_channel(int channel);
+int drm_mpi_vp_set_channel_attribute(int channel, const drm_vp_chn_attr_t *pstChnAttr);
 
 int drm_mpi_vi_get_status(int channel);
 int drm_mpi_vi_start_stream(int channel);

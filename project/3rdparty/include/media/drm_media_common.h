@@ -16,6 +16,7 @@ typedef enum MOD_ID_E {
     MOD_ID_VENC,
     MOD_ID_VO,
     MOD_ID_VI,
+    MOD_ID_VP,
     MOD_ID_RGA,
     MOD_ID_VMIX,
     MOD_ID_BUTT
