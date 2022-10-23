@@ -12,7 +12,7 @@ config GUI
 
 config DRM_DISP_DRIVER
     bool "Direct Rendering Manger display driver"
-    depends on AZURE_GUIX
+    depends on GUI
     select MEDIA_API
     default n
     help
@@ -20,14 +20,14 @@ config DRM_DISP_DRIVER
 
 config FBDEV_DISP_DRIVER
     bool "framebuffer display driver"
-    depends on AZURE_GUIX
+    depends on GUI
     default n
     help
       framebuffer display driver
 
 config X11_DISP_DRIVER
     bool "x11 window display driver"
-    depends on AZURE_GUIX && LINUX_GNU
+    depends on GUI && LINUX_GNU
     default n
     help
       x11 window display driver
