@@ -1,6 +1,7 @@
 #ifndef LV_DRV_CONF_H
 #define LV_DRV_CONF_H
 
+#include <linux/kconfig.h>
 #include "lv_conf.h"
 
 #define LV_DRV_DELAY_INCLUDE                    <stdint.h>
@@ -205,8 +206,22 @@
 #define ILI9341_TEARING                         0
 #endif
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
+#ifndef USE_DRM
+#define USE_DRM                                 1
+#endif
+
 #ifndef USE_FBDEV
 #define USE_FBDEV                               0
+#endif
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+#ifndef USE_FBDEV
+#define USE_FBDEV                               1
+#endif
+
+#ifndef USE_DRM
+#define USE_DRM                                 0
+#endif
 #endif
 
 #if USE_FBDEV
@@ -219,10 +234,6 @@
 
 #if USE_BSD_FBDEV
 #define FBDEV_PATH                              "/dev/fb0"
-#endif
-
-#ifndef USE_DRM
-#define USE_DRM                                 1
 #endif
 
 #if USE_DRM

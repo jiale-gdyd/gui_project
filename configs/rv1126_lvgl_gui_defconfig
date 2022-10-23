@@ -21,6 +21,10 @@ CONFIG_LIBDRM=y
 # CONFIG_LIBDRM_MODETEST is not set
 # CONFIG_LIBDRM_MODEPRINT is not set
 
+CONFIG_DRM_DISP_DRIVER=y
+# CONFIG_X11_DISP_DRIVER is not set
+# CONFIG_FBDEV_DISP_DRIVER is not set
+
 #
 # hardware platform
 #

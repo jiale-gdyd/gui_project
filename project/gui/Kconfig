@@ -10,6 +10,28 @@ config GUI
     help
       gui
 
+config DRM_DISP_DRIVER
+    bool "Direct Rendering Manger display driver"
+    depends on AZURE_GUIX
+    select MEDIA_API
+    default n
+    help
+      DRM display driver
+
+config FBDEV_DISP_DRIVER
+    bool "framebuffer display driver"
+    depends on AZURE_GUIX
+    default n
+    help
+      framebuffer display driver
+
+config X11_DISP_DRIVER
+    bool "x11 window display driver"
+    depends on AZURE_GUIX && LINUX_GNU
+    default n
+    help
+      x11 window display driver
+
 source "project/gui/lvgl/Kconfig"
 source "project/gui/azure/Kconfig"
 
