@@ -3,4 +3,5 @@
 #
 
 source "project/entry/gui_demo/lvgl/Kconfig"
+source "project/entry/gui_demo/awtk/Kconfig"
 source "project/entry/gui_demo/azure/Kconfig"

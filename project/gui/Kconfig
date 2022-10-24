@@ -33,6 +33,7 @@ config X11_DISP_DRIVER
       x11 window display driver
 
 source "project/gui/lvgl/Kconfig"
+source "project/gui/awtk/Kconfig"
 source "project/gui/azure/Kconfig"
 
 endmenu

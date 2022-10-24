@@ -1,0 +1,20 @@
+#
+# AWTK GUI Demo Kconfig
+#
+
+menu "AWTK GUI Demo Menu"
+
+choice
+    prompt "awtk demo choice"
+    depends on AWTK
+    default AWTK_UNK_TEST
+
+    config AWTK_UI_DEMO
+        bool "awtk ui demo"
+
+    config AWTK_UNK_TEST
+        bool "awtk unknown test"
+
+endchoice
+
+endmenu

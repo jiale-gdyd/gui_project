@@ -15,6 +15,10 @@
    ```shell
    ./build.sh host_lvgl_gui             最终生成lvgl_gui可执行文件，可通过修改build.config.host中对应名字的版本号
    ```
++ 构建基于主机的AWTK项目
+   ```shell
+   ./build.sh host_awtk_gui             最终生成awtk_gui可执行文件，可通过修改build.config.host中对应名字的版本号
+   ```
 + 构建主机azure-rtos threadx+gui项目
    ```shell
    ./build.sh host_azure_gui            最终生成azure_gui可执行文件，可通过修改build.config.host中对应名字的版本号
@@ -26,6 +30,10 @@
 + 构建基于rv1126 soc的LVGL项目
    ```shell
    ./build.sh rv1126_lvgl_gui           最终生成lvgl_gui可执行文件，可通过修改build.config.rv11xx中对应名字的版本号
+   ```
++ 构建基于rv1126 soc的AWTK项目
+   ```shell
+   ./build.sh rv1126_awtk_gui           最终生成awtk_gui可执行文件，可通过修改build.config.rv11xx中对应名字的版本号
    ```
 + 构建基于rv1126 soc的azure-rtos threadx+gui项目
    ```shell

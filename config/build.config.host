@@ -19,7 +19,11 @@ USER_LIB_INCLUDE += $(HOST_ROOT) \
                     $(GUI_ROOT)/gui \
                     $(GUI_ROOT)/gui/azure \
                     $(GUI_ROOT)/gui/azure/guix \
-                    $(GUI_ROOT)/gui/azure/threadx
+                    $(GUI_ROOT)/gui/azure/threadx \
+                    $(GUI_ROOT)/gui/awtk/3rd \
+                    $(GUI_ROOT)/gui/awtk/src \
+                    $(GUI_ROOT)/gui/awtk/driver \
+                    $(GUI_ROOT)/gui/awtk/src/ext_widgets
 
 USER_LINK_LIB    := -L/usr/local/lib \
                     -L/usr/libx86_64-linux-gnu
@@ -38,7 +42,7 @@ KBUILD_CXXFLAGS := -DRAPIDJSON_HAS_STDSTRING
 KBUILD_CFLAGS_KERNEL   := -D__OPTIMIZE__ -fdata-sections -ffunction-sections
 KBUILD_CXXFLAGS_KERNEL := -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
 
-KBUILD_CXXFLAGS += -Wall -g \
+KBUILD_CXXFLAGS += -Wall -O2 \
                 -fno-strict-aliasing \
                 -fno-common \
                 -Wno-return-type \
@@ -68,7 +72,7 @@ KBUILD_CXXFLAGS += -Wall -g \
                 -Wno-sizeof-pointer-memaccess \
                 -Wno-class-conversion
 
-KBUILD_CFLAGS := -Wall -g \
+KBUILD_CFLAGS := -Wall -O2 \
             -Wno-trigraphs \
             -fno-strict-aliasing -fno-common \
             -Wno-format-security \

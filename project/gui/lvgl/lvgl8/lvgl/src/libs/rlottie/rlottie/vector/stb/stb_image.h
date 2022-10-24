@@ -336,6 +336,10 @@ typedef unsigned short stbi_us;
 extern "C" {
 #endif
 
+#ifndef STB_IMAGE_STATIC
+#define STB_IMAGE_STATIC
+#endif
+
 #ifdef STB_IMAGE_STATIC
 #define STBIDEF static
 #else
@@ -3279,7 +3283,7 @@ static stbi_uc *stbi__resample_row_hv_2(stbi_uc *out, stbi_uc *in_near, stbi_uc 
 }
 
 #if defined(STBI_SSE2) || defined(STBI_NEON)
-static stbi_uc *stbi__resample_row_hv_2_simd(stbi_uc *out, stbi_uc *in_near, stbi_uc *in_far, int w, int hs)
+static inline stbi_uc *stbi__resample_row_hv_2_simd(stbi_uc *out, stbi_uc *in_near, stbi_uc *in_far, int w, int hs)
 {
    // need to generate 2x2 samples for every one in input
    int i=0,t0,t1;

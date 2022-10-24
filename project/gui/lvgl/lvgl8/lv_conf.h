@@ -36,7 +36,10 @@
 #define LV_SPRINTF_USE_FLOAT                        0
 #endif
 
-#define LV_STDLIB_INCLUDE                           <stdint.h>
+#define LV_STDIO_INCLUDE                            <stdio.h>
+#define LV_STDLIB_INCLUDE                           <stdlib.h>
+#define LV_STRING_INCLUDE                           <string.h>
+
 #define LV_MALLOC                                   lv_malloc_builtin
 #define LV_REALLOC                                  lv_realloc_builtin
 #define LV_FREE                                     lv_free_builtin

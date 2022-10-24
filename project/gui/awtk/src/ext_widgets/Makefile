@@ -1,0 +1,27 @@
+obj-y += ext_widgets.o
+
+obj-y += canvas_widget/
+obj-y += color_picker/
+obj-y += combo_box_ex/
+obj-y += features/
+obj-y += file_browser/
+obj-y += gauge/
+obj-y += gif_image/
+obj-y += image_animation/
+obj-y += image_value/
+obj-y += keyboard/
+obj-y += mledit/
+obj-y += mutable_image/
+obj-y += progress_circle/
+obj-y += rich_text/
+obj-y += scroll_label/
+obj-y += scroll_view/
+obj-y += serial_widget/
+obj-y += slide_menu/
+obj-y += slide_view/
+obj-y += svg_image/
+obj-y += switch/
+obj-y += text_selector/
+obj-y += time_clock/
+obj-y += timer_widget/
+obj-y += vpage/

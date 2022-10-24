@@ -1,0 +1,9 @@
+obj-y += buffered/
+obj-y += file/
+obj-y += inet/
+obj-y += mem/
+obj-y += serial/
+obj-y += shdlc/
+obj-y += noisy/
+obj-y += misc/
+obj-y += statistics/

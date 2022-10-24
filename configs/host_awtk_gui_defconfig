@@ -1,0 +1,26 @@
+#
+# Automatically generated file; DO NOT EDIT.
+# Application Configuration
+#
+
+#
+# Threadx and Guix
+#
+CONFIG_GUI=y
+CONFIG_AWTK=y
+
+CONFIG_AWTK_UI_DEMO=y
+
+# CONFIG_DRM_DISP_DRIVER is not set
+CONFIG_FBDEV_DISP_DRIVER=y
+
+# CONFIG_LIBDRM_TOOLS is not set
+# CONFIG_LIBDRM_MODETEST is not set
+# CONFIG_LIBDRM_MODEPRINT is not set
+
+#
+# hardware platform
+#
+CONFIG_X86_64=y
+CONFIG_LINUX_GNU=y
+CONFIG_ARCH_64BIT=y

@@ -15,7 +15,11 @@ USER_LIB_INCLUDE += $(SDK_INC) \
                     $(GUI_ROOT)/gui \
                     $(GUI_ROOT)/gui/azure \
                     $(GUI_ROOT)/gui/azure/guix \
-                    $(GUI_ROOT)/gui/azure/threadx
+                    $(GUI_ROOT)/gui/azure/threadx \
+                    $(GUI_ROOT)/gui/awtk/3rd \
+                    $(GUI_ROOT)/gui/awtk/src \
+                    $(GUI_ROOT)/gui/awtk/driver \
+                    $(GUI_ROOT)/gui/awtk/src/ext_widgets
 
 USER_LINK_LIB    := -L$(SDK_LIB)
 

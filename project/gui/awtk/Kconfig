@@ -1,0 +1,23 @@
+#
+# AWTK Kconfig
+#
+
+menu "Toolkit AnyWhere"
+
+config AWTK
+    bool "Toolkit AnyWhere"
+    depends on GUI
+    default n
+    help
+      AWTK, the abbreviation of Toolkit AnyWhere, is an open source GUI engine developed by ZLG.
+      It is a cross-platform GUI engine for embedded systems, WEB, mini programs, mobile phones and PC.
+      It is a powerful, efficient, reliable and easy-to-use GUI engine for users to design beautiful GUI applications
+
+config TSLIB
+    bool "touch screen library"
+    depends on AWTK
+    default n
+    help
+      touch screen library
+
+endmenu

@@ -1,0 +1,13 @@
+obj-y += window_animator_builtins.o
+obj-y += window_animator_center_scale.o
+obj-y += window_animator_common.o
+obj-y += window_animator_fade.o
+obj-y += window_animator_htranslate.o
+obj-y += window_animator_popdown.o
+obj-y += window_animator_popup.o
+obj-y += window_animator_slide.o
+obj-y += window_animator_slide_down.o
+obj-y += window_animator_slide_left.o
+obj-y += window_animator_slide_right.o
+obj-y += window_animator_slide_up.o
+obj-y += window_animator_vtranslate.o

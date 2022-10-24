@@ -1,0 +1,12 @@
+obj-y += iostream_mbedtls.o
+obj-y += iostream_tcp.o
+obj-y += iostream_udp.o
+obj-y += istream_mbedtls.o
+obj-y += istream_tcp.o
+obj-y += istream_udp.o
+obj-y += mbedtls_client.o
+obj-y += mbedtls_helper.o
+obj-y += mbedtls_server.o
+obj-y += ostream_mbedtls.o
+obj-y += ostream_tcp.o
+obj-y += ostream_udp.o

@@ -1,0 +1,11 @@
+obj-y += fribidi-arabic.o
+obj-y += fribidi-bidi-types.o
+obj-y += fribidi-bidi.o
+obj-y += fribidi-brackets.o
+obj-y += fribidi-deprecated.o
+obj-y += fribidi-joining-types.o
+obj-y += fribidi-joining.o
+obj-y += fribidi-mirroring.o
+obj-y += fribidi-run.o
+obj-y += fribidi-shape.o
+obj-y += fribidi.o

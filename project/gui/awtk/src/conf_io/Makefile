@@ -1,0 +1,11 @@
+obj-y += app_conf.o
+obj-y += app_conf_init.o
+obj-y += app_conf_init_ini.o
+obj-y += app_conf_init_json.o
+obj-y += app_conf_init_ubjson.o
+obj-y += conf_ini.o
+obj-y += conf_json.o
+obj-y += conf_node.o
+obj-y += conf_obj.o
+obj-y += conf_ubjson.o
+obj-y += conf_xml.o

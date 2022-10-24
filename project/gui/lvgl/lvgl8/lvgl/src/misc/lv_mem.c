@@ -13,6 +13,7 @@
 #include "lv_log.h"
 
 #include LV_STDLIB_INCLUDE
+#include LV_STRING_INCLUDE
 
 #if LV_USE_BUILTIN_MALLOC
 #include "lv_malloc_builtin.h"
@@ -148,9 +149,9 @@ size_t lv_strlen(const char * str)
     return LV_STRLEN(str);
 }
 
-size_t lv_strncpy(char * dst, size_t dest_size, const char * src)
+char *lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
-    return LV_STRNCPY(dst, dest_size, src);
+    return LV_STRNCPY(dst, src, dest_size);
 }
 
 lv_res_t lv_mem_test(void)
