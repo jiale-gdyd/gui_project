@@ -12,6 +12,12 @@ choice
     config AWTK_UI_DEMO
         bool "awtk ui demo"
 
+    config AWTK_DESKTOP_DEMO
+        bool "awtk desktop demo"
+
+    config AWTK_ANIMATOR_DEMO
+        bool "awtk animator demo"
+
     config AWTK_UNK_TEST
         bool "awtk unknown test"
 

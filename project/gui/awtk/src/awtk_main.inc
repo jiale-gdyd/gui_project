@@ -20,10 +20,6 @@ END_C_DECLS
 #define APP_DEFAULT_FONT                "default"
 #endif
 
-#ifndef APP_TYPE
-#define APP_TYPE                        APP_DESKTOP
-#endif
-
 #ifndef APP_NAME
 #define APP_NAME                        "awtk_gui"
 #endif
@@ -39,16 +35,16 @@ END_C_DECLS
 #include "base/custom_keys.inc"
 #include "base/asset_loader_zip.h"
 
-static int gui_app_start_ex(size_t disp_width, size_t disp_height, const char *app_name, const char *res_root);
+static int gui_app_start_ex(size_t disp_width, size_t disp_height, int app_type, const char *app_name, const char *res_root, const char *app_font);
 
-static inline int awtk_application_enter(size_t disp_width, size_t disp_height, const char *app_name, const char *res_root)
+static inline int awtk_application_enter(size_t disp_width, size_t disp_height, int app_type, const char *app_name, const char *res_root, const char *app_font)
 {
-    return gui_app_start_ex(disp_width, disp_height, app_name ? app_name : APP_NAME, res_root ? res_root : APP_RES_ROOT);
+    return gui_app_start_ex(disp_width, disp_height, app_type, app_name ? app_name : APP_NAME, res_root ? res_root : APP_RES_ROOT, app_font ? app_font : APP_DEFAULT_FONT);
 }
 
-int gui_app_start_ex(size_t disp_width, size_t disp_height, const char *app_name, const char *res_root)
+int gui_app_start_ex(size_t disp_width, size_t disp_height, int app_type, const char *app_name, const char *res_root, const char *app_font)
 {
-    tk_init(disp_width, disp_height, APP_TYPE, app_name, res_root);
+    tk_init(disp_width, disp_height, (app_type_t)app_type, app_name, res_root);
 
 #ifdef ASSETS_ZIP
     assets_manager_set_res_root(assets_manager(), "");
@@ -77,7 +73,7 @@ int gui_app_start_ex(size_t disp_width, size_t disp_height, const char *app_name
     }
 #endif
 
-    system_info_set_default_font(system_info(), APP_DEFAULT_FONT);
+    system_info_set_default_font(system_info(), app_font);
     awtk_assets_init();
 
 #ifndef WITH_FS_RES

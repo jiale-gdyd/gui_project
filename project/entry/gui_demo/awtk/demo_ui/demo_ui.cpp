@@ -1,7 +1,8 @@
 #include <awtk.h>
+#include <awtk_main.inc>
 
 #include "demo_ui.h"
-#include "res/assets.inc"
+#include "../res/assets.inc"
 
 #define THEME_NAME_PREFIX               "uiex_"
 #define WINDOW_NAME_PREFIX              "uiex/"
@@ -1306,10 +1307,10 @@ int awtk_ui_demo_init(int argc, char *argv[])
         return -1;
     }
 
-    return awtk_application_enter(1280, 720, "awtk_gui", argv[1]);
+    return awtk_application_enter(320, 480, APP_MOBILE, "awtk_gui", argv[1], "default");
 }
 
 int awtk_ui_demo_exit(void)
 {
-    return -1;
+    return 0;
 }
