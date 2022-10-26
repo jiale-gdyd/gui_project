@@ -16,6 +16,9 @@
 // `lv_malloc()`可用的内存大小(>= 2kB)
 #define LV_MEM_SIZE                                 (128U * 1024U)
 
+// lv_malloc()的内存扩展大小(以字节为单位)
+#define LV_MEM_POOL_EXPAND_SIZE                     0
+
 // 为内存池设置地址，而不是将其分配为普通数组。也可以在外部SRAM中
 #define LV_MEM_ADR                                  0     // 0: 未使用
 
