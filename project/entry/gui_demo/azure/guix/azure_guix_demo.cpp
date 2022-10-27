@@ -56,6 +56,10 @@
 #include "car_infotainment/guix_car_infotainment.h"
 #endif
 
+#if defined(CONFIG_AZURE_GUIX_WIDGET_ANIMATION)
+#include "widget_animation/guix_widget_animation.h"
+#endif
+
 int azure_guix_demo_init(int argc, char *argv[])
 {
 #if defined(CONFIG_AZURE_GUIX_SIMPLE)
@@ -84,6 +88,8 @@ int azure_guix_demo_init(int argc, char *argv[])
     return azure_guix_home_automation_demo_init(argc, argv);
 #elif defined(CONFIG_AZURE_GUIX_CAR_INFOTAINMENT)
     return azure_guix_car_infotainment_demo_init(argc, argv);
+#elif defined(CONFIG_AZURE_GUIX_WIDGET_ANIMATION)
+    return azure_guix_widget_animation_demo_init(argc, argv);
 #endif
 
     return -1;
@@ -117,6 +123,8 @@ int azure_guix_demo_exit(void)
     return azure_guix_home_automation_demo_exit();
 #elif defined(CONFIG_AZURE_GUIX_CAR_INFOTAINMENT)
     return azure_guix_car_infotainment_demo_exit();
+#elif defined(CONFIG_AZURE_GUIX_WIDGET_ANIMATION)
+    return azure_guix_widget_animation_demo_exit();
 #endif
 
     return -1;

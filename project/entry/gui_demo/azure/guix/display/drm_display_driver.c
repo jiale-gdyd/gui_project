@@ -322,7 +322,7 @@ static int drm_dmabuf_set_plane(struct drm_buffer *buf)
     drm_add_plane_property("CRTC_Y", 0);
     drm_add_plane_property("CRTC_W", g_drmDev.width);
     drm_add_plane_property("CRTC_H", g_drmDev.height);
-    drm_add_plane_property("ZPOS", DRM_DISP_ZPOS);
+    // drm_add_plane_property("ZPOS", DRM_DISP_ZPOS);
 
     // 提交数据进行显示
     ret = drmModeAtomicCommit(g_drmDev.fd, g_drmDev.req, flags, NULL);

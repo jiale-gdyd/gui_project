@@ -88,6 +88,10 @@ UINT gx_studio_icon_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_b
     {
         gx_icon_pixelmap_set(icon, props->normal_pixelmap_id, props->selected_pixelmap_id);
     }
+    else
+    {
+        gx_widget_resize((GX_WIDGET *)icon, (GX_RECTANGLE *)&info->size);
+    }
     return status;
 }
 

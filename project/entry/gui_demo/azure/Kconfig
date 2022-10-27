@@ -47,6 +47,10 @@ choice
 
     config AZURE_GUIX_CAR_INFOTAINMENT
         bool "azure-rtos guix infotainment test"
+
+    config AZURE_GUIX_WIDGET_ANIMATION
+        bool "azure-rtos guix widget animation test"
+
 endchoice
 
 endmenu

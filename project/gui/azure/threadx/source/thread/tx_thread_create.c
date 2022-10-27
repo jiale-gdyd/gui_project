@@ -37,7 +37,7 @@
 /*  FUNCTION                                               RELEASE        */
 /*                                                                        */
 /*    _tx_thread_create                                  PORTABLE SMP     */
-/*                                                           6.1.8        */
+/*                                                           6.2.0        */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -85,6 +85,10 @@
 /*                                            resulting in version 6.1.3  */
 /*  08-02-2021      Scott Larson            Removed unneeded cast,        */
 /*                                            resulting in version 6.1.8  */
+/*  10-31-2022      Scott Larson            Removed ifdef block to always */
+/*                                            restore interrupts at end   */
+/*                                            of if block,                */
+/*                                            resulting in version 6.2.0  */
 /*                                                                        */
 /**************************************************************************/
 UINT  _tx_thread_create(TX_THREAD *thread_ptr, CHAR *name_ptr,
@@ -319,11 +323,11 @@ ALIGN_TYPE              updated_stack_start;
 #endif
 
             /* Clear the entry in the preempted thread list.  */
-            _tx_thread_preemption_threshold_list[priority] = (TX_THREAD *)TX_NULL;
+            _tx_thread_preemption_threshold_list[priority] =  TX_NULL;
 #endif
 
             /* Set the pointer to the thread currently with preemption-threshold set to NULL.  */
-            _tx_thread_preemption__threshold_scheduled =  (TX_THREAD *)TX_NULL;
+            _tx_thread_preemption__threshold_scheduled =  TX_NULL;
 
 #ifdef TX_THREAD_SMP_DEBUG_ENABLE
 
@@ -344,11 +348,8 @@ ALIGN_TYPE              updated_stack_start;
 #endif
         }
 
-#ifndef TX_NOT_INTERRUPTABLE
-
         /* Restore interrupts.  */
         TX_RESTORE
-#endif
     }
     else
     {
