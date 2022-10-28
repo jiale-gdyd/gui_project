@@ -47,3 +47,15 @@
    ```shell
    ./build.sh [help]                    显示项目构建帮助信息[help]表示可选，也可以直接执行./build.sh
    ```
+
+## 二、构建主机使用DRM/FB
++ 如果当前在图形桌面模式，执行下面的命令重启后进入字符模式，然后再执行GUI程序
+   ```shell
+   sudo systemctl set-default multi-user.target
+   sudo reboot
+   ```
++ 如果当前在字符模式，执行下面的命令重启后恢复桌面模式
+   ```shell
+   sudo systemctl set-default graphical.target
+   sudo reboot
+   ```
