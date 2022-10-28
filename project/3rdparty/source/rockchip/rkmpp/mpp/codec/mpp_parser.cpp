@@ -45,6 +45,7 @@
 static const ParserApi *parsers[] = {
 #if defined(CONFIG_RKMPP_AVSD)
     &api_avsd_parser,
+    &api_avsd_plus_parser,
 #endif
 #if defined(CONFIG_RKMPP_AVS2D)
     &api_avs2d_parser,

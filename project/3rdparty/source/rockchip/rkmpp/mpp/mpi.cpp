@@ -60,6 +60,7 @@ static MppCodingTypeInfo support_list[] = {
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingVP9,        "dec",  "VP9",          },
 #endif
 #if defined(CONFIG_RKMPP_AVSD)
+    {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVS,        "dec",  "avs",          },
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVSPLUS,    "dec",  "avs+",         },
 #endif
 #if defined(CONFIG_RKMPP_AVS2D)

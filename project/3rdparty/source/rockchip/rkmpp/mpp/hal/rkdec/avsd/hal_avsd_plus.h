@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef __AVSD_API_H__
-#define __AVSD_API_H__
-
-#include "parser_api.h"
+#ifndef __HAL_AVSD_PLUS_H__
+#define __HAL_AVSD_PLUS_H__
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-extern const ParserApi api_avsd_parser;
-extern const ParserApi api_avsd_plus_parser;
 
-MPP_RET  avsd_init   (void *decoder, ParserCfg *cfg);
-MPP_RET  avsd_deinit (void *decoder);
-MPP_RET  avsd_reset  (void *decoder);
-MPP_RET  avsd_flush  (void *decoder);
-MPP_RET  avsd_control(void *decoder, MpiCmd cmd_type, void *param);
-MPP_RET  avsd_prepare(void *decoder, MppPacket pkt, HalDecTask *task);
-MPP_RET  avsd_parse  (void *decoder, HalDecTask *task);
-MPP_RET  avsd_callback(void *decoder, void *err_info);
+MPP_RET hal_avsd_plus_init    (void *decoder, MppHalCfg *cfg);
+MPP_RET hal_avsd_plus_deinit  (void *decoder);
+MPP_RET hal_avsd_plus_gen_regs(void *decoder, HalTaskInfo *task);
+MPP_RET hal_avsd_plus_start   (void *decoder, HalTaskInfo *task);
+MPP_RET hal_avsd_plus_wait    (void *decoder, HalTaskInfo *task);
+MPP_RET hal_avsd_plus_reset   (void *decoder);
+MPP_RET hal_avsd_plus_flush   (void *decoder);
+MPP_RET hal_avsd_plus_control (void *decoder, MpiCmd cmd_type, void *param);
 
 #ifdef  __cplusplus
 }
 #endif
 
-#endif /*__AVSD_API_H__*/
+#endif /*__HAL_AVSD_PLUS_H__*/

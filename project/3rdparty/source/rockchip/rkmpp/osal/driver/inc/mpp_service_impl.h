@@ -20,7 +20,7 @@
 #include "../../inc/mpp_device.h"
 #include "../../inc/mpp_service.h"
 
-#define MAX_REG_OFFSET          32
+#define MAX_REG_OFFSET          64
 #define MAX_RCB_OFFSET          32
 #define MAX_INFO_COUNT          16
 

@@ -1,75 +1,44 @@
 /*
-*
-* Copyright 2015 Rockchip Electronics Co. LTD
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2015 Rockchip Electronics Co. LTD
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#define MODULE_TAG "hal_avsd_reg"
+#define MODULE_TAG "hal_avsd_plus"
+
+#include <string.h>
 
 #include "../../../../osal/inc/mpp_common.h"
+#include "../../../../osal/inc/mpp_mem.h"
+#include "../../../../osal/inc/mpp_device.h"
 
 #include "../../../common/avsd_syntax.h"
 #include "../../inc/hal_avsd_api.h"
-#include "hal_avsd_reg.h"
+#include "hal_avsd_plus_reg.h"
+#include "hal_avsd_plus.h"
 #include "../../../base/inc/mpp_dec_cb_param.h"
+#include "hal_avsd_base.h"
 
-static RK_S32 get_queue_pic(AvsdHalCtx_t *p_hal)
-{
-    RK_U32 i = 0;
-    RK_S32 ret_idx = -1;
-
-    for (i = 0; i < MPP_ARRAY_ELEMS(p_hal->pic); i++) {
-        if (!p_hal->pic[i].valid) {
-            ret_idx = i;
-            p_hal->pic[i].valid = 1;
-            break;
-        }
-    }
-
-    return ret_idx;
-}
-
-static RK_S32 get_packet_fd(AvsdHalCtx_t *p_hal, RK_S32 idx)
-{
-    RK_S32 ret_fd = 0;
-    MppBuffer mbuffer = NULL;
-
-    mpp_buf_slot_get_prop(p_hal->packet_slots, idx, SLOT_BUFFER, &mbuffer);
-    ret_fd =  mpp_buffer_get_fd(mbuffer);
-
-    return ret_fd;
-}
-static RK_S32 get_frame_fd(AvsdHalCtx_t *p_hal, RK_S32 idx)
-{
-    RK_S32 ret_fd = 0;
-    MppBuffer mbuffer = NULL;
-
-    mpp_buf_slot_get_prop(p_hal->frame_slots, idx, SLOT_BUFFER, &mbuffer);
-    ret_fd = mpp_buffer_get_fd(mbuffer);
-
-    return ret_fd;
-}
 /*!
-***********************************************************************
-* \brief
-*    init decoder parameters
-***********************************************************************
-*/
+ ***********************************************************************
+ * \brief
+ *    init decoder parameters
+ ***********************************************************************
+ */
 //extern "C"
 MPP_RET set_defalut_parameters(AvsdHalCtx_t *p_hal)
 {
-    AvsdRegs_t *p_regs = (AvsdRegs_t *)p_hal->p_regs;
+    AvsdPlusRegs_t *p_regs = (AvsdPlusRegs_t *)p_hal->p_regs;
 
     p_regs->sw02.dec_out_endian = 1;
     p_regs->sw02.dec_in_endian = 0;
@@ -107,19 +76,12 @@ MPP_RET set_defalut_parameters(AvsdHalCtx_t *p_hal)
     return MPP_OK;
 }
 
-/*!
-***********************************************************************
-* \brief
-*    generate register parameters
-***********************************************************************
-*/
-//extern "C"
-MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
+static MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
 
     AvsdSyntax_t *p_syn = &p_hal->syn;
-    AvsdRegs_t *p_regs = (AvsdRegs_t *)p_hal->p_regs;
+    AvsdPlusRegs_t *p_regs = (AvsdPlusRegs_t *)p_hal->p_regs;
 
     //!< set wrok_out pic info
     if (p_hal->work_out < 0) {
@@ -138,6 +100,7 @@ MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
         p_work_out->picture_distance = p_syn->pp.pictureDistance;
     }
     //!< set register
+    set_defalut_parameters(p_hal);
     p_regs->sw04.pic_mb_width = (p_syn->pp.horizontalSize + 15) >> 4;
     p_regs->sw03.dec_mode = 11; //!< DEC_MODE_AVS
 
@@ -156,7 +119,7 @@ MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
     }
 
     p_regs->sw04.pic_mb_height_p = (p_syn->pp.verticalSize + 15) >> 4;
-    p_regs->sw07.avs_h264_h_ext = (p_syn->pp.verticalSize + 15) >> 12;
+    p_regs->sw07.avs_h_ext = (p_syn->pp.verticalSize + 15) >> 12;
 
     if (p_syn->pp.picCodingType == BFRAME) {
         p_regs->sw03.pic_b_e = 1;
@@ -169,6 +132,7 @@ MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
     p_hal->data_offset = (p_hal->data_offset & ~0x7);
     p_regs->sw12.rlc_vlc_base = get_packet_fd(p_hal, task->input) | (p_hal->data_offset << 10);
     p_regs->sw06.stream_len = p_syn->bitstream_size - p_hal->data_offset;
+
     p_regs->sw03.pic_fixed_quant = p_syn->pp.fixedPictureQp;
     p_regs->sw06.init_qp = p_syn->pp.pictureQp;
     //!< AVS Plus stuff
@@ -492,8 +456,13 @@ MPP_RET set_regs_parameters(AvsdHalCtx_t *p_hal, HalDecTask *task)
         (p_syn->pp.picCodingType == BFRAME && p_hal->prev_pic_structure)) {
         p_regs->sw41.dir_mv_base = mpp_buffer_get_fd(p_hal->mv_buf);
     } else {
-        RK_U32 offset = MPP_ALIGN(p_syn->pp.horizontalSize, 16)
-                        * MPP_ALIGN(p_syn->pp.verticalSize, 16) / 32;
+        RK_U32 frame_width = 0, frame_height = 0, offset = 0;
+        frame_width = (p_syn->pp.horizontalSize + 15) >> 4;
+        if (p_syn->pp.progressiveFrame)
+            frame_height = (p_syn->pp.verticalSize + 15) >> 4;
+        else
+            frame_height = 2 * ((p_syn->pp.verticalSize + 31) >> 5);
+        offset = MPP_ALIGN(frame_width * frame_height / 2, 2) * 16;
         p_regs->sw41.dir_mv_base = mpp_buffer_get_fd(p_hal->mv_buf) | (offset << 10);
     }
     //!< AVS Plus stuff
@@ -522,14 +491,7 @@ __FAILED:
     return ret;
 }
 
-/*!
-***********************************************************************
-* \brief
-*    init decoder parameters
-***********************************************************************
-*/
-//extern "C"
-MPP_RET update_parameters(AvsdHalCtx_t *p_hal)
+static MPP_RET update_parameters(AvsdHalCtx_t *p_hal)
 {
     AvsdSyntax_t *p_syn = &p_hal->syn;
 
@@ -551,4 +513,296 @@ MPP_RET update_parameters(AvsdHalCtx_t *p_hal)
     }
 
     return MPP_OK;
+}
+
+static MPP_RET repeat_other_field(AvsdHalCtx_t *p_hal, HalTaskInfo *task)
+{
+    RK_U8 i = 0;
+    RK_U8 *pdata = NULL;
+    MppBuffer mbuffer = NULL;
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    AvsdPlusRegs_t *p_regs = (AvsdPlusRegs_t *)p_hal->p_regs;
+
+    //!< re-find start code and calculate offset
+    p_hal->data_offset = p_regs->sw12.rlc_vlc_base >> 10;
+    p_hal->data_offset += p_hal->syn.bitstream_offset;
+    p_hal->data_offset -= MPP_MIN(p_hal->data_offset, 8);
+
+    mpp_buf_slot_get_prop(p_hal->packet_slots, task->dec.input, SLOT_BUFFER, &mbuffer);
+    pdata = (RK_U8 *)mpp_buffer_get_ptr(mbuffer) + p_hal->data_offset;
+
+    while (i < 16) {
+        if (pdata[i] == 0 && pdata[i + 1] == 0 && pdata[i + 2] == 1) {
+            p_hal->data_offset += i;
+            break;
+        }
+        i++;
+    }
+    AVSD_HAL_DBG(AVSD_HAL_DBG_OFFSET, "frame_no=%d, i=%d, offset=%d\n",
+                 p_hal->frame_no, i, p_hal->data_offset);
+    //!< re-generate register
+    FUN_CHECK(ret = set_regs_parameters(p_hal, &task->dec));
+    hal_avsd_plus_start((void *)p_hal, task);
+    hal_avsd_plus_wait((void *)p_hal, task);
+
+    return ret = MPP_OK;
+__FAILED:
+    return ret;
+}
+
+/*!
+ ***********************************************************************
+ * \brief
+ *    init
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_init(void *decoder, MppHalCfg *cfg)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    RK_U32 buf_size = 0;
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("AVS_plus In.");
+
+    buf_size = (1920 * 1088) * 2;
+    FUN_CHECK(ret = mpp_buffer_get(p_hal->buf_group, &p_hal->mv_buf, buf_size));
+
+    p_hal->p_regs = mpp_calloc_size(RK_U32, sizeof(AvsdPlusRegs_t));
+    MEM_CHECK(ret, p_hal->p_regs);
+
+    mpp_slots_set_prop(p_hal->frame_slots, SLOTS_HOR_ALIGN, avsd_hor_align);
+    mpp_slots_set_prop(p_hal->frame_slots, SLOTS_VER_ALIGN, avsd_ver_align);
+    mpp_slots_set_prop(p_hal->frame_slots, SLOTS_LEN_ALIGN, avsd_len_align);
+
+    p_hal->regs_num = 60;
+    //!< initial for control
+    p_hal->first_field = 1;
+    p_hal->prev_pic_structure = 0; //!< field
+
+    memset(p_hal->pic, 0, sizeof(p_hal->pic));
+    p_hal->work_out = -1;
+    p_hal->work0 = -1;
+    p_hal->work1 = -1;
+
+    AVSD_HAL_TRACE("Out.");
+    (void)cfg;
+    return ret = MPP_OK;
+__FAILED:
+    return ret;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    deinit
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_deinit(void *decoder)
+{
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("In.");
+    if (p_hal->mv_buf) {
+        mpp_buffer_put(p_hal->mv_buf);
+        p_hal->mv_buf = NULL;
+    }
+    MPP_FREE(p_hal->p_regs);
+
+    AVSD_HAL_TRACE("Out.");
+    return MPP_OK;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    generate register
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_gen_regs(void *decoder, HalTaskInfo *task)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("In.");
+    if (task->dec.flags.parse_err || task->dec.flags.ref_err) {
+        goto __RETURN;
+    }
+    p_hal->data_offset = p_hal->syn.bitstream_offset;
+
+    FUN_CHECK(ret = set_regs_parameters(p_hal, &task->dec));
+__RETURN:
+    AVSD_HAL_TRACE("Out.");
+    return ret = MPP_OK;
+__FAILED:
+    return ret;
+}
+/*!
+ ***********************************************************************
+ * \brief h
+ *    start hard
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_start(void *decoder, HalTaskInfo *task)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("In.");
+    INP_CHECK(ret, NULL == decoder);
+
+    if (task->dec.flags.parse_err || task->dec.flags.ref_err) {
+        goto __RETURN;
+    }
+
+    do {
+        MppDevRegWrCfg wr_cfg;
+        MppDevRegRdCfg rd_cfg;
+
+        wr_cfg.reg = p_hal->p_regs;
+        wr_cfg.size = AVSD_REGISTERS * sizeof(RK_U32);
+        wr_cfg.offset = 0;
+
+        ret = mpp_dev_ioctl(p_hal->dev, MPP_DEV_REG_WR, &wr_cfg);
+        if (ret) {
+            mpp_err_f("set register write failed %d\n", ret);
+            break;
+        }
+
+        rd_cfg.reg = p_hal->p_regs;
+        rd_cfg.size = AVSD_REGISTERS * sizeof(RK_U32);
+        rd_cfg.offset = 0;
+
+        ret = mpp_dev_ioctl(p_hal->dev, MPP_DEV_REG_RD, &rd_cfg);
+        if (ret) {
+            mpp_err_f("set register read failed %d\n", ret);
+            break;
+        }
+
+        ret = mpp_dev_ioctl(p_hal->dev, MPP_DEV_CMD_SEND, NULL);
+        if (ret) {
+            mpp_err_f("send cmd failed %d\n", ret);
+            break;
+        }
+    } while (0);
+
+    p_hal->frame_no++;
+
+__RETURN:
+    AVSD_HAL_TRACE("Out.");
+
+    return ret;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    wait hard
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_wait(void *decoder, HalTaskInfo *task)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("In.");
+    INP_CHECK(ret, NULL == decoder);
+
+    if (task->dec.flags.parse_err ||
+        task->dec.flags.ref_err) {
+        goto __SKIP_HARD;
+    }
+
+    ret = mpp_dev_ioctl(p_hal->dev, MPP_DEV_CMD_POLL, NULL);
+    if (ret)
+        mpp_err_f("poll cmd failed %d\n", ret);
+
+__SKIP_HARD:
+    if (p_hal->dec_cb) {
+        DecCbHalDone param;
+
+        param.task = (void *)&task->dec;
+        param.regs = (RK_U32 *)p_hal->p_regs;
+        param.hard_err = (!((AvsdPlusRegs_t *)p_hal->p_regs)->sw01.dec_rdy_int);
+
+        mpp_callback(p_hal->dec_cb, &param);
+    }
+    update_parameters(p_hal);
+    memset(&p_hal->p_regs[1], 0, sizeof(RK_U32));
+    if (!p_hal->first_field && p_hal->syn.pp.pictureStructure == FIELDPICTURE &&
+        !task->dec.flags.parse_err && !task->dec.flags.ref_err) {
+        repeat_other_field(p_hal, task);
+    }
+
+__RETURN:
+    AVSD_HAL_TRACE("Out.");
+
+    return ret;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    reset
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_reset(void *decoder)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+    AvsdHalCtx_t *p_hal = (AvsdHalCtx_t *)decoder;
+
+    AVSD_HAL_TRACE("In.");
+
+    p_hal->first_field = 1;
+    p_hal->prev_pic_structure = 0; //!< field
+
+    memset(p_hal->pic, 0, sizeof(p_hal->pic));
+    p_hal->work_out = -1;
+    p_hal->work0 = -1;
+    p_hal->work1 = -1;
+
+    AVSD_HAL_TRACE("Out.");
+
+    return ret = MPP_OK;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    flush
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_flush(void *decoder)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+
+    AVSD_HAL_TRACE("In.");
+
+    (void)decoder;
+
+    AVSD_HAL_TRACE("Out.");
+
+    return ret = MPP_OK;
+}
+/*!
+ ***********************************************************************
+ * \brief
+ *    control
+ ***********************************************************************
+ */
+//extern "C"
+MPP_RET hal_avsd_plus_control(void *decoder, MpiCmd cmd_type, void *param)
+{
+    MPP_RET ret = MPP_ERR_UNKNOW;
+
+    AVSD_HAL_TRACE("In.");
+
+    (void)decoder;
+    (void)cmd_type;
+    (void)param;
+
+    AVSD_HAL_TRACE("Out.");
+
+    return ret = MPP_OK;
 }
