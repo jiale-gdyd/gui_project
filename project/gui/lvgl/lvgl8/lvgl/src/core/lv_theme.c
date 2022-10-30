@@ -1,6 +1,7 @@
 #include "../../lvgl.h"
 
 static void apply_theme(lv_theme_t *th, lv_obj_t *obj);
+static void apply_theme_recursion(lv_theme_t *th, lv_obj_t *obj);
 
 lv_theme_t *lv_theme_get_from_obj(lv_obj_t *obj)
 {
@@ -18,7 +19,7 @@ void lv_theme_apply(lv_obj_t *obj)
     lv_obj_remove_style_all(obj);
 
     // 应用主题，包括基本主题
-    apply_theme(th, obj);
+    apply_theme_recursion(th, obj);
 }
 
 void lv_theme_set_parent(lv_theme_t *new_theme, lv_theme_t *base)
@@ -70,4 +71,17 @@ static void apply_theme(lv_theme_t *th, lv_obj_t *obj)
     if (th->apply_cb) {
         th->apply_cb(th, obj);
     }
+}
+
+static void apply_theme_recursion(lv_theme_t *th, lv_obj_t *obj)
+{
+    const lv_obj_class_t *original_class_p = obj->class_p;
+
+    if (obj->class_p->base_class && (obj->class_p->theme_inheritable == LV_OBJ_CLASS_THEME_INHERITABLE_TRUE)) {
+        obj->class_p = obj->class_p->base_class;
+        apply_theme_recursion(th, obj);
+    }
+
+    obj->class_p = original_class_p;
+    apply_theme(th, obj);
 }
