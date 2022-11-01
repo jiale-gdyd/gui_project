@@ -3,3 +3,4 @@
 #
 
 source "project/unittest/host/libdrm/Kconfig"
+source "project/unittest/host/signalslot/Kconfig"

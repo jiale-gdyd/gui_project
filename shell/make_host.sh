@@ -158,7 +158,7 @@ function host_unittest()
     export SOC=x86_64
     export Platform=host
     export APP_NAME=host_unittest
-    export USE_STDCPP_VERSION=-std=gnu++11
+    export USE_STDCPP_VERSION=-std=gnu++17
     generate_gitcommit
 
     make ${HOST_UNITTEST_CONFIG} && make ARCH=x86_64 -j$[$(nproc)-1]

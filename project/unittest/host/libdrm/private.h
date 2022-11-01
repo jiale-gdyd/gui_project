@@ -6,15 +6,15 @@
 #endif
 
 #ifndef unittest_error
-#define unittest_error(msg, ...)        unittest_print("\033[1;31m[UART][E]: " msg "\033[0m\n", ##__VA_ARGS__)
+#define unittest_error(msg, ...)        unittest_print("\033[1;31m[TEST][E]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
 #ifndef unittest_warn
-#define unittest_warn(msg, ...)         unittest_print("\033[1;33m[UART][W]: " msg "\033[0m\n", ##__VA_ARGS__)
+#define unittest_warn(msg, ...)         unittest_print("\033[1;33m[TEST][W]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
 #ifndef unittest_info
-#define unittest_info(msg, ...)         unittest_print("\033[1;32m[UART][I]: " msg "\033[0m\n", ##__VA_ARGS__)
+#define unittest_info(msg, ...)         unittest_print("\033[1;32m[TEST][I]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
 #ifndef unittest_debug

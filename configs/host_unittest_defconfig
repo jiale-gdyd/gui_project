@@ -5,7 +5,12 @@
 
 # unittest
 CONFIG_UNITTEST=y
+
+CONFIG_HOST_UNITTEST_LIBDRM=y
 CONFIG_HOST_LIBDRM_DISP=y
+
+# CONFIG_HOST_UNITTEST_SIGSLOT is not set
+# CONFIG_HOST_SIGNAL_SLOTS is not set
 
 #
 # hardware platform
