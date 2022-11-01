@@ -49,6 +49,7 @@
 #include "default/inc/ui/auto_play_landscape.data"
 #include "default/inc/ui/color_picker_simple.data"
 #include "default/inc/ui/bidi.data"
+#include "default/inc/ui/slide_view_v3.data"
 #include "default/inc/ui/dialog_highlight_update_bg.data"
 #include "default/inc/ui/progress_circle.data"
 #include "default/inc/ui/accordion2.data"
@@ -102,6 +103,7 @@
 #include "default/inc/ui/calibration_win.data"
 #include "default/inc/ui/memtest.data"
 #include "default/inc/ui/slide_view_h2.data"
+#include "default/inc/ui/slide_view_h3.data"
 #include "default/inc/ui/folder_chooser.data"
 #include "default/inc/ui/slide_view_v_loop.data"
 #include "default/inc/ui/language.data"
@@ -251,6 +253,7 @@
 #include "default/inc/data/gpinyin_dat.data"
 #include "default/inc/data/test_dat.data"
 #include "default/inc/data/conf_test_json.data"
+#include "default/inc/data/custom_keys_json.data"
 #include "default/inc/data/suggest_words_zh_cn_dat.data"
 #include "default/inc/data/test_json.data"
 #include "default/inc/data/a_b_c_any.data"
@@ -881,8 +884,7 @@
 #endif /*WITH_VGCANVAS*/
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/
 
-ret_t awtk_assets_init_default(void)
-{
+ret_t assets_init_default(void) {
   assets_manager_t* am = assets_manager();
   assets_manager_set_theme(am, "default");
 
@@ -937,6 +939,7 @@ ret_t awtk_assets_init_default(void)
   assets_manager_add(am, ui_auto_play_landscape);
   assets_manager_add(am, ui_color_picker_simple);
   assets_manager_add(am, ui_bidi);
+  assets_manager_add(am, ui_slide_view_v3);
   assets_manager_add(am, ui_dialog_highlight_update_bg);
   assets_manager_add(am, ui_progress_circle);
   assets_manager_add(am, ui_accordion2);
@@ -990,6 +993,7 @@ ret_t awtk_assets_init_default(void)
   assets_manager_add(am, ui_calibration_win);
   assets_manager_add(am, ui_memtest);
   assets_manager_add(am, ui_slide_view_h2);
+  assets_manager_add(am, ui_slide_view_h3);
   assets_manager_add(am, ui_folder_chooser);
   assets_manager_add(am, ui_slide_view_v_loop);
   assets_manager_add(am, ui_language);
@@ -1139,6 +1143,7 @@ ret_t awtk_assets_init_default(void)
   assets_manager_add(am, data_gpinyin_dat);
   assets_manager_add(am, data_test_dat);
   assets_manager_add(am, data_conf_test_json);
+  assets_manager_add(am, data_custom_keys_json);
   assets_manager_add(am, data_suggest_words_zh_cn_dat);
   assets_manager_add(am, data_test_json);
   assets_manager_add(am, data_a_b_c_any);

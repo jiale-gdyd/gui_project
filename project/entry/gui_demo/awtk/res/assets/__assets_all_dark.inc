@@ -49,6 +49,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char ui_menu_left_bottom[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_auto_play_landscape[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_color_picker_simple[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_bidi[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_v3[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_dialog_highlight_update_bg[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_progress_circle[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_accordion2[]);
@@ -102,6 +103,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char ui_mutable_image[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_calibration_win[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_memtest[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_h2[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_h3[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_folder_chooser[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_v_loop[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_language[]);
@@ -251,6 +253,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char data_com_zlg_app_json[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_gpinyin_dat[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_test_dat[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_conf_test_json[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char data_custom_keys_json[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_suggest_words_zh_cn_dat[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_test_json[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char data_a_b_c_any[]);
@@ -881,7 +884,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char image_windmill[]);
 #endif /*WITH_VGCANVAS*/
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/
 
-ret_t awtk_assets_init_dark(void) {
+ret_t assets_init_dark(void) {
   assets_manager_t* am = assets_manager();
   assets_manager_set_theme(am, "dark");
 
@@ -936,6 +939,7 @@ ret_t awtk_assets_init_dark(void) {
   assets_manager_add(am, ui_auto_play_landscape);
   assets_manager_add(am, ui_color_picker_simple);
   assets_manager_add(am, ui_bidi);
+  assets_manager_add(am, ui_slide_view_v3);
   assets_manager_add(am, ui_dialog_highlight_update_bg);
   assets_manager_add(am, ui_progress_circle);
   assets_manager_add(am, ui_accordion2);
@@ -989,6 +993,7 @@ ret_t awtk_assets_init_dark(void) {
   assets_manager_add(am, ui_calibration_win);
   assets_manager_add(am, ui_memtest);
   assets_manager_add(am, ui_slide_view_h2);
+  assets_manager_add(am, ui_slide_view_h3);
   assets_manager_add(am, ui_folder_chooser);
   assets_manager_add(am, ui_slide_view_v_loop);
   assets_manager_add(am, ui_language);
@@ -1138,6 +1143,7 @@ ret_t awtk_assets_init_dark(void) {
   assets_manager_add(am, data_gpinyin_dat);
   assets_manager_add(am, data_test_dat);
   assets_manager_add(am, data_conf_test_json);
+  assets_manager_add(am, data_custom_keys_json);
   assets_manager_add(am, data_suggest_words_zh_cn_dat);
   assets_manager_add(am, data_test_json);
   assets_manager_add(am, data_a_b_c_any);
