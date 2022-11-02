@@ -507,9 +507,12 @@ static void mpp_dec_put_frame(Mpp *mpp, RK_S32 index, HalDecTaskFlag flags)
     RK_U32 fake_frame = 0;
 
     if (index >= 0) {
+        RK_U32 mode = 0;
+
         mpp_buf_slot_get_prop(slots, index, SLOT_FRAME_PTR, &frame);
-        if (mpp_frame_get_mode(frame) && dec->enable_deinterlace &&
-            NULL == dec->vproc) {
+
+        mode = mpp_frame_get_mode(frame);
+        if (mode && dec->enable_deinterlace && NULL == dec->vproc) {
             MppDecVprocCfg cfg = { mpp, NULL };
             MPP_RET ret = dec_vproc_init(&dec->vproc, &cfg);
             if (ret) {
@@ -518,8 +521,23 @@ static void mpp_dec_put_frame(Mpp *mpp, RK_S32 index, HalDecTaskFlag flags)
                 dec->enable_deinterlace = 0;
                 dec->vproc = NULL;
             } else {
-                dec->vproc_tasks = cfg.task_group;
-                dec_vproc_start(dec->vproc);
+                if (dec_vproc_get_version(dec->vproc) == 1 && mode == MPP_FRAME_FLAG_DEINTERLACED) {
+                    mpp_frame_set_mode(frame, MPP_FRAME_FLAG_FRAME);
+                    /*iep 1 can't no detect DEINTERLACED, direct disable*/
+                    dec->cfg.base.enable_vproc &= (~MPP_VPROC_MODE_DETECTION);
+                    dec->enable_deinterlace = dec->cfg.base.enable_vproc;
+                    if (dec->vproc && !dec->enable_deinterlace) {
+                        dec_vproc_deinit(dec->vproc);
+                        dec->vproc = NULL;
+                    }
+                    dec->vproc = NULL;
+                } else {
+                    if (mode == MPP_FRAME_FLAG_DEINTERLACED)
+                        dec_vproc_enable_detect(dec->vproc);
+
+                    dec->vproc_tasks = cfg.task_group;
+                    dec_vproc_start(dec->vproc);
+                }
             }
         }
     } else {
@@ -538,11 +556,17 @@ static void mpp_dec_put_frame(Mpp *mpp, RK_S32 index, HalDecTaskFlag flags)
             do {
                 ret = hal_task_get_hnd(group, TASK_IDLE, &hnd);
                 if (ret) {
-                    msleep(10);
+                    if (dec->reset_flag) {
+                        MppBuffer buffer = NULL;
+                        mpp_buf_slot_get_prop(slots, index, SLOT_BUFFER, &buffer);
+                        if (buffer)
+                            mpp_buffer_put(buffer);
+                        return;
+                    } else {
+                        msleep(10);
+                    }
                 }
             } while (ret);
-
-            mpp_assert(ret == MPP_OK);
 
             vproc_task->flags.val = 0;
             vproc_task->flags.eos = eos;
@@ -614,7 +638,15 @@ static void mpp_dec_put_frame(Mpp *mpp, RK_S32 index, HalDecTaskFlag flags)
         do {
             ret = hal_task_get_hnd(group, TASK_IDLE, &hnd);
             if (ret) {
-                msleep(10);
+                if (dec->reset_flag) {
+                    MppBuffer buffer = NULL;
+                    mpp_buf_slot_get_prop(slots, index, SLOT_BUFFER, &buffer);
+                    if (buffer)
+                        mpp_buffer_put(buffer);
+                    return;
+                } else {
+                    msleep(10);
+                }
             }
         } while (ret);
 
@@ -2032,6 +2064,9 @@ MPP_RET mpp_dec_notify(MppDec ctx, RK_U32 flag)
             notify = 1;
     }
 
+    if (dec->vproc && (flag & MPP_DEC_NOTIFY_BUFFER_MATCH))
+        dec_vproc_signal(dec->vproc);
+
     if (notify) {
         dec_dbg_notify("%p status %08x notify control signal\n", dec,
                        dec->parser_wait_flag, dec->parser_notify_flag);
@@ -2127,9 +2162,9 @@ MPP_RET mpp_dec_set_cfg_by_cmd(MppDecCfgSet *set, MpiCmd cmd, void *param)
         dec_dbg_func("fast output mode %d\n", cfg->fast_out);
     } break;
     case MPP_DEC_SET_ENABLE_DEINTERLACE: {
-        cfg->enable_vproc = (param) ? (*((RK_U32 *)param)) : (1);
+        cfg->enable_vproc = (param) ? (*((RK_U32 *)param)) : MPP_VPROC_MODE_DEINTELACE;
         cfg->change |= MPP_DEC_CFG_CHANGE_ENABLE_VPROC;
-        dec_dbg_func("enable dec_vproc %d\n", cfg->enable_vproc);
+        dec_dbg_func("enable dec_vproc %x\n", cfg->enable_vproc);
     } break;
     case MPP_DEC_SET_ENABLE_FAST_PLAY : {
         cfg->enable_fast_play = (param) ? (*((RK_U32 *)param)) : (0);
