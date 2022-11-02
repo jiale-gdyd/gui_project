@@ -18,6 +18,10 @@ choice
     config HOST_SIGNAL_SLOTS
         bool "host signal slots unittest demo"
 
+    config HOST_SIGSLOT_THREADED_PRODUCER_CONSUMER
+        bool "host signal slots threaded producer consumer unittest demo"
+        select HOPE
+
     config HOST_SIGSLOT_UNKNOWN
         bool "host signal-slot unittest unknow demo"
 

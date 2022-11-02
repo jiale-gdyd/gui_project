@@ -1,0 +1,13 @@
+#
+# Hope Kconfig
+#
+
+menu "Hope"
+
+config HOPE
+    bool "A simple pure cplusplus event loop with signals and slots"
+    default n
+    help
+      A simple pure cplusplus event loop with signals and slots
+
+endmenu

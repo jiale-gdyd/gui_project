@@ -28,6 +28,9 @@ extern "C" {
 int host_unittest_sigslot_exit(void);
 int host_unittest_sigslot_init(int argc, char *argv[]);
 
+int host_unittest_sigslot_threaded_producer_consumer_exit(void);
+int host_unittest_sigslot_threaded_producer_consumer_init(int argc, char *argv[]);
+
 #if defined(__cplusplus)
 }
 #endif
