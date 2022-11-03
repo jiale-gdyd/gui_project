@@ -300,8 +300,6 @@ cpu_set_t mask;
     /* Create semaphore for ISR thread. */
     sem_init(&_tx_linux_isr_semaphore, 0, 0);
 
-    printf("create _tx_linux_timer_interrupt thread\n");
-
     /* Setup periodic timer interrupt.  */
     if(pthread_create(&_tx_linux_timer_id, NULL, _tx_linux_timer_interrupt, (void *)&_tx_linux_timer_id/*NULL*/))
     {

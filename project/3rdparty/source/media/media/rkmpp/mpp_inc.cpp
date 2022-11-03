@@ -123,6 +123,7 @@ public:
         types.append(DRM_TYPENEAR(DRM_IMAGE_BGRA8888));
         types.append(DRM_TYPENEAR(DRM_IMAGE_FBC0));
         types.append(DRM_TYPENEAR(DRM_IMAGE_FBC2));
+        types.append(DRM_TYPENEAR(DRM_IMAGE_XRGB8888));
     }
 };
 static _MPP_SUPPORT_TYPES priv_types;

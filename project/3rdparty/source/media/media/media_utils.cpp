@@ -70,6 +70,9 @@ std::string ImageTypeToString(drm_image_type_e type)
         case DRM_IMAGE_TYPE_ARGB8888:
             return DRM_IMAGE_ARGB8888;
 
+        case DRM_IMAGE_TYPE_XRGB8888:
+            return DRM_IMAGE_XRGB8888;
+
         case DRM_IMAGE_TYPE_ABGR8888:
             return DRM_IMAGE_ABGR8888;
 
@@ -140,8 +143,10 @@ drm_image_type_e StringToImageType(std::string type)
         return DRM_IMAGE_TYPE_BGRA8888;
     } else if (type == DRM_IMAGE_JPEG) {
         return DRM_IMAGE_TYPE_JPEG;
+    } else if (type == DRM_IMAGE_XRGB8888) {
+        return DRM_IMAGE_TYPE_XRGB8888;
     } else {
-        DRM_MEDIA_LOGE("unknown image type:%s", type.c_str());
+        DRM_MEDIA_LOGE("unknown image type:[%s]", type.c_str());
     }
 
     return DRM_IMAGE_TYPE_UNKNOW;

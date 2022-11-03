@@ -25,6 +25,8 @@ typedef enum {
     DRM_PIX_FMT_FBC0,
     DRM_PIX_FMT_FBC2,
     DRM_PIX_FMT_MJPEG,
+
+    DRM_PIX_FMT_XRGB8888,
     DRM_PIX_FMT_NB
 } DrmPixelFormat;
 

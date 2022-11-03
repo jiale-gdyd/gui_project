@@ -684,6 +684,7 @@ bool filter_ids_up_plane_ids(struct resources *res)
     struct drm_ids &ids = res->ids;
     int ret = filter_crtc_ids_by_possible_crtcs(res, get_possible_crtcs_by_plane_ids(res));
     if (ids.count_crtcs == 0) {
+        DRM_MEDIA_LOGW("ids.count_crtcs == 0");
         return false;
     }
 
@@ -693,6 +694,7 @@ bool filter_ids_up_plane_ids(struct resources *res)
 
     ret = filter_encoder_ids_by_crtc_ids(res);
     if (ids.count_encoders == 0) {
+        DRM_MEDIA_LOGW("ids.count_encoders == 0");
         return false;
     }
 
@@ -702,6 +704,7 @@ bool filter_ids_up_plane_ids(struct resources *res)
 
     ret = filter_connector_ids_by_encoder_ids(res);
     if (ids.count_connectors == 0) {
+        DRM_MEDIA_LOGW("ids.count_connectors == 0");
         return false;
     }
 
@@ -740,26 +743,31 @@ bool filter_ids_by_data_type(struct resources *res, const std::string &data_type
 {
     uint32_t drm_fmt = GetDRMFmtByString(data_type.c_str());
     if (drm_fmt == 0) {
+        DRM_MEDIA_LOGW("drm_fmt == 0, data_type:[%s]", data_type.c_str());
         return false;
     }
 
     auto f = [drm_fmt](struct plane *plane) -> bool {
         auto dmp = plane->plane;
         if (!dmp) {
+            DRM_MEDIA_LOGW("plane->plane == nullptr");
             return false;
         }
 
         for (uint32_t i = 0; i < dmp->count_formats; i++) {
+            // DRM_MEDIA_LOGI("[%02d]: drm_fmt:[%u]->formats:[%u]->[%c%c%c%c]", (int)i, drm_fmt, dmp->formats[i], DRM_DUMP_FOURCC(dmp->formats[i]));
             if (drm_fmt == dmp->formats[i]) {
                 return true;
             }
         }
 
+        // DRM_MEDIA_LOGW("not match suitable format");
         return false;
     };
 
     int ret = filter_plane_ids_by_cond(res, f);
     if (ret == 0) {
+        DRM_MEDIA_LOGW("filter_plane_ids_by_cond return:[0]");
         return false;
     }
 
@@ -973,7 +981,7 @@ const struct DRMFmtStringEntry drm_fmt_string_map[] = {
     {DRM_FORMAT_RGB332,   DRM_IMAGE_RGB332},  {DRM_FORMAT_RGB565,   DRM_IMAGE_RGB565},
     {DRM_FORMAT_BGR565,   DRM_IMAGE_BGR565},  {DRM_FORMAT_RGB888,   DRM_IMAGE_RGB888},
     {DRM_FORMAT_BGR888,   DRM_IMAGE_BGR888},  {DRM_FORMAT_ARGB8888, DRM_IMAGE_ARGB8888},
-    {DRM_FORMAT_ABGR8888, DRM_IMAGE_ABGR8888}
+    {DRM_FORMAT_ABGR8888, DRM_IMAGE_ABGR8888},{DRM_FORMAT_XRGB8888, DRM_IMAGE_XRGB8888}
 };
 
 uint32_t GetDRMFmtByString(const char *type)
@@ -982,7 +990,8 @@ uint32_t GetDRMFmtByString(const char *type)
         return 0;
     }
 
-    for (size_t i = 0; i < ARRAY_ELEMS(drm_fmt_string_map) - 1; i++) {
+    for (size_t i = 0; i < ARRAY_ELEMS(drm_fmt_string_map)/* - 1*/; i++) {
+        //printf("[%02d]: type:[%s]->type_str:[%s], fmt:[%u]\n", (int)i, type, drm_fmt_string_map[i].type_str, drm_fmt_string_map[i].fmt);
         if (!strcmp(type, drm_fmt_string_map[i].type_str)) {
             return drm_fmt_string_map[i].fmt;
         }

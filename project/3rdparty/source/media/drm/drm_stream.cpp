@@ -172,7 +172,7 @@ int DRMStream::Open()
         return -1;
     }
 
-    if (img_info.vir_width > 0 && img_info.vir_height > 0) {
+    if ((img_info.vir_width > 0) && (img_info.vir_height > 0)) {
 #define ivw img_info.vir_width
 #define ivh img_info.vir_height
         find_strict_match_wh = find_connector_ids_by_wh(res, ivw, ivh);

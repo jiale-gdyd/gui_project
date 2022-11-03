@@ -581,6 +581,7 @@ public:
         types.append(DRM_TYPENEAR(DRM_IMAGE_BGR888));
         types.append(DRM_TYPENEAR(DRM_IMAGE_ARGB8888));
         types.append(DRM_TYPENEAR(DRM_IMAGE_ABGR8888));
+        types.append(DRM_TYPENEAR(DRM_IMAGE_XRGB8888));
     }
 };
 static _PRIVATE_SUPPORT_FMTS priv_fmts;

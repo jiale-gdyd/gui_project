@@ -205,6 +205,7 @@ int DRMOutPutStream::Open()
     }
 
     if (!GetAgreeableIDSet()) {
+        DRM_MEDIA_LOGE("GetAgreeableIDSet failed");
         return -1;
     }
 

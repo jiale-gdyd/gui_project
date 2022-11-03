@@ -38,6 +38,7 @@ enum class DrmType {
 #define DRM_IMAGE_RGB888                            "image:rgb888"
 #define DRM_IMAGE_BGR888                            "image:bgr888"
 #define DRM_IMAGE_ARGB8888                          "image:argb8888"
+#define DRM_IMAGE_XRGB8888                          "image:xrgb8888"
 #define DRM_IMAGE_ABGR8888                          "image:abgr8888"
 #define DRM_IMAGE_RGBA8888                          "image:rgba8888"
 #define DRM_IMAGE_BGRA8888                          "image:bgra8888"

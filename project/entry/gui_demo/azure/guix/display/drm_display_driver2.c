@@ -43,7 +43,7 @@ static size_t g_dispXoffset = 0;
 static size_t g_dispYoffset = 0;
 static int g_bufPingPong = CACHE_BUF_PING;
 static drm_plane_type_e g_planeType = VO_PLANE_PRIMARY;
-static drm_image_type_e g_imageType = DRM_IMAGE_TYPE_RGB888;
+static drm_image_type_e g_imageType = DRM_IMAGE_TYPE_XRGB8888;
 static media_buffer_t g_canvasBuffer[CACHE_BUF_BUTT] = {NULL, };
 
 static void _gx_copy_canvas_to_buffer_332rgb(void *dest, GX_CANVAS *canvas, GX_RECTANGLE *dirty_area)
@@ -312,7 +312,11 @@ static void gx_drm_buffer_toggle(struct GX_CANVAS_STRUCT *canvas, GX_RECTANGLE *
             if (format == GX_COLOR_FORMAT_24XRGB) {
                 g_imageType = DRM_IMAGE_TYPE_RGB888;
             } else {
+#if defined(CONFIG_X86_64)
+                g_imageType = DRM_IMAGE_TYPE_XRGB8888;
+#else
                 g_imageType = DRM_IMAGE_TYPE_ARGB8888;
+#endif
             }
 
             _gx_copy_canvas_to_buffer_24xrgb(gx_canvas_memory, canvas, &overLapArea);

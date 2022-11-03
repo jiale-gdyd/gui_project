@@ -1154,7 +1154,11 @@ UINT gx_drm_graphics_driver_setup_24xrgb(GX_DISPLAY *display)
 
     if (drm_init_flags == 0) {
         g_colorSize = 32;
+#if defined(CONFIG_X86_64)
+        int ret = drm_init(DRM_FORMAT_XRGB8888);
+#else
         int ret = drm_init(DRM_FORMAT_ARGB8888);
+#endif
         if (ret == 0) {
             drm_init_flags = 1;
         }
