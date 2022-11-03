@@ -25,7 +25,7 @@
    ```
 + 构建基于rv1126 soc的单元测试项目
    ```shell
-   ./build.sh rv1126_unittest           最终生成rv1126_unittest可执行文件，可通过修改build.host.version中对应名字的版本号
+   ./build.sh rv1126_unittest           最终生成rv1126_unittest可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
 + 构建基于rv1126 soc的LVGL项目
    ```shell
