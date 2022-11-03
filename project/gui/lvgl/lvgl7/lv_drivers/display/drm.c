@@ -6,6 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <linux/kconfig.h>
+
 #include "drm.h"
 #if USE_DRM
 
@@ -759,10 +761,14 @@ void drm_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp_drv);
 }
 
-#if LV_COLOR_DEPTH == 32
-#define DRM_FOURCC DRM_FORMAT_ARGB8888
-#elif LV_COLOR_DEPTH == 16
-#define DRM_FOURCC DRM_FORMAT_RGB565
+#if (LV_COLOR_DEPTH == 32)
+#if defined(CONFIG_X86_64)
+#define DRM_FOURCC      DRM_FORMAT_XRGB8888
+#else
+#define DRM_FOURCC      DRM_FORMAT_ARGB8888
+#endif
+#elif (LV_COLOR_DEPTH == 16)
+#define DRM_FOURCC      DRM_FORMAT_RGB565
 #else
 #error LV_COLOR_DEPTH not supported
 #endif

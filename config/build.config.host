@@ -31,7 +31,7 @@ USER_LINK_LIB    := -L/usr/local/lib \
 ifeq ($(APP_NAME),azure_gui)
 USER_LD_LIB      += X11
 else
-USER_LD_LIB      +=
+USER_LD_LIB      += # xkbcommon
 endif
 
 USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})

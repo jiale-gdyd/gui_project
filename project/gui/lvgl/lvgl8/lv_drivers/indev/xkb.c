@@ -80,9 +80,9 @@ bool xkb_init_state(xkb_drv_state_t *state) {
  * @return true if creating the keymap and associated state succeeded
  */
 bool xkb_set_keymap(struct xkb_rule_names names) {
-  if (keymap) {
+  //if (keymap) {
      return xkb_set_keymap_state(&default_state, names);
-  }
+  //}
 }
 
 /**
