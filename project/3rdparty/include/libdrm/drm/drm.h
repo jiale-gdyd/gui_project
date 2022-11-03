@@ -30,7 +30,14 @@ extern "C" {
 #define libdrm_debug(msg, ...)                              libdrm_print("\033[1;34m[LIBDRM][D]: " msg "\033[0m\n", ##__VA_ARGS__)
 #endif
 
+#define DRM_VERSION_MAJOR                                   2
+#define DRM_VERSION_MINOR                                   4
+#define DRM_VERSION_PATCH                                   114
+
+#define DRM_VERSION_STRING                                  "2.4.114"
+
 #define DRM_NAME                                            "drm"
+
 #define DRM_MIN_ORDER                                       5
 #define DRM_MAX_ORDER                                       22
 #define DRM_RAM_PERCENT                                     10
