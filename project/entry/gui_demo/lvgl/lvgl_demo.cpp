@@ -1,8 +1,9 @@
+#include <linux/kconfig.h>
+
 #include <time.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/time.h>
-#include <linux/kconfig.h>
 
 #include "lvgl_demo.h"
 
@@ -49,7 +50,12 @@ int lvgl_demo_init(int argc, char *argv[])
 {
     lv_init();
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
     drm_init();
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    fbdev_init();
+#endif
+
     evdev_init();
 
 #if defined(CONFIG_LVGL_V7)
@@ -60,7 +66,12 @@ int lvgl_demo_init(int argc, char *argv[])
 
     lv_disp_drv_init(&disp_drv);
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
     drm_get_sizes(&width, &height, NULL);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    fbdev_get_sizes(&width, &height, NULL);
+#endif
+
     lv_disp_buf_init(&disp_buf, buf0, buf1, DISP_BUF_SIZE);
 
     disp_drv.buffer = &disp_buf;
@@ -86,11 +97,20 @@ int lvgl_demo_init(int argc, char *argv[])
 
     lv_disp_drv_init(&disp_drv);
 
+#if defined(CONFIG_DRM_DISP_DRIVER)
     drm_get_sizes(&width, &height, NULL);
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    fbdev_get_sizes(&width, &height, NULL);
+#endif
+
     lv_disp_draw_buf_init(&disp_buf, buf0, buf1, DISP_BUF_SIZE);
 
     disp_drv.draw_buf = &disp_buf;
+#if defined(CONFIG_DRM_DISP_DRIVER)
     disp_drv.flush_cb = drm_flush;
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    disp_drv.flush_cb = fbdev_flush;
+#endif
     disp_drv.hor_res = width;
     disp_drv.ver_res = height;
     static lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
@@ -125,6 +145,11 @@ int lvgl_demo_init(int argc, char *argv[])
 
 int lvgl_demo_exit(void)
 {
+#if defined(CONFIG_DRM_DISP_DRIVER)
     drm_exit();
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    fbdev_exit();
+#endif
+
     lv_deinit();
 }

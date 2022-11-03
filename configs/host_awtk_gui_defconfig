@@ -25,6 +25,7 @@ CONFIG_FBDEV_DISP_DRIVER=y
 #
 # libdrm tools
 # 
+# CONFIG_LIBDRM is not set
 # CONFIG_LIBDRM_TOOLS is not set
 # CONFIG_LIBDRM_MODETEST is not set
 # CONFIG_LIBDRM_MODEPRINT is not set

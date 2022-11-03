@@ -12,8 +12,8 @@ config GUI
 
 config DRM_DISP_DRIVER
     bool "Direct Rendering Manger display driver"
+    select LIBDRM
     depends on GUI
-    select MEDIA_API
     default n
     help
       DRM display driver

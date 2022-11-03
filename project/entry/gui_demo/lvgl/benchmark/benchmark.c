@@ -82,7 +82,6 @@ static void generate_report(void);
 static void render_start_cb(lv_disp_drv_t *drv);
 static void dummy_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colors);
 
-
 static void rectangle_cb(void)
 {
     lv_style_reset(&style_common);
