@@ -28,7 +28,11 @@ USER_LIB_INCLUDE += $(HOST_ROOT) \
 USER_LINK_LIB    := -L/usr/local/lib \
                     -L/usr/libx86_64-linux-gnu
 
-USER_LD_LIB      := X11
+ifeq ($(APP_NAME),azure_gui)
+USER_LD_LIB      += X11
+else
+USER_LD_LIB      +=
+endif
 
 USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})
 USER_PTH_RT_LIB       += -lpthread -lrt -lm -ldl $(USE_STDCPP_VERSION)

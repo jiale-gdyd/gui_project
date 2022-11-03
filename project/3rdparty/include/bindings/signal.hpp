@@ -337,6 +337,58 @@ private:
 };
 
 /**
+ * ScopedConnection是一种rails风格的方法，用于确保连接断开。
+ * 当ScopedConnections作用域结束时，此ScopedConnection保护的连接将断开
+ */
+class ScopedConnection {
+public:
+    ScopedConnection() = default;
+    ScopedConnection(ScopedConnection &&) = default;
+
+    ScopedConnection(const ScopedConnection &) = delete;
+    ScopedConnection &operator=(const ScopedConnection &) = delete;
+
+    ScopedConnection &operator=(ScopedConnection &&other) {
+        m_connection.disconnect();
+        m_connection = std::move(other.m_connection);
+        return *this;
+    }
+
+    ScopedConnection(ConnectionHandle &&h) : m_connection(std::move(h)) {
+
+    }
+
+    ScopedConnection &operator=(ConnectionHandle &&h) {
+        return *this = ScopedConnection(std::move(h));
+    }
+
+    /* 此实例正在管理的连接的句柄 */
+    ConnectionHandle &handle() {
+        return m_connection;
+    }
+
+    const ConnectionHandle &handle() const {
+        return m_connection;
+    }
+
+    /* 使用'->'操作符方便地访问底层连接句柄 */
+    ConnectionHandle *operator->() {
+        return &m_connection;
+    }
+
+    const ConnectionHandle *operator->() const {
+        return &m_connection;
+    }
+
+    ~ScopedConnection() {
+        m_connection.disconnect();
+    }
+
+private:
+    ConnectionHandle m_connection;
+};
+
+/**
  * ConnectionBlocker是一种方便的raii式机制，用于临时阻塞连接。当ConnectionBlocker被构造时，它将阻塞连接。
  * 当它被销毁时，它将把连接返回到构造ConnectionBlocker之前的阻塞状态
  */

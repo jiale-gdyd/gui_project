@@ -273,10 +273,14 @@ typedef struct drmModeObjectList {
 } drmModeObjectListRes, *drmModeObjectListPtr;
 
 extern drmModeObjectListPtr drmModeGetLease(int fd);
-
 extern int drmModeRevokeLease(int fd, uint32_t lessee_id);
 
 extern const char *drmModeGetConnectorTypeName(uint32_t connector_type);
+
+extern int drmModeCreateDumbBuffer(int fd, uint32_t width, uint32_t height, uint32_t bpp, uint32_t flags, uint32_t *handle, uint32_t *pitch, uint64_t *size);
+
+extern int drmModeDestroyDumbBuffer(int fd, uint32_t handle);
+extern int drmModeMapDumbBuffer(int fd, uint32_t handle, uint64_t *offset);
 
 #if defined(__cplusplus)
 }
