@@ -1,3 +1,5 @@
+#include <linux/kconfig.h>
+
 #include <math.h>
 #include <poll.h>
 #include <fcntl.h>
@@ -93,7 +95,11 @@ struct device {
 static int dump_only;
 static int encoders = 0, connectors = 0, crtcs = 0, planes = 0, fbs = 0;
 
-#define need_resource(type)         /*(!dump_only || type##s)*/
+#if defined(CONFIG_ROCKCHIP)
+#define need_resource(type)         (!dump_only || type##s)
+#else
+#define need_resource(type)         1
+#endif
 
 static inline int64_t U642I64(uint64_t val)
 {
@@ -1020,7 +1026,11 @@ static bool set_property(struct device *dev, struct property_arg *p)
 
     p->prop_id = props->props[i];
 
+#if defined(CONFIG_ROCKCHIP)
+    if (1 || !dev->use_atomic) {
+#else
     if (!dev->use_atomic) {
+#endif
         ret = drmModeObjectSetProperty(dev->fd, p->obj_id, p->obj_type, p->prop_id, p->value);
     } else {
         ret = drmModeAtomicAddProperty(dev->req, p->obj_id, p->prop_id, p->value);
@@ -2146,13 +2156,18 @@ int libdrm_modetest_main(int argc, char **argv)
         return -1;
     }
 
-    dump_only = 1;//!count && !plane_count && !prop_count;
+#if defined(CONFIG_ROCKCHIP)
+    dump_only = !count && !plane_count && !prop_count;
 
-    // if (dump_only && !device) {
-    //     dev.fd = open("/dev/dri/card0", O_RDWR);
-    // } else {
+    if (dump_only && !device && !module) {
+        dev.fd = open("/dev/dri/card0", O_RDWR);
+    } else {
         dev.fd = util_open(device, module);
-    //}
+    }
+#else
+    dump_only = 1;
+    dev.fd = util_open(device, module);
+#endif
 
     if (dev.fd < 0) {
         return -1;

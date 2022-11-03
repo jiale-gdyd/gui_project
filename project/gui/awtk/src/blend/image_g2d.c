@@ -27,7 +27,7 @@
 #define WITH_FAST_LCD_PORTRAIT
 #endif
 
-#ifdef WITH_G2D
+#if defined(WITH_G2D) && !defined(WITHOUT_DEFAULT_G2D)
 
 ret_t TK_WEAK g2d_fill_rect(bitmap_t* fb, const rect_t* dst, color_t c) {
   (void)fb;

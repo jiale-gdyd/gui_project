@@ -2,6 +2,8 @@
 #define _GNU_SOURCE
 #endif
 
+#include <linux/kconfig.h>
+
 #include <math.h>
 #include <time.h>
 #include <stdio.h>
@@ -977,6 +979,12 @@ static int drmOpenByName(const char *name, int type)
 
 drm_public int drmOpen(const char *name, const char *busid)
 {
+#if defined(CONFIG_ROCKCHIP)
+    if (!name && !busid) {
+        name = "rockchip";
+    }
+#endif
+
     return drmOpenWithType(name, busid, DRM_NODE_PRIMARY);
 }
 
@@ -1145,6 +1153,12 @@ drm_public char *drmGetBusid(int fd)
 {
     drm_unique_t u;
 
+#if defined(CONFIG_ROCKCHIP)
+    if (!getenv("DRM_ALLOW_GET_BUSID")) {
+        return strdup("");
+    }
+#endif
+
     memclear(u);
 
     if (drmIoctl(fd, DRM_IOCTL_GET_UNIQUE, &u)) {
@@ -1194,6 +1208,12 @@ drm_public int drmGetMagic(int fd, drm_magic_t * magic)
 drm_public int drmAuthMagic(int fd, drm_magic_t magic)
 {
     drm_auth_t auth;
+
+#if defined(CONFIG_ROCKCHIP)
+    if (!getenv("DRM_ALLOW_AUTH_MAGIC")) {
+        return 0;
+    }
+#endif
 
     memclear(auth);
     auth.magic = magic;

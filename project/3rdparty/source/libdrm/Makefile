@@ -4,6 +4,10 @@ obj-y += xf86drmHash.o
 obj-y += xf86drmMode.o
 obj-y += xf86drmRandom.o
 
-obj-$(CONFIG_TEGRA) += tegra/
-obj-$(CONFIG_ROCKCHIP) += rockchip/
+obj-y += omap/
+obj-y += tegra/
+obj-y += amdgpu/
+obj-y += nouveau/
+obj-y += rockchip/
+
 obj-$(CONFIG_LIBDRM_TOOLS) += tools/
