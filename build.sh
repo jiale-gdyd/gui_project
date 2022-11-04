@@ -1,12 +1,12 @@
 #!/bin/bash
 
 export TOPSHELL=`pwd`
-NUILDSHELLNAME=build.sh
+BUILDSHELLNAME=build.sh
 MAKE=${TOPSHELL}/shell/make.sh
 
 function help()
 {
-    echo "Usage: ./${NUILDSHELLNAME} [OPTION]"
+    echo "Usage: ./${BUILDSHELLNAME} [OPTION]"
     echo "[OPTION]:"
     echo "============================================================================================================="
     echo "    -    help                  显示帮助信息"
