@@ -35,63 +35,57 @@
 #define SRC_XSCALE_REG                      (0x032C)
 #define SRC_YSCALE_REG                      (0x0330)
 
-#define DST_SELECT_REG			(0x0400)
-#define DST_BASE_ADDR_REG		(0x0404)
-#define DST_STRIDE_REG			(0x0408)
-#define DST_COLOR_MODE_REG		(0x040C)
-#define DST_LEFT_TOP_REG		(0x0410)
-#define DST_RIGHT_BOTTOM_REG		(0x0414)
-#define DST_PLANE2_BASE_ADDR_REG	(0x0418)	/* VER4.1 */
-#define DST_A8_RGB_EXT_REG		(0x041C)
+#define DST_SELECT_REG                      (0x0400)
+#define DST_BASE_ADDR_REG                   (0x0404)
+#define DST_STRIDE_REG                      (0x0408)
+#define DST_COLOR_MODE_REG                  (0x040C)
+#define DST_LEFT_TOP_REG                    (0x0410)
+#define DST_RIGHT_BOTTOM_REG                (0x0414)
+#define DST_PLANE2_BASE_ADDR_REG            (0x0418)
+#define DST_A8_RGB_EXT_REG                  (0x041C)
 
-/* PATTERN */
-#define PAT_BASE_ADDR_REG		(0x0500)
-#define PAT_SIZE_REG			(0x0504)
-#define PAT_COLOR_MODE_REG		(0x0508)
-#define PAT_OFFSET_REG			(0x050C)
-#define PAT_STRIDE_REG			(0x0510)
+#define PAT_BASE_ADDR_REG                   (0x0500)
+#define PAT_SIZE_REG                        (0x0504)
+#define PAT_COLOR_MODE_REG                  (0x0508)
+#define PAT_OFFSET_REG                      (0x050C)
+#define PAT_STRIDE_REG                      (0x0510)
 
-/* MASK	*/
-#define MASK_BASE_ADDR_REG		(0x0520)
-#define MASK_STRIDE_REG			(0x0524)
-#define MASK_LEFT_TOP_REG		(0x0528)	/* VER4.1 */
-#define MASK_RIGHT_BOTTOM_REG		(0x052C)	/* VER4.1 */
-#define MASK_MODE_REG			(0x0530)	/* VER4.1 */
-#define MASK_REPEAT_MODE_REG		(0x0534)
-#define MASK_PAD_VALUE_REG		(0x0538)
-#define MASK_SCALE_CTRL_REG		(0x053C)
-#define MASK_XSCALE_REG			(0x0540)
-#define MASK_YSCALE_REG			(0x0544)
+#define MASK_BASE_ADDR_REG                  (0x0520)
+#define MASK_STRIDE_REG                     (0x0524)
+#define MASK_LEFT_TOP_REG                   (0x0528)
+#define MASK_RIGHT_BOTTOM_REG               (0x052C)
+#define MASK_MODE_REG                       (0x0530)
+#define MASK_REPEAT_MODE_REG                (0x0534)
+#define MASK_PAD_VALUE_REG                  (0x0538)
+#define MASK_SCALE_CTRL_REG                 (0x053C)
+#define MASK_XSCALE_REG                     (0x0540)
+#define MASK_YSCALE_REG                     (0x0544)
 
-/* CLIPPING WINDOW */
-#define CW_LT_REG			(0x0600)
-#define CW_RB_REG			(0x0604)
+#define CW_LT_REG                           (0x0600)
+#define CW_RB_REG                           (0x0604)
 
-/* ROP & ALPHA SETTING */
-#define THIRD_OPERAND_REG		(0x0610)
-#define ROP4_REG			(0x0614)
-#define ALPHA_REG			(0x0618)
+#define THIRD_OPERAND_REG                   (0x0610)
+#define ROP4_REG                            (0x0614)
+#define ALPHA_REG                           (0x0618)
 
-/* COLOR SETTING */
-#define FG_COLOR_REG			(0x0700)
-#define BG_COLOR_REG			(0x0704)
-#define BS_COLOR_REG			(0x0708)
-#define SF_COLOR_REG			(0x070C)	/* VER4.1 */
+#define FG_COLOR_REG                        (0x0700)
+#define BG_COLOR_REG                        (0x0704)
+#define BS_COLOR_REG                        (0x0708)
+#define SF_COLOR_REG                        (0x070C)
 
-/* COLOR KEY */
-#define SRC_COLORKEY_CTRL_REG		(0x0710)
-#define SRC_COLORKEY_DR_MIN_REG		(0x0714)
-#define SRC_COLORKEY_DR_MAX_REG		(0x0718)
-#define DST_COLORKEY_CTRL_REG		(0x071C)
-#define DST_COLORKEY_DR_MIN_REG		(0x0720)
-#define DST_COLORKEY_DR_MAX_REG		(0x0724)
-/* YCbCr src Color Key */
-#define YCbCr_SRC_COLORKEY_CTRL_REG	(0x0728)	/* VER4.1 */
-#define YCbCr_SRC_COLORKEY_DR_MIN_REG	(0x072C)	/* VER4.1 */
-#define YCbCr_SRC_COLORKEY_DR_MAX_REG	(0x0730)	/* VER4.1 */
-/*Y CbCr dst Color Key */
-#define YCbCr_DST_COLORKEY_CTRL_REG	(0x0734)	/* VER4.1 */
-#define YCbCr_DST_COLORKEY_DR_MIN_REG	(0x0738)	/* VER4.1 */
-#define YCbCr_DST_COLORKEY_DR_MAX_REG	(0x073C)	/* VER4.1 */
+#define SRC_COLORKEY_CTRL_REG               (0x0710)
+#define SRC_COLORKEY_DR_MIN_REG             (0x0714)
+#define SRC_COLORKEY_DR_MAX_REG             (0x0718)
+#define DST_COLORKEY_CTRL_REG               (0x071C)
+#define DST_COLORKEY_DR_MIN_REG             (0x0720)
+#define DST_COLORKEY_DR_MAX_REG             (0x0724)
+
+#define YCbCr_SRC_COLORKEY_CTRL_REG         (0x0728)
+#define YCbCr_SRC_COLORKEY_DR_MIN_REG       (0x072C)
+#define YCbCr_SRC_COLORKEY_DR_MAX_REG       (0x0730)
+
+#define YCbCr_DST_COLORKEY_CTRL_REG         (0x0734)
+#define YCbCr_DST_COLORKEY_DR_MIN_REG       (0x0738)
+#define YCbCr_DST_COLORKEY_DR_MAX_REG       (0x073C)
 
 #endif
