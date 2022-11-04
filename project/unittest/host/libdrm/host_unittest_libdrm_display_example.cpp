@@ -41,8 +41,8 @@ static size_t g_dispYoffset = 0;
 static size_t g_DispWidth = 640;
 static size_t g_DispHeight = 480;
 static media_buffer_pool_t g_dispBufferPool = NULL;
-static drm_plane_type_e g_dispPlaneType = VO_PLANE_OVERLAY;
-static drm_image_type_e g_dispImageType = DRM_IMAGE_TYPE_RGB888;
+static drm_plane_type_e g_dispPlaneType = VO_PLANE_PRIMARY;
+static drm_image_type_e g_dispImageType = DRM_IMAGE_TYPE_XRGB8888;
 
 static void sigterm_handler(int signo)
 {
@@ -96,7 +96,7 @@ int host_unittest_libdrm_display_init(int argc, char *argv[])
     float fltImgRatio = 0.0f;
     if (g_dispImageType == DRM_IMAGE_TYPE_RGB888) {
         fltImgRatio = 3.0;
-    } else if (g_dispImageType == DRM_IMAGE_TYPE_ABGR8888) {
+    } else if ((g_dispImageType == DRM_IMAGE_TYPE_ARGB8888) || (g_dispImageType == DRM_IMAGE_TYPE_XRGB8888)) {
         fltImgRatio = 4.0;
     } else if (g_dispImageType == DRM_IMAGE_TYPE_RGB565) {
         fltImgRatio = 2.0;
