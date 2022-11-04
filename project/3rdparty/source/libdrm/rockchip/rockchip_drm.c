@@ -1,14 +1,18 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <sys/mman.h>
 #include <linux/stddef.h>
 
 #include <libdrm/xf86drm.h>
-
-#include "rockchip_drm.h"
-#include "rockchip_drmif.h"
+#include <libdrm/drm/rockchip_drm.h>
+#include <libdrm/drm/rockchip_drmif.h>
 
 struct rockchip_device *rockchip_device_create(int fd)
 {

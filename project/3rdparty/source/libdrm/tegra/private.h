@@ -8,8 +8,7 @@
 #include <libdrm/xf86atomic.h>
 #include <libdrm/libdrm_macros.h>
 #include <libdrm/drm/tegra_drm.h>
-
-#include "tegra.h"
+#include <libdrm/drm/tegra_drmif.h>
 
 #define container_of(ptr, type, member)                         \
     ({                                                          \

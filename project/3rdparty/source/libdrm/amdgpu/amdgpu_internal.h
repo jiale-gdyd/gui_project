@@ -5,10 +5,10 @@
 #include <pthread.h>
 
 #include <libdrm/xf86atomic.h>
+#include <libdrm/drm/amdgpu.h>
 #include <libdrm/libdrm_macros.h>
 #include <libdrm/util_double_list.h>
 
-#include "amdgpu.h"
 #include "handle_table.h"
 
 #define AMDGPU_CS_MAX_RINGS                 8

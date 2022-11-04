@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include <libdrm/util_math.h>
+#include <libdrm/drm/amdgpu.h>
 #include <libdrm/drm/amdgpu_drm.h>
 
-#include "amdgpu.h"
 #include "amdgpu_internal.h"
 
 drm_public int amdgpu_va_range_query(amdgpu_device_handle dev, enum amdgpu_gpu_va_range type, uint64_t *start, uint64_t *end)

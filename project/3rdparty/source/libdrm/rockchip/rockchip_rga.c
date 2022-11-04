@@ -7,9 +7,9 @@
 
 #include <libdrm/xf86drm.h>
 #include <libdrm/drm/drm_fourcc.h>
+#include <libdrm/drm/rockchip_drm.h>
 
 #include "rga_reg.h"
-#include "rockchip_drm.h"
 #include "rockchip_rga.h"
 
 #define LOGI(...)               print("libdrm", __VA_ARGS__)

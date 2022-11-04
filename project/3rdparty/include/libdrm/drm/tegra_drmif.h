@@ -1,9 +1,10 @@
-#ifndef __DRM_TEGRA_H__
-#define __DRM_TEGRA_H__ 1
+#ifndef __DRM_TEGRA_DRMIF_H__
+#define __DRM_TEGRA_DRMIF_H__ 1
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <libdrm/drm/tegra_drm.h>
+
+#include "tegra_drm.h"
 
 enum drm_tegra_class {
     DRM_TEGRA_HOST1X,

@@ -2,9 +2,9 @@
 #include <string.h>
 
 #include <libdrm/xf86drm.h>
+#include <libdrm/drm/amdgpu.h>
 #include <libdrm/drm/amdgpu_drm.h>
 
-#include "amdgpu.h"
 #include "amdgpu_internal.h"
 
 drm_public int amdgpu_query_info(amdgpu_device_handle dev, unsigned info_id, unsigned size, void *value)

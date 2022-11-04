@@ -2,7 +2,7 @@
 #define LIBDRM_ROCKCHIP_DRM_H
 
 #include <stdint.h>
-#include <libdrm/drm/drm.h>
+#include "drm.h"
 
 struct drm_rockchip_gem_create {
     uint64_t size;

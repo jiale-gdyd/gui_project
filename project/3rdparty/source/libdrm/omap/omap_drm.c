@@ -11,8 +11,7 @@
 #include <libdrm/xf86atomic.h>
 #include <libdrm/drm/omap_drm.h>
 #include <libdrm/libdrm_macros.h>
-
-#include "omap_drmif.h"
+#include <libdrm/drm/omap_drmif.h>
 
 #define __round_mask(x, y)              ((__typeof__(x))((y)-1))
 #define round_up(x, y)                  ((((x)-1) | __round_mask(x, y))+1)

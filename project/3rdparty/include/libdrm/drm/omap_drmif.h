@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-#include <libdrm/xf86drm.h>
-#include <libdrm/drm/omap_drm.h>
+#include "../xf86drm.h"
+#include "omap_drm.h"
 
 struct omap_bo;
 struct omap_device;

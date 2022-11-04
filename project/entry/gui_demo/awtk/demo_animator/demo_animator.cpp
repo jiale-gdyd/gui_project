@@ -121,7 +121,7 @@ ret_t awtk_application_exit(void)
 int awtk_demo_animator_init(int argc, char *argv[])
 {
     if (argc != 2) {
-        printf("Usage: %s <assets_path>\n", argv[0]);
+        printf("Usage: %s <assets_path>[project/entry/gui_demo/awtk]\n", argv[0]);
         return -1;
     }
 

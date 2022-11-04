@@ -1,7 +1,7 @@
 #include <libdrm/xf86drm.h>
+#include <libdrm/drm/amdgpu.h>
 #include <libdrm/drm/amdgpu_drm.h>
 
-#include "amdgpu.h"
 #include "amdgpu_internal.h"
 
 drm_public int amdgpu_vm_reserve_vmid(amdgpu_device_handle dev, uint32_t flags)
