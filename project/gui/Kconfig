@@ -32,6 +32,13 @@ config X11_DISP_DRIVER
     help
       x11 window display driver
 
+config WAYLAND_DISP_DRIVER
+    bool "wayland display driver"
+    depends on GUI
+    default n
+    help
+      wayland display driver
+
 source "project/gui/lvgl/Kconfig"
 source "project/gui/awtk/Kconfig"
 source "project/gui/azure/Kconfig"

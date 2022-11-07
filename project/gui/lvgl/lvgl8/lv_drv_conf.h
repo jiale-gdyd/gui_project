@@ -95,25 +95,6 @@
 #define USE_GTK                                 0
 #endif
 
-#ifndef USE_WAYLAND
-#define USE_WAYLAND                             0
-#endif
-
-#if USE_WAYLAND
-
-#ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
-#define LV_WAYLAND_CLIENT_SIDE_DECORATIONS      1
-#endif
-
-#ifndef LV_WAYLAND_WL_SHELL
-#define LV_WAYLAND_WL_SHELL                     1
-#endif
-
-#ifndef LV_WAYLAND_XDG_SHELL
-#define LV_WAYLAND_XDG_SHELL                    0
-#endif
-#endif
-
 #ifndef USE_SSD1963
 #define USE_SSD1963                             0
 #endif
@@ -214,6 +195,10 @@
 #ifndef USE_FBDEV
 #define USE_FBDEV                               0
 #endif
+
+#ifndef USE_WAYLAND
+#define USE_WAYLAND                             0
+#endif
 #elif defined(CONFIG_FBDEV_DISP_DRIVER)
 #ifndef USE_FBDEV
 #define USE_FBDEV                               1
@@ -221,6 +206,22 @@
 
 #ifndef USE_DRM
 #define USE_DRM                                 0
+#endif
+
+#ifndef USE_WAYLAND
+#define USE_WAYLAND                             0
+#endif
+#elif defined(CONFIG_WAYLAND_DISP_DRIVER)
+#ifndef USE_FBDEV
+#define USE_FBDEV                               0
+#endif
+
+#ifndef USE_DRM
+#define USE_DRM                                 0
+#endif
+
+#ifndef USE_WAYLAND
+#define USE_WAYLAND                             1
 #endif
 #endif
 
@@ -239,6 +240,25 @@
 #if USE_DRM
 #define DRM_CARD                                "/dev/dri/card0"
 #define DRM_CONNECTOR_ID                        -1                      // -1为第一个连接的
+#endif
+
+#if USE_WAYLAND
+
+#ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+#define LV_WAYLAND_CLIENT_SIDE_DECORATIONS      1
+#endif
+
+#ifndef LV_WAYLAND_WL_SHELL
+#define LV_WAYLAND_WL_SHELL                     1
+#endif
+
+#ifndef LV_WAYLAND_XDG_SHELL
+#define LV_WAYLAND_XDG_SHELL                    1
+#endif
+
+#ifndef LV_WAYLAND_TIMER_HANDLER
+#define LV_WAYLAND_TIMER_HANDLER                1
+#endif
 #endif
 
 #ifndef USE_XPT2046

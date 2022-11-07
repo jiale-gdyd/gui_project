@@ -48,6 +48,10 @@ void GetPixFmtNumDen(const DrmPixelFormat &fmt, int &num, int &den)
             num = 4;
             break;
 
+        case DRM_PIX_FMT_XRGB8888:
+            num = 4;
+            break;
+
         case DRM_PIX_FMT_MJPEG:
             num = 2;
             break;

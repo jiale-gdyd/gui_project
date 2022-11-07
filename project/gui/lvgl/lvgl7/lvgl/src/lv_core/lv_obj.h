@@ -291,9 +291,9 @@ void lv_init(void);
  * Deinit the 'lv' library
  * Currently only implemented when not using custom allocators, or GC is enabled.
  */
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+//#if LV_ENABLE_GC || !LV_MEM_CUSTOM
 void lv_deinit(void);
-#endif
+//#endif
 
 /*--------------------
  * Create and delete

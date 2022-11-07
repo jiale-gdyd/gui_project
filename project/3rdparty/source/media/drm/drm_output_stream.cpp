@@ -1,3 +1,4 @@
+#include <linux/kconfig.h>
 #include <media/utils/buffer.h>
 #include <media/utils/control.h>
 
@@ -76,6 +77,15 @@ public:
                 offsets[0] = 0;
                 break;
 
+            case DRM_FORMAT_XRGB8888:
+            case DRM_FORMAT_XBGR8888:
+            case DRM_FORMAT_RGBX8888:
+            case DRM_FORMAT_BGRX8888:
+                handles[0] = handle;
+                pitches[0] = w * 4;
+                offsets[0] = 0;
+                break;
+
             default:
                 DRM_MEDIA_LOGE("TODO: format for drm format:[%c%c%c%c]", DRM_DUMP_FOURCC(drm_fmt));
                 return;
@@ -134,7 +144,11 @@ public:
     virtual int IoCtrl(unsigned long int request, ...) override;
 
 private:
+#if defined(CONFIG_ROCKCHIP)
     static const DrmPixelFormat       defaultPixFmt = DRM_PIX_FMT_ARGB8888;
+#else
+    static const DrmPixelFormat       defaultPixFmt = DRM_PIX_FMT_XRGB8888;
+#endif
     struct plane_property_ids         plane_prop_ids;
     int                               zindex;
     bool                              support_scale;
@@ -221,7 +235,10 @@ int DRMOutPutStream::Open()
         property_active = get_property_id(res, DRM_MODE_OBJECT_CRTC, crtc_id, "ACTIVE");
         property_mode_id = get_property_id(res, DRM_MODE_OBJECT_CRTC, crtc_id, "MODE_ID");
 
-        drmModeCreatePropertyBlob(fd, &cur_mode, sizeof(cur_mode), &blob_id);
+        ret = drmModeCreatePropertyBlob(fd, &cur_mode, sizeof(cur_mode), &blob_id);
+        if (ret != 0) {
+            DRM_MEDIA_LOGE("drmModeCreatePropertyBlob failed, return:[%d], errstr:[%m]", ret);
+        }
 
         req = drmModeAtomicAlloc();
         if (!req) {
@@ -246,8 +263,8 @@ int DRMOutPutStream::Open()
 
         ret = drmModeAtomicCommit(fd, req, flags, NULL);
         drmModeAtomicFree(req);
-        if (ret) {
-            DRM_MEDIA_LOGE("drmModeAtomicCommit failed, return:[%d], errstr:[%m]", ret);
+        if (ret != 0) {
+            DRM_MEDIA_LOGE("drmModeAtomicCommit set crtc failed, return:[%d], errstr:[%m]", ret);
             return ret;
         }
     }

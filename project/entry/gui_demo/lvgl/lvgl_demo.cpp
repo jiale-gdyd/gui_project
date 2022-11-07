@@ -1,6 +1,9 @@
 #include <linux/kconfig.h>
 
 #include <time.h>
+#include <poll.h>
+#include <errno.h>
+#include <limits.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/time.h>
@@ -46,6 +49,20 @@ uint32_t custom_tick_get(void)
     return time_ms;
 }
 
+#if defined(CONFIG_WAYLAND_DISP_DRIVER)
+static int wayland_sleep;
+static struct pollfd wayland_pfd;
+static lv_disp_t *wayland_disp = NULL;
+static uint32_t wayland_time_till_next;
+
+static void wayland_handle_init(void)
+{
+    lv_coord_t hor_res = 640;
+    lv_coord_t ver_res = 480;
+    wayland_disp = lv_wayland_create_window(hor_res, ver_res, "wayland", NULL);
+}
+#endif
+
 int lvgl_demo_init(int argc, char *argv[])
 {
     lv_init();
@@ -54,15 +71,22 @@ int lvgl_demo_init(int argc, char *argv[])
     drm_init();
 #elif defined(CONFIG_FBDEV_DISP_DRIVER)
     fbdev_init();
+#elif defined(CONFIG_WAYLAND_DISP_DRIVER)
+    lv_wayland_init();
 #endif
 
+#if !defined(CONFIG_WAYLAND_DISP_DRIVER)
     evdev_init();
+#endif
 
 #if defined(CONFIG_LVGL_V7)
-    lv_coord_t width, height;
+#if defined(CONFIG_WAYLAND_DISP_DRIVER)
+    wayland_handle_init();
+#else
     static lv_disp_drv_t disp_drv;
     static lv_disp_buf_t disp_buf;
     static lv_indev_drv_t indev_drv;
+    lv_coord_t width = 640, height = 480;
 
     lv_disp_drv_init(&disp_drv);
 
@@ -75,25 +99,33 @@ int lvgl_demo_init(int argc, char *argv[])
     lv_disp_buf_init(&disp_buf, buf0, buf1, DISP_BUF_SIZE);
 
     disp_drv.buffer = &disp_buf;
+#if defined(CONFIG_DRM_DISP_DRIVER)
     disp_drv.flush_cb = drm_flush;
+#elif defined(CONFIG_FBDEV_DISP_DRIVER)
+    disp_drv.flush_cb = fbdev_flush;
+#endif
     disp_drv.hor_res = width;
     disp_drv.ver_res = height;
     static lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
-    lv_indev_drv_init(&indev_drv); 
+    lv_indev_drv_init(&indev_drv);
 
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.disp = disp;
     indev_drv.read_cb = evdev_read;
-    lv_indev_drv_register(&indev_drv); 
+    lv_indev_drv_register(&indev_drv);
+#endif
 
     lvgl_demo_printer(argc, argv);
 
 #elif defined(CONFIG_LVGL_V8)
-    lv_coord_t width, height;
+#if defined(CONFIG_WAYLAND_DISP_DRIVER)
+    wayland_handle_init();
+#else
     static lv_disp_drv_t disp_drv;
     static lv_indev_drv_t indev_drv;
     static lv_disp_draw_buf_t disp_buf;
+    lv_coord_t width = 640, height = 480;
 
     lv_disp_drv_init(&disp_drv);
 
@@ -120,6 +152,7 @@ int lvgl_demo_init(int argc, char *argv[])
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = evdev_read;
     static lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
+#endif
 
 #if defined(CONFIG_LVGL_MUSIC_TEST)
     lvgl_demo_music(argc, argv);
@@ -135,9 +168,26 @@ int lvgl_demo_init(int argc, char *argv[])
 #endif
 
     while (1) {
+#if defined(CONFIG_WAYLAND_DISP_DRIVER)
+        wayland_time_till_next = lv_wayland_timer_handler();
+        if (!lv_wayland_window_is_open(wayland_disp)) {
+            break;
+        }
+
+        if (wayland_time_till_next == LV_NO_TIMER_READY) {
+            wayland_sleep = -1;
+        } else if (wayland_time_till_next > INT_MAX) {
+            wayland_sleep = INT_MAX;
+        } else {
+            wayland_sleep = wayland_time_till_next;
+        }
+
+        while ((poll(&wayland_pfd, 1, wayland_sleep) < 0) && (errno == EINTR));
+#else
         lv_task_handler();
         usleep(1);
         lv_tick_inc(1);
+#endif
     }
 
     return 0;
@@ -149,6 +199,8 @@ int lvgl_demo_exit(void)
     drm_exit();
 #elif defined(CONFIG_FBDEV_DISP_DRIVER)
     fbdev_exit();
+#elif defined(CONFIG_WAYLAND_DISP_DRIVER)
+    lv_wayland_deinit();
 #endif
 
     lv_deinit();

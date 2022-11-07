@@ -173,7 +173,8 @@ static int get_rga_format(DrmPixelFormat f)
         {DRM_PIX_FMT_RGB888,   RK_FORMAT_BGR_888},
         {DRM_PIX_FMT_BGR888,   RK_FORMAT_RGB_888},
         {DRM_PIX_FMT_ARGB8888, RK_FORMAT_BGRA_8888},
-        {DRM_PIX_FMT_ABGR8888, RK_FORMAT_RGBA_8888}
+        {DRM_PIX_FMT_ABGR8888, RK_FORMAT_RGBA_8888},
+        {DRM_PIX_FMT_XRGB8888, RK_FORMAT_XRGB_8888}
     };
 
     auto it = rga_format_map.find(f);

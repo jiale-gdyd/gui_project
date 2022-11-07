@@ -127,7 +127,7 @@ static void home_open(uint32_t delay)
     lv_obj_align_origo(icon, NULL, LV_ALIGN_IN_TOP_LEFT, 290, 50);
     lv_demo_printer_anim_in(icon, delay);
 
-    lv_obj_t *title = add_title("22 April 2020 15:36");
+    lv_obj_t *title = add_title("07 November 2022 11:58");
     lv_obj_align(title, NULL, LV_ALIGN_IN_TOP_RIGHT, -60, LV_DEMO_PRINTER_TITLE_PAD);
 
     delay += LV_DEMO_PRINTER_ANIM_DELAY;
@@ -1042,7 +1042,7 @@ static void lv_demo_printer_anim_bg(uint32_t delay, lv_color_t color, int32_t y_
         lv_anim_set_var(&a, bg_top);
         lv_anim_set_time(&a, LV_DEMO_PRINTER_ANIM_TIME_BG + 200);
         lv_anim_set_delay(&a, delay);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
         lv_anim_set_values(&a, y_act, y_new);
         lv_anim_set_path(&a, &path);
         lv_anim_start(&a);
@@ -1051,7 +1051,7 @@ static void lv_demo_printer_anim_bg(uint32_t delay, lv_color_t color, int32_t y_
         lv_anim_set_var(&a, bg_top);
         lv_anim_set_time(&a, LV_DEMO_PRINTER_ANIM_TIME_BG);
         lv_anim_set_delay(&a, delay);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
         lv_anim_set_values(&a, lv_obj_get_y(bg_top), y_new);
         lv_anim_start(&a);
     }
@@ -1059,7 +1059,7 @@ static void lv_demo_printer_anim_bg(uint32_t delay, lv_color_t color, int32_t y_
     bg_color_prev = bg_color_act;
     bg_color_act = color;
 
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) anim_bg_color_cb);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)anim_bg_color_cb);
     lv_anim_set_values(&a, 0, 255);
     lv_anim_set_time(&a, LV_DEMO_PRINTER_ANIM_TIME_BG);
     lv_anim_set_path(&a, &lv_anim_path_def);

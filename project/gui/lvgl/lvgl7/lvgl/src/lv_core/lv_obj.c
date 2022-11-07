@@ -231,7 +231,7 @@ void lv_init(void)
     LV_LOG_INFO("lv_init ready");
 }
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+//#if LV_ENABLE_GC || !LV_MEM_CUSTOM
 
 /**
  * Deinit the 'lv' library
@@ -251,7 +251,7 @@ void lv_deinit(void)
     lv_log_register_print_cb(NULL);
 #endif
 }
-#endif
+//#endif
 
 /*--------------------
  * Create and delete
