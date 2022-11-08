@@ -24,10 +24,19 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
+static const char *mpp_last_commit_message = "2022-11-02 [mpp_h265]: Fix hevc video flicker issue";
 
 void show_mpp_version(void)
 {
+    RK_U32 show_history = 0;
 
+    mpp_env_get_u32("mpp_show_history", &show_history, 0);
+
+    if (show_history) {
+        mpp_log("%s\n", mpp_last_commit_message);
+    } else {
+        mpp_log("mpp version: %s\n", mpp_version);
+    }
 }
 
 const char *get_mpp_version(void)
