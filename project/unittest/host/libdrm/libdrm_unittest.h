@@ -16,7 +16,7 @@ extern "C" {
 int host_libdrm_unittest_init(int argc, char *argv[]);
 
 /**
- * 函数名称: unittest_libdrm_exit
+ * 函数名称: host_libdrm_unittest_exit
  * 功能描述: 构建主机libdrm单元测试退出函数
  * 输入参数: 无
  * 输出参数: 无
