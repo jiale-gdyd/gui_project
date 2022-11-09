@@ -10,7 +10,7 @@
 
 #include "lvgl_demo.h"
 
-#if defined(CONFIG_LVGL_V8)
+#if defined(CONFIG_LVGL_NEW)
 #if defined(CONFIG_LVGL_MUSIC_TEST)
 #include "music/music.h"
 #elif defined(CONFIG_LVGL_STRESS_TEST)
@@ -118,7 +118,7 @@ int lvgl_demo_init(int argc, char *argv[])
 
     lvgl_demo_printer(argc, argv);
 
-#elif defined(CONFIG_LVGL_V8)
+#elif defined(CONFIG_LVGL_NEW)
 #if defined(CONFIG_WAYLAND_DISP_DRIVER)
     wayland_handle_init();
 #else

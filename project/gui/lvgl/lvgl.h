@@ -11,8 +11,8 @@ extern "C" {
 #include "lvgl7/lvgl.h"
 #endif
 
-#if defined(CONFIG_LVGL_V8)
-#include "lvgl8/lvgl.h"
+#if defined(CONFIG_LVGL_NEW)
+#include "lvglx/lvgl.h"
 #endif
 
 #ifdef __cplusplus

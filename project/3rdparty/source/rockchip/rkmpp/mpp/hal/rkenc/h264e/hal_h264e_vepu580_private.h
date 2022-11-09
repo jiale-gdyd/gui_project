@@ -22,6 +22,7 @@
 #include "../common/vepu541_common.h"
 #include "hal_h264e_vepu580_reg.h"
 #include "../../../base/inc/mpp_enc_cb_param.h"
+#include "../../common/h264/hal_h264e_stream_amend.h"
 
 #define DUMP_REG 0
 #define MAX_TASK_CNT        2
@@ -59,6 +60,7 @@ typedef struct HalH264eVepu580Ctx_t {
     H264eReorderInfo        *reorder;
     H264eMarkingInfo        *marking;
     H264ePrefixNal          *prefix;
+    HalH264eVepuStreamAmend  amend;
 
     /* syntax for output to enc_impl */
     EncRcTaskInfo           hal_rc_cfg;

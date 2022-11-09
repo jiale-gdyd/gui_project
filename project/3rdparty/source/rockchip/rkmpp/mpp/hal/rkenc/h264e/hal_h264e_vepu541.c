@@ -37,6 +37,7 @@
 #include "hal_h264e_vepu541_reg.h"
 #include "hal_h264e_vepu541_reg_l2.h"
 #include "../common/vepu541_common.h"
+#include "../../common/h264/hal_h264e_stream_amend.h"
 
 typedef struct HalH264eVepu541Ctx_t {
     MppEncCfgSet            *cfg;
@@ -62,6 +63,7 @@ typedef struct HalH264eVepu541Ctx_t {
     H264eReorderInfo        *reorder;
     H264eMarkingInfo        *marking;
     H264ePrefixNal          *prefix;
+    HalH264eVepuStreamAmend  amend;
 
     /* syntax for output to enc_impl */
     EncRcTaskInfo           hal_rc_cfg;
@@ -125,6 +127,8 @@ static MPP_RET hal_h264e_vepu541_deinit(void *hal)
     HalH264eVepu541Ctx *p = (HalH264eVepu541Ctx *)hal;
 
     hal_h264e_dbg_func("enter %p\n", p);
+
+    h264e_vepu_stream_amend_deinit(&p->amend);
 
     if (p->dev) {
         mpp_dev_deinit(p->dev);
@@ -205,6 +209,8 @@ static MPP_RET hal_h264e_vepu541_init(void *hal, MppEncHalCfg *cfg)
 DONE:
     if (ret)
         hal_h264e_vepu541_deinit(hal);
+
+    h264e_vepu_stream_amend_init(&p->amend);
 
     hal_h264e_dbg_func("leave %p\n", p);
     return ret;
@@ -348,6 +354,9 @@ static MPP_RET hal_h264e_vepu541_get_task(void *hal, HalEncTask *task)
         mpp_meta_get_buffer_d(meta, KEY_QPMAP0, &ctx->qpmap, NULL);
     }
     hal_h264e_dbg_func("leave %p\n", hal);
+
+    h264e_vepu_stream_amend_config(&ctx->amend, task->packet, ctx->cfg,
+                                   ctx->slice, ctx->prefix);
 
     return MPP_OK;
 }
@@ -1618,6 +1627,20 @@ static MPP_RET hal_h264e_vepu541_wait(void *hal, HalEncTask *task)
         task->hw_length += ctx->regs_ret.st_bsl.bs_lgth;
     }
 
+    {
+        HalH264eVepuStreamAmend *amend = &ctx->amend;
+
+        if (amend->enable) {
+            amend->old_length = task->hw_length;
+            amend->slice->is_multi_slice = (ctx->cfg->split.split_mode > 0);
+            h264e_vepu_stream_amend_proc(amend, ctx->cfg->codec.h264.hw_poc_type);
+            task->hw_length = amend->new_length;
+        } else if (amend->prefix) {
+            /* check prefix value */
+            amend->old_length = task->hw_length;
+            h264e_vepu_stream_amend_sync_ref_idc(amend);
+        }
+    }
     hal_h264e_dbg_func("leave %p\n", hal);
 
     return ret;
