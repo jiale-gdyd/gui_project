@@ -8,9 +8,15 @@
 #include "filter.h"
 
 #if defined(CONFIG_RKRGA)
+#if defined(CONFIG_RKRGA_OLD)
 #include <rockchip/rkrga/rga.h>
 #include <rockchip/rkrga/im2d.h>
 #include <rockchip/rkrga/RockchipRga.h>
+#else
+#include <rockchip/rkrgax/rga.h>
+#include <rockchip/rkrgax/im2d.h>
+#include <rockchip/rkrgax/RockchipRga.h>
+#endif
 #endif
 
 namespace libdrm {
