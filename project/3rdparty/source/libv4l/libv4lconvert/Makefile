@@ -1,0 +1,27 @@
+obj-y += control/
+obj-y += processing/
+
+obj-y += flip.o
+obj-y += crop.o
+obj-y += jpeg.o
+obj-y += jpgl.o
+obj-y += cpia1.o
+obj-y += bayer.o
+obj-y += se401.o
+obj-y += helper.o
+obj-y += pac207.o
+obj-y += rgbyuv.o
+obj-y += sq905c.o
+obj-y += stv0680.o
+obj-y += spca501.o
+obj-y += sn9c10x.o
+obj-y += sn9c20x.o
+obj-y += tinyjpeg.o
+obj-y += jidctflt.o
+obj-y += mr97310a.o
+obj-y += jl2005bcd.o
+obj-y += nv12_16l16.o
+obj-y += libv4lconvert.o
+obj-y += sn9c2028-decomp.o
+obj-y += jpeg_memsrcdest.o
+obj-y += spca561-decompress.o

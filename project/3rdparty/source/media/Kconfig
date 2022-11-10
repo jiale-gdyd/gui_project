@@ -8,6 +8,8 @@ config MEDIA_API
     bool "Media application interface"
     default n
     select LIBDRM
+    select LIBV4L
+    select LIBV4L2
     help
       Media application interface
 
@@ -24,12 +26,6 @@ config RKMPP_RGA_OSD
     depends on RKRGA
     help
       rkmpp interface use rga osd
-
-config LIBV4L2
-    bool "media tools v4l2"
-    default n
-    help
-      v4l2 libraries
 
 config RKAIQ
     bool "enable rockchip aiq"

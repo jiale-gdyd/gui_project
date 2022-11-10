@@ -1,0 +1,26 @@
+#
+# v4l-utils Kconfig
+#
+
+menu "v4l-utils"
+
+config LIBV4L
+    bool "v4l-utils"
+    default n
+    help
+      Linux utilities and libraries to handle media devices (TV devices, capture devices, radio devices, remote controllers).
+
+choice
+    prompt "v4l version"
+    depends on LIBV4L
+    default LIBV4L2
+
+    config LIBV4L1
+        bool "v4l version 1"
+
+    config LIBV4L2
+        bool "v4l version 2"
+
+endchoice
+
+endmenu

@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 
 #if defined(CONFIG_LIBV4L2)
-#include <libv4l2.h>
+#include <libv4l/libv4l2.h>
 #endif
 
 #include "v4l2_utils.h"

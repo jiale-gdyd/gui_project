@@ -1,4 +1,3 @@
-obj-y += mediactl/
 obj-$(CONFIG_RKAIQ) += rkaiq/
 
 obj-y += v4l2_utils.o
