@@ -166,6 +166,16 @@ typedef enum {
 } IM_PRE_INTR_FLAGS;
 
 typedef enum {
+    IM_CONTEXT_NONE            = 0x0,
+    IM_CONTEXT_SRC_FIX_ENABLE  = 0x1 << 0,
+    IM_CONTEXT_SRC_CACHE_INFO  = 0x1 << 1,
+    IM_CONTEXT_SRC1_FIX_ENABLE = 0x1 << 2,
+    IM_CONTEXT_SRC1_CACHE_INFO = 0x1 << 3,
+    IM_CONTEXT_DST_FIX_ENABLE  = 0x1 << 4,
+    IM_CONTEXT_DST_CACHE_INFO  = 0x1 << 5,
+} IM_CONTEXT_FLAGS;
+
+typedef enum {
     RGA_VENDOR = 0,
     RGA_VERSION,
     RGA_MAX_INPUT,
@@ -190,6 +200,7 @@ typedef enum {
     IM_STATUS_FAILED        =  0,
 } IM_STATUS;
 
+typedef uint32_t im_ctx_id_t;
 typedef uint32_t im_api_version_t;
 typedef uint32_t rga_buffer_handle_t;
 

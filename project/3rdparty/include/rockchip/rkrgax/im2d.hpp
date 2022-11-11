@@ -10,7 +10,7 @@ rga_buffer_handle_t importbuffer_physicaladdr(uint64_t pa, int width, int height
 
 #undef wrapbuffer_handle
 rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int format);
-rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int wstride, int hstride, int format);
+rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int format, int wstride, int hstride);
 
 #undef imresize
 IM_STATUS imresize(const rga_buffer_t src, rga_buffer_t dst, double fx = 0, double fy = 0, int interpolation = 0, int sync = 1, int *release_fence_fd = NULL);
@@ -57,5 +57,6 @@ IM_STATUS immosaic(const rga_buffer_t image, im_rect rect, int mosaic_mode, int 
 IM_STATUS imosd(const rga_buffer_t osd,const rga_buffer_t dst, const im_rect osd_rect, im_osd_t *osd_config, int sync = 1, int *release_fence_fd = NULL);
 
 IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rect srect, im_rect drect, im_rect prect, int acquire_fence_fd, int *release_fence_fd, im_opt_t *opt_ptr, int usage);
+IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rect srect, im_rect drect, im_rect prect, int acquire_fence_fd, int *release_fence_fd, im_opt_t *opt, int usage, im_ctx_id_t ctx_id);
 
 #endif

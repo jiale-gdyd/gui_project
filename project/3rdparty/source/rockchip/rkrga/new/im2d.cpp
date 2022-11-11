@@ -157,7 +157,7 @@ rga_buffer_t wrapbuffer_fd_t(int fd, int width, int height, int wstride, int hst
     return buffer;
 }
 
-rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int wstride, int hstride, int format)
+rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int format, int wstride, int hstride)
 {
     rga_buffer_t buffer;
 

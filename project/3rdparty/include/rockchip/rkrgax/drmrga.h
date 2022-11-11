@@ -120,7 +120,9 @@ typedef struct rga_info {
     struct rga_mosaic_info   mosaic_info;
     struct rga_osd_info      osd_info;
     struct rga_pre_intr_info pre_intr;
-    char reserve[410];
+    int                      mpi_mode;
+    int                      ctx_id;
+    char                     reserve[402];
 } rga_info_t;
 
 

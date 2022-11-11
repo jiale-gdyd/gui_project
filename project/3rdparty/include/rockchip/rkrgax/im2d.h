@@ -46,6 +46,7 @@ IM_STATUS releasebuffer_handle(rga_buffer_handle_t handle);
         } else if (__argc == 2) {                                                                               \
             im2d_api_buffer = wrapbuffer_handle_t(handle, width, height, __args[0], __args[1], format);         \
         } else {                                                                                                \
+            memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
             printf("invalid parameter\n");                                                                      \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
@@ -64,6 +65,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
         } else if (__argc == 2) {                                                                               \
             im2d_api_buffer = wrapbuffer_virtualaddr_t(vir_addr, width, height, __args[0], __args[1], format);  \
         } else {                                                                                                \
+            memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
             printf("invalid parameter\n");                                                                      \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
@@ -80,6 +82,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
         } else if (__argc == 2) {                                                                               \
             im2d_api_buffer = wrapbuffer_physicaladdr_t(phy_addr, width, height, __args[0], __args[1], format); \
         } else {                                                                                                \
+            memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
             printf("invalid parameter\n");                                                                      \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
@@ -96,6 +99,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
         } else if (__argc == 2) {                                                                               \
             im2d_api_buffer = wrapbuffer_fd_t(fd, width, height, __args[0], __args[1], format);                 \
         } else {                                                                                                \
+            memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
             printf("invalid parameter\n");                                                                      \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
@@ -488,6 +492,9 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
 
 IM_STATUS imsync(int out_fence_fd);
 IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value);
+
+IM_STATUS imcancel(im_ctx_id_t id);
+im_ctx_id_t imbegin(uint32_t flags);
 
 #ifdef __cplusplus
 }
