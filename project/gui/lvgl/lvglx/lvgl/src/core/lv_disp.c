@@ -50,7 +50,7 @@ lv_obj_t *lv_disp_get_layer_top(lv_disp_t *disp)
     }
 
     if (!disp) {
-        LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
+        LV_LOG_WARN("no display registered to get its top layer");
         return NULL;
     }
 
@@ -64,7 +64,7 @@ lv_obj_t *lv_disp_get_layer_sys(lv_disp_t *disp)
     }
 
     if (!disp) {
-        LV_LOG_WARN("lv_layer_sys: no display registered to get its sys. layer");
+        LV_LOG_WARN("no display registered to get its sys. layer");
         return NULL;
     }
 
@@ -346,7 +346,7 @@ void lv_disp_trig_activity(lv_disp_t *disp)
     }
 
     if (!disp) {
-        LV_LOG_WARN("lv_disp_trig_activity: no display registered");
+        LV_LOG_WARN("no display registered");
         return;
     }
 
@@ -360,7 +360,7 @@ void lv_disp_clean_dcache(lv_disp_t *disp)
     }
 
     if (!disp) {
-        LV_LOG_WARN("lv_disp_clean_dcache: no display registered");
+        LV_LOG_WARN("no display registered");
         return;
     }
 
@@ -404,7 +404,7 @@ lv_timer_t *_lv_disp_get_refr_timer(lv_disp_t *disp)
     }
 
     if (!disp) {
-        LV_LOG_WARN("lv_disp_get_refr_timer: no display registered");
+        LV_LOG_WARN("no display registered");
         return NULL;
     }
 

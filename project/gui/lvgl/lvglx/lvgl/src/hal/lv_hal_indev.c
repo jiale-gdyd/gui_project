@@ -31,7 +31,7 @@ lv_indev_t *lv_indev_drv_register(lv_indev_drv_t *driver)
     }
 
     if (driver->disp == NULL) {
-        LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attach the indev to a display");
+        LV_LOG_WARN("no display registered hence can't attach the indev to a display");
         return NULL;
     }
 
@@ -64,7 +64,7 @@ void lv_indev_drv_update(lv_indev_t *indev, lv_indev_drv_t *new_drv)
     }
 
     if (new_drv->disp == NULL) {
-        LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attach the indev to a display");
+        LV_LOG_WARN("no display registered hence can't attach the indev to a display");
         indev->proc.disabled = true;
         return;
     }
