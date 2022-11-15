@@ -84,6 +84,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char ui_keyboard[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_kb_hex[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_gauge_h[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_popdown[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char ui_svg_test[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_remove[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_color[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_color_picker[]);
@@ -98,6 +99,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char ui_menu_down_right[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_tab_bottom[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_list_view_m[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_slide_view_h_loop[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char ui_popup_on_top[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_main_fscript[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_mutable_image[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_calibration_win[]);
@@ -263,12 +265,14 @@ extern TK_CONST_DATA_ALIGN(const unsigned char data_a_b_c_any[]);
 #include "dark/inc/images/uiex_num6.res"
 #include "dark/inc/images/uiex_shifton.res"
 #include "dark/inc/images/uiex_radio_d.res"
+#include "dark/inc/images/uiex_arrow_left_p.res"
 #include "dark/inc/images/uiex_num7.res"
 #include "dark/inc/images/uiex_battery_5.res"
 #include "dark/inc/images/uiex_num5.res"
 #include "dark/inc/images/uiex_radio_p.res"
 #include "dark/inc/images/uiex_num4.res"
 #include "dark/inc/images/uiex_battery_4.res"
+#include "dark/inc/images/uiex_arrow_right_n.res"
 #include "dark/inc/images/uiex_battery_0.res"
 #include "dark/inc/images/uiex_num0.res"
 #include "dark/inc/images/uiex_load2_bg.res"
@@ -321,11 +325,13 @@ extern TK_CONST_DATA_ALIGN(const unsigned char data_a_b_c_any[]);
 #include "dark/inc/images/uiex_editor_TextAlignright.res"
 #include "dark/inc/images/uiex_keyboard_EN.res"
 #include "dark/inc/images/uiex_logo.res"
+#include "dark/inc/images/uiex_arrow_left_n.res"
 #include "dark/inc/images/uiex_editor_TextItalic.res"
 #include "dark/inc/images/uiex_editor_TextCenteralignment.res"
 #include "dark/inc/images/uiex_button_time.res"
 #include "dark/inc/images/uiex_radio_n.res"
 #include "dark/inc/images/uiex_button_Empty.res"
+#include "dark/inc/images/uiex_arrow_right_p.res"
 #include "dark/inc/images/uiex_editor_TextBold.res"
 #include "dark/inc/images/uiex_num9.res"
 #include "dark/inc/images/uiex_button_Import.res"
@@ -558,6 +564,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char image_clock_hour[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_bg5_s[]);
 #else /*WITH_STB_IMAGE*/
 #include "dark/inc/images/uiex_keyboard_CN.data"
+#include "dark/inc/images/uiex_arrow_left_n.data"
 #include "dark/inc/images/uiex_radio_p.data"
 #include "dark/inc/images/uiex_load1_bg.data"
 #include "dark/inc/images/uiex_num1.data"
@@ -571,11 +578,13 @@ extern TK_CONST_DATA_ALIGN(const unsigned char image_bg5_s[]);
 #include "dark/inc/images/uiex_logo.data"
 #include "dark/inc/images/uiex_Portraitmenu_p.data"
 #include "dark/inc/images/uiex_radio_d.data"
+#include "dark/inc/images/uiex_arrow_right_n.data"
 #include "dark/inc/images/uiex_num7.data"
 #include "dark/inc/images/uiex_editor_TextAlignleft.data"
 #include "dark/inc/images/uiex_editor_Textcolor.data"
 #include "dark/inc/images/uiex_clock_bg.data"
 #include "dark/inc/images/uiex_Portraitmenu_n.data"
+#include "dark/inc/images/uiex_arrow_right_p.data"
 #include "dark/inc/images/uiex_texteditorhide.data"
 #include "dark/inc/images/uiex_load2_bg.data"
 #include "dark/inc/images/uiex_keyboard_backspace_p.data"
@@ -585,6 +594,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char image_bg5_s[]);
 #include "dark/inc/images/uiex_arrow_down_p.data"
 #include "dark/inc/images/uiex_editor_bgcolor.data"
 #include "dark/inc/images/uiex_editor_TextLinespacing.data"
+#include "dark/inc/images/uiex_arrow_left_p.data"
 #include "dark/inc/images/uiex_radio_n.data"
 #include "dark/inc/images/uiex_editor_TextItalic.data"
 #include "dark/inc/images/uiex_num6.data"
@@ -872,15 +882,27 @@ extern TK_CONST_DATA_ALIGN(const unsigned char script_dummy[]);
 #endif /*AWTK_WEB*/
 #ifdef WITH_VGCANVAS
 #include "dark/inc/images/computer.bsvg"
+extern TK_CONST_DATA_ALIGN(const unsigned char image_paths_data_02_t[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_pointer_4[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_htest[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_ball[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_polyline_01_t[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_china[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_meter_pointer[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_pservers_grad_99_b[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_tiger[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_line_01_t[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_painting_stroke_05_t[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_paths_data_01_t[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_pointer_1[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_pointer[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_circle_01_t[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_rect_01_t[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_girl[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_gradient[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char image_windmill[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_ellipse_01_t[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char image_shapes_polygon_01_t[]);
 #endif /*WITH_VGCANVAS*/
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/
 
@@ -974,6 +996,7 @@ ret_t assets_init_dark(void) {
   assets_manager_add(am, ui_kb_hex);
   assets_manager_add(am, ui_gauge_h);
   assets_manager_add(am, ui_popdown);
+  assets_manager_add(am, ui_svg_test);
   assets_manager_add(am, ui_slide_view_remove);
   assets_manager_add(am, ui_color);
   assets_manager_add(am, ui_color_picker);
@@ -988,6 +1011,7 @@ ret_t assets_init_dark(void) {
   assets_manager_add(am, ui_tab_bottom);
   assets_manager_add(am, ui_list_view_m);
   assets_manager_add(am, ui_slide_view_h_loop);
+  assets_manager_add(am, ui_popup_on_top);
   assets_manager_add(am, ui_main_fscript);
   assets_manager_add(am, ui_mutable_image);
   assets_manager_add(am, ui_calibration_win);
@@ -1152,12 +1176,14 @@ ret_t assets_init_dark(void) {
   assets_manager_add(am, image_uiex_num6_dark);
   assets_manager_add(am, image_uiex_shifton_dark);
   assets_manager_add(am, image_uiex_radio_d_dark);
+  assets_manager_add(am, image_uiex_arrow_left_p_dark);
   assets_manager_add(am, image_uiex_num7_dark);
   assets_manager_add(am, image_uiex_battery_5_dark);
   assets_manager_add(am, image_uiex_num5_dark);
   assets_manager_add(am, image_uiex_radio_p_dark);
   assets_manager_add(am, image_uiex_num4_dark);
   assets_manager_add(am, image_uiex_battery_4_dark);
+  assets_manager_add(am, image_uiex_arrow_right_n_dark);
   assets_manager_add(am, image_uiex_battery_0_dark);
   assets_manager_add(am, image_uiex_num0_dark);
   assets_manager_add(am, image_uiex_load2_bg_dark);
@@ -1210,11 +1236,13 @@ ret_t assets_init_dark(void) {
   assets_manager_add(am, image_uiex_editor_TextAlignright_dark);
   assets_manager_add(am, image_uiex_keyboard_EN_dark);
   assets_manager_add(am, image_uiex_logo_dark);
+  assets_manager_add(am, image_uiex_arrow_left_n_dark);
   assets_manager_add(am, image_uiex_editor_TextItalic_dark);
   assets_manager_add(am, image_uiex_editor_TextCenteralignment_dark);
   assets_manager_add(am, image_uiex_button_time_dark);
   assets_manager_add(am, image_uiex_radio_n_dark);
   assets_manager_add(am, image_uiex_button_Empty_dark);
+  assets_manager_add(am, image_uiex_arrow_right_p_dark);
   assets_manager_add(am, image_uiex_editor_TextBold_dark);
   assets_manager_add(am, image_uiex_num9_dark);
   assets_manager_add(am, image_uiex_button_Import_dark);
@@ -1462,15 +1490,27 @@ ret_t assets_init_dark(void) {
 #endif /*AWTK_WEB*/
 #ifdef WITH_VGCANVAS
   assets_manager_add(am, image_computer_dark);
+  assets_manager_add(am, image_paths_data_02_t);
   assets_manager_add(am, image_pointer_4);
   assets_manager_add(am, image_htest);
   assets_manager_add(am, image_ball);
+  assets_manager_add(am, image_shapes_polyline_01_t);
   assets_manager_add(am, image_china);
   assets_manager_add(am, image_meter_pointer);
+  assets_manager_add(am, image_pservers_grad_99_b);
+  assets_manager_add(am, image_tiger);
+  assets_manager_add(am, image_shapes_line_01_t);
+  assets_manager_add(am, image_painting_stroke_05_t);
+  assets_manager_add(am, image_paths_data_01_t);
   assets_manager_add(am, image_pointer_1);
   assets_manager_add(am, image_pointer);
+  assets_manager_add(am, image_shapes_circle_01_t);
+  assets_manager_add(am, image_shapes_rect_01_t);
   assets_manager_add(am, image_girl);
+  assets_manager_add(am, image_gradient);
   assets_manager_add(am, image_windmill);
+  assets_manager_add(am, image_shapes_ellipse_01_t);
+  assets_manager_add(am, image_shapes_polygon_01_t);
 #endif /*WITH_VGCANVAS*/
 #endif /*defined(WITH_FS_RES) && !defined(AWTK_WEB)*/
 

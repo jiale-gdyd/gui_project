@@ -84,6 +84,7 @@
 #include "assets/default/inc/ui/kb_hex.data"
 #include "assets/default/inc/ui/gauge_h.data"
 #include "assets/default/inc/ui/popdown.data"
+#include "assets/default/inc/ui/svg_test.data"
 #include "assets/default/inc/ui/slide_view_remove.data"
 #include "assets/default/inc/ui/color.data"
 #include "assets/default/inc/ui/color_picker.data"
@@ -98,6 +99,7 @@
 #include "assets/default/inc/ui/tab_bottom.data"
 #include "assets/default/inc/ui/list_view_m.data"
 #include "assets/default/inc/ui/slide_view_h_loop.data"
+#include "assets/default/inc/ui/popup_on_top.data"
 #include "assets/default/inc/ui/main_fscript.data"
 #include "assets/default/inc/ui/mutable_image.data"
 #include "assets/default/inc/ui/calibration_win.data"
@@ -263,12 +265,14 @@
 #include "assets/dark/inc/images/uiex_num6.res"
 #include "assets/dark/inc/images/uiex_shifton.res"
 #include "assets/dark/inc/images/uiex_radio_d.res"
+#include "assets/dark/inc/images/uiex_arrow_left_p.res"
 #include "assets/dark/inc/images/uiex_num7.res"
 #include "assets/dark/inc/images/uiex_battery_5.res"
 #include "assets/dark/inc/images/uiex_num5.res"
 #include "assets/dark/inc/images/uiex_radio_p.res"
 #include "assets/dark/inc/images/uiex_num4.res"
 #include "assets/dark/inc/images/uiex_battery_4.res"
+#include "assets/dark/inc/images/uiex_arrow_right_n.res"
 #include "assets/dark/inc/images/uiex_battery_0.res"
 #include "assets/dark/inc/images/uiex_num0.res"
 #include "assets/dark/inc/images/uiex_load2_bg.res"
@@ -321,11 +325,13 @@
 #include "assets/dark/inc/images/uiex_editor_TextAlignright.res"
 #include "assets/dark/inc/images/uiex_keyboard_EN.res"
 #include "assets/dark/inc/images/uiex_logo.res"
+#include "assets/dark/inc/images/uiex_arrow_left_n.res"
 #include "assets/dark/inc/images/uiex_editor_TextItalic.res"
 #include "assets/dark/inc/images/uiex_editor_TextCenteralignment.res"
 #include "assets/dark/inc/images/uiex_button_time.res"
 #include "assets/dark/inc/images/uiex_radio_n.res"
 #include "assets/dark/inc/images/uiex_button_Empty.res"
+#include "assets/dark/inc/images/uiex_arrow_right_p.res"
 #include "assets/dark/inc/images/uiex_editor_TextBold.res"
 #include "assets/dark/inc/images/uiex_num9.res"
 #include "assets/dark/inc/images/uiex_button_Import.res"
@@ -558,6 +564,7 @@
 #include "assets/default/inc/images/bg5_s.res"
 #else /*WITH_STB_IMAGE*/
 #include "assets/dark/inc/images/uiex_keyboard_CN.data"
+#include "assets/dark/inc/images/uiex_arrow_left_n.data"
 #include "assets/dark/inc/images/uiex_radio_p.data"
 #include "assets/dark/inc/images/uiex_load1_bg.data"
 #include "assets/dark/inc/images/uiex_num1.data"
@@ -571,11 +578,13 @@
 #include "assets/dark/inc/images/uiex_logo.data"
 #include "assets/dark/inc/images/uiex_Portraitmenu_p.data"
 #include "assets/dark/inc/images/uiex_radio_d.data"
+#include "assets/dark/inc/images/uiex_arrow_right_n.data"
 #include "assets/dark/inc/images/uiex_num7.data"
 #include "assets/dark/inc/images/uiex_editor_TextAlignleft.data"
 #include "assets/dark/inc/images/uiex_editor_Textcolor.data"
 #include "assets/dark/inc/images/uiex_clock_bg.data"
 #include "assets/dark/inc/images/uiex_Portraitmenu_n.data"
+#include "assets/dark/inc/images/uiex_arrow_right_p.data"
 #include "assets/dark/inc/images/uiex_texteditorhide.data"
 #include "assets/dark/inc/images/uiex_load2_bg.data"
 #include "assets/dark/inc/images/uiex_keyboard_backspace_p.data"
@@ -585,6 +594,7 @@
 #include "assets/dark/inc/images/uiex_arrow_down_p.data"
 #include "assets/dark/inc/images/uiex_editor_bgcolor.data"
 #include "assets/dark/inc/images/uiex_editor_TextLinespacing.data"
+#include "assets/dark/inc/images/uiex_arrow_left_p.data"
 #include "assets/dark/inc/images/uiex_radio_n.data"
 #include "assets/dark/inc/images/uiex_editor_TextItalic.data"
 #include "assets/dark/inc/images/uiex_num6.data"
@@ -872,19 +882,31 @@
 #endif /*AWTK_WEB*/
 #ifdef WITH_VGCANVAS
 #include "assets/dark/inc/images/computer.bsvg"
+#include "assets/default/inc/images/paths_data_02_t.bsvg"
 #include "assets/default/inc/images/pointer_4.bsvg"
 #include "assets/default/inc/images/htest.bsvg"
 #include "assets/default/inc/images/ball.bsvg"
+#include "assets/default/inc/images/shapes_polyline_01_t.bsvg"
 #include "assets/default/inc/images/china.bsvg"
 #include "assets/default/inc/images/meter_pointer.bsvg"
+#include "assets/default/inc/images/pservers_grad_99_b.bsvg"
+#include "assets/default/inc/images/tiger.bsvg"
+#include "assets/default/inc/images/shapes_line_01_t.bsvg"
+#include "assets/default/inc/images/painting_stroke_05_t.bsvg"
+#include "assets/default/inc/images/paths_data_01_t.bsvg"
 #include "assets/default/inc/images/pointer_1.bsvg"
 #include "assets/default/inc/images/pointer.bsvg"
+#include "assets/default/inc/images/shapes_circle_01_t.bsvg"
+#include "assets/default/inc/images/shapes_rect_01_t.bsvg"
 #include "assets/default/inc/images/girl.bsvg"
+#include "assets/default/inc/images/gradient.bsvg"
 #include "assets/default/inc/images/windmill.bsvg"
+#include "assets/default/inc/images/shapes_ellipse_01_t.bsvg"
+#include "assets/default/inc/images/shapes_polygon_01_t.bsvg"
 #endif /*WITH_VGCANVAS*/
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/
 
-ret_t awtk_assets_init(void) {
+ret_t assets_init(void) {
   assets_manager_t* am = assets_manager();
   assets_manager_set_theme(am, "dark");
 
@@ -974,6 +996,7 @@ ret_t awtk_assets_init(void) {
   assets_manager_add(am, ui_kb_hex);
   assets_manager_add(am, ui_gauge_h);
   assets_manager_add(am, ui_popdown);
+  assets_manager_add(am, ui_svg_test);
   assets_manager_add(am, ui_slide_view_remove);
   assets_manager_add(am, ui_color);
   assets_manager_add(am, ui_color_picker);
@@ -988,6 +1011,7 @@ ret_t awtk_assets_init(void) {
   assets_manager_add(am, ui_tab_bottom);
   assets_manager_add(am, ui_list_view_m);
   assets_manager_add(am, ui_slide_view_h_loop);
+  assets_manager_add(am, ui_popup_on_top);
   assets_manager_add(am, ui_main_fscript);
   assets_manager_add(am, ui_mutable_image);
   assets_manager_add(am, ui_calibration_win);
@@ -1152,12 +1176,14 @@ ret_t awtk_assets_init(void) {
   assets_manager_add(am, image_uiex_num6_dark);
   assets_manager_add(am, image_uiex_shifton_dark);
   assets_manager_add(am, image_uiex_radio_d_dark);
+  assets_manager_add(am, image_uiex_arrow_left_p_dark);
   assets_manager_add(am, image_uiex_num7_dark);
   assets_manager_add(am, image_uiex_battery_5_dark);
   assets_manager_add(am, image_uiex_num5_dark);
   assets_manager_add(am, image_uiex_radio_p_dark);
   assets_manager_add(am, image_uiex_num4_dark);
   assets_manager_add(am, image_uiex_battery_4_dark);
+  assets_manager_add(am, image_uiex_arrow_right_n_dark);
   assets_manager_add(am, image_uiex_battery_0_dark);
   assets_manager_add(am, image_uiex_num0_dark);
   assets_manager_add(am, image_uiex_load2_bg_dark);
@@ -1210,11 +1236,13 @@ ret_t awtk_assets_init(void) {
   assets_manager_add(am, image_uiex_editor_TextAlignright_dark);
   assets_manager_add(am, image_uiex_keyboard_EN_dark);
   assets_manager_add(am, image_uiex_logo_dark);
+  assets_manager_add(am, image_uiex_arrow_left_n_dark);
   assets_manager_add(am, image_uiex_editor_TextItalic_dark);
   assets_manager_add(am, image_uiex_editor_TextCenteralignment_dark);
   assets_manager_add(am, image_uiex_button_time_dark);
   assets_manager_add(am, image_uiex_radio_n_dark);
   assets_manager_add(am, image_uiex_button_Empty_dark);
+  assets_manager_add(am, image_uiex_arrow_right_p_dark);
   assets_manager_add(am, image_uiex_editor_TextBold_dark);
   assets_manager_add(am, image_uiex_num9_dark);
   assets_manager_add(am, image_uiex_button_Import_dark);
@@ -1462,15 +1490,27 @@ ret_t awtk_assets_init(void) {
 #endif /*AWTK_WEB*/
 #ifdef WITH_VGCANVAS
   assets_manager_add(am, image_computer_dark);
+  assets_manager_add(am, image_paths_data_02_t);
   assets_manager_add(am, image_pointer_4);
   assets_manager_add(am, image_htest);
   assets_manager_add(am, image_ball);
+  assets_manager_add(am, image_shapes_polyline_01_t);
   assets_manager_add(am, image_china);
   assets_manager_add(am, image_meter_pointer);
+  assets_manager_add(am, image_pservers_grad_99_b);
+  assets_manager_add(am, image_tiger);
+  assets_manager_add(am, image_shapes_line_01_t);
+  assets_manager_add(am, image_painting_stroke_05_t);
+  assets_manager_add(am, image_paths_data_01_t);
   assets_manager_add(am, image_pointer_1);
   assets_manager_add(am, image_pointer);
+  assets_manager_add(am, image_shapes_circle_01_t);
+  assets_manager_add(am, image_shapes_rect_01_t);
   assets_manager_add(am, image_girl);
+  assets_manager_add(am, image_gradient);
   assets_manager_add(am, image_windmill);
+  assets_manager_add(am, image_shapes_ellipse_01_t);
+  assets_manager_add(am, image_shapes_polygon_01_t);
 #endif /*WITH_VGCANVAS*/
 #endif /*defined(WITH_FS_RES) && !defined(AWTK_WEB)*/
 

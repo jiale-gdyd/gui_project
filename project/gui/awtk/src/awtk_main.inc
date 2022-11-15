@@ -10,7 +10,7 @@
 #endif
 
 BEGIN_C_DECLS
-extern ret_t awtk_assets_init(void);
+extern ret_t assets_init(void);
 
 extern ret_t awtk_application_init(void);
 extern ret_t awtk_application_exit(void);
@@ -74,7 +74,7 @@ int gui_app_start_ex(size_t disp_width, size_t disp_height, int app_type, const 
 #endif
 
     system_info_set_default_font(system_info(), app_font);
-    awtk_assets_init();
+    assets_init();
 
 #ifndef WITH_FS_RES
     locale_info_reload(locale_info());

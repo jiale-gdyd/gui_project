@@ -75,7 +75,7 @@ static ret_t on_set_theme_without_file_system(void* ctx, event_t* e) {
 }
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/
 
-ret_t awtk_assets_init(void) {
+ret_t assets_init(void) {
 #if !defined(WITH_FS_RES) || defined(AWTK_WEB)
   widget_on(window_manager(), EVT_THEME_WILL_CHANGE, on_set_theme_without_file_system, NULL);
 #endif /*!defined(WITH_FS_RES) || defined(AWTK_WEB)*/

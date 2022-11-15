@@ -7,3 +7,4 @@ obj-y += libunibreak/
 obj-y += mbedtls/
 obj-y += miniz/
 obj-y += nanovg/
+obj-y += svgtiny/
