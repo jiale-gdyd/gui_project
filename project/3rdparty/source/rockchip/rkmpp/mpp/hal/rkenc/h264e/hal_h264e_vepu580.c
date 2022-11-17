@@ -33,6 +33,7 @@
 #include "../../common/hal_bufs.h"
 #include "../../inc/mpp_enc_hal.h"
 #include "../common/vepu541_common.h"
+#include "../common/vepu5xx_common.h"
 #include "hal_h264e_vepu580_reg.h"
 #include "../../../base/inc/mpp_enc_cb_param.h"
 #include "hal_h264e_vepu580_private.h"
@@ -72,7 +73,6 @@
 //     H264eReorderInfo        *reorder;
 //     H264eMarkingInfo        *marking;
 //     H264ePrefixNal          *prefix;
-//     HalH264eVepuStreamAmend  amend;
 
 //     /* syntax for output to enc_impl */
 //     EncRcTaskInfo           hal_rc_cfg;
@@ -91,12 +91,14 @@
 
 //     /* register */
 //     HalVepu580RegSet        *regs_sets;
+//     HalH264eVepuStreamAmend *amend_sets;
 
 //     /* frame parallel info */
 //     RK_S32                  task_idx;
 //     RK_S32                  curr_idx;
 //     RK_S32                  prev_idx;
 //     HalVepu580RegSet        *regs_set;
+//     HalH264eVepuStreamAmend *amend;
 //     MppBuffer               ext_line_buf;
 
 //     /* slice low delay output callback */
@@ -181,6 +183,7 @@ static void clear_ext_line_bufs(HalH264eVepu580Ctx *ctx)
 static MPP_RET hal_h264e_vepu580_deinit(void *hal)
 {
     HalH264eVepu580Ctx *p = (HalH264eVepu580Ctx *)hal;
+    RK_U32 i;
 
     hal_h264e_dbg_func("enter %p\n", p);
 
@@ -191,10 +194,12 @@ static MPP_RET hal_h264e_vepu580_deinit(void *hal)
 
     clear_ext_line_bufs(p);
 
-    MPP_FREE(p->regs_sets);
-    MPP_FREE(p->poll_cfgs);
+    for (i = 0; i < p->task_cnt; i++)
+        h264e_vepu_stream_amend_deinit(&p->amend_sets[i]);
 
-    h264e_vepu_stream_amend_deinit(&p->amend);
+    MPP_FREE(p->regs_sets);
+    MPP_FREE(p->amend_sets);
+    MPP_FREE(p->poll_cfgs);
 
     if (p->ext_line_buf_grp) {
         mpp_buffer_group_put(p->ext_line_buf_grp);
@@ -230,6 +235,7 @@ static MPP_RET hal_h264e_vepu580_init(void *hal, MppEncHalCfg *cfg)
 {
     HalH264eVepu580Ctx *p = (HalH264eVepu580Ctx *)hal;
     MPP_RET ret = MPP_OK;
+    RK_U32 i;
 
     hal_h264e_dbg_func("enter %p\n", p);
 
@@ -260,6 +266,12 @@ static MPP_RET hal_h264e_vepu580_init(void *hal, MppEncHalCfg *cfg)
         mpp_err_f("init register buffer failed\n");
         goto DONE;
     }
+    p->amend_sets = mpp_malloc(HalH264eVepuStreamAmend, p->task_cnt);
+    if (NULL == p->amend_sets) {
+        ret = MPP_ERR_MALLOC;
+        mpp_err_f("init amend data failed\n");
+        goto DONE;
+    }
 
     p->poll_slice_max = 8;
     p->poll_cfg_size = (sizeof(p->poll_cfgs) + sizeof(RK_S32) * p->poll_slice_max);
@@ -279,7 +291,6 @@ static MPP_RET hal_h264e_vepu580_init(void *hal, MppEncHalCfg *cfg)
 
     {   /* setup default hardware config */
         MppEncHwCfg *hw = &cfg->cfg->hw;
-        RK_U32 i;
 
         hw->qp_delta_row_i  = 2;
         hw->qp_delta_row    = 2;
@@ -304,7 +315,8 @@ static MPP_RET hal_h264e_vepu580_init(void *hal, MppEncHalCfg *cfg)
 
     cfg->cap_recn_out = 1;
 
-    h264e_vepu_stream_amend_init(&p->amend);
+    for (i = 0; i < p->task_cnt; i++)
+        h264e_vepu_stream_amend_init(&p->amend_sets[i]);
 
 DONE:
     if (ret)
@@ -496,12 +508,13 @@ static MPP_RET hal_h264e_vepu580_get_task(void *hal, HalEncTask *task)
 
     ctx->ext_line_buf = ctx->ext_line_bufs[ctx->task_idx];
     ctx->regs_set = &ctx->regs_sets[ctx->task_idx];
+    ctx->amend = &ctx->amend_sets[ctx->task_idx];
     ctx->osd_cfg.reg_base = &ctx->regs_set->reg_osd;
 
     if (ctx->task_cnt > 1)
         ctx->task_idx = !ctx->task_idx;
 
-    h264e_vepu_stream_amend_config(&ctx->amend, task->packet, ctx->cfg,
+    h264e_vepu_stream_amend_config(ctx->amend, task->packet, ctx->cfg,
                                    ctx->slice, ctx->prefix);
 
     hal_h264e_dbg_func("leave %p\n", hal);
@@ -636,40 +649,43 @@ static MPP_RET setup_vepu580_prep(HalVepu580RegSet *regs, MppEncPrepCfg *prep,
     }
 
     if (hw_fmt < VEPU541_FMT_NONE) {
-        regs->reg_base.src_udfy.csc_wgt_b2y    = 25;
-        regs->reg_base.src_udfy.csc_wgt_g2y    = 129;
-        regs->reg_base.src_udfy.csc_wgt_r2y    = 66;
+        const VepuRgb2YuvCfg *cfg_coeffs = get_rgb2yuv_cfg(prep->range, prep->color);
 
-        regs->reg_base.src_udfu.csc_wgt_b2u    = 112;
-        regs->reg_base.src_udfu.csc_wgt_g2u    = -74;
-        regs->reg_base.src_udfu.csc_wgt_r2u    = -38;
+        hal_h264e_dbg_flow("input color range %d colorspace %d", prep->range, prep->color);
 
-        regs->reg_base.src_udfv.csc_wgt_b2v    = -18;
-        regs->reg_base.src_udfv.csc_wgt_g2v    = -94;
-        regs->reg_base.src_udfv.csc_wgt_r2v    = 112;
+        regs->reg_base.src_udfy.csc_wgt_b2y = cfg_coeffs->_2y.b_coeff;
+        regs->reg_base.src_udfy.csc_wgt_g2y = cfg_coeffs->_2y.g_coeff;
+        regs->reg_base.src_udfy.csc_wgt_r2y = cfg_coeffs->_2y.r_coeff;
 
-        regs->reg_base.src_udfo.csc_ofst_y     = 15;
-        regs->reg_base.src_udfo.csc_ofst_u     = 128;
-        regs->reg_base.src_udfo.csc_ofst_v     = 128;
+        regs->reg_base.src_udfu.csc_wgt_b2u = cfg_coeffs->_2u.b_coeff;
+        regs->reg_base.src_udfu.csc_wgt_g2u = cfg_coeffs->_2u.g_coeff;
+        regs->reg_base.src_udfu.csc_wgt_r2u = cfg_coeffs->_2u.r_coeff;
+
+        regs->reg_base.src_udfv.csc_wgt_b2v = cfg_coeffs->_2v.b_coeff;
+        regs->reg_base.src_udfv.csc_wgt_g2v = cfg_coeffs->_2v.g_coeff;
+        regs->reg_base.src_udfv.csc_wgt_r2v = cfg_coeffs->_2v.r_coeff;
+
+        regs->reg_base.src_udfo.csc_ofst_y  = cfg_coeffs->_2y.offset;
+        regs->reg_base.src_udfo.csc_ofst_u  = cfg_coeffs->_2u.offset;
+        regs->reg_base.src_udfo.csc_ofst_v  = cfg_coeffs->_2v.offset;
+
+        hal_h264e_dbg_flow("use color range %d colorspace %d", cfg_coeffs->dst_range, cfg_coeffs->color);
     } else {
-        regs->reg_base.src_udfy.csc_wgt_b2y    = cfg.weight[0];
-        regs->reg_base.src_udfy.csc_wgt_g2y    = cfg.weight[1];
-        regs->reg_base.src_udfy.csc_wgt_r2y    = cfg.weight[2];
+        regs->reg_base.src_udfy.csc_wgt_b2y = cfg.weight[0];
+        regs->reg_base.src_udfy.csc_wgt_g2y = cfg.weight[1];
+        regs->reg_base.src_udfy.csc_wgt_r2y = cfg.weight[2];
 
+        regs->reg_base.src_udfu.csc_wgt_b2u = cfg.weight[3];
+        regs->reg_base.src_udfu.csc_wgt_g2u = cfg.weight[4];
+        regs->reg_base.src_udfu.csc_wgt_r2u = cfg.weight[5];
 
-        regs->reg_base.src_udfu.csc_wgt_b2u    = cfg.weight[3];
-        regs->reg_base.src_udfu.csc_wgt_g2u    = cfg.weight[4];
-        regs->reg_base.src_udfu.csc_wgt_r2u    = cfg.weight[5];
+        regs->reg_base.src_udfv.csc_wgt_b2v = cfg.weight[6];
+        regs->reg_base.src_udfv.csc_wgt_g2v = cfg.weight[7];
+        regs->reg_base.src_udfv.csc_wgt_r2v = cfg.weight[8];
 
-
-        regs->reg_base.src_udfv.csc_wgt_b2v    = cfg.weight[6];
-        regs->reg_base.src_udfv.csc_wgt_g2v    = cfg.weight[7];
-        regs->reg_base.src_udfv.csc_wgt_r2v    = cfg.weight[8];
-
-
-        regs->reg_base.src_udfo.csc_ofst_y     = cfg.offset[0];
-        regs->reg_base.src_udfo.csc_ofst_u     = cfg.offset[1];
-        regs->reg_base.src_udfo.csc_ofst_v     = cfg.offset[2];
+        regs->reg_base.src_udfo.csc_ofst_y  = cfg.offset[0];
+        regs->reg_base.src_udfo.csc_ofst_u  = cfg.offset[1];
+        regs->reg_base.src_udfo.csc_ofst_v  = cfg.offset[2];
     }
 
     regs->reg_base.src_proc.afbcd_en   = MPP_FRAME_FMT_IS_FBC(fmt) ? 1 : 0;
@@ -2241,7 +2257,7 @@ static MPP_RET hal_h264e_vepu580_wait(void *hal, HalEncTask *task)
     }
 
     if (!(split_out & MPP_ENC_SPLIT_OUT_LOWDELAY) && !ret) {
-        HalH264eVepuStreamAmend *amend = &ctx->amend;
+        HalH264eVepuStreamAmend *amend = &ctx->amend_sets[task->flags.reg_idx];
 
         if (amend->enable) {
             amend->old_length = task->hw_length;

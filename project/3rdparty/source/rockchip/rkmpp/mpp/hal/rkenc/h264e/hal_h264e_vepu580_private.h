@@ -60,7 +60,6 @@ typedef struct HalH264eVepu580Ctx_t {
     H264eReorderInfo        *reorder;
     H264eMarkingInfo        *marking;
     H264ePrefixNal          *prefix;
-    HalH264eVepuStreamAmend  amend;
 
     /* syntax for output to enc_impl */
     EncRcTaskInfo           hal_rc_cfg;
@@ -79,12 +78,14 @@ typedef struct HalH264eVepu580Ctx_t {
 
     /* register */
     HalVepu580RegSet        *regs_sets;
+    HalH264eVepuStreamAmend *amend_sets;
 
     /* frame parallel info */
     RK_S32                  task_idx;
     RK_S32                  curr_idx;
     RK_S32                  prev_idx;
     HalVepu580RegSet        *regs_set;
+    HalH264eVepuStreamAmend *amend;
     MppBuffer               ext_line_buf;
 
     /* slice low delay output callback */

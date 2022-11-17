@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2022-11-07 [mpp_service]: Add more MPP_FLAGS_REG_OFFSET_ALONE";
+static const char *mpp_last_commit_message = "2022-11-17 [h265d_vdpu34x]: fix dec output green img with err source";
 
 void show_mpp_version(void)
 {

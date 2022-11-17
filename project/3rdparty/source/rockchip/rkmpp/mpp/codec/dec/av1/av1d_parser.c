@@ -50,6 +50,7 @@ static const Av1UnitType unit_types[] = {
     AV1_OBU_SEQUENCE_HEADER,
     AV1_OBU_FRAME_HEADER,
     AV1_OBU_TILE_GROUP,
+    AV1_OBU_METADATA,
     AV1_OBU_FRAME,
 };
 
@@ -89,7 +90,7 @@ static MPP_RET get_pixel_format(Av1CodecContext *ctx)
             if (bit_depth == 8)
                 pix_fmt = MPP_FMT_YUV420SP;
             else if (bit_depth == 10) {
-                pix_fmt = MPP_FMT_YUV420SP; //pp will covert to 8 bit
+                pix_fmt = MPP_FMT_YUV420SP_10BIT;
             } else {
                 mpp_err_f("no support MPP_FMT_YUV420SP bit depth > 8\n");
                 return -1;
@@ -103,7 +104,6 @@ static MPP_RET get_pixel_format(Av1CodecContext *ctx)
 
     if (pix_fmt == MPP_FMT_BUTT)
         return -1;
-
     ctx->pix_fmt = pix_fmt;
     s->bit_depth = bit_depth;
     return ret;
@@ -605,16 +605,15 @@ static MPP_RET get_current_frame(Av1CodecContext *ctx)
     if (MPP_FRAME_FMT_IS_FBC(s->cfg->base.out_fmt)) {
         mpp_slots_set_prop(s->slots, SLOTS_HOR_ALIGN, hor_align_16);
         if (s->bit_depth == 10) {
-            if (ctx->pix_fmt == MPP_FMT_YUV420SP)
+            if (ctx->pix_fmt == MPP_FMT_YUV420SP || ctx->pix_fmt == MPP_FMT_YUV420SP_10BIT)
                 ctx->pix_fmt = MPP_FMT_YUV420SP_10BIT;
             else
                 mpp_err("422p 10bit no support");
         }
         mpp_frame_set_fmt(frame->f, ctx->pix_fmt | ((s->cfg->base.out_fmt & (MPP_FRAME_FBC_MASK))));
         mpp_frame_set_offset_x(frame->f, 0);
-        mpp_frame_set_offset_y(frame->f, 8);
-        if (*compat_ext_fbc_buf_size)
-            mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(ctx->height, 8) + 16);
+        mpp_frame_set_offset_y(frame->f, 0);
+        mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(ctx->height, 8) + 28);
     } else
         mpp_frame_set_fmt(frame->f, ctx->pix_fmt);
 
