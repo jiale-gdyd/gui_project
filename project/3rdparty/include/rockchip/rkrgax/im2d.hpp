@@ -4,6 +4,10 @@
 #include "im2d.h"
 #include "RgaUtils.h"
 
+rga_buffer_handle_t importbuffer_fd(int fd, int size);
+rga_buffer_handle_t importbuffer_virtualaddr(void *va, int size);
+rga_buffer_handle_t importbuffer_physicaladdr(uint64_t pa, int size);
+
 rga_buffer_handle_t importbuffer_fd(int fd, int width, int height, int format);
 rga_buffer_handle_t importbuffer_virtualaddr(void *va, int width, int height, int format);
 rga_buffer_handle_t importbuffer_physicaladdr(uint64_t pa, int width, int height, int format);

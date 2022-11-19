@@ -105,9 +105,9 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
         im2d_api_buffer;                                                                                        \
     })
 
+rga_buffer_t wrapbuffer_fd_t(int fd, int width, int height, int wstride, int hstride, int format);
 rga_buffer_t wrapbuffer_virtualaddr_t(void* vir_addr, int width, int height, int wstride, int hstride, int format);
 rga_buffer_t wrapbuffer_physicaladdr_t(void* phy_addr, int width, int height, int wstride, int hstride, int format);
-rga_buffer_t wrapbuffer_fd_t(int fd, int width, int height, int wstride, int hstride, int format);
 
 const char *querystring(int name);
 

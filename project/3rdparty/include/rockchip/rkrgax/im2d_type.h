@@ -208,7 +208,7 @@ typedef struct {
     int x;
     int y;
     int width;
-    int height; 
+    int height;
 } im_rect;
 
 typedef struct {
@@ -287,8 +287,8 @@ typedef struct im_osd_block {
     int        background_config;
     int        direction;
     int        color_mode;
-    im_color_t background_color;
-    im_color_t Foreground_color;
+    im_color_t normal_color;
+    im_color_t invert_color;
 } im_osd_block_t;
 
 typedef struct im_osd_invert {

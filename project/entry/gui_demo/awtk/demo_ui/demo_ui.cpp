@@ -1262,7 +1262,7 @@ ret_t awtk_application_init(void)
         log_debug("not support language:%s!\n", APP_DEFAULT_LANGUAGE);
         change_language(FALSE);
     } else {
-        change_language(is_full_font && tk_str_eq(APP_DEFAULT_LANGUAGE, "zh"));
+        change_language(s_is_full_font && tk_str_eq(APP_DEFAULT_LANGUAGE, "zh"));
     }
 #else
     change_language(FALSE);
