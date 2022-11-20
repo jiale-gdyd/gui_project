@@ -26,6 +26,8 @@
 #endif
 
 #include "../draw/lv_draw.h"
+#include "../draw/lv_img_cache_builtin.h"
+
 #include "../misc/lv_anim.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_timer.h"
@@ -134,9 +136,7 @@ void lv_init(void)
     _lv_refr_init();
 
     _lv_img_decoder_init();
-#if LV_IMG_CACHE_DEF_SIZE
-    lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
-#endif
+    _lv_img_cache_builtin_init();
 
     // 测试IDE是否有UTF-8编码
     const char *txt = "Á";

@@ -19,3 +19,4 @@ obj-y += lv_draw_label.o
 obj-y += lv_img_decoder.o
 obj-y += lv_draw_triangle.o
 obj-y += lv_draw_transform.o
+obj-y += lv_img_cache_builtin.o
