@@ -20,7 +20,6 @@
 #include "../../../../osal/inc/mpp_device.h"
 #include "../../inc/mpp_hal.h"
 #include "../../common/hal_bufs.h"
-#include "../inc/vdpu34x_com.h"
 
 #define MAX_GEN_REG 3
 

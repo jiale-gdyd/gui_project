@@ -32,6 +32,7 @@
 #include "../../vpu/h264e/hal_h264e_vepu2_v2.h"
 #include "../../rkenc/h264e/hal_h264e_vepu541.h"
 #include "../../rkenc/h264e/hal_h264e_vepu580.h"
+#include "../../rkenc/h264e/hal_h264e_vepu540c.h"
 
 typedef struct HalH264eCtx_t {
     const MppEncHalApi  *api;
@@ -56,6 +57,9 @@ static MPP_RET hal_h264e_init(void *hal, MppEncHalCfg *cfg)
         switch (hw_id) {
         case HWID_VEPU58X : {
             api = &hal_h264e_vepu580;
+        } break;
+        case HWID_VEPU540C : {
+            api = &hal_h264e_vepu540c;
         } break;
         default : {
             api = &hal_h264e_vepu541;

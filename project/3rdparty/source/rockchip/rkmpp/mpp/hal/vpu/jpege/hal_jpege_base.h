@@ -23,7 +23,7 @@
 #include "../common/vepu_common.h"
 
 #include "../../../common/jpege_syntax.h"
-#include "hal_jpege_hdr.h"
+#include "../../common/jpeg/hal_jpege_hdr.h"
 
 #define QUANTIZE_TABLE_SIZE 64
 

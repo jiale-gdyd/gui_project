@@ -26,7 +26,7 @@
 #include "../../inc/mpp_enc_hal.h"
 #include "../../../../osal/inc/vcodec_service.h"
 
-#include "hal_jpege_debug.h"
+#include "../../common/jpeg/hal_jpege_debug.h"
 #include "../../inc/hal_jpege_api_v2.h"
 #include "hal_jpege_base.h"
 

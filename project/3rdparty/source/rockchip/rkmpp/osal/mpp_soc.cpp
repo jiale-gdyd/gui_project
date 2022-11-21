@@ -63,6 +63,7 @@
 #define CAP_CODING_VEPU_LITE    (HAVE_AVC|HAVE_MJPEG)
 #define CAP_CODING_VEPU22       (HAVE_HEVC)
 #define CAP_CODING_VEPU54X      (HAVE_AVC|HAVE_HEVC)
+#define CAP_CODING_VEPU540C     (HAVE_AVC|HAVE_HEVC|HAVE_MJPEG)
 
 static const MppDecHwCap vdpu1 = {
     .cap_coding         = CAP_CODING_VDPU,
@@ -455,6 +456,17 @@ static const MppEncHwCap vepu58x = {
     .reserved           = 0,
 };
 
+static const MppEncHwCap vepu540c = {
+    .cap_coding         = CAP_CODING_VEPU540C,
+    .type               = VPU_CLIENT_RKVENC,
+    .cap_fbc            = 0x1 | 0x2,
+    .cap_4k             = 0,
+    .cap_8k             = 0,
+    .cap_hw_osd         = 0,
+    .cap_hw_roi         = 1,
+    .reserved           = 0,
+};
+
 /*
  * NOTE:
  * vpu1 = vdpu1 + vepu1
@@ -709,6 +721,19 @@ static const MppSocInfo mpp_soc_infos[] = {
         HAVE_JPEG_DEC | HAVE_AV1DEC | HAVE_AVSDEC | HAVE_VEPU2_JPEG,
         {   &vdpu38x, &rkjpegd, &vdpu2, &vdpu2_jpeg_pp, &av1d, &avspd},
         {   &vepu58x, &vepu2, &vepu2_jpeg, NULL, },
+    },
+    {   /*
+         * rk3528 has codec:
+         * 1 - vpu2 for jpeg/vp8 decoder
+         * 2 - RK H.264/H.265/VP9 4K decoder
+         * 3 - RK H.264/H.265 1080P encoder
+         * 4 - RK jpeg decoder
+         */
+        "rk3528",
+        ROCKCHIP_SOC_RK3528,
+        HAVE_RKVDEC | HAVE_RKVENC | HAVE_VDPU2 | HAVE_JPEG_DEC | HAVE_AVSDEC,
+        {   &vdpu38x, &rkjpegd, &vdpu2, &avspd, NULL, NULL, },
+        {   &vepu540c, NULL, NULL, NULL, },
     },
 };
 

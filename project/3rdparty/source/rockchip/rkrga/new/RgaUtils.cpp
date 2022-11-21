@@ -287,7 +287,6 @@ int get_buf_size_by_w_h_f(int w, int h, int f)
 
 int get_buf_from_file(void *buf, int f, int sw, int sh, int index)
 {
-    int ret = 0;
     char filePath[100];
     const char *inputFilePath = "/usr/data/in%dw%d-h%d-%s.bin";
 
@@ -307,12 +306,11 @@ int get_buf_from_file(void *buf, int f, int sw, int sh, int index)
 
 int get_buf_from_file_FBC(void *buf, int f, int sw, int sh, int index)
 {
-    int ret = 0;
     char fstring[30];
     char filePath[100];
     const char *inputFilePath = "/usr/data/in%dw%d-h%d-%s-afbc.bin";
 
-    ret = get_string_by_format(fstring, f);
+    get_string_by_format(fstring, f);
     snprintf(filePath, 100, inputFilePath, index, sw, sh, fstring);
 
     FILE *file = fopen(filePath, "rb");
@@ -329,7 +327,6 @@ int get_buf_from_file_FBC(void *buf, int f, int sw, int sh, int index)
 
 int output_buf_data_to_file(void *buf, int f, int sw, int sh, int index)
 {
-    int ret = 0;
     char filePath[100];
     const char *outputFilePath = "/usr/data/out%dw%d-h%d-%s.bin";
 
@@ -351,12 +348,11 @@ int output_buf_data_to_file(void *buf, int f, int sw, int sh, int index)
 
 int output_buf_data_to_file_FBC(void *buf, int f, int sw, int sh, int index)
 {
-    int ret = 0;
     char fstring[30];
     char filePath[100];
     const char *outputFilePath = "/usr/data/out%dw%d-h%d-%s-afbc.bin";
 
-    ret = get_string_by_format(fstring, f);
+    get_string_by_format(fstring, f);
     snprintf(filePath, 100, outputFilePath, index, sw, sh, fstring);
 
     FILE *file = fopen(filePath, "wb+");

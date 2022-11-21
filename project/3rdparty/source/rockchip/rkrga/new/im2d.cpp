@@ -17,7 +17,7 @@
 __thread im_context_t g_im2d_context;
 __thread char rga_err_str[ERR_MSG_LEN] = "The current error message is empty!";
 
-const char* imStrError_t(IM_STATUS status) {
+const char *imStrError_t(IM_STATUS status) {
     const char *error_type[] = {
         "No errors during operation",
         "Run successfully",
