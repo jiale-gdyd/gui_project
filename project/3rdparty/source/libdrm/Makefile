@@ -4,12 +4,12 @@ obj-y += xf86drmHash.o
 obj-y += xf86drmMode.o
 obj-y += xf86drmRandom.o
 
-obj-y += omap/
-obj-y += tegra/
-obj-y += amdgpu/
-obj-y += exynos/
-obj-y += nouveau/
-obj-y += etnaviv/
-obj-y += rockchip/
+obj-n += omap/
+obj-n += tegra/
+obj-n += amdgpu/
+obj-n += exynos/
+obj-n += nouveau/
+obj-n += etnaviv/
+obj-n += rockchip/
 
 obj-$(CONFIG_LIBDRM_TOOLS) += tools/
