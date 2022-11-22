@@ -18,6 +18,9 @@ CONFIG_RKMPP_HWOSD=y
 CONFIG_RKMPP_RGA_OSD=y
 # CONFIG_RKAIQ is not set
 
+# live555
+# CONFIG_LIVE555 is not set
+
 #
 # hardware platform
 #

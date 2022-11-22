@@ -72,7 +72,8 @@ KBUILD_CXXFLAGS += -Wall -O2 \
                 -Wno-unused-value \
                 -Wno-sizeof-pointer-memaccess \
                 -Wno-unknown-pragmas \
-                -Wno-char-subscripts
+                -Wno-char-subscripts \
+                -Wno-array-bounds
 
 KBUILD_CFLAGS += -Wall -O2 \
             -Wno-trigraphs \

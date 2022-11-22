@@ -1,0 +1,20 @@
+#
+# Live555 Kconfig
+#
+
+menu "live555"
+
+config LIVE555
+    bool "live555"
+    default n
+    help
+      nternet Streaming Media, Wireless, and Multicast technology, services, & standards
+
+config LIVE555_OPENSSL
+    bool "live555 with openssl"
+    depends on LIVE555
+    default n
+    help
+      enable live555 with openssl
+
+endmenu

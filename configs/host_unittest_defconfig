@@ -16,6 +16,9 @@ CONFIG_UNITTEST=y
 CONFIG_HOST_UNITTEST_BOOST=y
 CONFIG_HOST_BOOST_SIGNAL_SLOTS=y
 
+# live555
+# CONFIG_LIVE555 is not set
+
 #
 # hardware platform
 #
