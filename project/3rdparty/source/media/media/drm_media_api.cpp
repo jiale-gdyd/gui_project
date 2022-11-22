@@ -1512,7 +1512,11 @@ int drm_mpi_vp_enable_channel(int channel)
         PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 0);
         PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_DMABUF));
     } else {
+#if defined(CONFIG_LIBV4L2)
         PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 1);
+#else
+        PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 0);
+#endif
         if (g_vp_chns[channel].vp_attr.enBufType == VP_CHN_BUF_TYPE_MMAP) {
             PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_MMAP));
         } else {
@@ -1671,7 +1675,11 @@ int drm_mpi_vi_enable_channel(int channel)
     PARAM_STRING_APPEND(stream_param, DRM_KEY_DEVICE, g_vi_chns[channel].vi_attr.pcVideoNode);
     PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_CAP_TYPE, DRM_KEY_V4L2_C_TYPE(VIDEO_CAPTURE));
 
+#if defined(CONFIG_LIBV4L2)
     PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 1);
+#else
+    PARAM_STRING_APPEND_TO(stream_param, DRM_KEY_USE_LIBV4L2, 0);
+#endif
     if (g_vi_chns[channel].vi_attr.enBufType == DRM_VI_CHN_BUF_TYPE_MMAP) {
         PARAM_STRING_APPEND(stream_param, DRM_KEY_V4L2_MEM_TYPE, DRM_KEY_V4L2_M_TYPE(MEMORY_MMAP));
     } else {
