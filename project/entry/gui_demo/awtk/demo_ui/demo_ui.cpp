@@ -1,3 +1,5 @@
+#define WITH_FS_RES
+
 #include <awtk.h>
 #include <awtk_main.inc>
 
@@ -7,8 +9,10 @@
 #define THEME_NAME_PREFIX               "uiex_"
 #define WINDOW_NAME_PREFIX              "uiex/"
 
+#define APP_DEFAULT_LANGUAGE            "zh"
+
 #define PRELOAD_DURATION                2000        /* 预加载窗口显示时长（单位：毫秒） */
-#define ENABLE_PAGE_SWITCH              0           /* 是否开启滚动切换页面功能 */
+#define ENABLE_PAGE_SWITCH              1           /* 是否开启滚动切换页面功能 */
 
 #define PAGE_NUM                        18
 #if !defined(PAGE_NUM) || (PAGE_NUM <= 0)

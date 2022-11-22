@@ -27,7 +27,7 @@ static inline int DRM_IOCTL(int fd, unsigned long cmd, void *arg)
 {
     int ret = drmIoctl(fd, cmd, arg);
     if (ret < 0) {
-        libdrm_error("drmIoctl failed, fd:[%d], cmd:[%lX], return:[%d], errstr:[%m]", fd, cmd, ret);
+        libdrm_error("drmIoctl failed, fd:[%d], cmd:[0x%lX], return:[%d], errno:[%d], errstr:[%m]", fd, cmd, ret, errno);
     }
 
     return ret < 0 ? -errno : ret;

@@ -1570,9 +1570,9 @@ bool MPPCommonConfig::CheckConfigChange(MPPEncoder &mpp_enc, uint32_t change, st
 
         MppFrameFormat pic_type = ConvertToMppPixFmt(iconfig.image_info.pix_fmt);
         int line_size = vid_cfg->vir_width;
-        if (pic_type == MPP_FMT_YUV422_YUYV || pic_type == MPP_FMT_YUV422_UYVY) {
+        if ((pic_type == MPP_FMT_YUV422_YUYV) || (pic_type == MPP_FMT_YUV422_UYVY)) {
             line_size = vid_cfg->vir_width * 2;
-        } else if (pic_type == MPP_FMT_RGB888 || pic_type == MPP_FMT_BGR888) {
+        } else if ((pic_type == MPP_FMT_RGB888) || (pic_type == MPP_FMT_BGR888)) {
             line_size = vid_cfg->vir_width * 3;
         }
 
