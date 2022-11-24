@@ -1,0 +1,24 @@
+#
+# host qtcore unittest Kconfig
+#
+
+menu "host qtcoreunittest menu"
+
+config HOST_UNITTEST_QTCORE
+    bool "host qtcore unittest"
+    default n
+    select QTCORE
+    help
+      host qtcore unittest
+
+choice
+    prompt "host qtcore unittest demo"
+    depends on X86_64 && UNITTEST && HOST_UNITTEST_QTCORE
+    default HOST_QTCORE_UNKNOWN
+
+    config HOST_QTCORE_UNKNOWN
+        bool "host qtcore unittest unknow demo"
+
+endchoice
+
+endmenu

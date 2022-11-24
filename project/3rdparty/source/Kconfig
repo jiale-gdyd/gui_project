@@ -1,5 +1,6 @@
 source "project/3rdparty/source/hope/Kconfig"
 source "project/3rdparty/source/media/Kconfig"
+source "project/3rdparty/source/qtcore/Kconfig"
 source "project/3rdparty/source/libv4l/Kconfig"
 source "project/3rdparty/source/libdrm/Kconfig"
 source "project/3rdparty/source/live555/Kconfig"

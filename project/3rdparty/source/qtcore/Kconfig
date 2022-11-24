@@ -1,0 +1,13 @@
+#
+# QtCore Kconfig
+#
+
+menu "QtCore application interface"
+
+config QTCORE
+    bool "QtCore application interface"
+    default n
+    help
+      QtCore application interface
+
+endmenu

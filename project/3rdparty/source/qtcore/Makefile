@@ -1,0 +1,1 @@
+obj-y += empty.o
