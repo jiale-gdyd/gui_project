@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2022-11-22 [hal_jpege]: Fix hardware mismatch error";
+static const char *mpp_last_commit_message = "2022-11-24 [vepu540c]: support enc with a res of more than 3k";
 
 void show_mpp_version(void)
 {
