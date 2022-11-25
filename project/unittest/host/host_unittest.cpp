@@ -13,10 +13,6 @@
 #include "boost/boost_unittest.h"
 #endif
 
-#if defined(CONFIG_HOST_UNITTEST_QTCORE)
-#include "qtcore/qtcore_unittest.h"
-#endif
-
 int host_unittest_init(int argc, char *argv[])
 {
 #if defined(CONFIG_HOST_UNITTEST_LIBDRM)
@@ -25,8 +21,6 @@ int host_unittest_init(int argc, char *argv[])
     return host_sigslot_unittest_init(argc, argv);
 #elif defined(CONFIG_HOST_UNITTEST_BOOST)
     return host_boost_unittest_init(argc, argv);
-#elif defined(CONFIG_HOST_UNITTEST_QTCORE)
-    return host_qtcore_unittest_init(argc, argv);
 #endif
 
     return -1;
@@ -40,8 +34,6 @@ int host_unittest_exit(void)
     return host_sigslot_unittest_exit();
 #elif defined(CONFIG_HOST_UNITTEST_BOOST)
     return host_boost_unittest_exit();
-#elif defined(CONFIG_HOST_UNITTEST_QTCORE)
-    return host_qtcore_unittest_exit();
 #endif
 
     return -1;

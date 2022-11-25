@@ -1,5 +1,4 @@
 obj-$(CONFIG_HOPE) += hope/
-obj-$(CONFIG_QTCORE) += qtcore/
 obj-$(CONFIG_LIBV4L) += libv4l/
 obj-$(CONFIG_LIBDRM) += libdrm/
 obj-$(CONFIG_LIVE555) += live555/
