@@ -537,12 +537,11 @@
 #define LV_USE_FREETYPE                             0
 
 #if LV_USE_FREETYPE
-#define LV_FREETYPE_CACHE_SIZE                      (16 * 1024)
-#if (LV_FREETYPE_CACHE_SIZE >= 0)
+#define LV_FREETYPE_CACHE_SIZE                      (64 * 1024)
+#define LV_FREETYPE_USE_LVGL_PORT                   0
 #define LV_FREETYPE_SBIT_CACHE                      0
-#define LV_FREETYPE_CACHE_FT_FACES                  0
-#define LV_FREETYPE_CACHE_FT_SIZES                  0
-#endif
+#define LV_FREETYPE_CACHE_FT_FACES                  4
+#define LV_FREETYPE_CACHE_FT_SIZES                  4
 #endif
 
 #endif

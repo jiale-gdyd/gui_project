@@ -622,7 +622,7 @@
     #endif
 
     /*1: Enable print timestamp;
-    *0: Disable print timestamp*/
+     *0: Disable print timestamp*/
     #ifndef LV_LOG_USE_TIMESTAMP
         #ifdef _LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
@@ -2162,40 +2162,49 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    /*Memory used by FreeType to cache characters [bytes]*/
     #ifndef LV_FREETYPE_CACHE_SIZE
         #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
             #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
         #else
-            #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+            #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
         #endif
     #endif
-    #if LV_FREETYPE_CACHE_SIZE >= 0
-        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
-        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
-        /* if font size >= 256, must be configured as image cache */
-        #ifndef LV_FREETYPE_SBIT_CACHE
-            #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
-                #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
-            #else
-                #define LV_FREETYPE_SBIT_CACHE 0
-            #endif
+
+    /*Let FreeType to use LVGL memory and file porting*/
+    #ifndef LV_FREETYPE_USE_LVGL_PORT
+        #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
+            #define LV_FREETYPE_USE_LVGL_PORT CONFIG_LV_FREETYPE_USE_LVGL_PORT
+        #else
+            #define LV_FREETYPE_USE_LVGL_PORT 0
         #endif
-        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-        /* (0:use system defaults) */
-        #ifndef LV_FREETYPE_CACHE_FT_FACES
-            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
-                #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
-            #else
-                #define LV_FREETYPE_CACHE_FT_FACES 0
-            #endif
+    #endif
+
+    /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+    /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+    /* if font size >= 256, must be configured as image cache */
+    #ifndef LV_FREETYPE_SBIT_CACHE
+        #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
+            #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
+        #else
+            #define LV_FREETYPE_SBIT_CACHE 0
         #endif
-        #ifndef LV_FREETYPE_CACHE_FT_SIZES
-            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-                #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-            #else
-                #define LV_FREETYPE_CACHE_FT_SIZES 0
-            #endif
+    #endif
+
+    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+    /* (0:use system defaults) */
+    #ifndef LV_FREETYPE_CACHE_FT_FACES
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
+            #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
+        #else
+            #define LV_FREETYPE_CACHE_FT_FACES 4
+        #endif
+    #endif
+    #ifndef LV_FREETYPE_CACHE_FT_SIZES
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+            #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+        #else
+            #define LV_FREETYPE_CACHE_FT_SIZES 4
         #endif
     #endif
 #endif
@@ -2412,131 +2421,7 @@
             #define LV_FILE_EXPLORER_QUICK_ACCESS        1
         #endif
     #endif
-#endif  
-
-/*==================
-* EXAMPLES
-*==================*/
-
-// /*Enable the examples to be built with the library*/
-// #ifndef LV_BUILD_EXAMPLES
-//     #ifdef _LV_KCONFIG_PRESENT
-//         #ifdef CONFIG_LV_BUILD_EXAMPLES
-//             #define LV_BUILD_EXAMPLES CONFIG_LV_BUILD_EXAMPLES
-//         #else
-//             #define LV_BUILD_EXAMPLES 0
-//         #endif
-//     #else
-//         #define LV_BUILD_EXAMPLES 1
-//     #endif
-// #endif
-
-// /*===================
-//  * DEMO USAGE
-//  ====================*/
-
-// /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-// #ifndef LV_USE_DEMO_WIDGETS
-//     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
-//         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
-//     #else
-//         #define LV_USE_DEMO_WIDGETS 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_WIDGETS
-//     #ifndef LV_DEMO_WIDGETS_SLIDESHOW
-//         #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-//             #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-//         #else
-//             #define LV_DEMO_WIDGETS_SLIDESHOW 0
-//         #endif
-//     #endif
-// #endif
-
-// /*Demonstrate the usage of encoder and keyboard*/
-// #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
-//     #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-//         #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-//     #else
-//         #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-//     #endif
-// #endif
-
-// /*Benchmark your system*/
-// #ifndef LV_USE_DEMO_BENCHMARK
-//     #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
-//         #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
-//     #else
-//         #define LV_USE_DEMO_BENCHMARK 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_BENCHMARK
-//     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-//     #ifndef LV_DEMO_BENCHMARK_RGB565A8
-//         #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-//             #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-//         #else
-//             #define LV_DEMO_BENCHMARK_RGB565A8 0
-//         #endif
-//     #endif
-// #endif
-
-// /*Stress test for LVGL*/
-// #ifndef LV_USE_DEMO_STRESS
-//     #ifdef CONFIG_LV_USE_DEMO_STRESS
-//         #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
-//     #else
-//         #define LV_USE_DEMO_STRESS 0
-//     #endif
-// #endif
-
-// /*Music player demo*/
-// #ifndef LV_USE_DEMO_MUSIC
-//     #ifdef CONFIG_LV_USE_DEMO_MUSIC
-//         #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
-//     #else
-//         #define LV_USE_DEMO_MUSIC 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_MUSIC
-//     #ifndef LV_DEMO_MUSIC_SQUARE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-//             #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-//         #else
-//             #define LV_DEMO_MUSIC_SQUARE    0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_LANDSCAPE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-//             #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-//         #else
-//             #define LV_DEMO_MUSIC_LANDSCAPE 0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_ROUND
-//         #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-//             #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-//         #else
-//             #define LV_DEMO_MUSIC_ROUND     0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_LARGE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-//             #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-//         #else
-//             #define LV_DEMO_MUSIC_LARGE     0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_AUTO_PLAY
-//         #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-//             #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-//         #else
-//             #define LV_DEMO_MUSIC_AUTO_PLAY 0
-//         #endif
-//     #endif
-// #endif
-
-
+#endif
 
 /*----------------------------------
  * End of parsing lv_conf_template.h
