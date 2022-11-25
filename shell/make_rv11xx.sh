@@ -3,10 +3,10 @@
 source ${TOPSHELL}/shell/buildFunc.sh
 source ${TOPSHELL}/shell/buildConf.sh
 
-RV11XX_UNITTEST_CONFIG=rv1126_unittest_defconfig
-RV11XX_LVGL_GUI_CONFIG=rv1126_lvgl_gui_defconfig
-RV11XX_AWTK_GUI_CONFIG=rv1126_awtk_gui_defconfig
-RV11XX_AZURE_GUI_CONFIG=rv1126_azure_gui_defconfig
+RV11XX_UNITTEST_CONFIG=rv11xx_unittest_defconfig
+RV11XX_LVGL_GUI_CONFIG=rv11xx_lvgl_gui_defconfig
+RV11XX_AWTK_GUI_CONFIG=rv11xx_awtk_gui_defconfig
+RV11XX_AZURE_GUI_CONFIG=rv11xx_azure_gui_defconfig
 
 if [ -e /opt/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-g++ ]; then
     RV11XX_CROSS_COMPILE=/opt/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
@@ -14,7 +14,7 @@ else
     RV11XX_CROSS_COMPILE=arm-linux-gnueabihf-
 fi
 
-function rv1126_clean()
+function rv11xx_clean()
 {
     rm -rf lvgl_gui
     rm -rf awtk_gui
@@ -23,7 +23,7 @@ function rv1126_clean()
     remove_gitcommit
 }
 
-function rv1126_lvgl_gui()
+function rv11xx_lvgl_gui()
 {
     begin=`get_timestamp`
     type=$(uname)
@@ -63,7 +63,7 @@ function rv1126_lvgl_gui()
     echo "It takes "${min}" minutes, and "${second} "seconds"
 }
 
-function rv1126_awtk_gui()
+function rv11xx_awtk_gui()
 {
     begin=`get_timestamp`
     type=$(uname)
@@ -103,7 +103,7 @@ function rv1126_awtk_gui()
     echo "It takes "${min}" minutes, and "${second} "seconds"
 }
 
-function rv1126_azure_gui()
+function rv11xx_azure_gui()
 {
     begin=`get_timestamp`
     type=$(uname)
@@ -143,7 +143,7 @@ function rv1126_azure_gui()
     echo "It takes "${min}" minutes, and "${second} "seconds"
 }
 
-function rv1126_unittest()
+function rv11xx_unittest()
 {
     begin=`get_timestamp`
     type=$(uname)

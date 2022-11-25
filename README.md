@@ -23,21 +23,21 @@
    ```shell
    ./build.sh host_azure_gui            最终生成azure_gui可执行文件，可通过修改build.host.version中对应名字的版本号
    ```
-+ 构建基于rv1126 soc的单元测试项目
++ 构建基于rv1109/rv1126 soc的单元测试项目
    ```shell
-   ./build.sh rv1126_unittest           最终生成rv1126_unittest可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
+   ./build.sh rv11xx_unittest           最终生成rv11xx_unittest可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
-+ 构建基于rv1126 soc的LVGL项目
++ 构建基于rv1109/rv1126 soc的LVGL项目
    ```shell
-   ./build.sh rv1126_lvgl_gui           最终生成lvgl_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
+   ./build.sh rv11xx_lvgl_gui           最终生成lvgl_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
-+ 构建基于rv1126 soc的AWTK项目
++ 构建基于rv1109/rv1126 soc的AWTK项目
    ```shell
-   ./build.sh rv1126_awtk_gui           最终生成awtk_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
+   ./build.sh rv11xx_awtk_gui           最终生成awtk_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
-+ 构建基于rv1126 soc的azure-rtos threadx+gui项目
++ 构建基于rv1109/rv1126 soc的azure-rtos threadx+gui项目
    ```shell
-   ./build.sh rv1126_azure_gui          最终生成azure_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
+   ./build.sh rv11xx_azure_gui          最终生成azure_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
 + 项目工程清理
    ```shell

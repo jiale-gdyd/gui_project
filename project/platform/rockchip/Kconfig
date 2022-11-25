@@ -1,0 +1,35 @@
+#
+# Rockchip Soc Vensor Kconfig
+# 
+
+menu "Rockchip Soc"
+
+config ROCKCHIP
+    bool "Rockchip"
+    default n
+    help
+      Rockchip Electronics Co., Ltd
+
+choice
+    prompt "Rockchip soc choice"
+    depends on ROCKCHIP
+    default RV11XX
+
+    config RV11XX
+        bool "rv1126 or rv1109"
+        select AARCH32
+
+    config RK3399
+        bool "rockchip 3399 chip"
+        select AARCH64
+
+    config RK3568
+        bool "rockchip 3568 chip"
+        select AARCH64
+
+    config RK3588
+        bool "rockchip 3588 chip"
+        select AARCH64
+endchoice
+
+endmenu

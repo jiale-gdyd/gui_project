@@ -5,55 +5,75 @@
 menu "Hardware platform"
 
 choice
-    prompt "System Architecture"
+    prompt "ARM Cortex Architecture"
     default LINUX_GNU
+
+    config CORTEX_A5
+        bool "ARM Cortex A5"
 
     config CORTEX_A7
         bool "ARM Cortex A7"
 
+    config CORTEX_A8
+        bool "ARM Cortex A8"
+
+    config CORTEX_A9
+        bool "ARM Cortex A9"
+
+    config CORTEX_A34
+        bool "ARM Cortex A34"
+
+    config CORTEX_A35
+        bool "ARM Cortex A35"
+
+    config CORTEX_A53
+        bool "ARM Cortex A53"
+
+    config CORTEX_A55
+        bool "ARM Cortex A55"
+
+    config CORTEX_A57
+        bool "ARM Cortex A57"
+
+    config CORTEX_A65
+        bool "ARM Cortex A65"
+
+    config CORTEX_A72
+        bool "ARM Cortex A72"
+
+    config CORTEX_A73
+        bool "ARM Cortex A73"
+
+    config CORTEX_A75
+        bool "ARM Cortex A75"
+
+    config CORTEX_A76
+        bool "ARM Cortex A76"
+
+    config CORTEX_A77
+        bool "ARM Cortex A77"
+
+    config CORTEX_A78
+        bool "ARM Cortex A78"
+
     config LINUX_GNU
-        bool "Linux GNU (eg. ubuntu)"
-
+        bool "Linux GNU (eg. Ubuntu/Debian)"
 endchoice
 
 choice
-    prompt "Architecture system bits"
-    default ARCH_32BIT
-
-    config ARCH_32BIT
-        bool "32-bit"
-
-    config ARCH_64BIT
-        bool "64-bit"
-
-endchoice
-
-choice
-    prompt "Hardware platforms choice"
+    prompt "Hardware Architecture choice"
     default X86_64
 
-    config ROCKCHIP
-        bool "rockchip platform"
+    config AARCH32
+        bool "aarch32 platform"
+
+    config AARCH64
+        bool "aarch64 platform"
 
     config X86_64
         bool "x86_64 platform"
-        select ARCH_64BIT
-
 endchoice
 
-choice
-    prompt "Rockchip soc choice"
-    depends on ROCKCHIP
-    default RV11XX
-
-    config RV11XX
-        bool "rv1126 or rv1109"
-        select ARCH_32BIT
-
-    config RK3588
-        bool "rockchip 3588 chip"
-        select ARCH_64BIT
-
-endchoice
+source "project/platform/rockchip/Kconfig"
 
 endmenu

@@ -17,10 +17,10 @@ function help()
     echo "    -    host_lvgl_gui         构建使用构建主机的lvgl gui项目"
     echo "    -    host_azure_gui        构建使用构建主机的azure gui项目"
     echo "============================================================================"
-    echo "    -    rv1126_unittest       构建使用rv1126 soc板卡的单元测试项目"
-    echo "    -    rv1126_awtk_gui       构建使用rv1126 soc板卡的awtk gui项目"
-    echo "    -    rv1126_lvgl_gui       构建使用rv1126 soc板卡的lvgl gui项目"
-    echo "    -    rv1126_azure_gui      构建使用rv1126 soc板卡的azure gui项目"
+    echo "    -    rv11xx_unittest       构建使用rv1109/rv1126 soc板卡的单元测试项目"
+    echo "    -    rv11xx_awtk_gui       构建使用rv1109/rv1126 soc板卡的awtk gui项目"
+    echo "    -    rv11xx_lvgl_gui       构建使用rv1109/rv1126 soc板卡的lvgl gui项目"
+    echo "    -    rv11xx_azure_gui      构建使用rv1109/rv1126 soc板卡的azure gui项目"
     echo "============================================================================"
 }
 

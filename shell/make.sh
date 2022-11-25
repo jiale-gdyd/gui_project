@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ${TOPSHELL}/shell/make_host.sh
-source ${TOPSHELL}/shell/make_rv1126.sh
+source ${TOPSHELL}/shell/make_rv11xx.sh
 
 function clean()
 {
@@ -23,7 +23,7 @@ function clean()
     print_info "distclean ${PROJECT_NAME} project start"
 
     host_clean
-    rv1126_clean
+    rv11xx_clean
 
     make distclean -j$[$(nproc)-1]
     if [ $? -ne 0 ]; then
