@@ -231,7 +231,7 @@ IM_STATUS rga_get_info(rga_info_table_entry *return_table)
 
     memset(&merge_table, 0x0, sizeof(merge_table));
 
-    for (int i = 0; i < rgaCtx->mHwVersions.size; i++) {
+    for (uint32_t i = 0; i < rgaCtx->mHwVersions.size; i++) {
         if ((rgaCtx->mHwVersions.version[i].major == 2) && (rgaCtx->mHwVersions.version[i].minor == 0)) {
             if (rgaCtx->mHwVersions.version[i].revision == 0) {
                 rga_version = IM_RGA_HW_VERSION_RGA_2_INDEX;
@@ -283,6 +283,20 @@ IM_STATUS rga_get_info(rga_info_table_entry *return_table)
         } else if ((rgaCtx->mHwVersions.version[i].major == 3) && (rgaCtx->mHwVersions.version[i].minor == 3)) {
             switch (rgaCtx->mHwVersions.version[i].revision) {
                 case 0x87975:
+                    rga_version = IM_RGA_HW_VERSION_RGA_2_ENHANCE_INDEX;
+                    memcpy(&merge_table, &hw_info_table[rga_version], sizeof(merge_table));
+
+                    merge_table.input_format |= IM_RGA_SUPPORT_FORMAT_YUYV_422 | IM_RGA_SUPPORT_FORMAT_YUV_400 | IM_RGA_SUPPORT_FORMAT_RGBA2BPP;
+                    merge_table.output_format |= IM_RGA_SUPPORT_FORMAT_YUV_400 | IM_RGA_SUPPORT_FORMAT_Y4;
+                    merge_table.feature |= IM_RGA_SUPPORT_FEATURE_QUANTIZE | IM_RGA_SUPPORT_FEATURE_SRC1_R2Y_CSC | IM_RGA_SUPPORT_FEATURE_DST_FULL_CSC | IM_RGA_SUPPORT_FEATURE_MOSAIC | IM_RGA_SUPPORT_FEATURE_OSD | IM_RGA_SUPPORT_FEATURE_PRE_INTR;
+                    break;
+
+                default:
+                    goto TRY_TO_COMPATIBLE;
+            }
+        } else if ((rgaCtx->mHwVersions.version[i].major == 3) && (rgaCtx->mHwVersions.version[i].minor == 7)) {
+            switch (rgaCtx->mHwVersions.version[i].revision) {
+                case 0x93215:
                     rga_version = IM_RGA_HW_VERSION_RGA_2_ENHANCE_INDEX;
                     memcpy(&merge_table, &hw_info_table[rga_version], sizeof(merge_table));
 
@@ -877,7 +891,7 @@ rga_buffer_handle_t rga_import_buffer(uint64_t memory, int type, im_handle_param
 
     buffers[0].type = type;
     buffers[0].memory = memory;
-    memcpy(&buffers[0].memory_info, param, sizeof(struct rga_memory_parm));
+    memcpy(&buffers[0].memory_info, param, sizeof(*param));
     buffers[0].memory_info.format = RkRgaGetRgaFormat(buffers[0].memory_info.format) >> 8;
 
     buffer_pool.buffers = (uint64_t)buffers;

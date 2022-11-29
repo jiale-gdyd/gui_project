@@ -189,7 +189,7 @@ rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height
 
 rga_buffer_t wrapbuffer_handle(rga_buffer_handle_t handle, int width, int height, int format)
 {
-    return wrapbuffer_handle(handle, width, height, width, height, format);
+    return wrapbuffer_handle(handle, width, height, format, width, height);
 }
 
 rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int height, int wstride, int hstride, int format)
@@ -1342,11 +1342,11 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
 
         switch (opt.osd_config.invert_config.invert_channel) {
             case IM_OSD_INVERT_CHANNEL_NONE:
-                srcinfo.osd_info.mode_ctrl.invert_enable = (0x1 << 1) | (0x1 << 3);
+                srcinfo.osd_info.mode_ctrl.invert_enable = (0x1 << 1) | (0x1 << 2);
                 break;
 
             case IM_OSD_INVERT_CHANNEL_Y_G:
-                srcinfo.osd_info.mode_ctrl.invert_enable = 0x1 <<3;
+                srcinfo.osd_info.mode_ctrl.invert_enable = 0x1 << 2;
                 break;
 
             case IM_OSD_INVERT_CHANNEL_C_RB:
@@ -1354,7 +1354,7 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
                 break;
 
             case IM_OSD_INVERT_CHANNEL_ALPHA:
-                srcinfo.osd_info.mode_ctrl.invert_enable = (0x1 << 0) | (0x1 << 1) | (0x1 << 3);
+                srcinfo.osd_info.mode_ctrl.invert_enable = (0x1 << 0) | (0x1 << 1) | (0x1 << 2);
                 break;
 
             case IM_OSD_INVERT_CHANNEL_COLOR:
@@ -1409,7 +1409,7 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
         srcinfo.pre_intr.read_intr_en = opt.intr_config.flags & IM_INTR_READ_INTR ? true : false;
         if (srcinfo.pre_intr.read_intr_en) {
             srcinfo.pre_intr.read_intr_en = true;
-            srcinfo.pre_intr.read_hold_en = opt.intr_config.flags & IM_INTR_READ_HOLD;
+            srcinfo.pre_intr.read_hold_en = opt.intr_config.flags & IM_INTR_READ_HOLD ? true : false;
             srcinfo.pre_intr.read_threshold = opt.intr_config.read_threshold;
         }
 
@@ -1624,7 +1624,7 @@ IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value)
             break;
 
         case IM_CONFIG_PRIORITY:
-            if ((value >= 0) && (value <= 6)) {
+            if ((value > 0) && (value <= 6)) {
                 g_im2d_context.priority = (int)value;
             } else {
                 ALOGE("IM2D: It's not legal priority, it needs to be a 'int', and it should be in the range of 0~6.");

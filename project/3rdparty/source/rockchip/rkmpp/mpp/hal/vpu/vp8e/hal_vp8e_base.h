@@ -18,10 +18,11 @@
 #define __HAL_VP8E_BASE_H__
 
 #include "../../../../osal/inc/mpp_device.h"
-#include "../../inc/hal_enc_task.h"
 
 #include "../../../common/vp8e_syntax.h"
 
+#include "../common/vepu_common.h"
+#include "../../inc/hal_enc_task.h"
 #include "hal_vp8e_entropy.h"
 
 #define VP8_PROB_COUNT_MV_OFFSET     (222)
@@ -364,6 +365,7 @@ typedef struct hal_vp8e_ctx_s {
     RK_U32           mb_per_frame;
     RK_U32           mb_per_row;
     RK_U32           mb_per_col;
+    VepuStrideCfg    stride_cfg;
 } HalVp8eCtx;
 
 #ifdef  __cplusplus

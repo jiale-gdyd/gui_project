@@ -425,7 +425,10 @@ static ret_t on_fps_visable(void *ctx, event_t *e)
 
 static ret_t on_switch_ratio(void *ctx, event_t *e)
 {
+    (void)s_is_portrait, (void)s_win_default_portrait;
+    (void)s_win_default_width, (void)s_win_default_height;
     dialog_toast("Embedded system not support switch ratio!", 2000);
+
     return RET_OK;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rockchip Electronics Co. LTD
+ * Copyright 2022 Rockchip Electronics Co. LTD
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef __AVSD_API_H__
-#define __AVSD_API_H__
+#ifndef __MPP_DEC_NORMAL_H__
+#define __MPP_DEC_NORMAL_H__
 
-#include "parser_api.h"
+#include "mpp_dec_impl.h"
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-extern const ParserApi api_avsd_parser;
-extern const ParserApi api_avsd_plus_parser;
+extern MppDecModeApi dec_api_normal;
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif /*__AVSD_API_H__*/
+#endif /*__MPP_DEC_NORMAL_H__*/

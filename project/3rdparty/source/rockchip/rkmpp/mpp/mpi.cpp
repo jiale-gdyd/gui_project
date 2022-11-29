@@ -38,50 +38,50 @@ typedef struct {
 } MppCodingTypeInfo;
 
 static MppCodingTypeInfo support_list[] = {
-#if defined(CONFIG_RKMPP_MPEG2D)
+#if HAVE_MPEG2D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMPEG2,      "dec",  "mpeg2",        },
 #endif
-#if defined(CONFIG_RKMPP_MPEG4D)
+#if HAVE_MPEG4D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMPEG4,      "dec",  "mpeg4",        },
 #endif
-#if defined(CONFIG_RKMPP_H263D)
+#if HAVE_H263D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingH263,       "dec",  "h.263",        },
 #endif
-#if defined(CONFIG_RKMPP_H264D)
+#if HAVE_H264D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVC,        "dec",  "h.264/AVC",    },
 #endif
-#if defined(CONFIG_RKMPP_H265D)
+#if HAVE_H265D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingHEVC,       "dec",  "h.265/HEVC",   },
 #endif
-#if defined(CONFIG_RKMPP_VP8D)
+#if HAVE_VP8D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingVP8,        "dec",  "vp8",          },
 #endif
-#if defined(CONFIG_RKMPP_VP9D)
+#if HAVE_VP9D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingVP9,        "dec",  "VP9",          },
 #endif
-#if defined(CONFIG_RKMPP_AVSD)
+#if HAVE_AVSD
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVS,        "dec",  "avs",          },
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVSPLUS,    "dec",  "avs+",         },
 #endif
-#if defined(CONFIG_RKMPP_AVS2D)
+#if HAVE_AVS2D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAVS2,       "dec",  "avs2",         },
 #endif
-#if defined(CONFIG_RKMPP_JPEGD)
+#if HAVE_JPEGD
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingMJPEG,      "dec",  "jpeg",         },
 #endif
-#if defined(CONFIG_RKMPP_AV1D)
+#if HAVE_AV1D
     {   MPP_CTX_DEC,    MPP_VIDEO_CodingAV1,        "dec",  "av1",          },
 #endif
-#if defined(CONFIG_RKMPP_H264E)
+#if HAVE_H264E
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingAVC,        "enc",  "h.264/AVC",    },
 #endif
-#if defined(CONFIG_RKMPP_JPEGE)
+#if HAVE_JPEGE
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingMJPEG,      "enc",  "jpeg",         },
 #endif
-#if defined(CONFIG_RKMPP_H265E)
+#if HAVE_H265E
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingHEVC,       "enc",  "h265",         },
 #endif
-#if defined(CONFIG_RKMPP_VP8E)
+#if HAVE_VP8E
     {   MPP_CTX_ENC,    MPP_VIDEO_CodingVP8,        "enc",  "vp8",          }
 #endif
 };
@@ -103,46 +103,22 @@ static MPP_RET mpi_decode(MppCtx ctx, MppPacket packet, MppFrame *frame)
     MpiImpl *p = (MpiImpl *)ctx;
 
     mpi_dbg_func("enter ctx %p packet %p frame %p\n", ctx, packet, frame);
+
     do {
-        RK_U32 packet_done = 0;
-        Mpp *mpp = p->ctx;
         ret = check_mpp_ctx(p);
         if (ret)
             break;
 
-        if (NULL == frame || NULL == packet) {
-            mpp_err_f("found NULL input packet %p frame %p\n", packet, frame);
-            ret = MPP_ERR_NULL_PTR;
-            break;
-        }
+        /*
+         * NOTE: packet and frame could be NULL
+         * If packet is NULL then it is equal to get_frame
+         * If frame is NULL then it is equal to put_packet
+         */
+        if (frame)
+            *frame = NULL;
 
-        *frame = NULL;
-
-        do {
-            /*
-             * If there is frame to return get the frame first
-             * But if the output mode is block then we need to send packet first
-             */
-            if (!mpp->mOutputTimeout || packet_done) {
-                ret = mpp->get_frame(frame);
-                if (ret || *frame)
-                    break;
-            }
-
-            /* when packet is send do one more get frame here */
-            if (packet_done)
-                break;
-
-            /*
-             * then send input stream with timeout mode
-             */
-            ret = mpp->put_packet(packet);
-            if (MPP_OK == ret)
-                packet_done = 1;
-        } while (1);
+        ret = p->ctx->decode(packet, frame);
     } while (0);
-
-    mpp_assert(0 == mpp_packet_get_length(packet));
 
     mpi_dbg_func("leave ctx %p ret %d\n", ctx, ret);
     return ret;

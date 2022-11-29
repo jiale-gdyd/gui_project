@@ -83,6 +83,8 @@ const struct format_table_entry format_table[] = {
     { RK_FORMAT_ABGR_5551,          "abgr5551" },
     { RK_FORMAT_ABGR_4444,          "abgr4444" },
 
+    { RK_FORMAT_RGBA2BPP,           "rgba2bpp" },
+
     { RK_FORMAT_UNKNOWN,            "unknown" }
 };
 
@@ -90,7 +92,7 @@ const char *translate_format_str(int format)
 {
     format = RkRgaGetRgaFormat(format);
 
-    for (int i = 0; i < (sizeof(format_table) / sizeof(format_table[0])); i++) {
+    for (size_t i = 0; i < (sizeof(format_table) / sizeof(format_table[0])); i++) {
         if (format_table[i].format == format) {
             return format_table[i].name;
         }
@@ -127,6 +129,9 @@ float get_bpp_from_format(int format)
     }
 
     switch (format) {
+        case RK_FORMAT_RGBA2BPP:
+            return 0.25;
+
         case RK_FORMAT_Y4:
             bpp = 0.5;
             break;
@@ -212,6 +217,9 @@ int get_perPixel_stride_from_format(int format)
     }
 
     switch (format) {
+        case RK_FORMAT_RGBA2BPP:
+            return 2;
+
         case RK_FORMAT_Y4:
             return (0.5 * 8);
 

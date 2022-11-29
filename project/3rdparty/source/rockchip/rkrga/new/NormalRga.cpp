@@ -705,6 +705,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         ditherEn = 0;
     }
 
+#if 0
     if (NormalRgaIsYuvFormat(relDstRect.format)) {
         rgaReg.uvhds_mode = 1;
         if (((relDstRect.format == RK_FORMAT_YCbCr_420_SP)
@@ -714,6 +715,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
             rgaReg.uvvds_mode = 1;
         }
     }
+#endif
 
     if (ctx->mVersion <= (float)1.003) {
         srcMmuFlag = dstMmuFlag = src1MmuFlag = 1;
@@ -1009,14 +1011,38 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     rgaReg.core = dst->core;
     rgaReg.priority = dst->priority;
 
-    do {
-        ret = ioctl(ctx->rgaFd, sync_mode, &rgaReg);
-    } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
+    if ((dst->mpi_mode == 1) && (dst->ctx_id > 0)) {
+        int ret;
+        struct rga_req cmd[1];
+        struct rga_user_ctx_t cmd_ctx;
 
-    if (ret) {
-        printf(" %s(%d) RGA_BLIT fail: %s\n", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) RGA_BLIT fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-        return -errno;
+        memset(&cmd_ctx, 0x0, sizeof(cmd_ctx));
+        memset(cmd, 0x0, sizeof(cmd));
+
+        cmd_ctx.sync_mode = sync_mode;
+
+        cmd[0] = rgaReg;
+
+        cmd_ctx.id = dst->ctx_id;
+        cmd_ctx.cmd_ptr = (uint64_t)cmd;
+        cmd_ctx.cmd_num = 1;
+
+        ret = ioctl(ctx->rgaFd, RGA_CMD_CONFIG, &cmd_ctx);
+        if (ret < 0) {
+            printf(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+            ALOGE(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+            return -errno;
+        }
+    } else {
+        do {
+            ret = ioctl(ctx->rgaFd, sync_mode, &rgaReg);
+        } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
+
+        if (ret) {
+            printf(" %s(%d) RGA_BLIT fail: %s\n", __FUNCTION__, __LINE__, strerror(errno));
+            ALOGE(" %s(%d) RGA_BLIT fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+            return -errno;
+        }
     }
 
     dst->out_fence_fd = rgaReg.out_fence_fd;

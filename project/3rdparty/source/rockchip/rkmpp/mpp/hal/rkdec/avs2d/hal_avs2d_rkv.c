@@ -30,6 +30,7 @@
 #include "hal_avs2d_rkv.h"
 #include "../../../base/inc/mpp_dec_cb_param.h"
 #include "../inc/vdpu34x_avs2d.h"
+#include "rockchip/rkmpp/rk_hdr_meta_com.h"
 
 #define VDPU34X_FAST_REG_SET_CNT    (3)
 #define MAX_REF_NUM                 (8)
@@ -438,7 +439,8 @@ static MPP_RET fill_registers(Avs2dHalCtx_t *p_hal, Vdpu34xAvs2dRegSet *p_regs, 
         p_regs->common_addr.reg129_rlcwrite_base = p_regs->common_addr.reg128_rlc_base;
         common->reg016_str_len = MPP_ALIGN(mpp_packet_get_length(task_dec->input_packet), 16) + 64;
     }
-
+    if (MPP_FRAME_FMT_IS_HDR(mpp_frame_get_fmt(mframe)) && p_hal->cfg->base.enable_hdr_meta)
+        fill_hdr_meta_to_frame(mframe, HDR_AVS2);
     return ret;
 }
 
@@ -1010,6 +1012,14 @@ static MPP_RET hal_avs2d_rkv_dump_yuv(void *hal, HalTaskInfo *task)
     snprintf(name, sizeof(name), "/data/tmp/rkv_out_%dx%d_nv12_%03d.yuv", vir_w, vir_h,
              p_hal->frame_no);
     fp_stream = fopen(name, "wb");
+    /* if format is fbc, write fbc header first */
+    if (MPP_FRAME_FMT_IS_FBC(fmt)) {
+        RK_U32 header_size = 0;
+
+        header_size = vir_w * vir_h / 16;
+        fwrite(base, 1, header_size, fp_stream);
+        base += header_size;
+    }
 
     if (fmt != MPP_FMT_YUV420SP_10BIT) {
         fwrite(base, 1, vir_w * vir_h * 3 / 2, fp_stream);

@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2022-11-24 [vepu540c]: support enc with a res of more than 3k";
+static const char *mpp_last_commit_message = "2022-11-29 [hdr_meta]: do not get meta when fill hdr meta fail";
 
 void show_mpp_version(void)
 {

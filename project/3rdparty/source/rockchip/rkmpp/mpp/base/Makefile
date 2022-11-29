@@ -17,3 +17,4 @@ obj-y += mpp_packet.o
 obj-y += mpp_task_impl.o
 obj-y += mpp_task.o
 obj-y += mpp_trie.o
+obj-y += mpp_dec_hdr_meta.o
