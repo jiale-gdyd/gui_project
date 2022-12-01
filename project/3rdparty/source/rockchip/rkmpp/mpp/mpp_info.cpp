@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2022-11-29 [hdr_meta]: do not get meta when fill hdr meta fail";
+static const char *mpp_last_commit_message = "2022-12-01 [h264d]: Fix memory leak of pps";
 
 void show_mpp_version(void)
 {
