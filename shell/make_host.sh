@@ -28,6 +28,8 @@ function host_lvgl_gui()
         version=$(get_ubuntu_version)
     elif [ ${distro} == "CentOS" ]; then
         version=$(get_centos_version)
+    elif [ ${distro} == "Debian" ]; then
+        version=$(get_debian_version)
     fi
     echo "Platform type: "${type}" "${distro}" "${version}
 
@@ -68,6 +70,8 @@ function host_awtk_gui()
         version=$(get_ubuntu_version)
     elif [ ${distro} == "CentOS" ]; then
         version=$(get_centos_version)
+    elif [ ${distro} == "Debian" ]; then
+        version=$(get_debian_version)
     fi
     echo "Platform type: "${type}" "${distro}" "${version}
 
@@ -108,6 +112,8 @@ function host_azure_gui()
         version=$(get_ubuntu_version)
     elif [ ${distro} == "CentOS" ]; then
         version=$(get_centos_version)
+    elif [ ${distro} == "Debian" ]; then
+        version=$(get_debian_version)
     fi
     echo "Platform type: "${type}" "${distro}" "${version}
 
@@ -148,6 +154,8 @@ function host_unittest()
         version=$(get_ubuntu_version)
     elif [ ${distro} == "CentOS" ]; then
         version=$(get_centos_version)
+    elif [ ${distro} == "Debian" ]; then
+        version=$(get_debian_version)
     fi
     echo "Platform type: "${type}" "${distro}" "${version}
 

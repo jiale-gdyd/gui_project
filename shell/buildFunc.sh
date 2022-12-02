@@ -107,6 +107,13 @@ function get_ubuntu_version()
     echo ${version[0]}
 }
 
+# 获取Debian版本
+function get_debian_version()
+{
+    version=$(cat /etc/debian_version)
+    echo ${version}
+}
+
 # 获取centos版本
 function get_centos_version()
 {
