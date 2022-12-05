@@ -330,7 +330,7 @@ static ret_t combo_box_on_layout_children_for_combobox_popup(widget_t* widget) {
     if (combo_box->open_window != NULL) {
       h = combo_box->combobox_popup->h;
     }
-    combo_box_combobox_popup_calc_position(widget, h, &p);
+    combo_box_combobox_popup_calc_position(widget, widget->w, h, &p);
     widget_move_resize(combo_box->combobox_popup, p.x, p.y, widget->w, h);
   }
   return RET_OK;
@@ -599,19 +599,29 @@ ret_t combo_box_combobox_popup_on_close_func(void* ctx, event_t* e) {
   combo_box_t* combo_box = COMBO_BOX(ctx);
   return_value_if_fail(combo_box != NULL, RET_BAD_PARAMS);
 
-  widget_off_by_func(window_manager(), EVT_WIDGET_WILL_RESTACK_CHILD, combo_box_popup_restack, combo_box);
+  widget_off_by_func(window_manager(), EVT_WIDGET_WILL_RESTACK_CHILD, combo_box_popup_restack,
+                     combo_box);
   combo_box->combobox_popup = NULL;
 
   return RET_OK;
 }
 
-ret_t combo_box_combobox_popup_calc_position(widget_t* widget, wh_t popup_h, point_t* p) {
+ret_t combo_box_combobox_popup_calc_position(widget_t* widget, wh_t popup_w, wh_t popup_h,
+                                             point_t* p) {
+  widget_t* parent = NULL;
   combo_box_t* combo_box = COMBO_BOX(widget);
+  widget_t* win = widget_get_window(widget);
   return_value_if_fail(combo_box != NULL && p != NULL, RET_BAD_PARAMS);
 
   memset(p, 0x00, sizeof(point_t));
   widget_to_screen(widget, p);
-  if ((p->y + widget->h + popup_h) < combo_box->combobox_popup->parent->h) {
+
+  parent = widget->parent;
+  if ((p->x + popup_w) >= win->w) {
+    p->x = win->w - popup_w;
+  }
+
+  if ((p->y + widget->h + popup_h) < win->h) {
     p->y += widget->h;
   } else if (p->y >= popup_h) {
     p->y -= combo_box->combobox_popup->h;
@@ -675,7 +685,7 @@ static ret_t combo_box_active(widget_t* widget) {
       win = combo_box->open_popup(widget);
       return_value_if_fail(win != NULL, RET_FAIL);
 
-      widget_resize(win, widget->w, win->h);
+      widget_resize(win, tk_max_int(win->w, widget->w), win->h);
       widget_layout_children(win);
     } else {
       win = combo_box_create_popup(combo_box);
@@ -690,7 +700,7 @@ static ret_t combo_box_active(widget_t* widget) {
   widget_set_prop_str(win, WIDGET_PROP_MOVE_FOCUS_NEXT_KEY, "down");
   combo_box_hook_items(combo_box, win);
 
-  combo_box_combobox_popup_calc_position(widget, win->h, &p);
+  combo_box_combobox_popup_calc_position(widget, win->w, win->h, &p);
   widget_move(win, p.x, p.y);
 
   return RET_OK;
