@@ -114,6 +114,11 @@ static HEVCFrame *alloc_frame(HEVCContext *s)
                 mpp_frame_set_mode(frame->frame, MPP_FRAME_FLAG_DEINTERLACED);
         }
 
+        if (s->h265dctx->cfg->base.enable_thumbnail && s->h265dctx->hw_info->cap_down_scale)
+            mpp_frame_set_thumbnail_en(frame->frame, 1);
+        else
+            mpp_frame_set_thumbnail_en(frame->frame, 0);
+
         mpp_frame_set_errinfo(frame->frame, 0);
         mpp_frame_set_pts(frame->frame, s->pts);
         mpp_frame_set_poc(frame->frame, s->poc);
@@ -240,8 +245,7 @@ static int add_candidate_ref(HEVCContext *s, RefPicList *list,
         if (!ref)
             return MPP_ERR_NOMEM;
 
-        if (cur_used)
-            ref->error_flag = 1;
+        ref->error_flag = 1;
     }
 
     list->list[list->nb_refs] = ref->poc;
@@ -252,7 +256,7 @@ static int add_candidate_ref(HEVCContext *s, RefPicList *list,
         mpp_buf_slot_set_flag(s->slots, ref->slot_index, SLOT_CODEC_USE);
     }
     mark_ref(ref, ref_flag);
-    if (ref->error_flag) {
+    if (ref->error_flag && cur_used) {
         s->miss_ref_flag = 1;
     }
     return 0;

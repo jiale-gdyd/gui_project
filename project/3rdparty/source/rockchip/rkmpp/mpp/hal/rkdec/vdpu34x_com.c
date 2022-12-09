@@ -17,7 +17,6 @@
 #define MODULE_TAG "vdpu34x_com"
 
 #include <string.h>
-
 #include "rockchip/rkmpp/mpp_log.h"
 #include "rockchip/rkmpp/mpp_buffer.h"
 #include "../../../osal/inc/mpp_common.h"

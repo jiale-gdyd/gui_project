@@ -760,8 +760,19 @@ static MPP_RET hal_vp9d_vdpu382_gen_regs(void *hal, HalTaskInfo *task)
     vp9_hw_regs->common.reg011.buf_empty_en     = 1;
     vp9_hw_regs->common.reg011.dec_clkgate_e    = 1;
 
-    vp9_hw_regs->common.reg026.swreg_block_gating_e = 0xfffff;
+    vp9_hw_regs->common.reg026.inter_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.filterd_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.strmd_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.mcp_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.busifd_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.dec_ctrl_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.intra_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.mc_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.transd_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.sram_auto_gating_e = 1;
+    vp9_hw_regs->common.reg026.cru_auto_gating_e = 1;
     vp9_hw_regs->common.reg026.reg_cfg_gating_en = 1;
+
     vp9_hw_regs->common.reg032_timeout_threshold = 0x3ffff;
 
     //last info  update
@@ -799,6 +810,23 @@ static MPP_RET hal_vp9d_vdpu382_gen_regs(void *hal, HalTaskInfo *task)
 
         rcb_buf = p_hal->fast_mode ? hw_ctx->g_buf[task->dec.reg_index].rcb_buf : hw_ctx->rcb_buf;
         vdpu382_setup_rcb(&vp9_hw_regs->common_addr, p_hal->dev, rcb_buf, hw_ctx->rcb_info);
+    }
+
+    {
+        MppFrame mframe = NULL;
+
+        mpp_buf_slot_get_prop(p_hal->slots, task->dec.output, SLOT_FRAME_PTR, &mframe);
+        if (mpp_frame_get_thumbnail_en(mframe)) {
+            vp9_hw_regs->vp9d_addr.reg198_scale_down_luma_base =
+                vp9_hw_regs->common_addr.reg130_decout_base;
+            vp9_hw_regs->vp9d_addr.reg199_scale_down_chorme_base =
+                vp9_hw_regs->common_addr.reg130_decout_base;
+            vdpu382_setup_down_scale(mframe, p_hal->dev, &vp9_hw_regs->common);
+        } else {
+            vp9_hw_regs->vp9d_addr.reg198_scale_down_luma_base = 0;
+            vp9_hw_regs->vp9d_addr.reg199_scale_down_chorme_base = 0;
+            vp9_hw_regs->common.reg012.scale_down_en = 0;
+        }
     }
     vdpu382_setup_statistic(&vp9_hw_regs->common, &vp9_hw_regs->statistic);
 

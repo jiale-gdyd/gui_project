@@ -795,15 +795,24 @@ static MPP_RET hal_h265d_vdpu382_gen_regs(void *hal,  HalTaskInfo *syn)
                aglin_offset);
     }
     hw_regs->common.reg010.dec_e                = 1;
-    hw_regs->common.reg012.wr_ddr_align_en      = dxva_cxt->pp.tiles_enabled_flag
-                                                  ? 0 : 1;
     hw_regs->common.reg012.colmv_compress_en    = 1;
 
     hw_regs->common.reg024.cabac_err_en_lowbits = 0xffffdfff;
     hw_regs->common.reg025.cabac_err_en_highbits = 0x3ffbf9ff;
 
     hw_regs->common.reg011.dec_clkgate_e    = 1;
-    hw_regs->common.reg026.swreg_block_gating_e = 0xfffff;
+
+    hw_regs->common.reg026.inter_auto_gating_e = 1;
+    hw_regs->common.reg026.filterd_auto_gating_e = 1;
+    hw_regs->common.reg026.strmd_auto_gating_e = 1;
+    hw_regs->common.reg026.mcp_auto_gating_e = 1;
+    hw_regs->common.reg026.busifd_auto_gating_e = 1;
+    hw_regs->common.reg026.dec_ctrl_auto_gating_e = 1;
+    hw_regs->common.reg026.intra_auto_gating_e = 1;
+    hw_regs->common.reg026.mc_auto_gating_e = 1;
+    hw_regs->common.reg026.transd_auto_gating_e = 1;
+    hw_regs->common.reg026.sram_auto_gating_e = 1;
+    hw_regs->common.reg026.cru_auto_gating_e = 1;
     hw_regs->common.reg026.reg_cfg_gating_en = 1;
     hw_regs->common.reg032_timeout_threshold = 0x3ffff;
 
@@ -898,6 +907,24 @@ static MPP_RET hal_h265d_vdpu382_gen_regs(void *hal,  HalTaskInfo *syn)
     vdpu382_setup_rcb(&hw_regs->common_addr, reg_cxt->dev, reg_cxt->fast_mode ?
                       reg_cxt->rcb_buf[syn->dec.reg_index] : reg_cxt->rcb_buf[0],
                       (Vdpu382RcbInfo*)reg_cxt->rcb_info);
+    {
+        MppFrame mframe = NULL;
+
+        mpp_buf_slot_get_prop(reg_cxt->slots, dxva_cxt->pp.CurrPic.Index7Bits,
+                              SLOT_FRAME_PTR, &mframe);
+
+        if (mpp_frame_get_thumbnail_en(mframe)) {
+            hw_regs->h265d_addr.reg198_scale_down_luma_base =
+                hw_regs->common_addr.reg130_decout_base;
+            hw_regs->h265d_addr.reg199_scale_down_chorme_base =
+                hw_regs->common_addr.reg130_decout_base;
+            vdpu382_setup_down_scale(mframe, reg_cxt->dev, &hw_regs->common);
+        } else {
+            hw_regs->h265d_addr.reg198_scale_down_luma_base = 0;
+            hw_regs->h265d_addr.reg199_scale_down_chorme_base = 0;
+            hw_regs->common.reg012.scale_down_en = 0;
+        }
+    }
     vdpu382_setup_statistic(&hw_regs->common, &hw_regs->statistic);
 
     return ret;

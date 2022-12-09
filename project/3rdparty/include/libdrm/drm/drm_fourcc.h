@@ -13,11 +13,22 @@ extern "C" {
 
 #define DRM_FORMAT_INVALID                              0
 
+#define DRM_FORMAT_C1                                   fourcc_code('C', '1', ' ', ' ') /* [7:0] C0:C1:C2:C3:C4:C5:C6:C7 1:1:1:1:1:1:1:1 eight pixels/byte */
+#define DRM_FORMAT_C2                                   fourcc_code('C', '2', ' ', ' ') /* [7:0] C0:C1:C2:C3 2:2:2:2 four pixels/byte */
+#define DRM_FORMAT_C4                                   fourcc_code('C', '4', ' ', ' ') /* [7:0] C0:C1 4:4 two pixels/byte */
 #define DRM_FORMAT_C8                                   fourcc_code('C', '8', ' ', ' ') /* [7:0] C */
+
+#define DRM_FORMAT_D1                                   fourcc_code('D', '1', ' ', ' ') /* [7:0] D0:D1:D2:D3:D4:D5:D6:D7 1:1:1:1:1:1:1:1 eight pixels/byte */
+#define DRM_FORMAT_D2                                   fourcc_code('D', '2', ' ', ' ') /* [7:0] D0:D1:D2:D3 2:2:2:2 four pixels/byte */
+#define DRM_FORMAT_D4                                   fourcc_code('D', '4', ' ', ' ') /* [7:0] D0:D1 4:4 two pixels/byte */
+#define DRM_FORMAT_D8                                   fourcc_code('D', '8', ' ', ' ') /* [7:0] D */
+
+#define DRM_FORMAT_R1                                   fourcc_code('R', '1', ' ', ' ') /* [7:0] R0:R1:R2:R3:R4:R5:R6:R7 1:1:1:1:1:1:1:1 eight pixels/byte */
+#define DRM_FORMAT_R2                                   fourcc_code('R', '2', ' ', ' ') /* [7:0] R0:R1:R2:R3 2:2:2:2 four pixels/byte */
+#define DRM_FORMAT_R4                                   fourcc_code('R', '4', ' ', ' ') /* [7:0] R0:R1 4:4 two pixels/byte */
 #define DRM_FORMAT_R8                                   fourcc_code('R', '8', ' ', ' ') /* [7:0] R */
 #define DRM_FORMAT_R10                                  fourcc_code('R', '1', '0', ' ') /* [15:0] x:R 6:10 little endian */
 #define DRM_FORMAT_R12                                  fourcc_code('R', '1', '2', ' ') /* [15:0] x:R 4:12 little endian */
-
 #define DRM_FORMAT_R16                                  fourcc_code('R', '1', '6', ' ') /* [15:0] R little endian */
 
 #define DRM_FORMAT_RG88                                 fourcc_code('R', 'G', '8', '8') /* [15:0] R:G 8:8 little endian */
@@ -95,7 +106,9 @@ extern "C" {
 #define DRM_FORMAT_VYUY                                 fourcc_code('V', 'Y', 'U', 'Y') /* [31:0] Y1:Cb0:Y0:Cr0 8:8:8:8 little endian */
 
 #define DRM_FORMAT_AYUV                                 fourcc_code('A', 'Y', 'U', 'V') /* [31:0] A:Y:Cb:Cr 8:8:8:8 little endian */
+#define DRM_FORMAT_AVUY8888                             fourcc_code('A', 'V', 'U', 'Y') /* [31:0] A:Cr:Cb:Y 8:8:8:8 little endian */
 #define DRM_FORMAT_XYUV8888                             fourcc_code('X', 'Y', 'U', 'V') /* [31:0] X:Y:Cb:Cr 8:8:8:8 little endian */
+#define DRM_FORMAT_XVUY8888                             fourcc_code('X', 'V', 'U', 'Y') /* [31:0] X:Cr:Cb:Y 8:8:8:8 little endian */
 #define DRM_FORMAT_VUY888                               fourcc_code('V', 'U', '2', '4') /* [23:0] Cr:Cb:Y 8:8:8 little endian */
 #define DRM_FORMAT_VUY101010                            fourcc_code('V', 'U', '3', '0') /* Y followed by U then V, 10:10:10. Non-linear modifier only */
 
@@ -219,6 +232,17 @@ extern "C" {
 #define DRM_FORMAT_MOD_VIVANTE_SUPER_TILED              fourcc_mod_code(VIVANTE, 2)
 #define DRM_FORMAT_MOD_VIVANTE_SPLIT_TILED              fourcc_mod_code(VIVANTE, 3)
 #define DRM_FORMAT_MOD_VIVANTE_SPLIT_SUPER_TILED        fourcc_mod_code(VIVANTE, 4)
+
+#define VIVANTE_MOD_TS_64_4                             (1ULL << 48)
+#define VIVANTE_MOD_TS_64_2                             (2ULL << 48)
+#define VIVANTE_MOD_TS_128_4                            (3ULL << 48)
+#define VIVANTE_MOD_TS_256_4                            (4ULL << 48)
+#define VIVANTE_MOD_TS_MASK                             (0xfULL << 48)
+
+#define VIVANTE_MOD_COMP_DEC400                         (1ULL << 52)
+#define VIVANTE_MOD_COMP_MASK                           (0xfULL << 52)
+
+#define VIVANTE_MOD_EXT_MASK                            (VIVANTE_MOD_TS_MASK | VIVANTE_MOD_COMP_MASK)
 
 #define DRM_FORMAT_MOD_NVIDIA_TEGRA_TILED               fourcc_mod_code(NVIDIA, 1)
 

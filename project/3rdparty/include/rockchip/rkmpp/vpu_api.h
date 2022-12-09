@@ -46,9 +46,9 @@
 #define VPU_OUTPUT_FORMAT_BIT_12                    (0x00020000)
 #define VPU_OUTPUT_FORMAT_BIT_14                    (0x00030000)
 #define VPU_OUTPUT_FORMAT_BIT_16                    (0x00040000)
-#define VPU_OUTPUT_FORMAT_COLORSPACE_MASK           (0x00f00000)
-#define VPU_OUTPUT_FORMAT_COLORSPACE_BT709          (0x00100000)
-#define VPU_OUTPUT_FORMAT_COLORSPACE_BT2020         (0x00200000)
+#define VPU_OUTPUT_FORMAT_FBC_MASK                  (0x00f00000)
+#define VPU_OUTPUT_FORMAT_FBC_AFBC_V1               (0x00100000)
+#define VPU_OUTPUT_FORMAT_FBC_AFBC_V2               (0x00200000)
 #define VPU_OUTPUT_FORMAT_DYNCRANGE_MASK            (0x0f000000)
 #define VPU_OUTPUT_FORMAT_DYNCRANGE_SDR             (0x00000000)
 #define VPU_OUTPUT_FORMAT_DYNCRANGE_HDR10           (0x01000000)
@@ -99,6 +99,9 @@ typedef enum VPU_API_CMD {
 
     VPU_API_SET_IMMEDIATE_OUT = 0x1000,
     VPU_API_SET_PARSER_SPLIT_MODE,          /* NOTE: should control before init */
+    VPU_API_DEC_OUT_FRM_STRUCT_TYPE,
+    VPU_API_DEC_EN_THUMBNAIL,
+    VPU_API_DEC_EN_HDR_META,
 
     VPU_API_ENC_VEPU22_START = 0x2000,
     VPU_API_ENC_SET_VEPU22_CFG,
@@ -174,6 +177,25 @@ typedef struct tVPU_FRAME {
         RK_U32          Res[4];
     };
 } VPU_FRAME;
+
+typedef struct FrameThumbInfo {
+    RK_U32      enable;
+    RK_U32      yOffset;
+    RK_U32      uvOffset;
+} FrameThumbInfo_t;
+
+typedef struct FrameHdrInfo {
+    RK_U32      isHdr;
+    RK_U32      offset;
+    RK_U32      size;
+} FrameHdrInfo_t;
+
+typedef struct VideoFrame {
+    VPU_FRAME        vpuFrame;
+    FrameThumbInfo_t thumbInfo;
+    FrameHdrInfo_t   hdrInfo;
+    RK_U32          *reserved[4];
+} VideoFrame_t;
 
 typedef struct VideoPacket {
     RK_S64 pts;                /* with unit of us*/

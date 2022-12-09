@@ -695,8 +695,20 @@ static MPP_RET init_common_regs(Vdpu382H264dRegSet *regs)
 
     common->reg024.cabac_err_en_lowbits = 0xffffffff;
     common->reg025.cabac_err_en_highbits = 0x3ff3ffff;
-    common->reg026.swreg_block_gating_e = 0xfffff;
+
+    common->reg026.inter_auto_gating_e = 1;
+    common->reg026.filterd_auto_gating_e = 1;
+    common->reg026.strmd_auto_gating_e = 1;
+    common->reg026.mcp_auto_gating_e = 1;
+    common->reg026.busifd_auto_gating_e = 1;
+    common->reg026.dec_ctrl_auto_gating_e = 1;
+    common->reg026.intra_auto_gating_e = 1;
+    common->reg026.mc_auto_gating_e = 1;
+    common->reg026.transd_auto_gating_e = 1;
+    common->reg026.sram_auto_gating_e = 1;
+    common->reg026.cru_auto_gating_e = 1;
     common->reg026.reg_cfg_gating_en = 1;
+
     common->reg032_timeout_threshold = 0x3ffff;
 
     common->reg011.dec_clkgate_e = 1;
@@ -997,6 +1009,23 @@ MPP_RET vdpu382_h264d_gen_regs(void *hal, HalTaskInfo *task)
     vdpu382_setup_rcb(&regs->common_addr, p_hal->dev, p_hal->fast_mode ?
                       ctx->rcb_buf[task->dec.reg_index] : ctx->rcb_buf[0],
                       ctx->rcb_info);
+    {
+        MppFrame mframe = NULL;
+        DXVA_PicParams_H264_MVC *pp = p_hal->pp;
+        mpp_buf_slot_get_prop(p_hal->frame_slots, pp->CurrPic.Index7Bits, SLOT_FRAME_PTR, &mframe);
+
+        if (mpp_frame_get_thumbnail_en(mframe)) {
+            regs->h264d_addr.reg198_scale_down_luma_base =
+                regs->common_addr.reg130_decout_base;
+            regs->h264d_addr.reg199_scale_down_chorme_base =
+                regs->common_addr.reg130_decout_base;
+            vdpu382_setup_down_scale(mframe, p_hal->dev, &regs->common);
+        } else {
+            regs->h264d_addr.reg198_scale_down_luma_base = 0;
+            regs->h264d_addr.reg199_scale_down_chorme_base = 0;
+            regs->common.reg012.scale_down_en = 0;
+        }
+    }
     vdpu382_setup_statistic(&regs->common, &regs->statistic);
 
 __RETURN:
