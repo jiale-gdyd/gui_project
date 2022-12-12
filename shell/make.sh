@@ -16,6 +16,8 @@ function clean()
         version=$(get_ubuntu_version)
     elif [ ${distro} == "CentOS" ]; then
         version=$(get_centos_version)
+    elif [ ${distro} == "Debian" ]; then
+        version=$(get_debian_version)
     fi
     echo "Platform type: "${type}" "${distro}" "${version}
 

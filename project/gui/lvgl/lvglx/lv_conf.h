@@ -181,6 +181,7 @@
 #define LV_LOG_TRACE_OBJ_CREATE                     1
 #define LV_LOG_TRACE_LAYOUT                         1
 #define LV_LOG_TRACE_ANIM                           1
+#define LV_LOG_TRACE_MSG                            1
 #endif
 
 // 如果操作失败或发现无效数据，则启用断言。如果启用LV_USE_LOG，将在失败时打印错误消息
@@ -481,6 +482,7 @@
 #define LV_USE_GIF                                  1
 #define LV_USE_SJPG                                 1
 #define LV_USE_QRCODE                               1
+#define LV_USE_BARCODE                              1
 #define LV_USE_RLOTTIE                              1
 
 // 1启用拼音输入法。需要：lv_keyboard

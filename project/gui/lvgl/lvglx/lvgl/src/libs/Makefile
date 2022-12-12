@@ -5,6 +5,7 @@ obj-y += sjpg/
 obj-y += fsdrv/
 obj-y += qrcode/
 obj-y += ffmpeg/
+obj-y += barcode/
 obj-y += freetype/
 obj-y += tiny_ttf/
 
