@@ -389,11 +389,23 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
             break;
 
         case 0x0501:
-            NormalRgaSetAlphaEnInfo(&rgaReg, 1, 2, planeAlpha , 1, 4, 0);
+            if (perpixelAlpha && (planeAlpha < 255)) {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 2, planeAlpha , 1, 4, 0);
+            } else if (perpixelAlpha) {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 1, planeAlpha , 1, 4, 0);
+            } else {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 3, planeAlpha , 1, 4, 0);
+            }
             break;
 
         case 0x0504:
-            NormalRgaSetAlphaEnInfo(&rgaReg, 1, 2, planeAlpha , 1, 4, 0);
+            if (perpixelAlpha && (planeAlpha < 255)) {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 2, planeAlpha , 1, 4, 0);
+            } else if (perpixelAlpha) {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 1, planeAlpha , 1, 4, 0);
+            } else {
+                NormalRgaSetAlphaEnInfo(&rgaReg, 1, 3, planeAlpha , 1, 4, 0);
+            }
             rgaReg.alpha_rop_flag |= (1 << 9);
             break;
 
