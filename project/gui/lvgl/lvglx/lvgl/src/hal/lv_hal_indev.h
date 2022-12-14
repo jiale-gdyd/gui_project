@@ -96,6 +96,7 @@ typedef struct _lv_indev_proc_t {
         struct {
             // 指针和按钮数据
             lv_point_t       act_point;                 // 输入设备当前点
+            lv_point_t       indev_point;
             lv_point_t       last_point;                // 输入设备的最后一点
             lv_point_t       last_raw_point;            // 从read_cb读取的最后一点
             lv_point_t       vect;                      // `act_point`和`last_point`之间的区别

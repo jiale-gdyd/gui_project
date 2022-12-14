@@ -15,13 +15,14 @@ static lv_coord_t elastic_diff(lv_obj_t *scroll_obj, lv_coord_t diff, lv_coord_t
 
 void _lv_indev_scroll_handler(_lv_indev_proc_t *proc)
 {
+    if ((proc->types.pointer.vect.x == 0) && (proc->types.pointer.vect.y == 0)) {
+        return;
+    }
+
     lv_obj_t *scroll_obj = proc->types.pointer.scroll_obj;
 
     // 如果还没有滚动对象，请尝试找到一个
     if (scroll_obj == NULL) {
-        proc->types.pointer.scroll_sum.x += proc->types.pointer.vect.x;
-        proc->types.pointer.scroll_sum.y += proc->types.pointer.vect.y;
-
         scroll_obj = find_scroll_obj(proc);
         if (scroll_obj == NULL) {
             return;
@@ -35,48 +36,60 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t *proc)
         }
     }
 
-    // 如果向量不为零，则设置新位置或滚动
-    if ((proc->types.pointer.vect.x != 0) || (proc->types.pointer.vect.y != 0)) {
-        lv_coord_t diff_x = 0;
-        lv_coord_t diff_y = 0;
+    int16_t angle = 0;
+    int16_t zoom = 256;
+    lv_obj_t *parent = scroll_obj;
 
-        if (proc->types.pointer.scroll_dir == LV_DIR_HOR) {
-            lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
-            lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
-            diff_x = elastic_diff(scroll_obj, proc->types.pointer.vect.x, sl, sr, LV_DIR_HOR);
-        } else {
-            lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
-            lv_coord_t sb = lv_obj_get_scroll_bottom(scroll_obj);
-            diff_y = elastic_diff(scroll_obj, proc->types.pointer.vect.y, st, sb, LV_DIR_VER);
-        }
-
-        lv_dir_t scroll_dir = lv_obj_get_scroll_dir(scroll_obj);
-        if (((scroll_dir & LV_DIR_LEFT) == 0) && (diff_x > 0)) {
-            diff_x = 0;
-        }
-
-        if (((scroll_dir & LV_DIR_RIGHT) == 0) && (diff_x < 0)) {
-            diff_x = 0;
-        }
-
-        if (((scroll_dir & LV_DIR_TOP) == 0) && (diff_y > 0)) {
-            diff_y = 0;
-        }
-
-        if (((scroll_dir & LV_DIR_BOTTOM) == 0) && (diff_y < 0)) {
-            diff_y = 0;
-        }
-
-        // 尊重滚动限制区域
-        scroll_limit_diff(proc, &diff_x, &diff_y);
-
-        _lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
-        if (proc->reset_query) {
-            return;
-        }
-        proc->types.pointer.scroll_sum.x += diff_x;
-        proc->types.pointer.scroll_sum.y += diff_y;
+    while (parent) {
+        angle += lv_obj_get_style_transform_angle(parent, 0);
+        zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+        parent = lv_obj_get_parent(parent);
     }
+
+    if ((angle != 0) || (zoom != LV_IMG_ZOOM_NONE)) {
+        angle = -angle;
+        zoom = (256 * 256) / zoom;
+        lv_point_t pivot = { 0, 0 };
+        lv_point_transform(&proc->types.pointer.vect, angle, zoom, &pivot);
+    }
+
+    lv_coord_t diff_x = 0;
+    lv_coord_t diff_y = 0;
+    if (proc->types.pointer.scroll_dir == LV_DIR_HOR) {
+        lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
+        lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
+        diff_x = elastic_diff(scroll_obj, proc->types.pointer.vect.x, sl, sr, LV_DIR_HOR);
+    } else {
+        lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
+        lv_coord_t sb = lv_obj_get_scroll_bottom(scroll_obj);
+        diff_y = elastic_diff(scroll_obj, proc->types.pointer.vect.y, st, sb, LV_DIR_VER);
+    }
+
+    lv_dir_t scroll_dir = lv_obj_get_scroll_dir(scroll_obj);
+    if ((scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) {
+        diff_x = 0;
+    }
+
+    if ((scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) {
+        diff_x = 0;
+    }
+
+    if ((scroll_dir & LV_DIR_TOP) == 0 && diff_y > 0) {
+        diff_y = 0;
+    }
+
+    if ((scroll_dir & LV_DIR_BOTTOM) == 0 && diff_y < 0) {
+        diff_y = 0;
+    }
+
+    scroll_limit_diff(proc, &diff_x, &diff_y);
+
+    _lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
+    if (proc->reset_query) {
+        return;
+    }
+    proc->types.pointer.scroll_sum.x += diff_x;
+    proc->types.pointer.scroll_sum.y += diff_y;
 }
 
 void _lv_indev_scroll_throw_handler(_lv_indev_proc_t *proc)
@@ -254,13 +267,34 @@ static lv_obj_t *find_scroll_obj(_lv_indev_proc_t *proc)
 
     lv_obj_t *obj_act = proc->types.pointer.act_obj;
 
-    if (LV_ABS(proc->types.pointer.scroll_sum.x) > LV_ABS(proc->types.pointer.scroll_sum.y)) {
-        hor_en = true;
-    } else {
-        ver_en = true;
-    }
+    proc->types.pointer.scroll_sum.x += proc->types.pointer.vect.x;
+    proc->types.pointer.scroll_sum.y += proc->types.pointer.vect.y;
 
     while (obj_act) {
+        int16_t angle = 0;
+        int16_t zoom = 256;
+        lv_point_t pivot = { 0, 0 };
+        lv_obj_t *parent = obj_act;
+
+        while (parent) {
+            angle += lv_obj_get_style_transform_angle(parent, 0);
+            zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+            parent = lv_obj_get_parent(parent);
+        }
+
+        lv_point_t obj_scroll_sum = proc->types.pointer.scroll_sum;
+        if (angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+            angle = -angle;
+            zoom = (256 * 256) / zoom;
+            lv_point_transform(&obj_scroll_sum, angle, zoom, &pivot);
+        }
+
+        if (LV_ABS(obj_scroll_sum.x) > LV_ABS(obj_scroll_sum.y)) {
+            hor_en = true;
+        } else {
+            ver_en = true;
+        }
+
         if (lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
             if ((lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN_HOR) == false) && hor_en) {
                 break;
@@ -305,16 +339,16 @@ static lv_obj_t *find_scroll_obj(_lv_indev_proc_t *proc)
         lv_coord_t sr = lv_obj_get_scroll_right(obj_act);
 
         if (((st > 0) || (sb > 0))
-            && ((up_en && (proc->types.pointer.scroll_sum.y >= scroll_limit))
-            || (down_en && (proc->types.pointer.scroll_sum.y <= -scroll_limit))))
+            && ((up_en && (obj_scroll_sum.y >= scroll_limit))
+            || (down_en && (obj_scroll_sum.y <= -scroll_limit))))
         {
             obj_candidate = obj_act;
             dir_candidate = LV_DIR_VER;
         }
 
         if (((sl > 0) || (sr > 0)) 
-            && ((left_en && (proc->types.pointer.scroll_sum.x >= scroll_limit))
-            || (right_en && (proc->types.pointer.scroll_sum.x <= -scroll_limit))))
+            && ((left_en && (obj_scroll_sum.x >= scroll_limit))
+            || (right_en && (obj_scroll_sum.x <= -scroll_limit))))
         {
             obj_candidate = obj_act;
             dir_candidate = LV_DIR_HOR;
@@ -337,10 +371,10 @@ static lv_obj_t *find_scroll_obj(_lv_indev_proc_t *proc)
         }
 
         // 如果对象确实可以滚动到当前方向，请使用它
-        if ((left_en && (proc->types.pointer.scroll_sum.x >= scroll_limit))
-            || (right_en && (proc->types.pointer.scroll_sum.x <= -scroll_limit))
-            || (up_en && (proc->types.pointer.scroll_sum.y >= scroll_limit))
-            || (down_en && (proc->types.pointer.scroll_sum.y <= -scroll_limit)))
+        if ((left_en && (obj_scroll_sum.x >= scroll_limit))
+            || (right_en && (obj_scroll_sum.x <= -scroll_limit))
+            || (up_en && (obj_scroll_sum.y >= scroll_limit))
+            || (down_en && (obj_scroll_sum.y <= -scroll_limit)))
         {
             proc->types.pointer.scroll_dir = hor_en ? LV_DIR_HOR : LV_DIR_VER;
             break;
