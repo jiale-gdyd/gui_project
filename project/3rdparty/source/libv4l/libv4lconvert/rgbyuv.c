@@ -607,7 +607,7 @@ void v4lconvert_y16_to_yuv420(const unsigned char *src, unsigned char *dest, con
     memset(dest, 0x80, src_fmt->fmt.pix.width * src_fmt->fmt.pix.height / 2);
 }
 
-void v4lconvert_grey_to_rgb24(const unsigned char *src, unsigned char *dest, int width, int height)
+void v4lconvert_grey_to_rgb24(const unsigned char *src, unsigned char *dest, int width, int height, int stride)
 {
     int j;
     while (--height >= 0) {
@@ -617,6 +617,8 @@ void v4lconvert_grey_to_rgb24(const unsigned char *src, unsigned char *dest, int
             *dest++ = *src;
             src++;
         }
+
+        src += stride - width;
     }
 }
 
