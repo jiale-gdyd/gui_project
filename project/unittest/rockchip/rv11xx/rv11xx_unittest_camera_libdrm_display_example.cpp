@@ -28,23 +28,14 @@
 #define DISP_WIDTH_PIXELS               1280
 #define DISP_HEIGHT_PIXELS              720
 
-#define SCREEN_WIDTH_PIXELS             1920
-#define SCREEN_HEIGHT_PIXELS            720
+#define SCREEN_WIDTH_PIXELS             1440/* 1920 */
+#define SCREEN_HEIGHT_PIXELS            810/* 720 */
 
-#define CAPTURE_CAMERA_WIDTH_PIXELS     1920
-#define CAPTURE_CAMERA_HEIGHT_PIXELS    1080
+#define CAPTURE_CAMERA_WIDTH_PIXELS     1280/* 1920 */
+#define CAPTURE_CAMERA_HEIGHT_PIXELS    720/* 1080 */
 
 #define DISP_XOFFSET                    (SCREEN_WIDTH_PIXELS - DISP_WIDTH_PIXELS)
 #define DISP_YOFFSET                    ((SCREEN_HEIGHT_PIXELS - DISP_HEIGHT_PIXELS) / 2)
-
-static bool g_quit = false;
-static int g_viChn = 0, g_voChn = 1;
-
-static void sigterm_handler(int signo)
-{
-    unittest_info("catch signal: %d", signo);
-    g_quit = true;
-}
 
 int rv11xx_unittest_camera_libdrm_display_exit(void)
 {
@@ -58,6 +49,8 @@ int rv11xx_unittest_camera_libdrm_display_init(int argc, char *argv[])
         unittest_error("drm_mpi_system_init failed");
         return -1;
     }
+
+    int g_viChn = 0, g_voChn = 1;
 
     drm_vi_chn_attr_t stViChnAttr;
     memset(&stViChnAttr, 0, sizeof(stViChnAttr));
@@ -114,7 +107,10 @@ int rv11xx_unittest_camera_libdrm_display_init(int argc, char *argv[])
         return -5;
     }
 
-    signal(SIGINT, sigterm_handler);
+    static bool g_quit = false;
+    signal(SIGINT, [](int) {
+        g_quit = true;
+    });
 
     while (!g_quit) {
         usleep(500000);

@@ -12,6 +12,6 @@
 #define RGA_API_VERSION             STR(RGA_API_MAJOR_VERSION) "." STR(RGA_API_MINOR_VERSION) "." STR(RGA_API_REVISION_VERSION) "_[" STR(RGA_API_BUILD_VERSION) "]"
 
 #define RGA_API_PRODUCT_BASE        "rv1126"
-#define RGA_API_FULL_VERSION        "rga_api version " RGA_API_VERSION " ("" base: " RGA_API_PRODUCT_BASE ")"
+#define RGA_API_FULL_VERSION        "rga_api version " RGA_API_VERSION " (" "base: " RGA_API_PRODUCT_BASE ")"
 
 #endif
