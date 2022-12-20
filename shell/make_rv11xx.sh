@@ -62,7 +62,7 @@ function rv11xx_awtk_gui()
     begin=`get_timestamp`
     type=$(uname)
     distro=`get_linux_distro`
-    iversion=$(get_general_version)
+    version=$(get_general_version)
     echo "Platform type: "${type}" "${distro}" "${version}
 
     print_info "Starting '${SHELL_NAME}'"
