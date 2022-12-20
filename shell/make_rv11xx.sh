@@ -28,15 +28,7 @@ function rv11xx_lvgl_gui()
     begin=`get_timestamp`
     type=$(uname)
     distro=`get_linux_distro`
-    if [ ${distro} == "Ubuntu" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "LinuxMint" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "CentOS" ]; then
-        version=$(get_centos_version)
-    elif [ ${distro} == "Debian" ]; then
-        version=$(get_debian_version)
-    fi
+    version=$(get_general_version)
     echo "Platform type: "${type}" "${distro}" "${version}
 
     print_info "Starting '${SHELL_NAME}'"
@@ -70,15 +62,7 @@ function rv11xx_awtk_gui()
     begin=`get_timestamp`
     type=$(uname)
     distro=`get_linux_distro`
-    if [ ${distro} == "Ubuntu" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "LinuxMint" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "CentOS" ]; then
-        version=$(get_centos_version)
-    elif [ ${distro} == "Debian" ]; then
-        version=$(get_debian_version)
-    fi
+    iversion=$(get_general_version)
     echo "Platform type: "${type}" "${distro}" "${version}
 
     print_info "Starting '${SHELL_NAME}'"
@@ -112,15 +96,7 @@ function rv11xx_azure_gui()
     begin=`get_timestamp`
     type=$(uname)
     distro=`get_linux_distro`
-    if [ ${distro} == "Ubuntu" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "LinuxMint" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "CentOS" ]; then
-        version=$(get_centos_version)
-    elif [ ${distro} == "Debian" ]; then
-        version=$(get_debian_version)
-    fi
+    version=$(get_general_version)
     echo "Platform type: "${type}" "${distro}" "${version}
 
     print_info "Starting '${SHELL_NAME}'"
@@ -154,15 +130,7 @@ function rv11xx_unittest()
     begin=`get_timestamp`
     type=$(uname)
     distro=`get_linux_distro`
-    if [ ${distro} == "Ubuntu" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "LinuxMint" ]; then
-        version=$(get_ubuntu_version)
-    elif [ ${distro} == "CentOS" ]; then
-        version=$(get_centos_version)
-    elif [ ${distro} == "Debian" ]; then
-        version=$(get_debian_version)
-    fi
+    version=$(get_general_version)
     echo "Platform type: "${type}" "${distro}" "${version}
 
     print_info "Starting '${SHELL_NAME}'"

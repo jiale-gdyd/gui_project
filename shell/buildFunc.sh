@@ -107,6 +107,14 @@ function get_ubuntu_version()
     echo ${version[0]}
 }
 
+# 获取通用版本
+function get_general_version()
+{
+    version1=$(grep VERSION_ID /etc/os-release| sed 's/VERSION_ID=//')
+    version=$(echo ${version1:1:-1})
+    echo ${version}
+}
+
 # 获取Debian版本
 function get_debian_version()
 {
