@@ -8,6 +8,11 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "../misc/lv_area.h"
+#include "lv_obj_draw.h"
+#include "lv_obj_class.h"
+#include "../hal/lv_hal_indev.h"
+
 struct _lv_obj_t;
 struct _lv_event_dsc_t;
 

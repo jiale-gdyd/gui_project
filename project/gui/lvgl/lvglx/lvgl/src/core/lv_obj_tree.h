@@ -8,6 +8,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "../misc/lv_anim.h"
+#include "../hal/lv_hal_disp.h"
+
 struct _lv_obj_t;
 struct _lv_obj_class_t;
 

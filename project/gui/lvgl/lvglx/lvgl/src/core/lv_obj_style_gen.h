@@ -1,6 +1,10 @@
 #ifndef LV_OBJ_STYLE_GEN_H
 #define LV_OBJ_STYLE_GEN_H
 
+#include "../misc/lv_area.h"
+#include "../misc/lv_style.h"
+#include "../core/lv_obj_style.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
