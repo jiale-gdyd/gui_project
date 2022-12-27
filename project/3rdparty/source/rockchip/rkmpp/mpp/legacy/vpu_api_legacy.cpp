@@ -639,6 +639,8 @@ static void setup_video_frame_meta(VideoFrame_t *videoFrame, MppFrame mframe)
         videoFrame->hdrInfo.offset = offset;
         videoFrame->hdrInfo.size = size;
     }
+
+    videoFrame->viewId = mpp_frame_get_viewid(mframe);
 }
 
 RK_S32 VpuApiLegacy::decode(VpuCodecContext *ctx, VideoPacket_t *pkt, DecoderOut_t *aDecOut)
@@ -1715,6 +1717,9 @@ RK_S32 VpuApiLegacy::control(VpuCodecContext *ctx, VPU_API_CMD cmd, void *param)
     } break;
     case VPU_API_SET_PARSER_SPLIT_MODE: {
         mpicmd = MPP_DEC_SET_PARSER_SPLIT_MODE;
+    } break;
+    case VPU_API_DEC_EN_MVC: {
+        mpicmd = MPP_DEC_SET_ENABLE_MVC;
     } break;
     default: {
     } break;

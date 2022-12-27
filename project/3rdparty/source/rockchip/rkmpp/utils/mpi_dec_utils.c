@@ -50,6 +50,7 @@ typedef struct FileReader_t {
     FILE            *fp_input;
     size_t          file_size;
 
+    MppCodingType   type;
     FileType        file_type;
     char            *buf;
     size_t          buf_size;
@@ -205,7 +206,7 @@ static FileBufSlot *read_normal_file(FileReader data)
     return slot;
 }
 
-static void check_file_type(FileReader data, char *file_in)
+static void check_file_type(FileReader data, char *file_in, MppCodingType type)
 {
     FileReaderImpl *impl = (FileReaderImpl*)data;
 
@@ -221,7 +222,8 @@ static void check_file_type(FileReader data, char *file_in)
         impl->read_total = impl->seek_base;
     } else if (strstr(file_in, ".jpg") ||
                strstr(file_in, ".jpeg") ||
-               strstr(file_in, ".mjpeg")) {
+               strstr(file_in, ".mjpeg") ||
+               type == MPP_VIDEO_CodingMJPEG) {
         impl->file_type     = FILE_JPEG_TYPE;
         impl->buf_size      = impl->file_size;
         impl->stuff_size    = 0;
@@ -322,7 +324,7 @@ void reader_rewind(FileReader reader)
     impl->slot_rd_idx = 0;
 }
 
-void reader_init(FileReader* reader, char* file_in)
+void reader_init(FileReader* reader, char* file_in, MppCodingType type)
 {
     FILE *fp_input = fopen(file_in, "rb");
     FileReaderImpl *impl = NULL;
@@ -341,7 +343,7 @@ void reader_init(FileReader* reader, char* file_in)
     impl->file_size = ftell(fp_input);
     fseek(fp_input, 0L, SEEK_SET);
 
-    check_file_type(impl, file_in);
+    check_file_type(impl, file_in, type);
 
     impl->slots = mpp_calloc(FileBufSlot*, impl->slot_max);
 
@@ -442,7 +444,8 @@ RK_S32 mpi_dec_opt_i(void *ctx, const char *next)
     if (next) {
         strncpy(cmd->file_input, next, MAX_FILE_NAME_LENGTH - 1);
         cmd->have_input = 1;
-        name_to_coding_type(cmd->file_input, &cmd->type);
+        if (!cmd->type)
+            name_to_coding_type(cmd->file_input, &cmd->type);
         return 1;
     }
 
@@ -682,7 +685,7 @@ RK_S32 mpi_dec_test_cmd_init(MpiDecTestCmd* cmd, int argc, char **argv)
     ret = mpp_opt_parse(opts, argc, argv);
 
     if (cmd->have_input) {
-        reader_init(&cmd->reader, cmd->file_input);
+        reader_init(&cmd->reader, cmd->file_input, cmd->type);
         if (cmd->reader)
             mpp_log("input file %s size %ld\n", cmd->file_input, reader_size(cmd->reader));
     }

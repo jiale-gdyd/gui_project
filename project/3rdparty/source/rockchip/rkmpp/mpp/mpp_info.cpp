@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2022-12-12 [hal_jpege]: Fix crop freeze error";
+static const char *mpp_last_commit_message = "2022-12-26 [vpu_api]: modify struct VideoFrame";
 
 void show_mpp_version(void)
 {

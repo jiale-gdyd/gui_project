@@ -265,8 +265,6 @@ typedef struct h264_dpb_mark_t {
     RK_U8    mark_idx;
     MppFrame mframe;
     RK_S32   slot_idx;
-    RK_S32   poc;
-    RK_S64   pts;
     struct h264_store_pic_t *pic;
 } H264_DpbMark_t;
 
@@ -389,6 +387,7 @@ typedef struct h264_frame_store_t {
 typedef struct h264_dpb_buf_t {
     RK_U32   size;
     RK_U32   used_size;
+    RK_U32   allocated_size;
     RK_U32   ref_frames_in_buffer;
     RK_U32   ltref_frames_in_buffer;
     RK_U32   used_size_il;
@@ -892,7 +891,6 @@ typedef struct h264d_input_ctx_t {
     RK_S64 in_pts;
     RK_S64 in_dts;
     RK_U8  has_get_eos;
-    RK_U32 mvc_disable;
     //!< output data
     RK_U8  task_valid;
     RK_U32 task_eos;

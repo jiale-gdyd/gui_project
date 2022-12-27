@@ -102,6 +102,7 @@ typedef enum VPU_API_CMD {
     VPU_API_DEC_OUT_FRM_STRUCT_TYPE,
     VPU_API_DEC_EN_THUMBNAIL,
     VPU_API_DEC_EN_HDR_META,
+    VPU_API_DEC_EN_MVC,
 
     VPU_API_ENC_VEPU22_START = 0x2000,
     VPU_API_ENC_SET_VEPU22_CFG,
@@ -194,7 +195,8 @@ typedef struct VideoFrame {
     VPU_FRAME        vpuFrame;
     FrameThumbInfo_t thumbInfo;
     FrameHdrInfo_t   hdrInfo;
-    RK_U32          *reserved[4];
+    RK_U32           viewId;
+    RK_U32           reserved[16];
 } VideoFrame_t;
 
 typedef struct VideoPacket {

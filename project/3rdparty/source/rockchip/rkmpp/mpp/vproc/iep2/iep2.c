@@ -40,9 +40,18 @@
 
 #define IEP2_TILE_W_MAX     120
 #define IEP2_TILE_H_MAX     480
+#define IEP2_OSD_EN         0
 
 RK_U32 iep_debug = 0;
 RK_U32 iep_md_pre_en = 0;
+
+/* default iep2 mtn table */
+static RK_U32 iep2_mtn_tab[] = {
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x01010000, 0x06050302, 0x0f0d0a08, 0x1c191512,
+    0x2b282420, 0x3634312e, 0x3d3c3a38, 0x40403f3e,
+    0x40404040, 0x40404040, 0x40404040, 0x40404040
+};
 
 static MPP_RET get_param_from_env(struct iep2_api_ctx *ctx)
 {
@@ -147,7 +156,8 @@ static MPP_RET iep2_init(IepCtx *ictx)
 
     ctx->params.ble_backtoma_num = 1;
 
-    ctx->params.mtn_en = 0;
+    ctx->params.mtn_en = 1;
+    memcpy(ctx->params.mtn_tab, iep2_mtn_tab, sizeof(ctx->params.mtn_tab));
 
     ctx->params.roi_en = 0;
     ctx->params.roi_layer_num = 0;
@@ -219,13 +229,20 @@ static MPP_RET iep2_deinit(IepCtx ictx)
 
 static MPP_RET iep2_done(struct iep2_api_ctx *ctx)
 {
+    iep_dbg_trace("deinterlace detect osd cnt %d, combo %d\n",
+                  ctx->output.dect_osd_cnt,
+                  ctx->output.out_osd_comb_cnt);
 
     if (ctx->params.dil_mode == IEP2_DIL_MODE_I5O2 ||
         ctx->params.dil_mode == IEP2_DIL_MODE_I5O1T ||
         ctx->params.dil_mode == IEP2_DIL_MODE_I5O1B) {
         struct mv_list ls;
 
+#if IEP2_OSD_EN
         iep2_set_osd(ctx, &ls);
+#else
+        memset(&ls, 0, sizeof(struct mv_list));
+#endif
         iep2_update_gmv(ctx, &ls);
         iep2_check_ffo(ctx);
         iep2_check_pd(ctx);
@@ -299,6 +316,9 @@ static void iep2_set_param(struct iep2_api_ctx *ctx,
             ctx->params.dil_field_order = param->mode.dil_order;
         }
 
+        iep_dbg_trace("deinterlace, mode %d, out mode %d, fo_detected %d, dil_order %d\n",
+                      param->mode.dil_mode, param->mode.out_mode, ctx->ff_inf.fo_detected, param->mode.dil_order);
+
         if (param->mode.dil_order == IEP2_FIELD_ORDER_UND) {
             ctx->ff_inf.frm_offset = 6;
             ctx->ff_inf.fie_offset = 0;
@@ -307,7 +327,7 @@ static void iep2_set_param(struct iep2_api_ctx *ctx,
             ctx->ff_inf.fie_offset = 10;
         }
 
-        if (param->mode.dil_order == 0) {
+        if (param->mode.dil_order == IEP2_FIELD_ORDER_TFF) {
             ctx->ff_inf.tff_offset = 3;
             ctx->ff_inf.bff_offset = 0;
         } else {
@@ -450,6 +470,7 @@ static MPP_RET iep2_control(IepCtx ictx, IepCmd cmd, void *iparam)
             inf->dil_order = ctx->params.dil_field_order;
             inf->frm_mode = ctx->ff_inf.is_frm;
             inf->pd_types = ctx->pd_inf.pdtype;
+            inf->dil_order_confidence_ratio = ctx->ff_inf.fo_ratio_avg;
         }
     }
     break;
