@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <linux/stddef.h>
 
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/RgaUtils.h>
 #include <rockchip/rkrgax/NormalRga.h>
 #include <rockchip/rkrgax/RockchipRga.h>
@@ -113,7 +114,7 @@ int get_string_by_format(char *value, int format)
     if (strcmp(name, "unknown") != 0) {
         memcpy(value, name, strlen(name) + 1);
     } else {
-        printf("Is unsupport format now, please fix");
+        rga_error("Is unsupport format now, please fix");
         return -EINVAL;
     }
 
@@ -203,7 +204,7 @@ float get_bpp_from_format(int format)
             break;
 
         default:
-            printf("Is unsupport format now, please fix \n");
+            rga_error("Is unsupport format now, please fix");
             return 0;
     }
 
@@ -279,7 +280,7 @@ int get_perPixel_stride_from_format(int format)
             return (4 * 8);
 
         default:
-            printf("Is unsupport format now, please fix\n");
+            rga_error("Is unsupport format now, please fix");
             return 0;
     }
 }
@@ -302,7 +303,7 @@ int get_buf_from_file(void *buf, int f, int sw, int sh, int index)
 
     FILE *file = fopen(filePath, "rb");
     if (!file) {
-        fprintf(stderr, "Could not open %s\n", filePath);
+        rga_error("Could not open %s", filePath);
         return -EINVAL;
     }
 
@@ -323,7 +324,7 @@ int get_buf_from_file_FBC(void *buf, int f, int sw, int sh, int index)
 
     FILE *file = fopen(filePath, "rb");
     if (!file) {
-        fprintf(stderr, "Could not open %s\n", filePath);
+        rga_error("Could not open %s", filePath);
         return -EINVAL;
     }
 
@@ -342,10 +343,10 @@ int output_buf_data_to_file(void *buf, int f, int sw, int sh, int index)
 
     FILE *file = fopen(filePath, "wb+");
     if (!file) {
-        fprintf(stderr, "Could not open %s\n", filePath);
+        rga_error("Could not open %s", filePath);
         return false;
     } else {
-        fprintf(stderr, "open %s and write ok\n", filePath);
+        rga_info("open %s and write ok", filePath);
     }
 
     fwrite(buf, get_buf_size_by_w_h_f(sw, sh, f), 1, file);
@@ -365,10 +366,10 @@ int output_buf_data_to_file_FBC(void *buf, int f, int sw, int sh, int index)
 
     FILE *file = fopen(filePath, "wb+");
     if (!file) {
-        fprintf(stderr, "Could not open %s\n", filePath);
+        rga_error("Could not open %s", filePath);
         return false;
     } else {
-        fprintf(stderr, "open %s and write ok\n", filePath);
+        rga_info("open %s and write ok", filePath);
     }
 
     fwrite(buf, get_buf_size_by_w_h_f(sw, sh, f) * 1.5, 1, file);

@@ -4,7 +4,6 @@
 #include "rga.h"
 
 #define __DEBUG         0
-#define ALOGE(...)      { printf(__VA_ARGS__); printf("\n"); }
 
 struct rgaContext {
     int                      rgaFd;

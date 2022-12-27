@@ -3,16 +3,13 @@
 #include <sys/ioctl.h>
 
 #include <rockchip/rkrgax/im2d.hpp>
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/RgaUtils.h>
 #include <rockchip/rkrgax/rga_sync.h>
 #include <rockchip/rkrgax/NormalRga.h>
 #include <rockchip/rkrgax/RockchipRga.h>
 #include <rockchip/rkrgax/im2d_common.h>
 #include <rockchip/rkrgax/im2d_hardware.h>
-
-#ifndef ALOGE
-#define ALOGE(...)                      { printf(__VA_ARGS__); printf("\n"); }
-#endif
 
 __thread im_context_t g_im2d_context;
 __thread char rga_err_str[ERR_MSG_LEN] = "The current error message is empty!";
@@ -313,7 +310,7 @@ const char *querystring(int name)
     memset(&rga_info, 0x0, sizeof(rga_info));
     usage = rga_get_info(&rga_info);
     if (IM_STATUS_FAILED == usage) {
-        ALOGE("rga im2d: rga2 get info failed!\n");
+        rga_error("rga im2d: rga2 get info failed");
         return "get info failed";
     }
 
@@ -628,7 +625,7 @@ IM_STATUS imcheck_t(const rga_buffer_t src, const rga_buffer_t dst, const rga_bu
     memset(&rga_info, 0x0, sizeof(rga_info));
     ret = rga_get_info(&rga_info);
     if (IM_STATUS_FAILED == ret) {
-        ALOGE("rga im2d: rga2 get info failed!\n");
+        rga_error("rga im2d: rga2 get info failed");
         return IM_STATUS_FAILED;
     }
 
@@ -757,7 +754,7 @@ IM_STATUS imresize(const rga_buffer_t src, rga_buffer_t dst, double fx, double f
 
             ret = imcheck(src, dst, srect, drect, usage);
             if (ret != IM_STATUS_NOERROR) {
-                ALOGE("imresize error, factor[fx,fy]=[%lf,%lf], ALIGN[dw,dh]=[%d,%d][%d,%d]", fx, fy, width, height, dst.width, dst.height);
+                rga_error("imresize error, factor[fx,fy]=[%lf,%lf], ALIGN[dw,dh]=[%d,%d][%d,%d]", fx, fy, width, height, dst.width, dst.height);
                 return ret;
             }
         }
@@ -1244,7 +1241,7 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
         }
 
         if (srcinfo.rotation == 0) {
-            ALOGE("rga_im2d: Could not find rotate/flip usage : 0x%x \n", usage);
+            rga_error("rga_im2d: Could not find rotate/flip usage : 0x%x", usage);
         }
     }
 
@@ -1286,7 +1283,7 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
         }
 
         if (srcinfo.blend == 0) {
-            ALOGE("rga_im2d: Could not find blend usage : 0x%x \n", usage);
+            rga_error("rga_im2d: Could not find blend usage : 0x%x", usage);
         }
 
         if (src.global_alpha > 0) {
@@ -1577,15 +1574,13 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
 
     if (ret) {
         imSetErrorMsg("Failed to call RockChipRga interface, query log to find the cause of failure.");
-        ALOGE("srect[x,y,w,h] = [%d, %d, %d, %d] src[w,h,ws,hs] = [%d, %d, %d, %d]\n", srect.x, srect.y, srect.width, srect.height, src.width, src.height, src.wstride, src.hstride);
+        rga_error("srect[x,y,w,h] = [%d, %d, %d, %d] src[w,h,ws,hs] = [%d, %d, %d, %d]", srect.x, srect.y, srect.width, srect.height, src.width, src.height, src.wstride, src.hstride);
 
         if (rga_is_buffer_valid(pat)) {
-           ALOGE("s1/prect[x,y,w,h] = [%d, %d, %d, %d] src1/pat[w,h,ws,hs] = [%d, %d, %d, %d]\n", prect.x, prect.y, prect.width, prect.height, pat.width, pat.height, pat.wstride, pat.hstride);
+           rga_error("s1/prect[x,y,w,h] = [%d, %d, %d, %d] src1/pat[w,h,ws,hs] = [%d, %d, %d, %d]", prect.x, prect.y, prect.width, prect.height, pat.width, pat.height, pat.wstride, pat.hstride);
         }
 
-        ALOGE("drect[x,y,w,h] = [%d, %d, %d, %d] dst[w,h,ws,hs] = [%d, %d, %d, %d]\n", drect.x, drect.y, drect.width, drect.height, dst.width, dst.height, dst.wstride, dst.hstride);
-        ALOGE("usage[0x%x]", usage);
-
+        rga_error("drect[x,y,w,h] = [%d, %d, %d, %d] dst[w,h,ws,hs] = [%d, %d, %d, %d] usage[0x%x]", drect.x, drect.y, drect.width, drect.height, dst.width, dst.height, dst.wstride, dst.hstride, usage);
         return IM_STATUS_FAILED;
     }
 
@@ -1602,7 +1597,7 @@ IM_STATUS imsync(int fence_fd)
 
     ret = rga_sync_wait(fence_fd, -1);
     if (ret) {
-        ALOGE("Failed to wait for out fence = %d, ret = %d", fence_fd, ret);
+        rga_error("Failed to wait for out fence = %d, ret = %d", fence_fd, ret);
         return IM_STATUS_FAILED;
     }
 
@@ -1618,7 +1613,7 @@ IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value)
             if (value & IM_SCHEDULER_MASK) {
                 g_im2d_context.core = (IM_SCHEDULER_CORE)value;
             } else {
-                ALOGE("IM2D: It's not legal rga_core, it needs to be a 'IM_SCHEDULER_CORE'.");
+                rga_error("IM2D: It's not legal rga_core, it needs to be a 'IM_SCHEDULER_CORE'.");
                 return IM_STATUS_ILLEGAL_PARAM;
             }
             break;
@@ -1627,7 +1622,7 @@ IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value)
             if ((value > 0) && (value <= 6)) {
                 g_im2d_context.priority = (int)value;
             } else {
-                ALOGE("IM2D: It's not legal priority, it needs to be a 'int', and it should be in the range of 0~6.");
+                rga_error("IM2D: It's not legal priority, it needs to be a 'int', and it should be in the range of 0~6.");
                 return IM_STATUS_ILLEGAL_PARAM;
             }
             break;
@@ -1636,13 +1631,13 @@ IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value)
             if ((value == false) || (value == true)) {
                 g_im2d_context.check_mode = (bool)value;
             } else {
-                ALOGE("IM2D: It's not legal check config, it needs to be a 'bool'.");
+                rga_error("IM2D: It's not legal check config, it needs to be a 'bool'.");
                 return IM_STATUS_ILLEGAL_PARAM;
             }
             break;
 
         default:
-            ALOGE("IM2D: Unsupported config name!");
+            rga_error("IM2D: Unsupported config name!");
             return IM_STATUS_NOT_SUPPORTED;
     }
 

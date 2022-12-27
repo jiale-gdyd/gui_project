@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 
 #include <rockchip/rkrgax/im2d.h>
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/im2d_common.h>
 #include <rockchip/rkrgax/im2d_hardware.h>
 
@@ -34,7 +35,7 @@ static IM_STATUS rga_get_context(void)
     if (rgaCtx == NULL) {
         RockchipRga &rkRga(RockchipRga::get());
         if (rgaCtx == NULL) {
-            ALOGE("rga_im2d: The current RockchipRga singleton is destroyed. Please check if RkRgaInit/RkRgaDeInit are called, if so, please disable them.");
+            rga_error("rga_im2d: The current RockchipRga singleton is destroyed. Please check if RkRgaInit/RkRgaDeInit are called, if so, please disable them.");
             imSetErrorMsg("The current RockchipRga singleton is destroyed. Please check if RkRgaInit/RkRgaDeInit are called, if so, please disable them.");
             return IM_STATUS_FAILED;
         }
@@ -46,7 +47,7 @@ static IM_STATUS rga_get_context(void)
 static IM_STATUS rga_support_info_merge_table(rga_info_table_entry *dst_table, rga_info_table_entry *merge_table)
 {
     if ((dst_table == NULL) || (merge_table == NULL)) {
-        ALOGE("%s[%d] dst or merge table is NULL!\n", __FUNCTION__, __LINE__);
+        rga_error("dst or merge table is NULL");
         return IM_STATUS_FAILED;
     }
 
@@ -145,7 +146,7 @@ void empty_structure(rga_buffer_t *src, rga_buffer_t *dst, rga_buffer_t *pat, im
 IM_STATUS rga_set_buffer_info(rga_buffer_t dst, rga_info_t* dstinfo)
 {
     if (NULL == dstinfo) {
-        ALOGE("rga_im2d: invaild dstinfo");
+        rga_error("rga_im2d: invaild dstinfo");
         imSetErrorMsg("Dst structure address is NULL.");
         return IM_STATUS_INVALID_PARAM;
     }
@@ -161,7 +162,7 @@ IM_STATUS rga_set_buffer_info(rga_buffer_t dst, rga_info_t* dstinfo)
         dstinfo->virAddr = dst.vir_addr;
         dstinfo->mmuFlag = 1;
     } else {
-        ALOGE("rga_im2d: invaild dst buffer");
+        rga_error("rga_im2d: invaild dst buffer");
         imSetErrorMsg("No address available in dst buffer, phy_addr = %ld, fd = %d, vir_addr = %ld, handle = %d", (unsigned long)dst.phy_addr, dst.fd, (unsigned long)dst.vir_addr, dst.handle);
         return IM_STATUS_INVALID_PARAM;
     }
@@ -172,13 +173,13 @@ IM_STATUS rga_set_buffer_info(rga_buffer_t dst, rga_info_t* dstinfo)
 IM_STATUS rga_set_buffer_info(const rga_buffer_t src, rga_buffer_t dst, rga_info_t* srcinfo, rga_info_t* dstinfo)
 {
     if (NULL == srcinfo) {
-        ALOGE("rga_im2d: invaild srcinfo");
+        rga_error("rga_im2d: invaild srcinfo");
         imSetErrorMsg("Src structure address is NULL.");
         return IM_STATUS_INVALID_PARAM;
     }
 
     if (NULL == dstinfo) {
-        ALOGE("rga_im2d: invaild dstinfo");
+        rga_error("rga_im2d: invaild dstinfo");
         imSetErrorMsg("Dst structure address is NULL.");
         return IM_STATUS_INVALID_PARAM;
     }
@@ -194,7 +195,7 @@ IM_STATUS rga_set_buffer_info(const rga_buffer_t src, rga_buffer_t dst, rga_info
         srcinfo->virAddr = src.vir_addr;
         srcinfo->mmuFlag = 1;
     } else {
-        ALOGE("rga_im2d: invaild src buffer");
+        rga_error("rga_im2d: invaild src buffer");
         imSetErrorMsg("No address available in src buffer, phy_addr = %ld, fd = %d, vir_addr = %ld, handle = %d", (unsigned long)src.phy_addr, src.fd, (unsigned long)src.vir_addr, src.handle);
         return IM_STATUS_INVALID_PARAM;
     }
@@ -210,7 +211,7 @@ IM_STATUS rga_set_buffer_info(const rga_buffer_t src, rga_buffer_t dst, rga_info
         dstinfo->virAddr = dst.vir_addr;
         dstinfo->mmuFlag = 1;
     } else {
-        ALOGE("rga_im2d: invaild dst buffer");
+        rga_error("rga_im2d: invaild dst buffer");
         imSetErrorMsg("No address available in dst buffer, phy_addr = %ld, fd = %d, vir_addr = %ld, handle = %d", (unsigned long)dst.phy_addr, dst.fd, (unsigned long)dst.vir_addr, dst.handle);
         return IM_STATUS_INVALID_PARAM;
     }
@@ -363,7 +364,7 @@ TRY_TO_COMPATIBLE:
     memcpy(return_table, &hw_info_table[rga_version], sizeof(rga_info_table_entry));
 
     if (rga_version == IM_RGA_HW_VERSION_RGA_V_ERR_INDEX) {
-        ALOGE("rga_im2d: Can not get the correct RGA version, please check the driver, version=%s\n", rgaCtx->mHwVersions.version[0].str);
+        rga_error("rga_im2d: Can not get the correct RGA version, please check the driver, version=%s", rgaCtx->mHwVersions.version[0].str);
         imSetErrorMsg("Can not get the correct RGA version, please check the driver, version=%s", rgaCtx->mHwVersions.version[0].str);
         return IM_STATUS_FAILED;
     }
@@ -377,7 +378,7 @@ IM_STATUS rga_check_driver(void)
     int table_size, bind_index, least_index;
 
     if (rgaCtx == NULL) {
-        ALOGE("rga context is NULL!");
+        rga_error("rga context is NULL!");
         imSetErrorMsg("rga context is NULL!");
         return IM_STATUS_FAILED;
     }
@@ -417,19 +418,19 @@ IM_STATUS rga_check_driver(void)
                     }
                 }
 
-                ALOGE("The librga needs to be updated to version %s at least. current version: librga %s, driver %s.", driver_bind_table[least_index].user.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
+                rga_error("The librga needs to be updated to version %s at least. current version: librga %s, driver %s.", driver_bind_table[least_index].user.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
                 imSetErrorMsg("The librga needs to be updated to version %s at least. current version: librga %s, driver %s.", driver_bind_table[least_index].user.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
 
                 return IM_STATUS_ERROR_VERSION;
             }
         } else {
-            ALOGE("The driver may be compatible, but it is best to update the driver to version %s. current version: librga %s, driver %s.", driver_bind_table[bind_index].driver.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
+            rga_error("The driver may be compatible, but it is best to update the driver to version %s. current version: librga %s, driver %s.", driver_bind_table[bind_index].driver.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
             imSetErrorMsg("The driver may be compatible, but it is best to update the driver to version %s. current version: librga %s, driver %s.", driver_bind_table[bind_index].driver.str, RGA_API_VERSION, rgaCtx->mDriverVersion.str);
 
             return IM_STATUS_NOERROR;
         }
     } else {
-        ALOGE("Failed to get the version binding table of librga, current version: librga: %s, driver: %s", RGA_API_VERSION, rgaCtx->mDriverVersion.str);
+        rga_error("Failed to get the version binding table of librga, current version: librga: %s, driver: %s", RGA_API_VERSION, rgaCtx->mDriverVersion.str);
         imSetErrorMsg("Failed to get the version binding table of librga, current version: librga: %s, driver: %s", RGA_API_VERSION, rgaCtx->mDriverVersion.str);
 
         return IM_STATUS_ERROR_VERSION;
@@ -613,7 +614,7 @@ IM_STATUS rga_check_format(const char *name, rga_buffer_t info, im_rect rect, in
             return ret;
         }
 
-        ALOGE("If it is an RK encoder output, it needs to be aligned with an odd multiple of 256.\n");
+        rga_warn("If it is an RK encoder output, it needs to be aligned with an odd multiple of 256");
     } else if ((format == RK_FORMAT_YCrCb_422_10b_SP) || (format == RK_FORMAT_YCbCr_422_10b_SP)) {
         if (~format_usage & IM_RGA_SUPPORT_FORMAT_YUV_422_SEMI_PLANNER_10_BIT) {
             imSetErrorMsg("%s unsupported YUV422 semi-planner 10bit format, format = 0x%x(%s)\n%s", name, info.format, translate_format_str(info.format), querystring((strcmp("dst", name) == 0) ? RGA_OUTPUT_FORMAT : RGA_INPUT_FORMAT));
@@ -625,7 +626,7 @@ IM_STATUS rga_check_format(const char *name, rga_buffer_t info, im_rect rect, in
             return ret;
         }
 
-        ALOGE("If it is an RK encoder output, it needs to be aligned with an odd multiple of 256.\n");
+        rga_warn("If it is an RK encoder output, it needs to be aligned with an odd multiple of 256");
     } else if (format == RK_FORMAT_YUYV_420
         || format == RK_FORMAT_YVYU_420
         || format == RK_FORMAT_UYVY_420
@@ -974,8 +975,7 @@ im_ctx_id_t rga_begin_job(uint32_t flags)
     }
 
     if (ioctl(rgaCtx->rgaFd, RGA_START_CONFIG, &flags) < 0) {
-        printf(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+        rga_error("start config fail: %s", strerror(errno));
         return IM_STATUS_FAILED;
     }
 
@@ -989,9 +989,7 @@ IM_STATUS rga_cancel(im_ctx_id_t id)
     }
 
     if (ioctl(rgaCtx->rgaFd, RGA_CANCEL_CONFIG, &id) < 0) {
-        printf(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-
+        rga_error("start config fail: %s", strerror(errno));
         return IM_STATUS_FAILED;
     }
 

@@ -18,6 +18,7 @@
 #include <libdrm/xf86drm.h>
 #include <libdrm/drm/drm_mode.h>
 
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/NormalRga.h>
 #include <rockchip/rkrgax/RockchipRga.h>
 #include <rockchip/rkrgax/im2d.h>
@@ -27,7 +28,7 @@ RGA_SINGLETON_STATIC_INSTANCE(RockchipRga)
 RockchipRga::RockchipRga() : mSupportRga(false), mLogOnce(0), mLogAlways(0), mContext(NULL) 
 {
     RkRgaInit();
-    ALOGE("%s", RGA_API_FULL_VERSION);
+    rga_info("%s", RGA_API_FULL_VERSION);
 }
 
 RockchipRga::~RockchipRga()
@@ -81,7 +82,7 @@ int RockchipRga::RkRgaAllocBuffer(int drm_fd, bo_t *bo_info, int width, int heig
 
     ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_CREATE_DUMB, &arg);
     if (ret) {
-        fprintf(stderr, "failed to create dumb buffer: %s\n", strerror(errno));
+        rga_error("failed to create dumb buffer: %s", strerror(errno));
         return ret;
     }
 
@@ -109,7 +110,7 @@ int RockchipRga::RkRgaFreeBuffer(int drm_fd, bo_t *bo_info)
     arg.handle = bo_info->handle;
     ret = drmIoctl(drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &arg);
     if (ret) {
-        fprintf(stderr, "failed to destroy dumb buffer: %s\n", strerror(errno));
+        rga_error("failed to destroy dumb buffer: %s", strerror(errno));
         return -errno;
     }
 
@@ -135,7 +136,7 @@ int RockchipRga::RkRgaGetAllocBufferExt(bo_t *bo_info, int width, int height, in
     bo_info->handle = 0;
     drm_fd = open(card, flag);
     if (drm_fd < 0) {
-        fprintf(stderr, "Fail to open %s: %m\n", card);
+        rga_error("Fail to open %s: %m", card);
         return -errno;
     }
 
@@ -226,7 +227,7 @@ int RockchipRga::RkRgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         RkRgaLogOutUserPara(dst);
         RkRgaLogOutUserPara(src1);
 
-        ALOGE("This output the user patamaters when rga call blit fail");
+        rga_error("This output the user patamaters when rga call blit fail");
     }
 
     return ret;
@@ -236,7 +237,7 @@ int RockchipRga::RkRgaFlush()
 {
     int ret = RgaFlush();
     if (ret) {
-        ALOGE("RgaFlush Failed");
+        rga_error("RgaFlush Failed");
     }
 
     return ret;
@@ -255,7 +256,7 @@ int RockchipRga::RkRgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
         RkRgaLogOutUserPara(src);
         RkRgaLogOutUserPara(dst);
 
-        ALOGE("This output the user patamaters when rga call CollorPalette fail");
+        rga_error("This output the user patamaters when rga call CollorPalette fail");
     }
 
     return ret;
@@ -267,9 +268,9 @@ int RockchipRga::RkRgaLogOutUserPara(rga_info *rgaInfo)
         return -EINVAL;
     }
 
-    ALOGE("fd-vir-phy-hnd-format[%d, %p, %p, %lx, %d]", rgaInfo->fd, rgaInfo->virAddr, rgaInfo->phyAddr, (unsigned long)rgaInfo->hnd, rgaInfo->format);
-    ALOGE("rect[%d, %d, %d, %d, %d, %d, %d, %d]", rgaInfo->rect.xoffset, rgaInfo->rect.yoffset, rgaInfo->rect.width,   rgaInfo->rect.height, rgaInfo->rect.wstride, rgaInfo->rect.hstride, rgaInfo->rect.format, rgaInfo->rect.size);
-    ALOGE("f-blend-size-rotation-col-log-mmu[%d, %x, %d, %d, %d, %d, %d]", rgaInfo->format, rgaInfo->blend, rgaInfo->bufferSize, rgaInfo->rotation, rgaInfo->color, rgaInfo->testLog, rgaInfo->mmuFlag);
+    rga_info("fd-vir-phy-hnd-format[%d, %p, %p, %lx, %d]", rgaInfo->fd, rgaInfo->virAddr, rgaInfo->phyAddr, (unsigned long)rgaInfo->hnd, rgaInfo->format);
+    rga_info("rect[%d, %d, %d, %d, %d, %d, %d, %d]", rgaInfo->rect.xoffset, rgaInfo->rect.yoffset, rgaInfo->rect.width,   rgaInfo->rect.height, rgaInfo->rect.wstride, rgaInfo->rect.hstride, rgaInfo->rect.format, rgaInfo->rect.size);
+    rga_info("f-blend-size-rotation-col-log-mmu[%d, %x, %d, %d, %d, %d, %d]", rgaInfo->format, rgaInfo->blend, rgaInfo->bufferSize, rgaInfo->rotation, rgaInfo->color, rgaInfo->testLog, rgaInfo->mmuFlag);
 
     return 0;
 }

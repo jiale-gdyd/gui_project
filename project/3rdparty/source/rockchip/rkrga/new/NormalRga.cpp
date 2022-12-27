@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <sys/ioctl.h>
 
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/NormalRga.h>
 #include <rockchip/rkrgax/NormalRgaContext.h>
 
@@ -42,14 +43,14 @@ int NormalRgaOpen(void **context)
         ctx = (struct rgaContext *)malloc(sizeof(struct rgaContext));
         if(!ctx) {
             ret = -ENOMEM;
-            ALOGE("malloc fail:%s.",strerror(errno));
+            rga_error("malloc fail:%s.", strerror(errno));
             goto mallocErr;
         }
 
         fd = open("/dev/rga", O_RDWR, 0);
         if (fd < 0) {
             ret = -ENODEV;
-            ALOGE("failed to open RGA:%s.",strerror(errno));
+            rga_error("failed to open RGA:%s.", strerror(errno));
             goto rgaOpenErr;
         }
         ctx->rgaFd = fd;
@@ -58,20 +59,20 @@ int NormalRgaOpen(void **context)
         if (ret >= 0) {
             ret = ioctl(fd, RGA_IOC_GET_HW_VERSION, &ctx->mHwVersions);
             if (ret < 0) {
-                ALOGE("librga fail to get hw versions!\n");
+                rga_error("rga fail to get hw versions");
                 goto getVersionError;
             }
 
             ctx->mVersion = (float)3.2;
         } else {
-            ALOGE("librga fail to get driver version! Legacy mode will be enabled.\n");
+            rga_error("rga fail to get driver version! Legacy mode will be enabled");
 
             ctx->mHwVersions.size = 1;
             ret = ioctl(fd, RGA2_GET_VERSION, ctx->mHwVersions.version[0].str);
             if (ret < 0) {
                 ret = ioctl(fd, RGA_GET_VERSION, ctx->mHwVersions.version[0].str);
                 if (ret < 0) {
-                    ALOGE("librga fail to get RGA2/RGA1 version! %s\n", strerror(ret));
+                    rga_error("rga fail to get RGA2/RGA1 version! %s", strerror(ret));
                     goto getVersionError;
                 }
             }
@@ -89,7 +90,7 @@ int NormalRgaOpen(void **context)
         rgaCtx = ctx;
     } else {
         ctx = rgaCtx;
-        ALOGE("Had init the rga dev ctx = %p",ctx);
+        rga_warn("Had init the rga dev ctx:[%p]",ctx);
     }
 
     pthread_mutex_lock(&mMutex);
@@ -112,22 +113,22 @@ int NormalRgaClose(void **context)
     struct rgaContext *ctx = rgaCtx;
 
     if (!ctx) {
-        ALOGE("Try to exit uninit rgaCtx=%p", ctx);
+        rga_error("Try to exit uninit rgaCtx=%p", ctx);
         return -ENODEV;
     }
 
     if (!*context) {
-        ALOGE("Try to uninit rgaCtx=%p", *context);
+        rga_error("Try to uninit rgaCtx=%p", *context);
         return -ENODEV;
     }
 
     if (*context != ctx) {
-        ALOGE("Try to exit wrong ctx=%p",ctx);
+        rga_error("Try to exit wrong ctx=%p",ctx);
         return -ENODEV;
     }
 
     if (refCount <= 0) {
-        ALOGE("This can not be happened, close before init");
+        rga_error("This can not be happened, close before init");
         return 0;
     }
 
@@ -199,7 +200,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     int srcType, dstType, src1Type, srcMmuFlag, dstMmuFlag, src1MmuFlag;
 
     if (!ctx) {
-        ALOGE("Try to use uninit rgaCtx=%p",ctx);
+        rga_error("Try to use uninit rgaCtx=%p",ctx);
         return -ENODEV;
     }
 
@@ -212,12 +213,12 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     yuvToRgbMode = 0;
 
     if (!src && !dst && !src1) {
-        ALOGE("src = %p, dst = %p, src1 = %p", src, dst, src1);
+        rga_error("src = %p, dst = %p, src1 = %p", src, dst, src1);
         return -EINVAL;
     }
 
     if (!src && !dst) {
-        ALOGE("src = %p, dst = %p", src, dst);
+        rga_error("src = %p, dst = %p", src, dst);
         return -EINVAL;
     }
 
@@ -240,7 +241,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     if (src1) {
         if ((src->handle > 0) && (dst->handle > 0) && (src1->handle > 0)) {
             if ((src->handle <= 0) || (dst->handle <= 0) || (src1->handle <= 0)) {
-                ALOGE("librga only supports the use of handles only or no handles, [src,src1,dst] = [%d, %d, %d]\n", src->handle, src1->handle, dst->handle);
+                rga_error("rga only supports the use of handles only or no handles, [src,src1,dst] = [%d, %d, %d]", src->handle, src1->handle, dst->handle);
                 return -EINVAL;
             }
 
@@ -248,7 +249,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         }
     } else if ((src->handle > 0) && (dst->handle > 0)) {
         if ((src->handle <= 0) || (dst->handle <= 0)) {
-            ALOGE("librga only supports the use of handles only or no handles, [src,dst] = [%d, %d]\n", src->handle, dst->handle);
+            rga_error("rga only supports the use of handles only or no handles, [src,dst] = [%d, %d]", src->handle, dst->handle);
             return -EINVAL;
         }
 
@@ -268,12 +269,12 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     }
 
     if ((srcFd == -1) && !srcBuf) {
-        ALOGE("%d:src has not fd and address for render", __LINE__);
+        rga_error("src has not fd and address for render");
         return ret;
     }
 
     if ((srcFd == 0) && !srcBuf) {
-        ALOGE("srcFd is zero, now driver not support");
+        rga_error("srcFd is zero, now driver not support");
         return -EINVAL;
     }
 
@@ -295,12 +296,12 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         }
 
         if ((src1Fd == -1) && !src1Buf) {
-            ALOGE("%d:src1 has not fd and address for render", __LINE__);
+            rga_error("src1 has not fd and address for render");
             return ret;
         }
 
         if ((src1Fd == 0) && !src1Buf) {
-            ALOGE("src1Fd is zero, now driver not support");
+            rga_error("src1Fd is zero, now driver not support");
             return -EINVAL;
         }
 
@@ -322,12 +323,12 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     }
 
     if ((dstFd == -1) && !dstBuf) {
-        ALOGE("%d:dst has not fd and address for render", __LINE__);
+        rga_error("dst has not fd and address for render");
         return ret;
     }
 
     if ((dstFd == 0) && !dstBuf) {
-        ALOGE("dstFd is zero, now driver not support");
+        rga_error("dstFd is zero, now driver not support");
         return -EINVAL;
     }
 
@@ -431,8 +432,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     if (src) {
         ret = checkRectForRga(relSrcRect);
         if (ret) {
-            printf("Error srcRect\n");
-            ALOGE("[%s,%d]Error srcRect \n", __func__, __LINE__);
+            rga_error("Error srcRect");
             return ret;
         }
     }
@@ -440,8 +440,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     if (src1) {
         ret = checkRectForRga(relSrc1Rect);
         if (ret) {
-            printf("Error src1Rect\n");
-            ALOGE("[%s,%d]Error src1Rect \n", __func__, __LINE__);
+            rga_error("Error src1Rect");
             return ret;
         }
     }
@@ -449,8 +448,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     if (dst) {
         ret = checkRectForRga(relDstRect);
         if (ret) {
-            printf("Error dstRect\n");
-            ALOGE("[%s,%d]Error dstRect \n", __func__, __LINE__);
+            rga_error("Error dstRect");
             return ret;
         }
     }
@@ -464,17 +462,17 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         }
 
         if ((hScale < 1/16) || (hScale > 16) || (vScale < 1/16) || (vScale > 16)) {
-            ALOGE("Error scale[%f,%f] line %d", hScale, vScale, __LINE__);
+            rga_error("Error scale[%f,%f]", hScale, vScale);
             return -EINVAL;
         }
 
         if ((ctx->mVersion <= 2.0) && ((hScale < 1/8) || (hScale > 8) || (vScale < 1/8) || (vScale > 8))) {
-            ALOGE("Error scale[%f,%f] line %d", hScale, vScale, __LINE__);
+            rga_error("Error scale[%f,%f]", hScale, vScale);
             return -EINVAL;
         }
 
         if ((ctx->mVersion <= 1.003) && ((hScale < 1/2) || (vScale < 1/2))) {
-            ALOGE("e scale[%f,%f] ver[%f]", hScale, vScale, ctx->mVersion);
+            rga_error("Error scale[%f,%f] ver[%f]", hScale, vScale, ctx->mVersion);
             return -EINVAL;
         }
     } else if (src && dst) {
@@ -486,17 +484,17 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         }
 
         if ((hScale < 1.0/16) || (hScale > 16) || (vScale < 1.0/16) || (vScale > 16)) {
-            ALOGE("Error scale[%f,%f] line %d", hScale, vScale, __LINE__);
+            rga_error("Error scale[%f,%f]", hScale, vScale);
             return -EINVAL;
         }
 
         if ((ctx->mVersion < 2.0) && ((hScale < 1.0/8) || (hScale > 8) || (vScale < 1.0/8) || (vScale > 8))) {
-            ALOGE("Error scale[%f,%f] line %d", hScale, vScale, __LINE__);
+            rga_error("Error scale[%f,%f]", hScale, vScale);
             return -EINVAL;
         }
 
         if ((ctx->mVersion <= 1.003) && ((hScale < 1.0/2) || (vScale < 1.0/2))) {
-            ALOGE("e scale[%f,%f] ver[%f]", hScale, vScale, ctx->mVersion);
+            rga_error("Error scale[%f,%f] ver[%f]", hScale, vScale, ctx->mVersion);
             return -EINVAL;
         }
     }
@@ -1041,8 +1039,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
 
         ret = ioctl(ctx->rgaFd, RGA_CMD_CONFIG, &cmd_ctx);
         if (ret < 0) {
-            printf(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-            ALOGE(" %s(%d) start config fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+            rga_error("start config fail: %s", strerror(errno));
             return -errno;
         }
     } else {
@@ -1051,8 +1048,7 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
         } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
 
         if (ret) {
-            printf(" %s(%d) RGA_BLIT fail: %s\n", __FUNCTION__, __LINE__, strerror(errno));
-            ALOGE(" %s(%d) RGA_BLIT fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+            rga_error("RGA_BLIT fail: %s", strerror(errno));
             return -errno;
         }
     }
@@ -1065,13 +1061,12 @@ int RgaFlush()
 {
     struct rgaContext *ctx = rgaCtx;
     if (!ctx) {
-        ALOGE("Try to use uninit rgaCtx=%p",ctx);
+        rga_error("Try to use uninit rgaCtx=%p",ctx);
         return -ENODEV;
     }
 
     if (ioctl(ctx->rgaFd, RGA_FLUSH, NULL)) {
-        printf(" %s(%d) RGA_FLUSH fail: %s", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) RGA_FLUSH fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+        rga_error("RGA_FLUSH fail: %s", strerror(errno));
         return -errno;
     }
 
@@ -1095,7 +1090,7 @@ int RgaCollorFill(rga_info *dst)
     int dstVirW, dstVirH, dstActW, dstActH, dstXPos, dstYPos;
 
     if (!ctx) {
-        ALOGE("Try to use uninit rgaCtx=%p",ctx);
+        rga_error("Try to use uninit rgaCtx=%p",ctx);
         return -ENODEV;
     }
 
@@ -1103,7 +1098,7 @@ int RgaCollorFill(rga_info *dst)
     dstType = dstMmuFlag = 0;
 
     if (!dst) {
-        ALOGE("dst = %p", dst);
+        rga_error("dst = %p", dst);
         return -EINVAL;
     }
 
@@ -1134,12 +1129,12 @@ int RgaCollorFill(rga_info *dst)
     }
 
     if (dst && (dstFd == -1) && !dstBuf) {
-        ALOGE("%d:dst has not fd and address for render", __LINE__);
+        rga_error("dst has not fd and address for render");
         return ret;
     }
 
     if (dst && (dstFd == 0) && !dstBuf) {
-        ALOGE("dstFd is zero, now driver not support");
+        rga_error("dstFd is zero, now driver not support");
         return -EINVAL;
     }
 
@@ -1261,8 +1256,7 @@ int RgaCollorFill(rga_info *dst)
     } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
 
     if (ret) {
-        printf(" %s(%d) RGA_COLORFILL fail: %s\n", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) RGA_COLORFILL fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+        rga_error("RGA_COLORFILL fail: %s", strerror(errno));
         return -errno;
     }
 
@@ -1290,7 +1284,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     rga_rect_t relSrcRect, tmpSrcRect, relDstRect, tmpDstRect, relLutRect, tmpLutRect;
 
     if (!ctx) {
-        ALOGE("Try to use uninit rgaCtx=%p",ctx);
+        rga_error("Try to use uninit rgaCtx=%p",ctx);
         return -ENODEV;
     }
 
@@ -1298,7 +1292,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     srcType = dstType = lutType = srcMmuFlag = dstMmuFlag = lutMmuFlag = 0;
 
     if (!src && !dst) {
-        ALOGE("src = %p, dst = %p, lut = %p", src, dst, lut);
+        rga_error("src = %p, dst = %p, lut = %p", src, dst, lut);
         return -EINVAL;
     }
 
@@ -1319,7 +1313,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     if (lut) {
         if ((src->handle > 0) && (dst->handle > 0) && (lut->handle > 0)) {
             if ((src->handle <= 0) || (dst->handle <= 0) || (lut->handle <= 0)) {
-                ALOGE("librga only supports the use of handles only or no handles, [src,lut,dst] = [%d, %d, %d]\n", src->handle, lut->handle, dst->handle);
+                rga_error("rga only supports the use of handles only or no handles, [src,lut,dst] = [%d, %d, %d]", src->handle, lut->handle, dst->handle);
                 return -EINVAL;
             }
 
@@ -1327,7 +1321,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
         }
     } else if ((src->handle > 0) && (dst->handle > 0)) {
         if ((src->handle <= 0) || (dst->handle <= 0)) {
-            ALOGE("librga only supports the use of handles only or no handles, [src,dst] = [%d, %d]\n", src->handle, dst->handle);
+            rga_error("rga only supports the use of handles only or no handles, [src,dst] = [%d, %d]", src->handle, dst->handle);
             return -EINVAL;
         }
 
@@ -1347,12 +1341,12 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     }
 
     if ((srcFd == -1) && !srcBuf) {
-        ALOGE("%d:src has not fd and address for render", __LINE__);
+        rga_error("src has not fd and address for render");
         return ret;
     }
 
     if ((srcFd == 0) && !srcBuf) {
-        ALOGE("srcFd is zero, now driver not support");
+        rga_error("srcFd is zero, now driver not support");
         return -EINVAL;
     }
 
@@ -1373,12 +1367,12 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     }
 
     if ((dstFd == -1) && !dstBuf) {
-        ALOGE("%d:dst has not fd and address for render", __LINE__);
+        rga_error("dst has not fd and address for render");
         return ret;
     }
 
     if ((dstFd == 0) && !dstBuf) {
-        ALOGE("dstFd is zero, now driver not support");
+        rga_error("dstFd is zero, now driver not support");
         return -EINVAL;
     }
 
@@ -1431,8 +1425,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     if (src) {
         ret = checkRectForRga(relSrcRect);
         if (ret) {
-            printf("Error srcRect\n");
-            ALOGE("[%s,%d]Error srcRect \n", __func__, __LINE__);
+            rga_error("Error srcRect");
             return ret;
         }
     }
@@ -1440,8 +1433,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     if (dst) {
         ret = checkRectForRga(relDstRect);
         if (ret) {
-            printf("Error dstRect\n");
-            ALOGE("[%s,%d]Error dstRect \n", __func__, __LINE__);
+            rga_error("Error dstRect");
             return ret;
         }
     }
@@ -1692,7 +1684,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
         rgaReg.render_mode = update_palette_table_mode;
 
         if (ioctl(ctx->rgaFd, RGA_BLIT_SYNC, &rgaReg) != 0) {
-            printf("update palette table mode ioctl err\n");
+            rga_error("update palette table mode ioctl error");
             return -1;
         }
     }
@@ -1705,8 +1697,7 @@ int RgaCollorPalette(rga_info *src, rga_info *dst, rga_info *lut)
     } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
 
     if (ret) {
-        printf(" %s(%d) RGA_COLOR_PALETTE fail: %s\n", __FUNCTION__, __LINE__, strerror(errno));
-        ALOGE(" %s(%d) RGA_COLOR_PALETTE fail: %s", __FUNCTION__, __LINE__, strerror(errno));
+        rga_error("RGA_COLOR_PALETTE fail: %s", strerror(errno));
         return -errno;
     }
 

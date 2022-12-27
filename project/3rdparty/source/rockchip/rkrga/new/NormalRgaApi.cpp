@@ -1,4 +1,5 @@
 #include <rockchip/rkrgax/rga.h>
+#include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/NormalRga.h>
 #include <rockchip/rkrgax/NormalRgaContext.h>
 
@@ -31,7 +32,7 @@ int RkRgaGetRgaFormat(int format)
         }
     }
 
-    ALOGE("%x is unsupport format now,pilese fix.", format);
+    rga_error("%x is unsupport format now,pilese fix.", format);
     return -1;
 }
 
@@ -81,22 +82,22 @@ uint32_t bytesPerPixel(int format)
 int checkRectForRga(rga_rect_t rect)
 {
     if ((rect.xoffset < 0) || (rect.yoffset < 0)) {
-        ALOGE("err offset[%d,%d]", rect.xoffset, rect.yoffset);
+        rga_error("err offset[%d,%d]", rect.xoffset, rect.yoffset);
         return -EINVAL;
     }
 
     if ((rect.width < 2) || (rect.height < 2)) {
-        ALOGE("err act[%d,%d]", rect.width, rect.height);
+        rga_error("err act[%d,%d]", rect.width, rect.height);
         return -EINVAL;
     }
 
     if ((rect.xoffset + rect.width) > rect.wstride) {
-        ALOGE("err ws[%d,%d,%d]", rect.xoffset, rect.width, rect.wstride);
+        rga_error("err ws[%d,%d,%d]", rect.xoffset, rect.width, rect.wstride);
         return -EINVAL;
     }
 
     if ((rect.yoffset + rect.height) > rect.hstride) {
-        ALOGE("err hs[%d,%d,%d]", rect.yoffset, rect.height, rect.hstride);
+        rga_error("err hs[%d,%d,%d]", rect.yoffset, rect.height, rect.hstride);
         return -EINVAL;
     }
 
@@ -104,7 +105,7 @@ int checkRectForRga(rga_rect_t rect)
         && ((rect.wstride % 4) ||(rect.xoffset % 2) || (rect.width % 2)
         || (rect.yoffset % 2) || (rect.height % 2) || (rect.hstride % 2)))
     {
-        ALOGE("err yuv not align to 2");
+        rga_error("err yuv not align to 2");
         return -EINVAL;
     }
 
@@ -823,41 +824,41 @@ int NormalRgaInitTables()
 
 void NormalRgaLogOutRgaReq(struct rga_req rgaReg)
 {
-    ALOGE("render_mode = %d rotate_mode = %d in_fence_fd = %d",
+    rga_info("render_mode = %d rotate_mode = %d in_fence_fd = %d",
         rgaReg.render_mode, rgaReg.rotate_mode, rgaReg.in_fence_fd);
-    ALOGE("src:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
+    rga_info("src:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
         (unsigned long)rgaReg.src.yrgb_addr, (unsigned long)rgaReg.src.uv_addr, (unsigned long)rgaReg.src.v_addr,
         rgaReg.src.x_offset, rgaReg.src.y_offset,
         rgaReg.src.act_w, rgaReg.src.act_h,
         rgaReg.src.vir_w, rgaReg.src.vir_h, rgaReg.src.format, rgaReg.src.rd_mode);
-    ALOGE("dst:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
+    rga_info("dst:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
         (unsigned long)rgaReg.dst.yrgb_addr, (unsigned long)rgaReg.dst.uv_addr, (unsigned long)rgaReg.dst.v_addr,
         rgaReg.dst.x_offset, rgaReg.dst.y_offset,
         rgaReg.dst.act_w, rgaReg.dst.act_h,
         rgaReg.dst.vir_w, rgaReg.dst.vir_h, rgaReg.dst.format, rgaReg.dst.rd_mode);
-    ALOGE("pat:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
+    rga_info("pat:[%lx,%lx,%lx],x-y[%d,%d],w-h[%d,%d],vw-vh[%d,%d],f=%d, rd_mode = %d",
         (unsigned long)rgaReg.pat.yrgb_addr, (unsigned long)rgaReg.pat.uv_addr, (unsigned long)rgaReg.pat.v_addr,
         rgaReg.pat.x_offset, rgaReg.pat.y_offset,
         rgaReg.pat.act_w, rgaReg.pat.act_h,
         rgaReg.pat.vir_w, rgaReg.pat.vir_h, rgaReg.pat.format, rgaReg.pat.rd_mode);
-    ALOGE("ROP:[%lx,%x,%x],LUT[%lx]", (unsigned long)rgaReg.rop_mask_addr, rgaReg.alpha_rop_flag,
+    rga_info("ROP:[%lx,%x,%x],LUT[%lx]", (unsigned long)rgaReg.rop_mask_addr, rgaReg.alpha_rop_flag,
         rgaReg.rop_code, (unsigned long)rgaReg.LUT_addr);
 
-    ALOGE("color:[%x,%x,%x,%x,%x]", rgaReg.color_key_max, rgaReg.color_key_min,
+    rga_info("color:[%x,%x,%x,%x,%x]", rgaReg.color_key_max, rgaReg.color_key_min,
         rgaReg.fg_color, rgaReg.bg_color, rgaReg.color_fill_mode);
 
-    ALOGE("MMU:[%d,%lx,%x]", rgaReg.mmu_info.mmu_en,
+    rga_info("MMU:[%d,%lx,%x]", rgaReg.mmu_info.mmu_en,
         (unsigned long)rgaReg.mmu_info.base_addr, rgaReg.mmu_info.mmu_flag);
 
-    ALOGE("mode[%d,%d,%d,%d,%d]", rgaReg.palette_mode, rgaReg.yuv2rgb_mode,
+    rga_info("mode[%d,%d,%d,%d,%d]", rgaReg.palette_mode, rgaReg.yuv2rgb_mode,
         rgaReg.endian_mode, rgaReg.src_trans_mode,rgaReg.scale_mode);
 
-    ALOGE("Full CSC : EN[%d] FACTOR[%d, %d, %d, %d], [%d, %d, %d, %d], [%d, %d, %d, %d]",
+    rga_info("Full CSC : EN[%d] FACTOR[%d, %d, %d, %d], [%d, %d, %d, %d], [%d, %d, %d, %d]",
         rgaReg.full_csc.flag,
         rgaReg.full_csc.coe_y.r_v, rgaReg.full_csc.coe_y.g_y, rgaReg.full_csc.coe_y.b_u, rgaReg.full_csc.coe_y.off,
         rgaReg.full_csc.coe_u.r_v, rgaReg.full_csc.coe_u.g_y, rgaReg.full_csc.coe_u.b_u, rgaReg.full_csc.coe_u.off,
         rgaReg.full_csc.coe_v.r_v, rgaReg.full_csc.coe_v.g_y, rgaReg.full_csc.coe_v.b_u, rgaReg.full_csc.coe_v.off);
 
-    ALOGE("gr_color_x [%x, %x, %x]", rgaReg.gr_color.gr_x_r, rgaReg.gr_color.gr_x_g, rgaReg.gr_color.gr_x_b);
-    ALOGE("gr_color_x [%x, %x, %x]", rgaReg.gr_color.gr_y_r, rgaReg.gr_color.gr_y_g, rgaReg.gr_color.gr_y_b);
+    rga_info("gr_color_x [%x, %x, %x]", rgaReg.gr_color.gr_x_r, rgaReg.gr_color.gr_x_g, rgaReg.gr_color.gr_x_b);
+    rga_info("gr_color_x [%x, %x, %x]", rgaReg.gr_color.gr_y_r, rgaReg.gr_color.gr_y_g, rgaReg.gr_color.gr_y_b);
 }

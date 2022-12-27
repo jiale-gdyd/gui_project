@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "rgadbg.h"
 #include "im2d_type.h"
 #include "im2d_version.h"
 
@@ -22,7 +23,7 @@ extern "C" {
             im2d_api_err = imStrError_t((IM_STATUS)__args[0]);                                                  \
         } else {                                                                                                \
             im2d_api_err = ("Fatal error, imStrError() too many parameters\n");                                 \
-            printf("Fatal error, imStrError() too many parameters\n");                                          \
+            rga_error("Fatal error, imStrError() too many parameters");                                         \
         }                                                                                                       \
         im2d_api_err;                                                                                           \
     })
@@ -47,7 +48,7 @@ IM_STATUS releasebuffer_handle(rga_buffer_handle_t handle);
             im2d_api_buffer = wrapbuffer_handle_t(handle, width, height, __args[0], __args[1], format);         \
         } else {                                                                                                \
             memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
     })
@@ -66,7 +67,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
             im2d_api_buffer = wrapbuffer_virtualaddr_t(vir_addr, width, height, __args[0], __args[1], format);  \
         } else {                                                                                                \
             memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
     })
@@ -83,7 +84,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
             im2d_api_buffer = wrapbuffer_physicaladdr_t(phy_addr, width, height, __args[0], __args[1], format); \
         } else {                                                                                                \
             memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
     })
@@ -100,7 +101,7 @@ rga_buffer_t wrapbuffer_handle_t(rga_buffer_handle_t handle, int width, int heig
             im2d_api_buffer = wrapbuffer_fd_t(fd, width, height, __args[0], __args[1], format);                 \
         } else {                                                                                                \
             memset(&im2d_api_buffer, 0x0, sizeof(im2d_api_buffer));                                             \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         im2d_api_buffer;                                                                                        \
     })
@@ -133,7 +134,7 @@ const char *querystring(int name);
             __ret = imcheck_t(src, dst, __pat, src_rect, dst_rect, __pat_rect, __args[0]);                      \
         } else {                                                                                                \
             __ret = IM_STATUS_FAILED;                                                                           \
-            printf("check failed\n");                                                                           \
+            rga_error("check failed");                                                                          \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -154,7 +155,7 @@ const char *querystring(int name);
             __ret = imcheck_t(src, dst, pat, src_rect, dst_rect, pat_rect, __args[0]);                          \
         } else {                                                                                                \
             __ret = IM_STATUS_FAILED;                                                                           \
-            printf("check failed\n");                                                                           \
+            rga_error("check failed");                                                                          \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -182,7 +183,7 @@ IM_STATUS imcheck_t(const rga_buffer_t src, const rga_buffer_t dst, const rga_bu
                 (int)__args[RGA_GET_MIN(__argc, 3)]);                                                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -204,7 +205,7 @@ IM_STATUS imresize_t(const rga_buffer_t src, rga_buffer_t dst, double fx, double
             __ret = imcrop_t(src, dst, rect, (int)__args[RGA_GET_MIN(__argc, 0)]);                              \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -223,7 +224,7 @@ IM_STATUS imcrop_t(const rga_buffer_t src, rga_buffer_t dst, im_rect rect, int s
             __ret = imrotate_t(src, dst, rotation, (int)__args[RGA_GET_MIN(__argc, 0)]);                        \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -242,7 +243,7 @@ IM_STATUS imrotate_t(const rga_buffer_t src, rga_buffer_t dst, int rotation, int
             __ret = imflip_t(src, dst, mode, (int)__args[RGA_GET_MIN(__argc, 0)]);                              \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -261,7 +262,7 @@ IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, int sync
             __ret = imfill_t(buf, rect, color, (int)__args[RGA_GET_MIN(__argc, 0)]);                            \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -278,7 +279,7 @@ IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, int sync
             __ret = imfill_t(buf, rect, color, (int)__args[RGA_GET_MIN(__argc, 0)]);                            \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -295,7 +296,7 @@ IM_STATUS imflip_t (const rga_buffer_t src, rga_buffer_t dst, int mode, int sync
             __ret = imfill_t(buf, rect, color, (int)__args[RGA_GET_MIN(__argc, 0)]);                            \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -314,7 +315,7 @@ IM_STATUS imfill_t(rga_buffer_t dst, im_rect rect, int color, int sync);
             __ret = impalette_t(src, dst, lut, (int)__args[RGA_GET_MIN(__argc, 0)]);                            \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -333,7 +334,7 @@ IM_STATUS impalette_t(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t lut, int 
             __ret = imtranslate_t(src, dst, x, y, (int)__args[RGA_GET_MIN(__argc, 0)]);                         \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -352,7 +353,7 @@ IM_STATUS imtranslate_t(const rga_buffer_t src, rga_buffer_t dst, int x, int y, 
             __ret = imcopy_t(src, dst, (int)__args[RGA_GET_MIN(__argc, 0)]);                                    \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -378,7 +379,7 @@ IM_STATUS imcopy_t(const rga_buffer_t src, rga_buffer_t dst, int sync);
                 (int)__args[RGA_GET_MIN(__argc, 1)]);                                                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -398,7 +399,7 @@ IM_STATUS imcopy_t(const rga_buffer_t src, rga_buffer_t dst, int sync);
                 (int)__args[RGA_GET_MIN(__argc, 1)]);                                                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -420,7 +421,7 @@ IM_STATUS imblend_t(const rga_buffer_t srcA, const rga_buffer_t srcB, rga_buffer
                 (int)__args[RGA_GET_MIN(__argc, 1)]);                                                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -442,7 +443,7 @@ IM_STATUS imcolorkey_t(const rga_buffer_t src, rga_buffer_t dst, im_colorkey_ran
                 (int)__args[RGA_GET_MIN(__argc, 1)]);                                                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -461,7 +462,7 @@ IM_STATUS imcvtcolor_t(rga_buffer_t src, rga_buffer_t dst, int sfmt, int dfmt, i
             __ret = imquantize_t(src, dst, nn_info, (int)__args[RGA_GET_MIN(__argc, 0)]);                       \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
@@ -480,7 +481,7 @@ IM_STATUS imquantize_t(const rga_buffer_t src, rga_buffer_t dst, im_nn_t nn_info
             __ret = imrop_t(src, dst, rop_code, (int)__args[RGA_GET_MIN(__argc, 0)]);                           \
         } else {                                                                                                \
             __ret = IM_STATUS_INVALID_PARAM;                                                                    \
-            printf("invalid parameter\n");                                                                      \
+            rga_error("invalid parameter");                                                                     \
         }                                                                                                       \
         __ret;                                                                                                  \
     })
