@@ -60,7 +60,7 @@ static int asset_cache_cmp_type_and_name(const void* a, const void* b) {
   }
 
   if (aa->type == bb->type) {
-    return tk_str_cmp(asset_info_get_name(aa), asset_info_get_name(bb));
+    return tk_str_cmp(asset_info_get_name((asset_info_t*)aa), asset_info_get_name((asset_info_t*)bb));
   } else {
     return aa->type - bb->type;
   }
@@ -690,7 +690,7 @@ const asset_info_t* assets_manager_find_in_cache(assets_manager_t* am, asset_typ
 
   for (i = 0; i < am->assets.size; i++) {
     iter = all[i];
-    if (type == iter->type && strcmp(name, asset_info_get_name(iter)) == 0 &&
+    if (type == iter->type && strcmp(name, asset_info_get_name((asset_info_t*)iter)) == 0 &&
         (subtype == 0 || (subtype != 0 && subtype == iter->subtype))) {
       return iter;
     }
@@ -795,7 +795,7 @@ ret_t assets_manager_clear_cache_ex(assets_manager_t* am, asset_type_t type, con
   info.type = type;
   strncpy(info.name, asset_name, TK_NAME_LEN);
   if (asset_name != name) {
-    info.full_name = name;
+    info.full_name = (char*)name;
   }
 
   size = am->assets.size;
