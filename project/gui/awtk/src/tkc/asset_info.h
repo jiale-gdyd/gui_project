@@ -275,6 +275,7 @@ typedef struct _preload_res_t {
  * @annotation ["scriptable"]
  * 单个资源的描述信息。
  */
+#pragma pack(push, 1)
 typedef struct _asset_info_t {
   /**
    * @property {uint16_t} type
@@ -313,6 +314,7 @@ typedef struct _asset_info_t {
    * 名称。
    */
   char name[TK_NAME_LEN + 1];
+  char* full_name;
 #ifdef LOAD_ASSET_WITH_MMAP
   uint8_t* data;
   mmap_t* map;
@@ -320,6 +322,7 @@ typedef struct _asset_info_t {
   uint8_t data[4];
 #endif /*LOAD_ASSET_WITH_MMAP*/
 } asset_info_t;
+#pragma pack(pop)
 
 /**
  * @method asset_info_create
