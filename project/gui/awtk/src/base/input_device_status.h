@@ -56,6 +56,7 @@ typedef struct _input_device_status_t {
   uint32_t cmd : 1;
   uint32_t menu : 1;
   uint32_t capslock : 1;
+  uint32_t numlock : 1;
 
   xy_t last_x;
   xy_t last_y;
