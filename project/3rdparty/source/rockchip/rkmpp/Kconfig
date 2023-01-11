@@ -116,4 +116,11 @@ config RKMPP_VP8E
     help
       rockchip Media Process Platform vp8 encoder
 
+config FASTPLAY_ONCE
+    bool "enable fastplat once"
+    depends on RKMPP
+    default n
+    help
+      enable fastplat once
+
 endmenu

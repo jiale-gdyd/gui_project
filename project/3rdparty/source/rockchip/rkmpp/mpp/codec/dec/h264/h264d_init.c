@@ -466,6 +466,12 @@ static MPP_RET dpb_mark_malloc(H264dVideoCtx_t *p_Vid, H264_StorePic_t *dec_pic)
             impl->hor_stride = hor_stride;
             impl->ver_stride = ver_stride;
 
+            /* After cropped */
+            impl->width = p_Vid->width_after_crop;
+            impl->height = p_Vid->height_after_crop;
+            impl->pts = p_Vid->p_Cur->last_pts;
+            impl->dts = p_Vid->p_Cur->last_dts;
+
             if (MPP_FRAME_FMT_IS_FBC(out_fmt)) {
                 impl->offset_x = 0;
                 impl->offset_y = 4;
@@ -478,11 +484,6 @@ static MPP_RET dpb_mark_malloc(H264dVideoCtx_t *p_Vid, H264_StorePic_t *dec_pic)
                     impl->fbc_hdr_stride =  MPP_ALIGN(impl->width, 256) | 256;
             }
 
-            /* After cropped */
-            impl->width = p_Vid->width_after_crop;
-            impl->height = p_Vid->height_after_crop;
-            impl->pts = p_Vid->p_Cur->last_pts;
-            impl->dts = p_Vid->p_Cur->last_dts;
             /* Setting the interlace mode for the picture */
             switch (structure) {
             case FRAME:
@@ -2027,6 +2028,7 @@ MPP_RET init_picture(H264_SLICE_t *currSlice)
     if (((p_err->i_slice_no < 2) && (!currSlice->layer_id) && (H264_I_SLICE == currSlice->slice_type)) ||
         currSlice->idr_flag) {
         p_err->first_iframe_poc = p_Vid->dec_pic->poc; //!< recoder first i frame poc
+        p_err->first_iframe_is_output = 0;
     }
     //!< idr_memory_management MVC_layer, idr_flag==1
     if (currSlice->layer_id && !currSlice->svc_extension_flag && !currSlice->mvcExt.non_idr_flag) {

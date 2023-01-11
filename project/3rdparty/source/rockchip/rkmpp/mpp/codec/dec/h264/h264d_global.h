@@ -1045,6 +1045,9 @@ typedef struct h264d_video_ctx_t {
     MppMemPool pic_st;
     //!< spspps data update
     RK_U32     spspps_update;
+
+    RK_U32     dpb_fast_out;
+    RK_U32     dpb_first_fast_played;
 } H264dVideoCtx_t;
 
 typedef struct h264d_mem_t {
@@ -1105,6 +1108,7 @@ typedef struct h264_err_ctx_t {
 
     RK_U32    i_slice_no;
     RK_S32    first_iframe_poc;
+    RK_S32    first_iframe_is_output;
 } H264dErrCtx_t;
 //!< decoder video parameter
 typedef struct h264_dec_ctx_t {
