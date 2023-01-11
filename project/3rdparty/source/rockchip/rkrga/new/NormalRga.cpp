@@ -3,12 +3,14 @@
 
 #include <rockchip/rkrgax/rgadbg.h>
 #include <rockchip/rkrgax/NormalRga.h>
+#include <rockchip/rkrgax/im2d_impl.h>
 #include <rockchip/rkrgax/NormalRgaContext.h>
 
 #define RGA_SRCOVER_EN          1
 
 volatile int32_t refCount = 0;
 struct rgaContext *rgaCtx = NULL;
+extern struct im2d_job_manager g_im2d_job_manager;
 pthread_mutex_t mMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void NormalRgaSetLogOnceFlag(int log)
@@ -1021,27 +1023,24 @@ int RgaBlit(rga_info *src, rga_info *dst, rga_info *src1)
     rgaReg.core = dst->core;
     rgaReg.priority = dst->priority;
 
-    if ((dst->mpi_mode == 1) && (dst->ctx_id > 0)) {
-        int ret;
-        struct rga_req cmd[1];
-        struct rga_user_ctx_t cmd_ctx;
+    if (dst->job_id > 0) {
+        im_rga_job_t *job = NULL;
 
-        memset(&cmd_ctx, 0x0, sizeof(cmd_ctx));
-        memset(cmd, 0x0, sizeof(cmd));
+        g_im2d_job_manager.mutex.lock();
 
-        cmd_ctx.sync_mode = sync_mode;
+        job = g_im2d_job_manager.job_map[dst->job_id];
+        if (job->task_count >= RGA_TASK_NUM_MAX) {
+            rga_error("job:[%d] add task failed! too many tasks, count:[%d]", dst->job_id, job->task_count);
+             g_im2d_job_manager.mutex.unlock();
 
-        cmd[0] = rgaReg;
-
-        cmd_ctx.id = dst->ctx_id;
-        cmd_ctx.cmd_ptr = (uint64_t)cmd;
-        cmd_ctx.cmd_num = 1;
-
-        ret = ioctl(ctx->rgaFd, RGA_CMD_CONFIG, &cmd_ctx);
-        if (ret < 0) {
-            rga_error("start config fail: %s", strerror(errno));
             return -errno;
         }
+
+        job->req[job->task_count] = rgaReg;
+        job->task_count++;
+        g_im2d_job_manager.mutex.unlock();
+
+        return 0;
     } else {
         do {
             ret = ioctl(ctx->rgaFd, sync_mode, &rgaReg);
@@ -1251,13 +1250,32 @@ int RgaCollorFill(rga_info *dst)
     rgaReg.core = dst->core;
     rgaReg.priority = dst->priority;
 
-    do {
-        ret = ioctl(ctx->rgaFd, sync_mode, &rgaReg);
-    } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
+    if (dst->job_id > 0) {
+        im_rga_job_t *job = NULL;
 
-    if (ret) {
-        rga_error("RGA_COLORFILL fail: %s", strerror(errno));
-        return -errno;
+        g_im2d_job_manager.mutex.lock();
+        job = g_im2d_job_manager.job_map[dst->job_id];
+        if (job->task_count >= RGA_TASK_NUM_MAX) {
+            rga_error("job:[%d] add task failed! too many tasks, count:[%d]", dst->job_id, job->task_count);
+            g_im2d_job_manager.mutex.unlock();
+
+            return -errno;
+        }
+
+        job->req[job->task_count] = rgaReg;
+        job->task_count++;
+        g_im2d_job_manager.mutex.unlock();
+
+        return 0;
+    } else {
+        do {
+            ret = ioctl(ctx->rgaFd, sync_mode, &rgaReg);
+        } while ((ret == -1) && ((errno == EINTR) || (errno == 512)));
+
+        if (ret) {
+            rga_error("RGA_COLORFILL failed:[%s]", strerror(errno));
+            return -errno;
+        }
     }
 
     return 0;

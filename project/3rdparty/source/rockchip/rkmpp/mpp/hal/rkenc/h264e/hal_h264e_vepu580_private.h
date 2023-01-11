@@ -29,6 +29,15 @@
 
 #define CHROMA_KLUT_TAB_SIZE    (24 * sizeof(RK_U32))
 
+typedef struct Vepu580RoiH264BsCfg_t {
+    RK_U64 force_inter   : 42;
+    RK_U64 mode_mask     : 9;
+    RK_U64 reserved      : 10;
+    RK_U64 force_intra   : 1;
+    RK_U64 qp_adj_en     : 1;
+    RK_U64 amv_en        : 1;
+} Vepu580RoiH264BsCfg;
+
 typedef struct HalH264eVepu580Ctx_t {
     MppEncCfgSet            *cfg;
 
@@ -66,6 +75,9 @@ typedef struct HalH264eVepu580Ctx_t {
 
     /* roi */
     void                    *roi_data;
+    MppBufferGroup          roi_grp;
+    MppBuffer               roi_base_cfg_buf;
+    RK_S32                  roi_base_buf_size;
 
     /* osd */
     Vepu541OsdCfg           osd_cfg;

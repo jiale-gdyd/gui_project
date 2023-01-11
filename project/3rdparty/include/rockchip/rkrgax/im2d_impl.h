@@ -1,5 +1,8 @@
-#ifndef ROCKCHIP_RKRGAX_IM2D_COMMON_H
-#define ROCKCHIP_RKRGAX_IM2D_COMMON_H
+#ifndef ROCKCHIP_RKRGAX_IM2D_IMPL_H
+#define ROCKCHIP_RKRGAX_IM2D_IMPL_H
+
+#include <map>
+#include <mutex>
 
 #include "im2d.h"
 #include "drmrga.h"
@@ -18,6 +21,18 @@
     }
 
 #define ERR_MSG_LEN                 300
+
+typedef struct im_rga_job {
+    struct rga_req req[RGA_TASK_NUM_MAX];
+    int            task_count;
+    int            id;
+} im_rga_job_t;
+
+struct im2d_job_manager {
+    std::map<im_job_id_t, im_rga_job_t *> job_map;
+    int                                   job_count;
+    std::mutex                            mutex;
+};
 
 int imSetErrorMsg(const char* format, ...);
 
@@ -58,7 +73,12 @@ IM_STATUS rga_release_buffer(int handle);
 
 IM_STATUS rga_get_opt(im_opt_t *opt, void *ptr);
 
-im_ctx_id_t rga_begin_job(uint32_t flags);
-IM_STATUS rga_cancel(im_ctx_id_t id);
+IM_STATUS rga_single_task_submit(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rect srect, im_rect drect, im_rect prect, int acquire_fence_fd, int *release_fence_fd, im_opt_t *opt_ptr, int usage);
+IM_STATUS rga_task_submit(im_job_id_t job_id, rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rect srect, im_rect drect, im_rect prect, im_opt_t *opt_ptr, int usage);
+
+im_job_id_t rga_job_creat(uint32_t flags);
+IM_STATUS rga_job_cancel(im_job_id_t job_id);
+IM_STATUS rga_job_submit(im_job_id_t job_id, int sync_mode, int acquire_fence_fd, int *release_fence_fd);
+IM_STATUS rga_job_config(im_job_id_t job_id, int sync_mode, int acquire_fence_fd, int *release_fence_fd);
 
 #endif

@@ -35,6 +35,7 @@
 #include "hal_h265e_vepu580.h"
 #include "hal_h265e_vepu580_reg.h"
 #include "../../../base/inc/mpp_enc_cb_param.h"
+#include "../common/vepu5xx.h"
 
 #include "../../../../osal/inc/mpp_service.h"
 #include "hal_h265e_vepu580_private.h"
@@ -75,6 +76,14 @@
 //     RK_U32 st_ctu_num;
 // } vepu580_h265_fbk;
 
+// typedef struct Vepu580RoiH265BsCfg_t {
+//     RK_U8 amv_en        : 1;
+//     RK_U8 qp_adj        : 1;
+//     RK_U8 force_split   : 1;
+//     RK_U8 force_intra   : 2;
+//     RK_U8 force_inter   : 2;
+// } Vepu580RoiH265BsCfg;
+
 // typedef struct H265eV580HalContext_t {
 //     MppEncHalApi        api;
 //     MppDev              dev;
@@ -93,6 +102,11 @@
 //     Vepu541OsdCfg       osd_cfg;
 //     MppDevRegOffCfgs    *reg_cfg;
 //     void                *roi_data;
+//     RkvRoiCfg_v2        *roi_cfg_tmp;
+//     MppBufferGroup      roi_grp;
+//     MppBuffer           roi_base_cfg_buf;
+//     void                *roi_base_cfg_sw_buf;
+//     RK_S32              roi_base_buf_size;
 //     MppEncCfgSet        *cfg;
 
 //     MppBufferGroup      tile_grp;
@@ -1383,6 +1397,25 @@ MPP_RET hal_h265e_v580_deinit(void *hal)
         ctx->tile_grp = NULL;
     }
 
+    if (ctx->roi_base_cfg_buf) {
+        mpp_buffer_put(ctx->roi_base_cfg_buf);
+        ctx->roi_base_cfg_buf = NULL;
+        ctx->roi_base_buf_size = 0;
+    }
+
+    if (ctx->roi_grp) {
+        mpp_buffer_group_put(ctx->roi_grp);
+        ctx->roi_grp = NULL;
+    }
+
+    if (ctx->roi_base_cfg_sw_buf)
+        MPP_FREE(ctx->roi_base_cfg_sw_buf);
+
+    if (ctx->roi_cfg_tmp) {
+        MPP_FREE(ctx->roi_cfg_tmp);
+        ctx->roi_cfg_tmp = NULL;
+    }
+
     if (ctx->buf_pass1) {
         mpp_buffer_put(ctx->buf_pass1);
         ctx->buf_pass1 = NULL;
@@ -1585,6 +1618,140 @@ vepu580_h265_set_patch_info(MppDevRegOffCfgs *cfgs, H265eSyntax_new *syn,
     if (ret)
         mpp_err_f("set input cr addr offset failed %d\n", ret);
 
+    return ret;
+}
+
+typedef struct refresh_area {
+    RK_S32 roi_ctu_x_sta;
+    RK_S32 roi_ctu_y_sta;
+    RK_S32 roi_ctu_x_end;
+    RK_S32 roi_ctu_y_end;
+} RefreshArea;
+
+static MPP_RET cal_refresh_area(RK_S32 ctu_w, RK_S32 ctu_h, RK_U32 refresh_idx,
+                                MppEncRcRefreshMode refresh_mode, RK_U32 refresh_num, RefreshArea *area)
+{
+    MPP_RET ret = MPP_OK;
+    RK_U32 refresh_ctu_h = 0;
+
+    if (refresh_mode == MPP_ENC_RC_INTRA_REFRESH_ROW) {
+        area->roi_ctu_x_sta = 0;
+        area->roi_ctu_x_end = ctu_w - 1;
+
+        if (refresh_idx > 0) {
+            refresh_ctu_h = refresh_num + 1;
+            area->roi_ctu_y_sta = refresh_num * refresh_idx - 1;
+        } else {
+            refresh_ctu_h = refresh_num;
+            area->roi_ctu_y_sta = 0;
+        }
+
+        area->roi_ctu_y_end = area->roi_ctu_y_sta + refresh_ctu_h - 1;
+    } else {
+        area->roi_ctu_y_sta = 0;
+        area->roi_ctu_y_end = ctu_h - 1;
+
+        if (refresh_idx > 0) {
+            refresh_ctu_h = refresh_num + 1;
+            area->roi_ctu_x_sta = refresh_num * refresh_idx - 1;
+        } else {
+            refresh_ctu_h = refresh_num;
+            area->roi_ctu_x_sta = 0;
+        }
+
+        area->roi_ctu_x_end = area->roi_ctu_x_sta + refresh_ctu_h - 1;
+    }
+
+    area->roi_ctu_x_end = MPP_MIN(area->roi_ctu_x_end, ctu_w - 1);
+    area->roi_ctu_y_end = MPP_MIN(area->roi_ctu_y_end, ctu_h - 1);
+    area->roi_ctu_x_sta = MPP_MAX(area->roi_ctu_x_sta, 0);
+    area->roi_ctu_y_sta = MPP_MAX(area->roi_ctu_y_sta, 0);
+
+    hal_h265e_dbg_detail("size in ctu : %d x %d, refresh_num %d, refresh_idx %d, area x[%d, %d], y[%d, %d]",
+                         ctu_w, ctu_h, refresh_num, refresh_idx,
+                         area->roi_ctu_x_sta, area->roi_ctu_x_end,
+                         area->roi_ctu_y_sta, area->roi_ctu_y_end);
+
+    return ret;
+}
+
+static MPP_RET setup_intra_refresh(H265eV580RegSet *regs, H265eV580HalContext *ctx, RK_U32 refresh_idx)
+{
+    MPP_RET ret = MPP_OK;
+    RK_U32 w = ctx->cfg->prep.width;
+    RK_U32 h = ctx->cfg->prep.height;
+    RK_S32 ctu_w = MPP_ALIGN(w, 64) / 64;
+    RK_S32 ctu_h = MPP_ALIGN(h, 64) / 64;
+    RK_U32 roi_base_cfg_buf_size = ctu_w * ctu_h * 64;
+    MppEncROICfg2 *external_roi_cfg = ( MppEncROICfg2 *)ctx->roi_data;
+    RK_U8 *roi_base_cfg_hw_ptr = NULL;
+    RK_U8 *roi_base_cfg_sw_ptr = NULL;
+    RK_S32 roi_base_cfg_buf_fd = 0;
+    RefreshArea cur_area;
+    RK_S32 j, k;
+
+    hal_h265e_dbg_func("enter\n");
+
+    if (!ctx->cfg->rc.refresh_en) {
+        ret = MPP_ERR_VALUE;
+        goto __RET;
+    }
+
+    if (ctx->roi_data) {
+        roi_base_cfg_hw_ptr = mpp_buffer_get_ptr(external_roi_cfg->base_cfg_buf);
+        roi_base_cfg_buf_fd = mpp_buffer_get_fd(external_roi_cfg->base_cfg_buf);
+    } else {
+        if (NULL == ctx->roi_base_cfg_buf) {
+            if (NULL == ctx->roi_grp)
+                mpp_buffer_group_get_internal(&ctx->roi_grp, MPP_BUFFER_TYPE_ION);
+            mpp_buffer_get(ctx->roi_grp, &ctx->roi_base_cfg_buf, roi_base_cfg_buf_size);
+        }
+        roi_base_cfg_hw_ptr = mpp_buffer_get_ptr(ctx->roi_base_cfg_buf);
+        roi_base_cfg_buf_fd = mpp_buffer_get_fd(ctx->roi_base_cfg_buf);
+    }
+
+    ctx->roi_base_buf_size = roi_base_cfg_buf_size;
+
+    if (NULL == ctx->roi_base_cfg_sw_buf) {
+        ctx->roi_base_cfg_sw_buf = mpp_malloc(RK_U8, roi_base_cfg_buf_size);
+    }
+    roi_base_cfg_sw_ptr = ctx->roi_base_cfg_sw_buf;
+
+    memset(ctx->roi_base_cfg_sw_buf, 0, roi_base_cfg_buf_size);
+
+    if (MPP_OK != cal_refresh_area(ctu_w, ctu_h, refresh_idx, ctx->cfg->rc.refresh_mode, ctx->cfg->rc.refresh_num, &cur_area)) {
+        ret = MPP_ERR_VALUE;
+        mpp_err_f("setting refresh area out of range");
+        goto __RET;
+    }
+
+    RK_U8 *ptr = roi_base_cfg_sw_ptr;
+    for (j = 0; j < ctu_h; j++) {
+        for (k = 0; k < ctu_w; k++) {
+            if (j <= cur_area.roi_ctu_y_end && j >= cur_area.roi_ctu_y_sta &&
+                k <= cur_area.roi_ctu_x_end && k >= cur_area.roi_ctu_x_sta) {
+
+                memset(ptr + 22, 0x55, 20); //176~336
+                *(ptr + 21) = 0x54; //170~175
+                *(ptr + 42) = 0x05; //336~339
+            }
+
+            ptr += 64;
+        }
+    }
+
+    memcpy(roi_base_cfg_hw_ptr, roi_base_cfg_sw_ptr, roi_base_cfg_buf_size);
+
+    if (ctx->cfg->rc.refresh_mode == MPP_ENC_RC_INTRA_REFRESH_ROW)
+        regs->reg_base.reg0220_me_rnge.cme_srch_v = 1;
+    else if (ctx->cfg->rc.refresh_mode == MPP_ENC_RC_INTRA_REFRESH_COL)
+        regs->reg_base.reg0220_me_rnge.cme_srch_h = 1;
+
+    regs->reg_base.reg0192_enc_pic.roi_en = 1;
+    regs->reg_base.reg0178_roi_addr = roi_base_cfg_buf_fd;
+
+__RET:
+    hal_h265e_dbg_func("leave, ret %d\n", ret);
     return ret;
 }
 
@@ -2358,6 +2525,7 @@ MPP_RET hal_h265e_v580_gen_regs(void *hal, HalEncTask *task)
     hevc_vepu580_control_cfg *reg_ctl = &regs->reg_ctl;
     hevc_vepu580_base        *reg_base = &regs->reg_base;
     hevc_vepu580_rc_klut *reg_klut = &regs->reg_rc_klut;
+    EncFrmStatus *frm_status = &task->rc_task->frm;
 
     hal_h265e_enter();
     pic_width_align8 = (syn->pp.pic_width + 7) & (~7);
@@ -2468,6 +2636,8 @@ MPP_RET hal_h265e_v580_gen_regs(void *hal, HalEncTask *task)
     vepu580_set_osd(&ctx->osd_cfg);
     /* ROI configure */
     vepu580_h265_set_roi_regs(ctx, reg_base);
+    if (frm_status->is_i_refresh)
+        setup_intra_refresh(regs, ctx, frm_status->seq_idx % ctx->cfg->rc.gop);
 
     /*paramet cfg*/
     vepu580_h265_global_cfg_set(ctx, regs);

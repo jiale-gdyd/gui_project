@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2023-01-10 [h264d_parser]: fix decode parser crash";
+static const char *mpp_last_commit_message = "2023-01-11 [vepu580_hevc]: optimize intra setting";
 
 void show_mpp_version(void)
 {

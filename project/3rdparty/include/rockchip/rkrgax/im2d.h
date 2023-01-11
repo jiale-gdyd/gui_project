@@ -494,8 +494,10 @@ IM_STATUS improcess(rga_buffer_t src, rga_buffer_t dst, rga_buffer_t pat, im_rec
 IM_STATUS imsync(int out_fence_fd);
 IM_STATUS imconfig(IM_CONFIG_NAME name, uint64_t value);
 
-IM_STATUS imcancel(im_ctx_id_t id);
-im_ctx_id_t imbegin(uint32_t flags);
+IM_STATUS imcancel(im_job_id_t id);
+im_job_id_t imbegin(uint32_t flags);
+
+IM_STATUS imend(im_job_id_t job_id, int sync_mode, int acquire_fence_fd, int *release_fence_fd);
 
 #ifdef __cplusplus
 }

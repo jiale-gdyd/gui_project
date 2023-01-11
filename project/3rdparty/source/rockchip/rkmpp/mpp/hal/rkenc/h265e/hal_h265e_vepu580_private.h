@@ -53,6 +53,14 @@ typedef struct vepu580_h265_fbk_t {
     RK_U32 st_ctu_num;
 } vepu580_h265_fbk;
 
+typedef struct Vepu580RoiH265BsCfg_t {
+    RK_U8 amv_en        : 1;
+    RK_U8 qp_adj        : 1;
+    RK_U8 force_split   : 1;
+    RK_U8 force_intra   : 2;
+    RK_U8 force_inter   : 2;
+} Vepu580RoiH265BsCfg;
+
 typedef struct H265eV580HalContext_t {
     MppEncHalApi        api;
     MppDev              dev;
@@ -71,6 +79,11 @@ typedef struct H265eV580HalContext_t {
     Vepu541OsdCfg       osd_cfg;
     MppDevRegOffCfgs    *reg_cfg;
     void                *roi_data;
+    RkvRoiCfg_v2        *roi_cfg_tmp;
+    MppBufferGroup      roi_grp;
+    MppBuffer           roi_base_cfg_buf;
+    void                *roi_base_cfg_sw_buf;
+    RK_S32              roi_base_buf_size;
     MppEncCfgSet        *cfg;
 
     MppBufferGroup      tile_grp;
