@@ -1,5 +1,5 @@
-#ifndef ROCKCHIP_RKRGAX_RGA_MUTEX_H
-#define ROCKCHIP_RKRGAX_RGA_MUTEX_H
+#ifndef RKRGA_RGAMUTEX_H
+#define RKRGA_RGAMUTEX_H
 
 #include <time.h>
 #include <stdint.h>
@@ -13,29 +13,37 @@
 #endif
 
 #define CAPABILITY(x)                           THREAD_ANNOTATION_ATTRIBUTE__(capability(x))
+
 #define SCOPED_CAPABILITY                       THREAD_ANNOTATION_ATTRIBUTE__(scoped_lockable)
 
 #define GUARDED_BY(x)                           THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+
 #define PT_GUARDED_BY(x)                        THREAD_ANNOTATION_ATTRIBUTE__(pt_guarded_by(x))
 
 #define ACQUIRED_BEFORE(...)                    THREAD_ANNOTATION_ATTRIBUTE__(acquired_before(__VA_ARGS__))
+
 #define ACQUIRED_AFTER(...)                     THREAD_ANNOTATION_ATTRIBUTE__(acquired_after(__VA_ARGS__))
 
 #define REQUIRES(...)                           THREAD_ANNOTATION_ATTRIBUTE__(requires_capability(__VA_ARGS__))
+
 #define REQUIRES_SHARED(...)                    THREAD_ANNOTATION_ATTRIBUTE__(requires_shared_capability(__VA_ARGS__))
 
 #define ACQUIRE(...)                            THREAD_ANNOTATION_ATTRIBUTE__(acquire_capability(__VA_ARGS__))
+
 #define ACQUIRE_SHARED(...)                     THREAD_ANNOTATION_ATTRIBUTE__(acquire_shared_capability(__VA_ARGS__))
 
 #define RELEASE(...)                            THREAD_ANNOTATION_ATTRIBUTE__(release_capability(__VA_ARGS__))
+
 #define RELEASE_SHARED(...)                     THREAD_ANNOTATION_ATTRIBUTE__(release_shared_capability(__VA_ARGS__))
 
 #define TRY_ACQUIRE(...)                        THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_capability(__VA_ARGS__))
+
 #define TRY_ACQUIRE_SHARED(...)                 THREAD_ANNOTATION_ATTRIBUTE__(try_acquire_shared_capability(__VA_ARGS__))
 
 #define EXCLUDES(...)                           THREAD_ANNOTATION_ATTRIBUTE__(locks_excluded(__VA_ARGS__))
 
 #define ASSERT_CAPABILITY(x)                    THREAD_ANNOTATION_ATTRIBUTE__(assert_capability(x))
+
 #define ASSERT_SHARED_CAPABILITY(x)             THREAD_ANNOTATION_ATTRIBUTE__(assert_shared_capability(x))
 
 #define RETURN_CAPABILITY(x)                    THREAD_ANNOTATION_ATTRIBUTE__(lock_returned(x))
@@ -54,7 +62,6 @@ public:
     Mutex();
     explicit Mutex(const char *name);
     explicit Mutex(int type, const char *name = nullptr);
-
     ~Mutex();
 
     int32_t lock() ACQUIRE();
@@ -81,7 +88,7 @@ public:
         Mutex &mLock;
 
         Autolock(const Autolock &);
-        Autolock &operator=(const Autolock &);
+        Autolock& operator=(const Autolock &);
     };
 
 private:
@@ -139,10 +146,9 @@ inline int32_t Mutex::tryLock()
 inline int32_t Mutex::timedLock(int64_t timeoutNs)
 {
     timespec now;
-
     clock_gettime(CLOCK_REALTIME, &now);
-    timeoutNs += now.tv_sec*1000000000 + now.tv_nsec;
 
+    timeoutNs += now.tv_sec * 1000000000 + now.tv_nsec;
     const struct timespec ts = {
         static_cast<time_t>(timeoutNs / 1000000000),
         static_cast<long>(timeoutNs % 1000000000),

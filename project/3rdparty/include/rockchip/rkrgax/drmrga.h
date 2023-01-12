@@ -1,5 +1,5 @@
-#ifndef ROCKCHIP_RKRGAX_DRMRGA_H
-#define ROCKCHIP_RKRGAX_DRMRGA_H
+#ifndef RKRGA_DRMRGA_H
+#define RKRGA_DRMRGA_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -8,26 +8,30 @@
 
 #include "rga.h"
 
-#define HAL_TRANSFORM_FLIP_H                    0x01
-#define HAL_TRANSFORM_FLIP_V                    0x02
-#define HAL_TRANSFORM_ROT_90                    0x04
-#define HAL_TRANSFORM_ROT_180                   0x03
-#define HAL_TRANSFORM_ROT_270                   0x07
-#define HAL_TRANSFORM_FLIP_H_V                  0x08
+#define RGA_BLIT_SYNC                       0x5017
+#define RGA_BLIT_ASYNC                      0x5018
 
-#define DRM_RGA_MODULE_API_VERSION              HWC_MODULE_API_VERSION_0_1
-#define DRM_RGA_DEVICE_API_VERSION              HWC_DEVICE_API_VERSION_0_1
-#define DRM_RGA_API_VERSION                     HWC_DEVICE_API_VERSION
+#define HAL_TRANSFORM_FLIP_H                0x01
+#define HAL_TRANSFORM_FLIP_V                0x02
+#define HAL_TRANSFORM_ROT_90                0x04
+#define HAL_TRANSFORM_ROT_180               0x03
+#define HAL_TRANSFORM_ROT_270               0x07
 
-#define DRM_RGA_TRANSFORM_ROT_MASK              0x0000000F
-#define DRM_RGA_TRANSFORM_ROT_0                 0x00000000
-#define DRM_RGA_TRANSFORM_ROT_90                HAL_TRANSFORM_ROT_90
-#define DRM_RGA_TRANSFORM_ROT_180               HAL_TRANSFORM_ROT_180
-#define DRM_RGA_TRANSFORM_ROT_270               HAL_TRANSFORM_ROT_270
+#define HAL_TRANSFORM_FLIP_H_V              0x08
 
-#define DRM_RGA_TRANSFORM_FLIP_MASK             0x00000003
-#define DRM_RGA_TRANSFORM_FLIP_H                HAL_TRANSFORM_FLIP_H
-#define DRM_RGA_TRANSFORM_FLIP_V                HAL_TRANSFORM_FLIP_V
+#define DRM_RGA_MODULE_API_VERSION          HWC_MODULE_API_VERSION_0_1
+#define DRM_RGA_DEVICE_API_VERSION          HWC_DEVICE_API_VERSION_0_1
+#define DRM_RGA_API_VERSION                 HWC_DEVICE_API_VERSION
+
+#define DRM_RGA_TRANSFORM_ROT_MASK          0x0000000F
+#define DRM_RGA_TRANSFORM_ROT_0             0x00000000
+#define DRM_RGA_TRANSFORM_ROT_90            HAL_TRANSFORM_ROT_90
+#define DRM_RGA_TRANSFORM_ROT_180           HAL_TRANSFORM_ROT_180
+#define DRM_RGA_TRANSFORM_ROT_270           HAL_TRANSFORM_ROT_270
+
+#define DRM_RGA_TRANSFORM_FLIP_MASK         0x00000003
+#define DRM_RGA_TRANSFORM_FLIP_H            HAL_TRANSFORM_FLIP_H
+#define DRM_RGA_TRANSFORM_FLIP_V            HAL_TRANSFORM_FLIP_V
 
 enum {
     AWIDTH = 0,
@@ -85,6 +89,89 @@ typedef struct rga_dither {
     int lut1_h;
 } rga_dither_t;
 
+struct rga_mosaic_info {
+    uint8_t enable;
+    uint8_t mode;
+};
+
+struct rga_pre_intr_info {
+    uint8_t  enable;
+    uint8_t  read_intr_en;
+    uint8_t  write_intr_en;
+    uint8_t  read_hold_en;
+    uint32_t read_threshold;
+    uint32_t write_start;
+    uint32_t write_step;
+};
+
+struct rga_osd_invert_factor {
+    uint8_t alpha_max;
+    uint8_t alpha_min;
+    uint8_t yg_max;
+    uint8_t yg_min;
+    uint8_t crb_max;
+    uint8_t crb_min;
+};
+
+struct rga_color {
+    union {
+        struct {
+            uint8_t red;
+            uint8_t green;
+            uint8_t blue;
+            uint8_t alpha;
+        };
+        uint32_t value;
+    };
+};
+
+struct rga_osd_bpp2 {
+    uint8_t          ac_swap;
+    uint8_t          endian_swap;
+    struct rga_color color0;
+    struct rga_color color1;
+};
+
+struct rga_osd_mode_ctrl {
+    uint8_t  mode;
+    uint8_t  direction_mode;
+    uint8_t  width_mode;
+    uint16_t block_fix_width;
+    uint8_t  block_num;
+    uint16_t flags_index;
+
+    uint8_t  color_mode;
+    uint8_t  invert_flags_mode;
+    uint8_t  default_color_sel;
+    uint8_t  invert_enable;
+    uint8_t  invert_mode;
+    uint8_t  invert_thresh;
+    uint8_t  unfix_index;
+};
+
+struct rga_osd_info {
+    uint8_t                      enable;
+    struct rga_osd_mode_ctrl     mode_ctrl;
+    struct rga_osd_invert_factor cal_factor;
+    struct rga_osd_bpp2          bpp2_info;
+
+    union {
+        struct {
+            uint32_t last_flags1;
+            uint32_t last_flags0;
+        };
+        uint64_t last_flags;
+    };
+
+    union {
+        struct {
+            uint32_t cur_flags1;
+            uint32_t cur_flags0;
+        };
+        uint64_t cur_flags;
+    };
+};
+
 typedef struct rga_info {
     int                      fd;
     void                     *virAddr;
@@ -122,12 +209,11 @@ typedef struct rga_info {
     struct rga_pre_intr_info pre_intr;
     int                      mpi_mode;
     union {
-        int ctx_id;
-        int job_id;
+        int                  ctx_id;
+        int                  job_handle;
     };
     char                     reserve[402];
 } rga_info_t;
-
 
 typedef struct drm_rga {
     rga_rect_t src;

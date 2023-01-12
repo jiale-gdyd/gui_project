@@ -1,13 +1,13 @@
-#ifndef ROCKCHIP_RKRGAX_RGAAPI_H
-#define ROCKCHIP_RKRGAX_RGAAPI_H
+#ifndef RKRGA_RGAAPI_H
+#define RKRGA_RGAAPI_H
 
 #include <time.h>
 #include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <linux/stddef.h>
@@ -16,32 +16,31 @@
 #include "drmrga.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"{
 #endif
 
-#define RgaInit(ctx)                \
-    ({                              \
-        int ret = 0;                \
-        ret = c_RkRgaInit();        \
-        c_RkRgaGetContext(ctx);     \
-        ret;\
+#define RgaInit(ctx)            \
+    ({                          \
+        int ret = 0;            \
+        ret = c_RkRgaInit();    \
+        c_RkRgaGetContext(ctx); \
+        ret;                    \
     })
 
-#define RgaDeInit(ctx)              \
-    {                               \
-        (void)ctx;                  \
-        c_RkRgaDeInit();            \
+#define RgaDeInit(ctx)          \
+    {                           \
+        (void)ctx;              \
+        c_RkRgaDeInit();        \
     }
 
-#define RgaBlit(...)                c_RkRgaBlit(__VA_ARGS__)
-#define RgaCollorFill(...)          c_RkRgaColorFill(__VA_ARGS__)
-#define RgaFlush()                  c_RkRgaFlush()
+#define RgaBlit(...)            c_RkRgaBlit(__VA_ARGS__)
+#define RgaCollorFill(...)      c_RkRgaColorFill(__VA_ARGS__)
+#define RgaFlush()              c_RkRgaFlush()
 
-int  c_RkRgaInit();
+int c_RkRgaInit();
 void c_RkRgaDeInit();
 
 void c_RkRgaGetContext(void **ctx);
-
 int c_RkRgaBlit(rga_info_t *src, rga_info_t *dst, rga_info_t *src1);
 int c_RkRgaColorFill(rga_info_t *dst);
 int c_RkRgaFlush();

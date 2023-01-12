@@ -1,7 +1,7 @@
-#ifndef ROCKCHIP_RKRGAX_IM2D_HARDWARE_H
-#define ROCKCHIP_RKRGAX_IM2D_HARDWARE_H
+#ifndef RKRGA_IM2D_HARDWARE_H
+#define RKRGA_IM2D_HARDWARE_H
 
-#include "rga.h"
+#include "rga_ioctl.h"
 
 typedef enum {
     IM_RGA_HW_VERSION_RGA_V_ERR_INDEX = 0x0,
@@ -117,13 +117,13 @@ typedef struct {
 } rga_info_table_entry;
 
 typedef struct {
-    struct rga_version_t user;
-    struct rga_version_t driver;
-} rga_dirver_bind_table_entry;
+    struct rga_version_t current;
+    struct rga_version_t minimum;
+} rga_version_bind_table_entry_t;
 
 const rga_info_table_entry hw_info_table[] = {
     { IM_RGA_HW_VERSION_RGA_V_ERR       ,    0,    0, 0, 0, 0,   0, 0, 0, {0} },
-    { IM_RGA_HW_VERSION_RGA_1           , 8192, 2048, 4, 8, 1,
+    {   IM_RGA_HW_VERSION_RGA_1         , 8192, 2048, 4, 8, 1,
                                         /* input format */
                                         IM_RGA_SUPPORT_FORMAT_RGB |
                                         IM_RGA_SUPPORT_FORMAT_RGB_OTHER |
@@ -282,12 +282,18 @@ const rga_info_table_entry hw_info_table[] = {
                                         {0} },
 };
 
-const rga_dirver_bind_table_entry driver_bind_table[] = {
+const rga_version_bind_table_entry_t user_driver_bind_table[] = {
     { { 0, 0, 0, "0.0.0" }, {0, 0, 0, "0.0.0" } },
     { { 1, 0, 3, "1.0.3" }, {0, 0, 0, "0.0.0" } },
     { { 1, 6, 0, "1.6.0" }, {1, 1, 5, "1.1.5" } },
     { { 1, 7, 2, "1.7.2" }, {1, 2, 0, "1.2.0" } },
     { { 1, 7, 3, "1.7.3" }, {1, 2, 4, "1.2.4" } },
+};
+
+const rga_version_bind_table_entry_t user_header_bind_table[] = {
+    { { 0, 0, 0, "0.0.0" }, { 0, 0, 0, "0.0.0" } },
+    { { 1, 0, 3, "1.0.3" }, { 1, 0, 3, "1.0.3" } },
+    { { 1, 4, 0, "1.4.0" }, { 1, 4, 0, "1.4.0" } },
 };
 
 #endif

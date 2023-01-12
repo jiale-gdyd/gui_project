@@ -1,11 +1,11 @@
 #include <time.h>
 #include <math.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -296,8 +296,9 @@ int get_buf_size_by_w_h_f(int w, int h, int f)
 
 int get_buf_from_file(void *buf, int f, int sw, int sh, int index)
 {
+    int ret = 0;
     char filePath[100];
-    const char *inputFilePath = "/usr/data/in%dw%d-h%d-%s.bin";
+    const char *inputFilePath = "/userdata/in%dw%d-h%d-%s.bin";
 
     snprintf(filePath, 100, inputFilePath, index, sw, sh, translate_format_str(f));
 
@@ -315,11 +316,12 @@ int get_buf_from_file(void *buf, int f, int sw, int sh, int index)
 
 int get_buf_from_file_FBC(void *buf, int f, int sw, int sh, int index)
 {
+    int ret = 0;
     char fstring[30];
     char filePath[100];
-    const char *inputFilePath = "/usr/data/in%dw%d-h%d-%s-afbc.bin";
+    const char *inputFilePath = "/userdata/in%dw%d-h%d-%s-afbc.bin";
 
-    get_string_by_format(fstring, f);
+    ret = get_string_by_format(fstring, f);
     snprintf(filePath, 100, inputFilePath, index, sw, sh, fstring);
 
     FILE *file = fopen(filePath, "rb");
@@ -336,8 +338,9 @@ int get_buf_from_file_FBC(void *buf, int f, int sw, int sh, int index)
 
 int output_buf_data_to_file(void *buf, int f, int sw, int sh, int index)
 {
+    int ret = 0;
     char filePath[100];
-    const char *outputFilePath = "/usr/data/out%dw%d-h%d-%s.bin";
+    const char *outputFilePath = "/userdata/out%dw%d-h%d-%s.bin";
 
     snprintf(filePath, 100, outputFilePath, index, sw, sh, translate_format_str(f));
 
@@ -357,11 +360,12 @@ int output_buf_data_to_file(void *buf, int f, int sw, int sh, int index)
 
 int output_buf_data_to_file_FBC(void *buf, int f, int sw, int sh, int index)
 {
+    int ret = 0;
     char fstring[30];
     char filePath[100];
-    const char *outputFilePath = "/usr/data/out%dw%d-h%d-%s-afbc.bin";
+    const char *outputFilePath = "/userdata/out%dw%d-h%d-%s-afbc.bin";
 
-    get_string_by_format(fstring, f);
+    ret = get_string_by_format(fstring, f);
     snprintf(filePath, 100, outputFilePath, index, sw, sh, fstring);
 
     FILE *file = fopen(filePath, "wb+");

@@ -1,19 +1,19 @@
 #include <poll.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <malloc.h>
 #include <stdint.h>
 #include <string.h>
-#include <malloc.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 #include <linux/sync_file.h>
 
 #ifndef __cplusplus
 #include <stdatomic.h>
 #else
 #include <atomic>
-#define _Atomic(X)                  std::atomic<X>
+#define _Atomic(X)      std::atomic<X>
 using namespace std;
 #endif
 
@@ -25,7 +25,7 @@ struct sync_legacy_merge_data {
     int32_t fence;
 };
 
-#define SYNC_IOC_LEGACY_MERGE       _IOWR(SYNC_IOC_MAGIC, 1, struct sync_legacy_merge_data)
+#define SYNC_IOC_LEGACY_MERGE   _IOWR(SYNC_IOC_MAGIC, 1, struct sync_legacy_merge_data)
 
 enum uapi_version {
     UAPI_UNKNOWN,
@@ -119,7 +119,8 @@ int rga_sync_merge(const char *name, int fd1, int fd2)
     int uapi;
 
     uapi = atomic_load_explicit(&g_uapi_version, memory_order_acquire);
-    if ((uapi == UAPI_MODERN) || (uapi == UAPI_UNKNOWN)) {
+
+    if (uapi == UAPI_MODERN || uapi == UAPI_UNKNOWN) {
         ret = modern_sync_merge(name, fd1, fd2);
         if ((ret >= 0) || (errno != ENOTTY)) {
             if ((ret >= 0) && (uapi == UAPI_UNKNOWN)) {

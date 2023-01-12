@@ -1,5 +1,5 @@
-#ifndef ROCKCHIP_RKRGAX_RGA_UTILS_H
-#define ROCKCHIP_RKRGAX_RGA_UTILS_H
+#ifndef RKRGA_RGAUTILS_H
+#define RKRGA_RGAUTILS_H
 
 float get_bpp_from_format(int format);
 int get_perPixel_stride_from_format(int format);

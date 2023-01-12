@@ -1,5 +1,5 @@
-#ifndef ROCKCHIP_RKRGAX_ROCKCHIPRGA_H
-#define ROCKCHIP_RKRGAX_ROCKCHIPRGA_H
+#ifndef RKRGA_ROCKCHIPRGA_H
+#define RKRGA_ROCKCHIPRGA_H
 
 #include <time.h>
 #include <errno.h>
@@ -17,7 +17,7 @@
 #include "RgaUtils.h"
 #include "RgaSingleton.h"
 
-class RockchipRga : public Singleton<RockchipRga> {
+class RockchipRga :public Singleton<RockchipRga> {
 public:
     static inline RockchipRga &get() {
         return getInstance();
@@ -25,6 +25,7 @@ public:
 
     int RkRgaInit();
     void RkRgaDeInit();
+
     void RkRgaGetContext(void **ctx);
 
     int RkRgaAllocBuffer(int drm_fd, bo_t *bo_info, int width, int height, int bpp, int flags);
@@ -64,9 +65,9 @@ public:
     ~RockchipRga();
 
 private:
-    bool mSupportRga;
-    int  mLogOnce;
-    int  mLogAlways;
+    bool  mSupportRga;
+    int   mLogOnce;
+    int   mLogAlways;
     void *mContext;
 
     friend class Singleton<RockchipRga>;

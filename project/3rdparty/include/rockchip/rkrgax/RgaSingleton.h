@@ -1,5 +1,5 @@
-#ifndef ROCKCHIP_RKRGAX_RGA_SINGLETON_H
-#define ROCKCHIP_RKRGAX_RGA_SINGLETON_H
+#ifndef RKRGA_RGASINGLETON_H
+#define RKRGA_RGASINGLETON_H
 
 #include "RgaMutex.h"
 
@@ -43,9 +43,10 @@ private:
 #pragma clang diagnostic pop
 #endif
 
-#define RGA_SINGLETON_STATIC_INSTANCE(TYPE)                             \
-    template<> ::Mutex(::Singleton< TYPE >::sLock)(::Mutex::PRIVATE);   \
-    template<> TYPE* ::Singleton< TYPE >::sInstance(nullptr);           \
+#define RGA_SINGLETON_STATIC_INSTANCE(TYPE)                     \
+    template<> ::Mutex                                          \
+        (::Singleton< TYPE >::sLock)(::Mutex::PRIVATE);         \
+    template<> TYPE* ::Singleton< TYPE >::sInstance(nullptr);   \
     template class ::Singleton< TYPE >;
 
 #endif
