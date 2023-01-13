@@ -1,6 +1,6 @@
 #include "tkc/utils.h"
 #include "base/types_def.h"
-#include "vgcanvas_nanovg.inc" 
+#include "vgcanvas_nanovg.inc"
 #include "base/vgcanvas_asset_manager.h"
 
 #ifndef WITH_FAST_LCD_PORTRAIT
