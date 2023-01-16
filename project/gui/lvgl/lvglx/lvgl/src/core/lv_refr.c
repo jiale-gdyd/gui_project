@@ -1194,7 +1194,7 @@ static void draw_buf_flush(lv_disp_t *disp)
 
 static void call_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
-    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2, (void *)color_p);
+    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)color_p);
 
     lv_area_t offset_area = {
         .x1 = (lv_coord_t)(area->x1 + drv->offset_x),
