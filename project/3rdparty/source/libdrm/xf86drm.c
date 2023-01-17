@@ -2454,6 +2454,12 @@ drm_public int drmSetInterfaceVersion(int fd, drmSetVersion *version)
     int retcode = 0;
     drm_set_version_t sv;
 
+#if defined(CONFIG_ROCKCHIP)
+    if (!getenv("DRM_ALLOW_SET_VERSION")) {
+        return 0;
+    }
+#endif
+
     memclear(sv);
     sv.drm_di_major = version->drm_di_major;
     sv.drm_di_minor = version->drm_di_minor;
