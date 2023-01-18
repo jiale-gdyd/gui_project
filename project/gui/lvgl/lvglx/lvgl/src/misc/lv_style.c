@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_style.h"
-#include "lv_gc.h"
-#include "lv_mem.h"
+#include "../misc/lv_gc.h"
+#include "../misc/lv_mem.h"
 #include "lv_assert.h"
 #include "lv_types.h"
 
@@ -34,131 +34,106 @@ static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t
 /**********************
  *  GLOBAL VARIABLES
  **********************/
+
 const lv_style_prop_t lv_style_const_prop_id_inv = LV_STYLE_PROP_INV;
 
 const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
-    /* LV_STYLE_PROP_INV               = 0   */ 0,
+    [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MIN_WIDTH] =                LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MAX_WIDTH] =                LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_HEIGHT] =                   LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MIN_HEIGHT] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MAX_HEIGHT] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_X] =                        LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_Y] =                        LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_ALIGN] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_TRANSFORM_WIDTH] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_TRANSFORM_HEIGHT] =          LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_TRANSLATE_X] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
+    [LV_STYLE_TRANSLATE_Y] =               LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
+    [LV_STYLE_TRANSFORM_ZOOM] =            LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE,
+    [LV_STYLE_TRANSFORM_ANGLE] =           LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE,
 
-    /* Group 0 */
-    /* LV_STYLE_WIDTH                  = 1   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_MIN_WIDTH              = 2   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_MAX_WIDTH              = 3   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_HEIGHT                 = 4   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_MIN_HEIGHT             = 5   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_MAX_HEIGHT             = 6   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_X                      = 7   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_Y                      = 8   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_ALIGN                  = 9   */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_LAYOUT                 = 10  */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_RADIUS                 = 11  */ 0,
+    [LV_STYLE_PAD_TOP] =                   LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_PAD_BOTTOM] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_PAD_LEFT] =                  LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_PAD_RIGHT] =                 LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_PAD_ROW] =                   LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_PAD_COLUMN] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MARGIN_TOP] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MARGIN_BOTTOM] =             LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MARGIN_LEFT] =               LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_MARGIN_RIGHT] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 
-    /* 12 - 15 */
-    0, 0, 0, 0,
+    [LV_STYLE_BG_COLOR] = 0,
+    [LV_STYLE_BG_OPA] = 0,
+    [LV_STYLE_BG_GRAD_COLOR] = 0,
+    [LV_STYLE_BG_GRAD_DIR] = 0,
+    [LV_STYLE_BG_MAIN_STOP] = 0,
+    [LV_STYLE_BG_GRAD_STOP] = 0,
+    [LV_STYLE_BG_GRAD] = 0,
+    [LV_STYLE_BG_DITHER_MODE] = 0,
 
-    /* Group 1 */
-    /* LV_STYLE_PAD_TOP                = 16  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_PAD_BOTTOM             = 17  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_PAD_LEFT               = 18  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_PAD_RIGHT              = 19  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_PAD_ROW                = 20  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_PAD_COLUMN             = 21  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_BASE_DIR               = 22  */ LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_CLIP_CORNER            = 23  */ 0,
+    [LV_STYLE_BG_IMG_SRC] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_BG_IMG_OPA] = 0,
+    [LV_STYLE_BG_IMG_RECOLOR] = 0,
+    [LV_STYLE_BG_IMG_RECOLOR_OPA] = 0,
+    [LV_STYLE_BG_IMG_TILED] = 0,
 
-    /* 24 - 31 */
-    0, 0, 0, 0, 0, 0, 0, 0,
+    [LV_STYLE_BORDER_COLOR] = 0,
+    [LV_STYLE_BORDER_OPA] = 0,
+    [LV_STYLE_BORDER_WIDTH] =              LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_BORDER_SIDE] = 0,
+    [LV_STYLE_BORDER_POST] = 0,
 
-    /* Group 2 */
-    /* LV_STYLE_BG_COLOR               = 32  */ 0,
-    /* LV_STYLE_BG_OPA                 = 33  */ 0,
-    /* LV_STYLE_BG_GRAD_COLOR          = 34  */ 0,
-    /* LV_STYLE_BG_GRAD_DIR            = 35  */ 0,
-    /* LV_STYLE_BG_MAIN_STOP           = 36  */ 0,
-    /* LV_STYLE_BG_GRAD_STOP           = 37  */ 0,
-    /* LV_STYLE_BG_GRAD                = 38  */ 0,
-    /* LV_STYLE_BG_DITHER_MODE         = 39  */ 0,
-    /* LV_STYLE_BG_IMG_SRC             = 40  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_BG_IMG_OPA             = 41  */ 0,
-    /* LV_STYLE_BG_IMG_RECOLOR         = 42  */ 0,
-    /* LV_STYLE_BG_IMG_RECOLOR_OPA     = 43  */ 0,
-    /* LV_STYLE_BG_IMG_TILED           = 44  */ 0,
+    [LV_STYLE_OUTLINE_WIDTH] =             LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_OUTLINE_COLOR] = 0,
+    [LV_STYLE_OUTLINE_OPA] =               LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_OUTLINE_PAD] =               LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
 
-    /* 45 - 47 */
-    0, 0, 0,
+    [LV_STYLE_SHADOW_WIDTH] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_OFS_X] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_OFS_Y] =              LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_SPREAD] =             LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_SHADOW_COLOR] = 0,
+    [LV_STYLE_SHADOW_OPA] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
 
-    /* Group 3 */
-    /* LV_STYLE_BORDER_COLOR           = 48  */ 0,
-    /* LV_STYLE_BORDER_OPA             = 49  */ 0,
-    /* LV_STYLE_BORDER_WIDTH           = 50  */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_BORDER_SIDE            = 51  */ 0,
-    /* LV_STYLE_BORDER_POST            = 52  */ 0,
-    /* LV_STYLE_OUTLINE_WIDTH          = 53  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_OUTLINE_COLOR          = 54  */ 0,
-    /* LV_STYLE_OUTLINE_OPA            = 55  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_OUTLINE_PAD            = 56  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_IMG_OPA] = 0,
+    [LV_STYLE_IMG_RECOLOR] = 0,
+    [LV_STYLE_IMG_RECOLOR_OPA] = 0,
 
-    /* 57 - 63 */
-    0, 0, 0, 0, 0, 0, 0,
+    [LV_STYLE_LINE_WIDTH] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_LINE_DASH_WIDTH] = 0,
+    [LV_STYLE_LINE_DASH_GAP] = 0,
+    [LV_STYLE_LINE_ROUNDED] = 0,
+    [LV_STYLE_LINE_COLOR] = 0,
+    [LV_STYLE_LINE_OPA] = 0,
 
-    /* Group 4 */
-    /* LV_STYLE_SHADOW_WIDTH           = 64  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_SHADOW_OFS_X           = 65  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_SHADOW_OFS_Y           = 66  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_SHADOW_SPREAD          = 67  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_SHADOW_COLOR           = 68  */ 0,
-    /* LV_STYLE_SHADOW_OPA             = 69  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_IMG_OPA                = 70  */ 0,
-    /* LV_STYLE_IMG_RECOLOR            = 71  */ 0,
-    /* LV_STYLE_IMG_RECOLOR_OPA        = 72  */ 0,
-    /* LV_STYLE_LINE_WIDTH             = 73  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_LINE_DASH_WIDTH        = 74  */ 0,
-    /* LV_STYLE_LINE_DASH_GAP          = 75  */ 0,
-    /* LV_STYLE_LINE_ROUNDED           = 76  */ 0,
-    /* LV_STYLE_LINE_COLOR             = 77  */ 0,
-    /* LV_STYLE_LINE_OPA               = 78  */ 0,
+    [LV_STYLE_ARC_WIDTH] =                 LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_ARC_ROUNDED] = 0,
+    [LV_STYLE_ARC_COLOR] = 0,
+    [LV_STYLE_ARC_OPA] = 0,
+    [LV_STYLE_ARC_IMG_SRC] = 0,
 
-    /* 79 */
-    0,
+    [LV_STYLE_TEXT_COLOR] =                LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_TEXT_OPA] =                  LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_TEXT_FONT] =                 LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_TEXT_LETTER_SPACE] =         LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_TEXT_LINE_SPACE] =           LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_TEXT_DECOR] =                LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_TEXT_ALIGN] =                LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 
-    /* Group 5*/
-    /* LV_STYLE_ARC_WIDTH              = 80  */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_ARC_ROUNDED            = 81  */ 0,
-    /* LV_STYLE_ARC_COLOR              = 82  */ 0,
-    /* LV_STYLE_ARC_OPA                = 83  */ 0,
-    /* LV_STYLE_ARC_IMG_SRC            = 84  */ 0,
-    /* LV_STYLE_TEXT_COLOR             = 85  */ LV_STYLE_PROP_FLAG_INHERITABLE,
-    /* LV_STYLE_TEXT_OPA               = 86  */ LV_STYLE_PROP_FLAG_INHERITABLE,
-    /* LV_STYLE_TEXT_FONT              = 87  */ LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_TEXT_LETTER_SPACE      = 88  */ LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_TEXT_LINE_SPACE        = 89  */ LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-    /* LV_STYLE_TEXT_DECOR             = 90  */ LV_STYLE_PROP_FLAG_INHERITABLE,
-    /* LV_STYLE_TEXT_ALIGN             = 91  */ LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-
-    /* 92 - 95 */
-    0, 0, 0, 0,
-
-    /* Group 6 */
-    /* LV_STYLE_OPA                    = 96  */ LV_STYLE_PROP_FLAG_LAYER_UPDATE,
-    /* LV_STYLE_COLOR_FILTER_DSC       = 97  */ LV_STYLE_PROP_FLAG_INHERITABLE,
-    /* LV_STYLE_COLOR_FILTER_OPA       = 98  */ LV_STYLE_PROP_FLAG_INHERITABLE,
-    /* LV_STYLE_ANIM                   = 99  */ 0,
-    /* LV_STYLE_ANIM_TIME              = 100 */ 0,
-    /* LV_STYLE_ANIM_SPEED             = 101 */ 0,
-    /* LV_STYLE_TRANSITION             = 102 */ 0,
-    /* LV_STYLE_BLEND_MODE             = 103 */ LV_STYLE_PROP_FLAG_LAYER_UPDATE,
-    /* LV_STYLE_TRANSFORM_WIDTH        = 104 */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_TRANSFORM_HEIGHT       = 105 */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    /* LV_STYLE_TRANSLATE_X            = 106 */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
-    /* LV_STYLE_TRANSLATE_Y            = 107 */ LV_STYLE_PROP_FLAG_LAYOUT_UPDATE | LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE,
-    /* LV_STYLE_TRANSFORM_ZOOM         = 108 */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE,
-    /* LV_STYLE_TRANSFORM_ANGLE        = 109 */ LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYER_UPDATE,
-    /* LV_STYLE_TRANSFORM_PIVOT_X      = 110 */ 0,
-    /* LV_STYLE_TRANSFORM_PIVOT_Y      = 111 */ 0,
-
-    /* _LV_STYLE_LAST_BUILT_IN_PROP    = 111 */ /*0, */
-    /* _LV_STYLE_NUM_BUILT_IN_PROPS    = _LV_STYLE_LAST_BUILT_IN_PROP + 1 */ /*0,*/
-
-    /* LV_STYLE_PROP_ANY               = 0xFFFF */
+    [LV_STYLE_RADIUS] = 0,
+    [LV_STYLE_CLIP_CORNER] = 0,
+    [LV_STYLE_OPA] =                       LV_STYLE_PROP_FLAG_LAYER_UPDATE,
+    [LV_STYLE_COLOR_FILTER_DSC] =          LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_COLOR_FILTER_OPA] =          LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_ANIM_TIME] = 0,
+    [LV_STYLE_ANIM_SPEED] = 0,
+    [LV_STYLE_TRANSITION] = 0,
+    [LV_STYLE_BLEND_MODE] =                LV_STYLE_PROP_FLAG_LAYER_UPDATE,
+    [LV_STYLE_LAYOUT] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
 };
 
 uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
@@ -206,7 +181,6 @@ void lv_style_reset(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
-
 }
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
@@ -230,7 +204,7 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         required_size = (required_size + 31) & ~31;
         LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
         uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
-        uint8_t * new_p = (uint8_t *)lv_realloc(old_p, required_size * sizeof(uint8_t));
+        uint8_t * new_p = lv_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
@@ -242,12 +216,12 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     /* This should never happen - we should bail out above */
     LV_ASSERT_NULL(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table));
     LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
-    return (lv_style_prop_t)last_custom_prop_id;
+    return last_custom_prop_id;
 }
 
 lv_style_prop_t lv_style_get_num_custom_props(void)
 {
-    return (lv_style_prop_t)(last_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP);
+    return last_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP;
 }
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
@@ -281,9 +255,10 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 style->prop_cnt = 1;
                 style->prop1 = i == 0 ? old_props[1] : old_props[0];
                 style->v_p.value1 = i == 0 ? old_values[1] : old_values[0];
-            } else {
+            }
+            else {
                 size_t size = (style->prop_cnt - 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-                uint8_t * new_values_and_props = (uint8_t *)lv_malloc(size);
+                uint8_t * new_values_and_props = lv_malloc(size);
                 if(new_values_and_props == NULL) return false;
                 style->v_p.values_and_props = new_values_and_props;
                 style->prop_cnt--;
@@ -293,7 +268,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 lv_style_value_t * new_values = (lv_style_value_t *)new_values_and_props;
 
                 uint32_t j;
-                for(i = j = 0; j <= style->prop_cnt; j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
+                for(i = j = 0; j <= style->prop_cnt;
+                    j++) { /*<=: because prop_cnt already reduced but all the old props. needs to be checked.*/
                     if(old_props[j] != prop) {
                         new_values[i] = old_values[j];
                         new_props[i++] = old_props[j];
@@ -311,20 +287,21 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
-   lv_style_set_prop_internal(style, prop, value, lv_style_set_prop_helper);
+    lv_style_set_prop_internal(style, prop, value, lv_style_set_prop_helper);
 }
 
 void lv_style_set_prop_meta(lv_style_t * style, lv_style_prop_t prop, uint16_t meta)
 {
-    lv_style_set_prop_internal(style, (lv_style_prop_t)(prop | meta), null_style_value, lv_style_set_prop_meta_helper);
+    lv_style_set_prop_internal(style, prop | meta, null_style_value, lv_style_set_prop_meta_helper);
 }
 
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
-   return lv_style_get_prop_inlined(style, prop, value);
+    return lv_style_get_prop_inlined(style, prop, value);
 }
 
-void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[], lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
+void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
+                                  lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
     lv_memzero(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
@@ -409,17 +386,14 @@ uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
     extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
     extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
+    if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
+    if(prop == LV_STYLE_PROP_INV) return 0;
 
-    int iprop = (int)prop;
-
-    if(iprop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
-    if(iprop == LV_STYLE_PROP_INV) return 0;
-
-    if(iprop < _LV_STYLE_NUM_BUILT_IN_PROPS)
-        return _lv_style_builtin_prop_flag_lookup_table[iprop];
-    iprop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && iprop < _lv_style_custom_prop_flag_lookup_table_size)
-        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[iprop];
+    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
+        return _lv_style_builtin_prop_flag_lookup_table[prop];
+    prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
+    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
+        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop];
     return 0;
 }
 
@@ -467,7 +441,7 @@ static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_
         }
 
         size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        uint8_t * values_and_props = (uint8_t *)lv_realloc(style->v_p.values_and_props, size);
+        uint8_t * values_and_props = lv_realloc(style->v_p.values_and_props, size);
         if(values_and_props == NULL) return;
         style->v_p.values_and_props = values_and_props;
 
@@ -493,7 +467,7 @@ static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_
             return;
         }
         size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        uint8_t * values_and_props = (uint8_t *)lv_malloc(size);
+        uint8_t * values_and_props = lv_malloc(size);
         if(values_and_props == NULL) return;
         lv_style_value_t value_tmp = style->v_p.value1;
         style->v_p.values_and_props = values_and_props;
