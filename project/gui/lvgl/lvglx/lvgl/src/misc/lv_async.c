@@ -100,6 +100,9 @@ static void lv_async_timer_cb(lv_timer_t * timer)
 {
     lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
 
-    info->cb(info->user_data);
+    lv_async_info_t info_save = *info;
+    lv_timer_del(timer);
     lv_free(info);
+
+    info_save.cb(info_save.user_data);
 }
