@@ -1,12 +1,12 @@
 /**
- * @file lv_draw_vglite_rect.h
+ * @file lv_vglite_buf.h
  *
  */
 
 /**
  * MIT License
  *
- * Copyright 2021-2023 NXP
+ * Copyright 2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_DRAW_VGLITE_RECT_H
-#define LV_DRAW_VGLITE_RECT_H
+#ifndef LV_VGLITE_BUF_H
+#define LV_VGLITE_BUF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,8 +40,8 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-#include "lv_vglite_utils.h"
-#include "../../lv_draw_rect.h"
+#include "vg_lite.h"
+#include "../../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -54,35 +54,51 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/**
+ * Init vglite destination buffer. It will be done once per frame.
+ *
+ * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
+ * @param[in] area Destination buffer area (for width and height)
+ * @param[in] stride Stride of destination buffer
+ */
+void lv_gpu_nxp_vglite_init_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
 /**
- * Draw rectangle background with effects (rounded corners, gradient)
+ * Get vglite destination buffer pointer.
  *
- * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
- * @param[in] dsc Description of the rectangle background
- *
- * @retval LV_RES_OK Draw completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- *
+ * @retval The vglite destination buffer
  */
-lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
-                                   const lv_draw_rect_dsc_t * dsc);
+vg_lite_buffer_t * lv_vglite_get_dest_buf(void);
 
 /**
- * Draw rectangle border/outline shape with effects (rounded corners, opacity)
+ * Get vglite source buffer pointer.
  *
- * @param[in] coords Coordinates of the rectangle border/outline (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
- * @param[in] dsc Description of the rectangle border/outline
- * @param[in] border True for border, False for outline
- *
- * @retval LV_RES_OK Draw completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- *
+ * @retval The vglite source buffer
  */
-lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const lv_area_t * clip_area,
-                                               const lv_draw_rect_dsc_t * dsc, bool border);
+vg_lite_buffer_t * lv_vglite_get_src_buf(void);
+
+/**
+ * Set vglite destination buffer address only.
+ *
+ * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
+ */
+void lv_vglite_set_dest_buf_ptr(const lv_color_t * buf);
+
+/**
+ * Set vglite source buffer address only.
+ *
+ * @param[in] buf Source buffer address
+ */
+void lv_vglite_set_src_buf_ptr(const lv_color_t * buf);
+
+/**
+ * Set vglite source buffer. It will be done only if buffer addreess is different.
+ *
+ * @param[in] buf Source buffer address
+ * @param[in] area Source buffer area (for width and height)
+ * @param[in] stride Stride of source buffer
+ */
+void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
 /**********************
  *      MACROS
@@ -94,4 +110,4 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const l
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_VGLITE_RECT_H*/
+#endif /*LV_VGLITE_BUF_H*/

@@ -1,12 +1,12 @@
 /**
- * @file lv_draw_vglite_rect.h
+ * @file lv_draw_vglite_line.h
  *
  */
 
 /**
  * MIT License
  *
- * Copyright 2021-2023 NXP
+ * Copyright 2022, 2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,12 @@
  *
  */
 
-#ifndef LV_DRAW_VGLITE_RECT_H
-#define LV_DRAW_VGLITE_RECT_H
+#ifndef LV_DRAW_VGLITE_LINE_H
+#define LV_DRAW_VGLITE_LINE_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*********************
@@ -41,7 +42,7 @@ extern "C" {
 
 #if LV_USE_GPU_NXP_VG_LITE
 #include "lv_vglite_utils.h"
-#include "../../lv_draw_rect.h"
+#include "../../lv_draw_line.h"
 
 /*********************
  *      DEFINES
@@ -56,33 +57,18 @@ extern "C" {
  **********************/
 
 /**
- * Draw rectangle background with effects (rounded corners, gradient)
+ * Draw line shape with effects
  *
- * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
+ * @param[in] point1 Starting point with relative coordinates
+ * @param[in] point2 Ending point with relative coordinates
  * @param[in] clip_area Clipping area with relative coordinates to dest buff
- * @param[in] dsc Description of the rectangle background
+ * @param[in] dsc Line description structure (width, rounded ending, opacity, ...)
  *
  * @retval LV_RES_OK Draw completed
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- *
  */
-lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
-                                   const lv_draw_rect_dsc_t * dsc);
-
-/**
- * Draw rectangle border/outline shape with effects (rounded corners, opacity)
- *
- * @param[in] coords Coordinates of the rectangle border/outline (relative to dest buff)
- * @param[in] clip_area Clipping area with relative coordinates to dest buff
- * @param[in] dsc Description of the rectangle border/outline
- * @param[in] border True for border, False for outline
- *
- * @retval LV_RES_OK Draw completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- *
- */
-lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const lv_area_t * clip_area,
-                                               const lv_draw_rect_dsc_t * dsc, bool border);
+lv_res_t lv_gpu_nxp_vglite_draw_line(const lv_point_t * point1, const lv_point_t * point2,
+                                     const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc);
 
 /**********************
  *      MACROS
@@ -94,4 +80,4 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const l
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_VGLITE_RECT_H*/
+#endif /*LV_DRAW_VGLITE_LINE_H*/

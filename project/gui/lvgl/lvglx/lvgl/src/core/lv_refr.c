@@ -579,6 +579,9 @@ static void refr_area(const lv_area_t *area_p)
 static void refr_area_part(lv_draw_ctx_t *draw_ctx)
 {
     lv_disp_draw_buf_t *draw_buf = lv_disp_get_draw_buf(disp_refr);
+    if (draw_ctx->init_buf) {
+        draw_ctx->init_buf(draw_ctx);
+    }
 
     if (draw_buf->buf1 && !draw_buf->buf2) {
         while (draw_buf->flushing) {
