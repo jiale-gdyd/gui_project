@@ -1,0 +1,6 @@
+#ifndef UNITTEST_HOST_EXAMPLES_LIVE555_RTSPSERVER_RTSPSERVER_H
+#define UNITTEST_HOST_EXAMPLES_LIVE555_RTSPSERVER_RTSPSERVER_H
+
+int live555_rtspserver_main(int argc, char *argv[]);
+
+#endif
