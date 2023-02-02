@@ -197,13 +197,15 @@ void lv_scr_load_anim(lv_obj_t *new_scr, lv_scr_load_anim_t anim_type, uint32_t 
 
     // 确保屏幕上没有其他动画
     lv_anim_del(new_scr, NULL);
-    lv_anim_del(lv_scr_act(), NULL);
+    lv_anim_del(act_scr, NULL);
 
     // 确保两个屏幕都处于正常位置
     lv_obj_set_pos(new_scr, 0, 0);
-    lv_obj_set_pos(lv_scr_act(), 0, 0);
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
-    lv_obj_remove_local_style_prop(lv_scr_act(), LV_STYLE_OPA, 0);
+    if (act_scr) {
+        lv_obj_set_pos(act_scr, 0, 0);
+        lv_obj_remove_local_style_prop(act_scr, LV_STYLE_OPA, 0);
+    }
 
     if ((time == 0) && (delay == 0)) {
         scr_load_internal(new_scr);
