@@ -47,8 +47,8 @@ extern "C" {
 /**
  * Other constants
  */
-#define LV_IMG_ZOOM_NONE            256        /*Value for not zooming the image*/
-LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
+#define LV_ZOOM_NONE                256        /*Value for not zooming the image*/
+LV_EXPORT_CONST_INT(LV_ZOOM_NONE);
 
 #if LV_USE_ASSERT_STYLE
 #define LV_STYLE_CONST_INIT(var_name, prop_array)                       \

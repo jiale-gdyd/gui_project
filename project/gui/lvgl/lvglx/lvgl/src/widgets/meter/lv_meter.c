@@ -335,7 +335,7 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t 
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.arc_dsc = &arc_dsc;
-    part_draw_dsc.part = LV_PART_INDICATOR;
+    part_draw_dsc.part = LV_PART_ITEMS;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_METER_DRAW_PART_ARC;
 
@@ -438,7 +438,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
         lv_coord_t line_width_ori = major ? meter->scale.tick_major_width : meter->scale.tick_width;
         lv_coord_t line_width = line_width_ori;
 
-        lv_meter_indicator_t * indic;
+        lv_meter_indicator_t *indic;
         _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
             if(indic->type != LV_METER_INDICATOR_TYPE_SCALE_LINES) continue;
             if(value_of_line >= indic->start_value && value_of_line <= indic->end_value) {
@@ -521,7 +521,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
         inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
         lv_draw_line(draw_ctx, &line_dsc, &p_outer, &p_center);
         lv_draw_mask_remove_id(inner_act_mask_id);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
+        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         line_dsc.color = line_color_ori;
         line_dsc.width = line_width_ori;
@@ -556,8 +556,9 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.p1 = &scale_center;
+    part_draw_dsc.part = LV_PART_ITEMS;
 
-    lv_meter_indicator_t * indic;
+    lv_meter_indicator_t *indic;
     _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
         part_draw_dsc.sub_part_ptr = indic;
 
@@ -678,7 +679,7 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
         scale_center.x -= indic->type_data.needle_img.pivot.x;
         scale_center.y -= indic->type_data.needle_img.pivot.y;
         lv_area_t a;
-        _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_IMG_ZOOM_NONE, &indic->type_data.needle_img.pivot);
+        _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_ZOOM_NONE, &indic->type_data.needle_img.pivot);
         a.x1 += scale_center.x - 2;
         a.y1 += scale_center.y - 2;
         a.x2 += scale_center.x + 2;

@@ -1197,7 +1197,7 @@ static void transform_point(const lv_obj_t *obj, lv_point_t *p, bool inv)
     int16_t angle = lv_obj_get_style_transform_angle(obj, 0);
     int16_t zoom = lv_obj_get_style_transform_zoom(obj, 0);
 
-    if ((angle == 0) && (zoom == LV_IMG_ZOOM_NONE)) {
+    if ((angle == 0) && (zoom == LV_ZOOM_NONE)) {
         return;
     }
 
