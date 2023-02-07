@@ -36,7 +36,6 @@ lv_disp_t *lv_wayland_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char
 void lv_wayland_close_window(lv_disp_t *disp);
 
 bool lv_wayland_window_is_open(lv_disp_t *disp);
-bool lv_wayland_window_is_flush_pending(lv_disp_t *disp);
 
 void lv_wayland_window_set_fullscreen(lv_disp_t *disp, bool fullscreen);
 

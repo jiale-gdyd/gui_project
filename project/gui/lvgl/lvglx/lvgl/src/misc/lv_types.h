@@ -25,12 +25,15 @@ typedef uint8_t lv_res_t;
 #if defined(__cplusplus) || (__STDC_VERSION__ >= 199901L)
 // 如果是c99或更新版本，则直接使用<stdint.h>中的uintptr_t定义
 typedef uintptr_t lv_uintptr_t;
+typedef intptr_t lv_intptr_t;
 #else
 // 否则，使用拱形尺寸确定
 #ifdef LV_ARCH_64
 typedef uint64_t lv_uintptr_t;
+typedef int64_t lv_intptr_t;
 #else
 typedef uint32_t lv_uintptr_t;
+typedef int32_t lv_intptr_t;
 #endif
 
 #endif
