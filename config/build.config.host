@@ -76,7 +76,8 @@ KBUILD_CXXFLAGS += -Wall -O2 \
                 -Wno-sizeof-pointer-memaccess \
                 -Wno-class-conversion \
                 -Wno-array-bounds \
-                -Wno-int-to-pointer-cast
+                -Wno-int-to-pointer-cast \
+                -Wno-array-compare
 
 KBUILD_CFLAGS := -Wall -O2 \
             -Wno-trigraphs \
