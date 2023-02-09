@@ -10,16 +10,18 @@ enum {
     RTSP_STREAM_CODEC_H265
 };
 
-typedef int(*rtspclient_callback)(uint8_t *frame, uint32_t frame_size, const char *streamId, void *user_data, bool &quit, int channel, int codec_type);
+typedef void (*rtspclient_callback)(uint8_t *frame, uint32_t frame_size, void *user_data, bool &quit, uint8_t channel);
 
 typedef struct {
-    int                 codecType;
+    uint8_t             codecType;
     std::string         rtspFullUrl;
     rtspclient_callback frameCallback;
     void                *userInsData;
-    int                 decodeChannel;
+    uint8_t             decodeChannel;
+    uint8_t             retryIntervalSec;
 } rtspPullType;
 
-int liveRtspClientPull(std::vector<rtspPullType> &rtspInfo);
+void liveRtspClientPullExit(void);
+int liveRtspClientPullInit(const std::vector<rtspPullType> &rtspInfo);
 
 #endif

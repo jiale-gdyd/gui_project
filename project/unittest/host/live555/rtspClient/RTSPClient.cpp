@@ -2,11 +2,9 @@
 #include "RTSPClient.h"
 #include "liveRTSP.hpp"
 
-int live_rtsp_client_callback(uint8_t *frame, uint32_t frame_size, const char *streamId, void *user_data, bool &quit, int channel, int codec_type)
+void live_rtsp_client_callback(uint8_t *frame, uint32_t frame_size, void *user_data, bool &quit, uint8_t channel)
 {
-    printf("streamId:[%s], frame_size:[%08u], channel:[%d], codec_type:[%s]\n",
-        streamId, frame_size, channel, codec_type == RTSP_STREAM_CODEC_H264 ? "H264" : codec_type == RTSP_STREAM_CODEC_H265 ? "H265" : "UNK");
-    return 0;
+    printf("channel:[%d], frame_size:[%08u]\n", (int)channel, frame_size);
 }
 
 int live555_rtspclient_main(int argc, char *argv[])
@@ -22,6 +20,7 @@ int live555_rtspclient_main(int argc, char *argv[])
 
     info.userInsData = NULL;
     info.decodeChannel = 1;
+    info.retryIntervalSec = 2;
     info.codecType = RTSP_STREAM_CODEC_H264;
     info.rtspFullUrl = std::move(argv[1]);
     info.frameCallback = live_rtsp_client_callback;
@@ -30,13 +29,14 @@ int live555_rtspclient_main(int argc, char *argv[])
     if (argc >= 3) {
         info1.userInsData = NULL;
         info1.decodeChannel = 2;
+        info1.retryIntervalSec = 2;
         info1.codecType = RTSP_STREAM_CODEC_H264;
         info1.rtspFullUrl = std::move(argv[2]);
         info1.frameCallback = live_rtsp_client_callback;
         rtspInfo.push_back(info1);
     }
 
-    liveRtspClientPull(rtspInfo);
+    liveRtspClientPullInit(rtspInfo);
 
     static bool exit_flag = false;
     signal(SIGINT, [](int) {
@@ -47,5 +47,6 @@ int live555_rtspclient_main(int argc, char *argv[])
         sleep(1);
     }
 
+    liveRtspClientPullExit();
     return 0;
 }

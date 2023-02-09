@@ -1,4 +1,5 @@
 #include <thread>
+#include <future>
 #include <unordered_map>
 
 #include <live555/liveMedia/liveMedia.hh>
@@ -9,13 +10,19 @@
 #define DUMMY_SINK_RECEIVE_BUFFER_SIZE      (524275)  /* 512*1024 = 524288 - 13 */
 
 typedef struct {
-    char       variable;
-    bool       quit_loop;
     RTSPClient *rtspClient;
-} rtspProCliWatch;
+} rtspClientHandle;
 
-static uint8_t sg_rtspClientCount = 0;
-static std::unordered_map<std::string, rtspProCliWatch> sg_rtspCliWatch;
+using rtsp_clients_map = std::unordered_map<std::string, rtspClientHandle>;
+
+static bool sg_bInitEnv = false;
+static bool sg_bFirstTime = true;
+static UsageEnvironment *sg_env = NULL;
+static TaskScheduler *sg_scheduler = NULL;
+
+static int sg_rtspClientCount = 0;
+static rtsp_clients_map sg_rtspCliWatch;
+static char volatile sg_eventLoopWatchVariable = 0;
 
 static void streamTimerHandler(void *clientData);
 static void subsessionAfterPlaying(void *clientData);
@@ -28,7 +35,7 @@ static void continueAfterPLAY(RTSPClient *rtspClient, int resultCode, char *resu
 static void continueAfterSETUP(RTSPClient *rtspClient, int resultCode, char *resultString);
 static void continueAfterDESCRIBE(RTSPClient *rtspClient, int resultCode, char *resultString);
 
-static void openURL(UsageEnvironment &env, char const *streamId, char const *rtspURL, rtspPullType *rtspParam);
+static void openURL(UsageEnvironment &env, char const *streamId, char const *rtspURL, rtspPullType *rtspParam, rtsp_clients_map &rtspClientsMap);
 
 UsageEnvironment &operator<<(UsageEnvironment &env, const RTSPClient &rtspClient)
 {
@@ -55,24 +62,25 @@ public:
 
 class SelfRTSPClient : public RTSPClient {
 public:
-    static SelfRTSPClient *createNew(UsageEnvironment &env, char const *rtspURL, int verbosityLevel = 0, char const *streamId = NULL, rtspPullType *rtspParam = NULL, portNumBits tunnelOverHTTPPortNum = 0);
+    static SelfRTSPClient *createNew(UsageEnvironment &env, char const *rtspURL, rtsp_clients_map &rtspClientsMap, int verbosityLevel = 0, char const *streamId = NULL, rtspPullType *rtspParam = NULL, portNumBits tunnelOverHTTPPortNum = 0);
 
 protected:
-    SelfRTSPClient(UsageEnvironment &env, char const *rtspURL, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum);
+    SelfRTSPClient(UsageEnvironment &env, char const *rtspURL, rtsp_clients_map &rtspClientsMap, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum);
     virtual ~SelfRTSPClient();
 
 public:
     const char        *streamId;
     rtspPullType      *rtspPull;
+    rtsp_clients_map  *rtspClientsMap;
     StreamClientState scs;
 };
 
 class SelfMediaSink : public MediaSink {
 public:
-    static SelfMediaSink *createNew(UsageEnvironment &env, MediaSubsession &subsession, char const *streamId = NULL, rtspPullType *rtspParam = NULL);
+    static SelfMediaSink *createNew(UsageEnvironment &env, MediaSubsession &subsession, rtsp_clients_map &rtspClientsMap, char const *streamId = NULL, rtspPullType *rtspParam = NULL);
 
 private:
-    SelfMediaSink(UsageEnvironment &env, MediaSubsession &subsession, char const *streamId, rtspPullType *rtspParam);
+    SelfMediaSink(UsageEnvironment &env, MediaSubsession &subsession, rtsp_clients_map &rtspClientsMap, char const *streamId, rtspPullType *rtspParam);
     virtual ~SelfMediaSink();
 
     static void afterGettingFrame(void *clientData, unsigned frameSize, unsigned numTruncatedBytes, struct timeval presentationTime, unsigned durationInMicroseconds);
@@ -82,23 +90,37 @@ private:
     virtual Boolean continuePlaying();
 
 private:
-    const char      *streamId;
-    u_int8_t        *fReceiveBuffer;
-    MediaSubsession &fSubsession;
-    char            *fStreamId;
-    rtspPullType    *rtspPull;
+    const char       *streamId;
+    u_int8_t         *fReceiveBuffer;
+    MediaSubsession  &fSubsession;
+    char             *fStreamId;
+    rtspPullType     *rtspPull;
+    rtsp_clients_map *rtspClientsMap;
 };
 
-static void openURL(UsageEnvironment &env, char const *streamId, char const *rtspURL, rtspPullType *rtspParam)
+static void removeRtspClient(std::string streamId)
 {
-    sg_rtspCliWatch[streamId].rtspClient = SelfRTSPClient::createNew(env, rtspURL, 1, streamId, rtspParam);
-    if (sg_rtspCliWatch[streamId].rtspClient == NULL) {
+    rtsp_clients_map::iterator iter = sg_rtspCliWatch.begin();
+    while (iter != sg_rtspCliWatch.end()) {
+        if (iter->first == streamId) {
+            sg_rtspCliWatch.erase(iter);
+            break;
+        }
+
+        iter++;
+    }
+}
+
+static void openURL(UsageEnvironment &env, char const *streamId, char const *rtspURL, rtspPullType *rtspParam, rtsp_clients_map &rtspClientsMap)
+{
+    rtspClientsMap[streamId].rtspClient = SelfRTSPClient::createNew(env, rtspURL, rtspClientsMap, 1, streamId, rtspParam);
+    if (rtspClientsMap[streamId].rtspClient == NULL) {
         env << "Failed to create a RTSP client for URL \"" << rtspURL << "\": " << env.getResultMsg() << "\n";
         return;
     }
 
     sg_rtspClientCount += 1;
-    sg_rtspCliWatch[streamId].rtspClient->sendDescribeCommand(continueAfterDESCRIBE); 
+    rtspClientsMap[streamId].rtspClient->sendDescribeCommand(continueAfterDESCRIBE);
 }
 
 static void continueAfterDESCRIBE(RTSPClient *rtspClient, int resultCode, char *resultString)
@@ -189,7 +211,7 @@ static void continueAfterSETUP(RTSPClient *rtspClient, int resultCode, char *res
         }
         env << ")\n";
 
-        scs.subsession->sink = SelfMediaSink::createNew(env, *scs.subsession, rtspClient->url(), selfRtspClient->rtspPull);
+        scs.subsession->sink = SelfMediaSink::createNew(env, *scs.subsession, *selfRtspClient->rtspClientsMap, rtspClient->url(), selfRtspClient->rtspPull);
         if (scs.subsession->sink == NULL) {
             env << *rtspClient << "Failed to create a data sink for the \"" << *scs.subsession << "\" subsession: " << env.getResultMsg() << "\n";
             break;
@@ -295,9 +317,9 @@ static void shutdownStream(RTSPClient *rtspClient)
     StreamClientState &scs = selfRtspClient->scs;
 
     if (scs.session != NULL) { 
+        MediaSubsession *subsession;
         Boolean someSubsessionsWereActive = False;
         MediaSubsessionIterator iter(*scs.session);
-        MediaSubsession *subsession;
 
         while ((subsession = iter.next()) != NULL) {
             if (subsession->sink != NULL) {
@@ -320,23 +342,24 @@ static void shutdownStream(RTSPClient *rtspClient)
     env << *rtspClient << "Closing the stream.\n";
     Medium::close(rtspClient);
 
-    if (--sg_rtspClientCount == 0) {
-        for (auto &cli : sg_rtspCliWatch) {
-            sg_rtspCliWatch[cli.first].variable = 1;
-        }
+    if (--sg_rtspClientCount <= 0) {
+        sg_bInitEnv = false;
+        sg_rtspClientCount = 0;
+        sg_eventLoopWatchVariable = 1;
     }
 }
 
-SelfRTSPClient *SelfRTSPClient::createNew(UsageEnvironment &env, char const *rtspURL, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum)
+SelfRTSPClient *SelfRTSPClient::createNew(UsageEnvironment &env, char const *rtspURL, rtsp_clients_map &rtspClientsMap, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum)
 {
-    return new SelfRTSPClient(env, rtspURL, verbosityLevel, streamId, rtspParam, tunnelOverHTTPPortNum);
+    return new SelfRTSPClient(env, rtspURL, rtspClientsMap, verbosityLevel, streamId, rtspParam, tunnelOverHTTPPortNum);
 }
 
-SelfRTSPClient::SelfRTSPClient(UsageEnvironment &env, char const *rtspURL, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum)
-    : RTSPClient(env,rtspURL, verbosityLevel, streamId, tunnelOverHTTPPortNum, -1)
+SelfRTSPClient::SelfRTSPClient(UsageEnvironment &env, char const *rtspURL, rtsp_clients_map &rtspClientsMap, int verbosityLevel, char const *streamId, rtspPullType *rtspParam, portNumBits tunnelOverHTTPPortNum)
+    : RTSPClient(env, rtspURL, verbosityLevel, streamId, tunnelOverHTTPPortNum, -1)
 {
     rtspPull = rtspParam;
     this->streamId = streamId;
+    this->rtspClientsMap = &rtspClientsMap;
 }
 
 SelfRTSPClient::~SelfRTSPClient()
@@ -360,16 +383,18 @@ StreamClientState::~StreamClientState()
     }
 }
 
-SelfMediaSink *SelfMediaSink::createNew(UsageEnvironment &env, MediaSubsession &subsession, char const *streamId, rtspPullType *rtspParam)
+SelfMediaSink *SelfMediaSink::createNew(UsageEnvironment &env, MediaSubsession &subsession, rtsp_clients_map &rtspClientsMap, char const *streamId, rtspPullType *rtspParam)
 {
-    return new SelfMediaSink(env, subsession, streamId, rtspParam);
+    return new SelfMediaSink(env, subsession, rtspClientsMap, streamId, rtspParam);
 }
 
-SelfMediaSink::SelfMediaSink(UsageEnvironment &env, MediaSubsession &subsession, char const *streamId, rtspPullType *rtspParam)
+SelfMediaSink::SelfMediaSink(UsageEnvironment &env, MediaSubsession &subsession, rtsp_clients_map &rtspClientsMap, char const *streamId, rtspPullType *rtspParam)
     : MediaSink(env), fSubsession(subsession)
 {
     rtspPull = rtspParam;
     this->streamId = streamId;
+    this->rtspClientsMap = &rtspClientsMap;
+
     fStreamId = strDup(streamId);
     fReceiveBuffer = new u_int8_t[DUMMY_SINK_RECEIVE_BUFFER_SIZE];
 }
@@ -386,12 +411,11 @@ void SelfMediaSink::afterGettingFrame(void *clientData, unsigned frameSize, unsi
     sink->afterGettingFrame(frameSize, numTruncatedBytes, presentationTime, durationInMicroseconds);
 }
 
-void SelfMediaSink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes, struct timeval presentationTime, unsigned /*durationInMicroseconds*/)
+void SelfMediaSink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedBytes, struct timeval presentationTime, unsigned)
 {
-    // envir() << fSubsession.mediumName() << "/" << fSubsession.codecName() << ":\tReceived " << frameSize << " bytes\n";
-
     if (strstr(fSubsession.mediumName(), "video")) {
         bool invokeCallback = false;
+
         if (rtspPull->codecType == RTSP_STREAM_CODEC_H264) {
             invokeCallback = strstr(fSubsession.codecName(), "264") ? true : false;
         } else if (rtspPull->codecType == RTSP_STREAM_CODEC_H265) {
@@ -400,14 +424,16 @@ void SelfMediaSink::afterGettingFrame(unsigned frameSize, unsigned numTruncatedB
 
         if (invokeCallback) {
             if (rtspPull->frameCallback) {
-                std::string streamIdStr = streamId;
-                streamIdStr = streamIdStr.substr(streamIdStr.find("_") + 1);
+                bool quit_loop = false;
+                rtspPull->frameCallback((uint8_t *)fReceiveBuffer, (uint32_t)frameSize, rtspPull->userInsData, quit_loop, rtspPull->decodeChannel);
+                if (quit_loop) {
+                    rtsp_clients_map::iterator iter = rtspClientsMap->find(streamId);
+                    if (iter != rtspClientsMap->end()) {
+                        shutdownStream(iter->second.rtspClient);
+                    }
 
-                rtspPull->frameCallback((uint8_t *)fReceiveBuffer, (uint32_t)frameSize, streamIdStr.c_str(),
-                    rtspPull->userInsData, sg_rtspCliWatch[streamId].quit_loop, rtspPull->decodeChannel, rtspPull->codecType);
-
-                if (sg_rtspCliWatch[streamId].quit_loop) {
-                    sg_rtspCliWatch[streamId].variable = 1;
+                    removeRtspClient(streamId);
+                    return;
                 }
             }
         }
@@ -426,29 +452,9 @@ Boolean SelfMediaSink::continuePlaying()
     return True;
 }
 
-void liveRtspProcessPrepareThread(const rtspPullType &info, std::string streamId)
+int liveRtspProcessPrepareThread(const std::vector<rtspPullType> &rtspInfo, UsageEnvironment *env)
 {
-    TaskScheduler *scheduler = BasicTaskScheduler::createNew();
-    UsageEnvironment *env = BasicUsageEnvironment::createNew(*scheduler);
-
-    sg_rtspCliWatch[streamId].variable = 0;
-    sg_rtspCliWatch[streamId].quit_loop = false;
-
-    openURL(*env, streamId.c_str(), info.rtspFullUrl.c_str(), (rtspPullType *)&info);
-
-    env->taskScheduler().doEventLoop(&sg_rtspCliWatch[streamId].variable);
-
-    std::unordered_map<std::string, rtspProCliWatch>::iterator iter;
-    for (iter = sg_rtspCliWatch.begin(); iter != sg_rtspCliWatch.end(); iter++) {
-        if (iter->first == streamId) {
-            sg_rtspCliWatch.erase(iter);
-        }
-    }
-}
-
-int liveRtspClientPull(std::vector<rtspPullType> &rtspInfo)
-{
-    int count = 0;
+    bool bFirst = sg_bFirstTime && (sg_rtspCliWatch.size() == 0);
 
     for (size_t idx = 0; idx < rtspInfo.size(); ++idx) {
         if (!rtspInfo[idx].rtspFullUrl.empty()
@@ -456,11 +462,69 @@ int liveRtspClientPull(std::vector<rtspPullType> &rtspInfo)
             && ((rtspInfo[idx].codecType == RTSP_STREAM_CODEC_H264) || (rtspInfo[idx].codecType == RTSP_STREAM_CODEC_H265)))
         {
             std::string streamId = std::to_string(idx) + "_" + rtspInfo[idx].rtspFullUrl;
-            std::thread(liveRtspProcessPrepareThread, std::cref(rtspInfo[idx]), streamId).detach();
 
-            count += 1;
+            rtsp_clients_map::iterator iter = sg_rtspCliWatch.find(streamId);
+            if (iter == sg_rtspCliWatch.end()) {
+                if (sg_bFirstTime) {
+                    sg_bFirstTime = false;
+                }
+
+                openURL(*env, streamId.c_str(), rtspInfo[idx].rtspFullUrl.c_str(), (rtspPullType *)&rtspInfo[idx], sg_rtspCliWatch);
+            }
         }
     }
 
-    return count > 0 ? 0 : -1;
+    return bFirst ? 1 : 0;
+}
+
+void liveRtspEventLoopMonitorThread(UsageEnvironment *env)
+{
+    env->taskScheduler().doEventLoop(&sg_eventLoopWatchVariable);
+}
+
+int liveRtspClientPullInit(const std::vector<rtspPullType> &rtspInfo)
+{
+    if (!sg_bInitEnv) {
+        sg_scheduler = BasicTaskScheduler::createNew();
+        if (!sg_scheduler) {
+            return -1;
+        }
+
+        sg_env = BasicUsageEnvironment::createNew(*sg_scheduler);
+        if (!sg_env) {
+            delete sg_scheduler;
+            return -2;
+        }
+
+        sg_bInitEnv = true;
+        sg_rtspCliWatch.clear();
+    }
+
+    std::shared_future<int> threadReturn = std::async(std::launch::async, liveRtspProcessPrepareThread, std::cref(rtspInfo), std::ref(sg_env));
+    if (threadReturn.get() == 1) {
+        std::thread(liveRtspEventLoopMonitorThread, std::ref(sg_env)).detach();
+    }
+
+    return 0;
+}
+
+void liveRtspClientPullExit(void)
+{
+    rtsp_clients_map::iterator iter = sg_rtspCliWatch.begin();
+    for (; iter != sg_rtspCliWatch.end(); iter++) {
+        if (iter->second.rtspClient) {
+            shutdownStream(iter->second.rtspClient);
+        }
+
+        sg_rtspCliWatch.erase(iter);
+    }
+
+    sg_eventLoopWatchVariable = 1;
+
+    sg_env->reclaim();
+    delete sg_scheduler;
+
+    sg_bInitEnv = false;
+    sg_bFirstTime = true;
+    sg_rtspCliWatch.clear();
 }
