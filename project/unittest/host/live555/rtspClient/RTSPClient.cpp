@@ -10,30 +10,22 @@ void live_rtsp_client_callback(uint8_t *frame, uint32_t frame_size, void *user_d
 int live555_rtspclient_main(int argc, char *argv[])
 {
     if (argc < 2) {
-        printf("Usage: %s <rtspURL1 rtspURL2>\n", argv[0]);
-        printf("Example: %s rtsp://admin:xd@123456@192.168.1.7 rtsp://admin:a12345678@192.168.1.165\n", argv[0]);
+        printf("Usage: %s <rtspURL-1 ... rtspURL-n>\n", argv[0]);
+        printf("Example: %s rtsp://admin:xd@123456@192.168.1.7 rtsp://admin:a12345678@192.168.1.165 ...\n", argv[0]);
         return 1;
     }
 
-    rtspPullType info, info1;
+    rtspPullType info;
     std::vector<rtspPullType> rtspInfo;
 
-    info.userInsData = NULL;
-    info.decodeChannel = 1;
-    info.retryIntervalSec = 2;
-    info.codecType = RTSP_STREAM_CODEC_H264;
-    info.rtspFullUrl = std::move(argv[1]);
-    info.frameCallback = live_rtsp_client_callback;
-    rtspInfo.push_back(info);
-
-    if (argc >= 3) {
-        info1.userInsData = NULL;
-        info1.decodeChannel = 2;
-        info1.retryIntervalSec = 2;
-        info1.codecType = RTSP_STREAM_CODEC_H264;
-        info1.rtspFullUrl = std::move(argv[2]);
-        info1.frameCallback = live_rtsp_client_callback;
-        rtspInfo.push_back(info1);
+    for (int i = 1; i <= (argc - 1); ++i) {
+        info.userInsData = NULL;
+        info.decodeChannel = i;
+        info.retryIntervalSec = 2;
+        info.codecType = RTSP_STREAM_CODEC_H264;
+        info.rtspFullUrl = std::move(argv[i]);
+        info.frameCallback = live_rtsp_client_callback;
+        rtspInfo.push_back(info);
     }
 
     liveRtspClientPullInit(rtspInfo);
