@@ -264,6 +264,7 @@ static MPP_RET hal_vp9d_vdpu382_init(void *hal, MppHalCfg *cfg)
 
         mpp_assert(hw_info);
         cfg->hw_info = hw_info;
+        p_hal->hw_info = hw_info;
     }
 
     return ret;
@@ -278,55 +279,66 @@ static void vp9d_refine_rcb_size(Vdpu382RcbInfo *rcb_info,
 {
     RK_U32 rcb_bits = 0;
     DXVA_PicParams_VP9 *pic_param = (DXVA_PicParams_VP9*)data;
-    RK_U32 num_tiles = pic_param->log2_tile_rows;
+    RK_U32 num_tiles_col = 1 << pic_param->log2_tile_cols;
     RK_U32 bit_depth = pic_param->BitDepthMinus8Luma + 8;
-    RK_U32 ext_align_size = num_tiles * 64 * 8;
+    RK_U32 ext_align_size = num_tiles_col * 64 * 8;
 
     width = MPP_ALIGN(width, VP9_CTU_SIZE);
     height = MPP_ALIGN(height, VP9_CTU_SIZE);
     /* RCB_STRMD_ROW */
-    if (width > 4096)
+    if (width >= 4096)
         rcb_bits = MPP_ALIGN(width, 64) * 232 + ext_align_size;
     else
         rcb_bits = 0;
     rcb_info[RCB_STRMD_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_TRANSD_ROW */
-    if (width > 8192)
+    if (width >= 8192)
         rcb_bits = (MPP_ALIGN(width - 8192, 4) << 1) + ext_align_size;
     else
         rcb_bits = 0;
     rcb_info[RCB_TRANSD_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_TRANSD_COL */
-    if (height > 8192)
-        rcb_bits = (MPP_ALIGN(height - 8192, 4) << 1) + ext_align_size;
+    if ((height >= 8192) && (num_tiles_col > 1))
+        rcb_bits = (MPP_ALIGN(height - 8192, 4) << 1);
     else
         rcb_bits = 0;
     rcb_info[RCB_TRANSD_COL].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_INTER_ROW */
     rcb_bits = width * 36 + ext_align_size;
     rcb_info[RCB_INTER_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_INTER_COL */
     rcb_info[RCB_INTER_COL].size = 0;
+
     /* RCB_INTRA_ROW */
-    rcb_bits = width * 48 + ext_align_size;
+    rcb_bits = width * 2 * 11 + ext_align_size;
     rcb_info[RCB_INTRA_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_DBLK_ROW */
-    rcb_bits = width * (1 + 16 * bit_depth) + num_tiles * 192 * bit_depth + ext_align_size;
+    rcb_bits = width * (0.5 + 16 * bit_depth) + num_tiles_col * 192 * bit_depth + ext_align_size;
     rcb_info[RCB_DBLK_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_SAO_ROW */
     rcb_info[RCB_SAO_ROW].size = 0;
+
     /* RCB_FBC_ROW */
     if (vp9_hw_regs->common.reg012.fbc_e) {
         rcb_bits = 8 * width * bit_depth + ext_align_size;
     } else
         rcb_bits = 0;
     rcb_info[RCB_FBC_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_FILT_COL */
-    if (vp9_hw_regs->common.reg012.fbc_e) {
-        rcb_bits = height * (4 + 24 *  bit_depth);
+    if (num_tiles_col > 1) {
+        if (vp9_hw_regs->common.reg012.fbc_e) {
+            rcb_bits = height * (4 + 24 *  bit_depth);
+        } else
+            rcb_bits = height * (4 + 16 *  bit_depth);
     } else
-        rcb_bits = height * (4 + 16 *  bit_depth);
-    rcb_bits += ext_align_size;
+        rcb_bits = 0;
     rcb_info[RCB_FILT_COL].size = MPP_RCB_BYTES(rcb_bits);
 }
 
@@ -953,24 +965,7 @@ static MPP_RET hal_vp9d_vdpu382_start(void *hal, HalTaskInfo *task)
             break;
         }
         /* rcb info for sram */
-        {
-            RK_U32 i = 0;
-            MppDevRcbInfoCfg rcb_cfg;
-            Vdpu382RcbInfo  rcb_info[RCB_BUF_COUNT];
-
-            memcpy(rcb_info, hw_ctx->rcb_info, sizeof(rcb_info));
-            qsort(rcb_info, MPP_ARRAY_ELEMS(rcb_info),
-                  sizeof(rcb_info[0]), vdpu382_compare_rcb_size);
-
-            for (i = 0; i < MPP_ARRAY_ELEMS(rcb_info); i++) {
-                rcb_cfg.reg_idx = rcb_info[i].reg;
-                rcb_cfg.size = rcb_info[i].size;
-                if (rcb_cfg.size > 0) {
-                    mpp_dev_ioctl(dev, MPP_DEV_RCB_INFO, &rcb_cfg);
-                } else
-                    break;
-            }
-        }
+        vdpu382_set_rcbinfo(dev, hw_ctx->rcb_info);
         ret = mpp_dev_ioctl(dev, MPP_DEV_CMD_SEND, NULL);
         if (ret) {
             mpp_err_f("send cmd failed %d\n", ret);

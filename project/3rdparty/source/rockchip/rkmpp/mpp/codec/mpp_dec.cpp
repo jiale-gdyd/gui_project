@@ -261,10 +261,6 @@ void mpp_dec_put_frame(Mpp *mpp, RK_S32 index, HalDecTaskFlag flags)
                 ret = hal_task_get_hnd(group, TASK_IDLE, &hnd);
                 if (ret) {
                     if (dec->reset_flag) {
-                        MppBuffer buffer = NULL;
-                        mpp_buf_slot_get_prop(slots, index, SLOT_BUFFER, &buffer);
-                        if (buffer)
-                            mpp_buffer_put(buffer);
                         return;
                     } else {
                         msleep(10);
@@ -676,7 +672,8 @@ MPP_RET mpp_dec_init(MppDec *dec, MppDecInitCfg *cfg)
         support_fast_mode = hal_cfg.support_fast_mode;
 
         if (dec_cfg->base.fast_parse && support_fast_mode) {
-            hal_task_count = 3;
+            hal_task_count = dec_cfg->status.hal_task_count ?
+                             dec_cfg->status.hal_task_count : 3;
         } else {
             dec_cfg->base.fast_parse = 0;
             p->parser_fast_mode = 0;

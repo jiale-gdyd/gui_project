@@ -153,9 +153,9 @@ static void read_global_param(AV1Context *s, RK_S32 type, RK_S32 ref, RK_S32 idx
      * with defaults at this point.
      */
     if (s->raw_frame_header->primary_ref_frame == AV1_PRIMARY_REF_NONE)
-        prev_gm_param = s->cur_frame.gm_params[ref][idx];
+        prev_gm_param = s->cur_frame.gm_params[ref].wmmat[idx];
     else
-        prev_gm_param = s->ref[prev_frame].gm_params[ref][idx];
+        prev_gm_param = s->ref[prev_frame].gm_params[ref].wmmat[idx];
 
     if (idx < 2) {
         if (type == AV1_WARP_MODEL_TRANSLATION) {
@@ -174,7 +174,7 @@ static void read_global_param(AV1Context *s, RK_S32 type, RK_S32 ref, RK_S32 idx
     mx = 1 << abs_bits;
     r = (prev_gm_param >> prec_diff) - sub;
 
-    s->cur_frame.gm_params[ref][idx] =
+    s->cur_frame.gm_params[ref].wmmat[idx] =
         (decode_signed_subexp_with_ref(s->raw_frame_header->gm_params[ref][idx],
                                        -mx, mx + 1, r) << prec_diff) + round;
 }
@@ -190,10 +190,10 @@ static void global_motion_params(AV1Context *s)
     RK_S32 i = 0;
 
     for (ref = AV1_REF_FRAME_LAST; ref <= AV1_REF_FRAME_ALTREF; ref++) {
-        s->cur_frame.gm_type[ref] = AV1_WARP_MODEL_IDENTITY;
+        s->cur_frame.gm_params[ref].wmtype = AV1_WARP_MODEL_IDENTITY;
         for (i = 0; i < 6; i++)
-            s->cur_frame.gm_params[ref][i] = (i % 3 == 2) ?
-                                             1 << AV1_WARPEDMODEL_PREC_BITS : 0;
+            s->cur_frame.gm_params[ref].wmmat[i] = (i % 3 == 2) ?
+                                                   1 << AV1_WARPEDMODEL_PREC_BITS : 0;
     }
     if (header->frame_type == AV1_FRAME_KEY ||
         header->frame_type == AV1_FRAME_INTRA_ONLY)
@@ -210,7 +210,7 @@ static void global_motion_params(AV1Context *s)
         } else {
             type = AV1_WARP_MODEL_IDENTITY;
         }
-        s->cur_frame.gm_type[ref] = type;
+        s->cur_frame.gm_params[ref].wmtype = type;
 
         if (type >= AV1_WARP_MODEL_ROTZOOM) {
             read_global_param(s, type, ref, 2);
@@ -219,8 +219,8 @@ static void global_motion_params(AV1Context *s)
                 read_global_param(s, type, ref, 4);
                 read_global_param(s, type, ref, 5);
             } else {
-                s->cur_frame.gm_params[ref][4] = -s->cur_frame.gm_params[ref][3];
-                s->cur_frame.gm_params[ref][5] = s->cur_frame.gm_params[ref][2];
+                s->cur_frame.gm_params[ref].wmmat[4] = -s->cur_frame.gm_params[ref].wmmat[3];
+                s->cur_frame.gm_params[ref].wmmat[5] = s->cur_frame.gm_params[ref].wmmat[2];
             }
         }
         if (type >= AV1_WARP_MODEL_TRANSLATION) {
@@ -401,11 +401,14 @@ static RK_S32 get_tiles_info(Av1CodecContext *ctx, const AV1RawTileGroup *tile_g
     bytestream_init(&gb, tile_group->tile_data.data,
                     tile_group->tile_data.data_size);
 
-    for (tile_num = tile_group->tg_start; tile_num <= tile_group->tg_end; tile_num++) {
+    if (s->tile_offset)
+        s->tile_offset += tile_group->tile_data.offset;
 
+    for (tile_num = tile_group->tg_start; tile_num <= tile_group->tg_end; tile_num++) {
         if (tile_num == tile_group->tg_end) {
-            s->tile_offset_start[tile_num] = bytestream_tell(&gb);
-            s->tile_offset_end[tile_num] = bytestream_tell(&gb) + bytestream_get_bytes_left(&gb);
+            s->tile_offset_start[tile_num] = bytestream_tell(&gb) + s->tile_offset;
+            s->tile_offset_end[tile_num] = bytestream_tell(&gb) + bytestream_get_bytes_left(&gb) + s->tile_offset;
+            s->tile_offset = s->tile_offset_end[tile_num];
             return 0;
         }
         size_bytes = s->raw_frame_header->tile_size_bytes_minus1 + 1;
@@ -418,9 +421,9 @@ static RK_S32 get_tiles_info(Av1CodecContext *ctx, const AV1RawTileGroup *tile_g
             return MPP_ERR_VALUE;
         size++;
 
-        s->tile_offset_start[tile_num] = bytestream_tell(&gb);
+        s->tile_offset_start[tile_num] = bytestream_tell(&gb) + s->tile_offset;
 
-        s->tile_offset_end[tile_num] = bytestream_tell(&gb) + size;
+        s->tile_offset_end[tile_num] = bytestream_tell(&gb) + size + s->tile_offset;
 
         bytestream_skipu(&gb, size);
     }
@@ -505,12 +508,9 @@ static RK_S32 av1d_frame_ref(Av1CodecContext *ctx, AV1Frame *dst, const AV1Frame
     dst->temporal_id = src->temporal_id;
     dst->order_hint  = src->order_hint;
 
-    memcpy(dst->gm_type,
-           src->gm_type,
-           AV1_NUM_REF_FRAMES * sizeof(uint8_t));
     memcpy(dst->gm_params,
            src->gm_params,
-           AV1_NUM_REF_FRAMES * 6 * sizeof(RK_S32));
+           sizeof(src->gm_params));
     memcpy(dst->skip_mode_frame_idx,
            src->skip_mode_frame_idx,
            2 * sizeof(uint8_t));
@@ -601,11 +601,11 @@ static MPP_RET get_current_frame(Av1CodecContext *ctx)
         av1d_frame_unref(ctx, frame);
 
     mpp_frame_set_meta(frame->f, NULL);
-    mpp_frame_set_width(frame->f, ctx->width);
-    mpp_frame_set_height(frame->f, ctx->height);
+    mpp_frame_set_width(frame->f, s->frame_width);
+    mpp_frame_set_height(frame->f, s->frame_height);
 
-    mpp_frame_set_hor_stride(frame->f, MPP_ALIGN(ctx->width * s->bit_depth / 8, 8));
-    mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(ctx->height, 8));
+    mpp_frame_set_hor_stride(frame->f, MPP_ALIGN(s->frame_width * s->bit_depth / 8, 8));
+    mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(s->frame_height, 8));
     mpp_frame_set_errinfo(frame->f, 0);
     mpp_frame_set_discard(frame->f, 0);
     mpp_frame_set_pts(frame->f, s->pts);
@@ -658,7 +658,6 @@ static MPP_RET get_current_frame(Av1CodecContext *ctx)
           mpp_err_f( "Failed to init tile data.\n");
           return ret;
       }*/
-
     global_motion_params(s);
     skip_mode_params(s);
     coded_lossless_param(s);
@@ -765,7 +764,7 @@ MPP_RET av1d_parser_frame(Av1CodecContext *ctx, HalDecTask *task)
 
     s->current_obu.data = data;
     s->current_obu.data_size = size;
-    s->obu_len = 0;
+    s->tile_offset = 0;
     ret = mpp_av1_split_fragment(s, &s->current_obu, 0);
     if (ret < 0) {
         return ret;
@@ -991,11 +990,18 @@ MPP_RET av1d_paser_reset(Av1CodecContext *ctx)
     av1d_dbg_func("enter ctx %p\n", ctx);
     for ( i = 0; i < MPP_ARRAY_ELEMS(s->ref); i++) {
         AV1Frame *f = &s->ref[i];
-        if (f->ref) {
-            av1d_frame_unref(ctx, &s->ref[i]);
-        }
 
+        if (f->ref)
+            av1d_frame_unref(ctx, &s->ref[i]);
     }
+
+    if (s->cur_frame.ref) {
+        av1d_frame_unref(ctx, &s->cur_frame);
+    }
+
+    ctx->frame_header = 0;
+    ctx->stream_offset = 0;
+
     av1d_dbg_func("leave ctx %p\n", ctx);
     return ret;
 
@@ -1087,12 +1093,10 @@ RK_S32 av1_extract_obu(AV1OBU *obu, uint8_t *buf, RK_S32 length)
     return len;
 }
 
-
-RK_S32 av1d_split_frame(SplitContext_t *ctx,
+RK_S32 av1d_split_frame(Av1CodecContext *ctx,
                         RK_U8 **out_data, RK_S32 *out_size,
                         RK_U8 *data, RK_S32 size)
 {
-    (void)ctx;
     (void)out_data;
     (void)out_size;
 
@@ -1106,22 +1110,35 @@ RK_S32 av1d_split_frame(SplitContext_t *ctx,
         RK_S32 len = av1_extract_obu(&obu, ptr, size);
         if (len < 0)
             break;
-        if (obu.type == AV1_OBU_FRAME_HEADER ||
-            obu.type == AV1_OBU_FRAME) {
+        if (obu.type == AV1_OBU_FRAME_HEADER || obu.type == AV1_OBU_FRAME ||
+            ((obu.type == AV1_OBU_TEMPORAL_DELIMITER ||
+              obu.type == AV1_OBU_SEQUENCE_HEADER) && ctx->frame_header))
+            ctx->frame_header ++;
+        if (ctx->frame_header == 2) {
+            *out_size = (RK_S32)(ptr - data);
+            ctx->new_frame = 1;
+            ctx->frame_header = 0;
+            return ptr - data;
+        }
+        if (obu.type == AV1_OBU_FRAME) {
             ptr      += len;
             size     -= len;
             *out_size = (RK_S32)(ptr - data);
+            ctx->new_frame = 1;
+            ctx->frame_header = 0;
             return ptr - data;
         }
         ptr      += len;
         size -= len;
     }
 
-    return 0;
+    *out_size = (RK_S32)(ptr - data);
+
+    return ptr - data;
 
     av1d_dbg_func("leave ctx %p\n", ctx);
-    return 0;
 
+    return 0;
 }
 
 MPP_RET av1d_get_frame_stream(Av1CodecContext *ctx, RK_U8 *buf, RK_S32 length)
@@ -1131,21 +1148,23 @@ MPP_RET av1d_get_frame_stream(Av1CodecContext *ctx, RK_U8 *buf, RK_S32 length)
     RK_S32 buff_size = 0;
     RK_U8 *data = NULL;
     RK_S32 size = 0;
+    RK_S32 offset = ctx->stream_offset;
 
     data = (RK_U8 *)mpp_packet_get_data(ctx->pkt);
     size = (RK_S32)mpp_packet_get_size(ctx->pkt);
 
-    if (length > size) {
-        mpp_free(data);
+    if ((length + offset) > size) {
         mpp_packet_deinit(&ctx->pkt);
-        buff_size = length + 10 * 1024;
-        data = mpp_malloc(RK_U8, buff_size);
-        mpp_packet_init(&ctx->pkt, (void *)data, length);
+        buff_size = length + offset + 10 * 1024;
+        data = mpp_realloc(data, RK_U8, buff_size);
+        mpp_packet_init(&ctx->pkt, (void *)data, buff_size);
         mpp_packet_set_size(ctx->pkt, buff_size);
+        ctx->stream_size = buff_size;
     }
 
-    memcpy(data, buf, length);
-    mpp_packet_set_length(ctx->pkt, length);
+    memcpy(data + offset, buf, length);
+    ctx->stream_offset += length;
+    mpp_packet_set_length(ctx->pkt, ctx->stream_offset);
 
     av1d_dbg_func("leave ctx %p\n", ctx);
     return ret;

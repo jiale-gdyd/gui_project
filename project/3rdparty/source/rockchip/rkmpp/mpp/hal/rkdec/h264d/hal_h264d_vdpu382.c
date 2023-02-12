@@ -540,7 +540,8 @@ static MPP_RET set_registers(H264dHalCtx_t *p_hal, Vdpu382H264dRegSet *regs, Hal
     memset(&regs->h264d_highpoc, 0, sizeof(regs->h264d_highpoc));
     common->reg016_str_len = p_hal->strm_len;
     common->reg013.cur_pic_is_idr = p_hal->slice_long->idr_flag;
-    common->reg012.colmv_compress_en = (pp->frame_mbs_only_flag) ? 1 : 0;
+    common->reg012.colmv_compress_en =
+        (p_hal->hw_info && p_hal->hw_info->cap_colmv_compress && pp->frame_mbs_only_flag) ? 1 : 0;
     //!< caculate the yuv_frame_size
     {
         MppFrame mframe = NULL;
@@ -783,6 +784,8 @@ MPP_RET vdpu382_h264d_init(void *hal, MppHalCfg *cfg)
 
         mpp_assert(hw_info);
         cfg->hw_info = hw_info;
+
+        p_hal->hw_info = hw_info;
     }
 
 __RETURN:
@@ -835,43 +838,52 @@ static void h264d_refine_rcb_size(H264dHalCtx_t *p_hal, Vdpu382RcbInfo *rcb_info
 
     width = MPP_ALIGN(width, H264_CTU_SIZE);
     height = MPP_ALIGN(height, H264_CTU_SIZE);
+
     /* RCB_STRMD_ROW */
-    if (width > 4096)
+    if (width >= 4096)
         rcb_bits = ((width + 15) / 16) * 154 * (mbaff ? 2 : 1);
     else
         rcb_bits = 0;
     rcb_info[RCB_STRMD_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_TRANSD_ROW */
-    if (width > 8192)
+    if (width >= 8192)
         rcb_bits = ((width - 8192 + 3) / 4) * 2;
     else
         rcb_bits = 0;
     rcb_info[RCB_TRANSD_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_TRANSD_COL */
-    if (height > 8192)
-        rcb_bits = ((height - 8192 + 3) / 4) * 2;
-    else
-        rcb_bits = 0;
-    rcb_info[RCB_TRANSD_COL].size = MPP_RCB_BYTES(rcb_bits);
+    rcb_info[RCB_TRANSD_COL].size = 0;
+
     /* RCB_INTER_ROW */
     rcb_bits = width * 42;
     rcb_info[RCB_INTER_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_INTER_COL */
     rcb_info[RCB_INTER_COL].size = 0;
+
     /* RCB_INTRA_ROW */
-    rcb_bits = width * 44;
+    if (mbaff)
+        rcb_bits = width * 44;
+    else
+        rcb_bits = width *  ((chroma_format_idc ? 1 : 0) + 1) * 11;
     rcb_info[RCB_INTRA_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_DBLK_ROW */
     rcb_bits = width * (2 + (mbaff ? 12 : 6) * bit_depth);
     rcb_info[RCB_DBLK_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_SAO_ROW */
     rcb_info[RCB_SAO_ROW].size = 0;
+
     /* RCB_FBC_ROW */
     if (regs->common.reg012.fbc_e) {
         rcb_bits = (chroma_format_idc > 1) ? (2 * width * bit_depth) : 0;
     } else
         rcb_bits = 0;
     rcb_info[RCB_FBC_ROW].size = MPP_RCB_BYTES(rcb_bits);
+
     /* RCB_FILT_COL */
     rcb_info[RCB_FILT_COL].size = 0;
 }
@@ -1168,24 +1180,7 @@ MPP_RET vdpu382_h264d_start(void *hal, HalTaskInfo *task)
             break;
         }
         /* rcb info for sram */
-        {
-            RK_U32 i = 0;
-            MppDevRcbInfoCfg rcb_cfg;
-            Vdpu382RcbInfo  rcb_info[RCB_BUF_COUNT];
-
-            memcpy(rcb_info, reg_ctx->rcb_info, sizeof(rcb_info));
-            qsort(rcb_info, MPP_ARRAY_ELEMS(rcb_info),
-                  sizeof(rcb_info[0]), vdpu382_compare_rcb_size);
-
-            for (i = 0; i < MPP_ARRAY_ELEMS(rcb_info); i++) {
-                rcb_cfg.reg_idx = rcb_info[i].reg;
-                rcb_cfg.size = rcb_info[i].size;
-                if (rcb_cfg.size > 0) {
-                    mpp_dev_ioctl(dev, MPP_DEV_RCB_INFO, &rcb_cfg);
-                } else
-                    break;
-            }
-        }
+        vdpu382_set_rcbinfo(dev, reg_ctx->rcb_info);
         /* send request to hardware */
         ret = mpp_dev_ioctl(dev, MPP_DEV_CMD_SEND, NULL);
         if (ret) {
