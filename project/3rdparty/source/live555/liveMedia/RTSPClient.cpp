@@ -402,7 +402,7 @@ RTSPClient::RTSPClient(UsageEnvironment& env, char const* rtspURL,
     fSessionCookieCounter(0), fHTTPTunnelingConnectionIsPending(False),
     fTLS(*this), fPOSTSocketTLS(*this) {
   fInputTLS = fOutputTLS = &fTLS; // fOutputTLS will change if we're doing RTSP-over-HTTPS
-  setBaseURL(rtspURL);
+  setBaseURL(rtspURL); setStreamId(applicationName);
 
   fResponseBuffer = new char[responseBufferSize+1];
   resetResponseBuffer();
@@ -459,6 +459,10 @@ void RTSPClient::reset() {
 
 void RTSPClient::setBaseURL(char const* url) {
   delete[] fBaseURL; fBaseURL = strDup(url);
+}
+
+void RTSPClient::setStreamId(char const *stream_id) {
+  delete[] fStreamId; fStreamId = strDup(stream_id);
 }
 
 int RTSPClient::grabSocket() {

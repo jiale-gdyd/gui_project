@@ -194,6 +194,7 @@ public:
   unsigned sessionTimeoutParameter() const { return fSessionTimeoutParameter; }
 
   char const* url() const { return fBaseURL; }
+  char const *streamId() const { return fStreamId; }
 
   static unsigned responseBufferSize;
 
@@ -245,7 +246,7 @@ protected:
   virtual ~RTSPClient();
 
   void reset();
-  void setBaseURL(char const* url);
+  void setBaseURL(char const* url); void setStreamId(char const *stream_id);
   int grabSocket(); // allows a subclass to reuse our input socket, so that it won't get closed when we're deleted
   virtual unsigned sendRequest(RequestRecord* request);
   virtual Boolean setRequestFields(RequestRecord* request,
@@ -346,7 +347,7 @@ private:
   char* fUserAgentHeaderStr;
   unsigned fUserAgentHeaderStrLen;
   int fInputSocketNum, fOutputSocketNum;
-  char* fBaseURL;
+  char* fBaseURL, *fStreamId;
   unsigned char fTCPStreamIdCount; // used for (optional) RTP/TCP
   char* fLastSessionId;
   unsigned fSessionTimeoutParameter; // optionally set in response "Session:" headers
