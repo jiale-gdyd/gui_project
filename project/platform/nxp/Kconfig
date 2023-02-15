@@ -1,0 +1,29 @@
+#
+# NXP Soc Vensor Kconfig
+# 
+
+menu "NXP Semiconductors Soc"
+
+config NXP
+    bool "freescale"
+    default n
+    help
+      Nxp Semiconductors N.V.
+
+choice
+    prompt "NXP soc choice"
+    depends on NXP
+    default IMX6ULL
+
+    config IMX6ULL
+        bool "i.MX 6UltraLite"
+        select AARCH32
+        select CORTEX_A7
+
+    config IMX6Q
+        bool "i.MX 6Quad"
+        select AARCH32
+        select CORTEX_A9
+endchoice
+
+endmenu

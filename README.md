@@ -7,6 +7,7 @@
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 ## 一、构建应用，(默认master分支)可以根据configs/*_defconfig文件对功能进行裁剪
 
+### 构建基于主机的应用
 + 构建主机的单元测试项目
    ```shell
    ./build.sh host_unittest             最终生成host_unittest可执行文件，可通过修改build.host.version中对应名字的版本号
@@ -23,6 +24,8 @@
    ```shell
    ./build.sh host_azure_gui            最终生成azure_gui可执行文件，可通过修改build.host.version中对应名字的版本号
    ```
+
+### 构建基于瑞星微rv1109/rv1126的应用
 + 构建基于rv1109/rv1126 soc的单元测试项目
    ```shell
    ./build.sh rv11xx_unittest           最终生成rv11xx_unittest可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
@@ -39,6 +42,22 @@
    ```shell
    ./build.sh rv11xx_azure_gui          最终生成azure_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
    ```
+
+### 构建基于恩智浦飞思卡尔imx6ull的应用
++ 构建基于freescale/imx6ull soc的LVGL项目
+   ```shell
+   ./build.sh imx6ull_lvgl_gui          最终生成lvgl_gui可执行文件，可通过修改build.imx6ull.version中对应名字的版本号
+   ```
++ 构建基于freescale/imx6ull soc的AWTK项目
+   ```shell
+   ./build.sh imx6ull_awtk_gui          最终生成awtk_gui可执行文件，可通过修改build.imx6ull.version中对应名字的版本号
+   ```
++ 构建基于freescale/imx6ull soc的azure-rtos threadx+gui项目
+   ```shell
+   ./build.sh imx6ull_azure_gui         最终生成azure_gui可执行文件，可通过修改build.imx6ull.version中对应名字的版本号
+   ```
+
+### 工程清理与帮助
 + 项目工程清理
    ```shell
    ./build.sh clean                     会将编译的信息全部清理干净

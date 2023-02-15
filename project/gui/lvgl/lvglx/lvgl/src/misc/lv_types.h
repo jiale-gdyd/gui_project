@@ -16,6 +16,12 @@ extern "C" {
 #define LV_ARCH_64
 #endif
 
+#if (defined(__cplusplus) && __cplusplus >= 201103L) || (__STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__))
+#define LV_USE_ATOMICS      0
+#else
+#define LV_USE_ATOMICS      0
+#endif
+
 enum {
     LV_RES_INV = 0,     // 通常表示对象在动作函数中被删除(变为无效)或操作失败
     LV_RES_OK,          // 动作后对象有效(未删除)

@@ -14,6 +14,11 @@ extern "C" {
 #include "../misc/lv_area.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_color.h"
+#include "../misc/lv_types.h"
+
+#if LV_USE_ATOMICS == 1
+#include <stdatomic.h>
+#endif
 
 #ifndef LV_INV_BUF_SIZE
 #define LV_INV_BUF_SIZE                 (32)
@@ -31,19 +36,26 @@ struct _lv_disp_t;
 struct _lv_theme_t;
 struct _lv_disp_drv_t;
 
+#if LV_USE_ATOMICS == 1
+#define FLUSHING_TYPE                   atomic_int
+#else
+#define FLUSHING_TYPE                   volatile int
+#endif
+
 // 用于保存显示缓冲区信息的结构
-typedef struct _lv_disp_draw_buf_t{
+typedef struct _lv_disp_draw_buf_t {
     void              *buf1;                // 第一个显示缓冲区
     void              *buf2;                // 第二个显示缓冲区
 
     void              *buf_act;
     uint32_t          size;                 // 像素数
 
-    volatile int      flushing;             // 1: 正在冲洗。(它不能是位域，因为当它从IRQ中清除时可能会发生读-修改-写问题)
-    volatile int      flushing_last;        // 1：这是最后一个要刷新的块。(它不能是位域，因为当它从IRQ中清除时可能会发生读-修改-写问题)
-    volatile uint32_t last_area : 1;        // 1: 正在渲染最后一个区域
-    volatile uint32_t last_part : 1;        // 1: 当前区域的最后一部分正在渲染
+    FLUSHING_TYPE     flushing;             // 1: 正在冲洗。(它不能是位域，因为当它从IRQ中清除时可能会发生读-修改-写问题)
+    FLUSHING_TYPE     flushing_last;        // 1：这是最后一个要刷新的块。(它不能是位域，因为当它从IRQ中清除时可能会发生读-修改-写问题)
+    uint32_t          last_area : 1;        // 1: 正在渲染最后一个区域
+    uint32_t          last_part : 1;        // 1: 当前区域的最后一部分正在渲染
 } lv_disp_draw_buf_t;
+#undef FLUSHING_TYPE
 
 typedef enum {
     LV_DISP_ROT_NONE = 0,

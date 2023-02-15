@@ -1,0 +1,110 @@
+USER_LIB_INCLUDE :=
+USER_LD_LIB      :=
+USER_LINK_LIB    :=
+USER_PTH_RT_LIB  :=
+
+GUI_ROOT         := $(shell pwd)/project
+SDK_ROOT         := $(shell pwd)/sdk/nxp/imx6ull
+
+SDK_LIB          := $(SDK_ROOT)/sdk/lib
+SDK_INC          := $(SDK_ROOT)/sdk/include
+
+USER_LIB_INCLUDE += $(SDK_INC) \
+                    $(GUI_ROOT) \
+                    $(GUI_ROOT)/gui \
+                    $(GUI_ROOT)/gui/azure \
+                    $(GUI_ROOT)/gui/azure/guix \
+                    $(GUI_ROOT)/gui/azure/threadx \
+                    $(GUI_ROOT)/gui/awtk/3rd \
+                    $(GUI_ROOT)/gui/awtk/src \
+                    $(GUI_ROOT)/gui/awtk/driver \
+                    $(GUI_ROOT)/gui/awtk/src/ext_widgets
+
+USER_LINK_LIB    := -L$(SDK_LIB)
+
+USER_LD_LIB      += 
+
+USER_LINK_LIB         += $(addprefix -l,${USER_LD_LIB})
+USER_PTH_RT_LIB       += -lpthread -lrt -lm -ldl $(USE_STDCPP_VERSION)
+USER_LIB_INCLUDE_FLAG := $(addprefix -I,${USER_LIB_INCLUDE})
+
+export USER_LIB_INCLUDE_FLAG USER_LINK_LIB USER_PTH_RT_LIB
+
+KBUILD_CFLAGS   := -D__arm__ -D__ARM_NEON -D__ARM_NEON__ -DLINUX -D_GNU_SOURCE -DBLUEZ_USE -Wno-psabi -fdata-sections -ffunction-sections
+KBUILD_CFLAGS   := -mfloat-abi=hard -mcpu=cortex-a7 -mfpu=neon-vfpv4
+
+KBUILD_CPPFLAGS := -D_GNU_SOURCE -Wno-psabi -Wno-write-strings -Wno-pointer-arith -fdata-sections -ffunction-sections
+KBUILD_CPPFLAGS += -DRAPIDJSON_HAS_STDSTRING -D__arm__ -D__ARM_NEON -DLINUX
+
+KBUILD_CXXFLAGS := -DRAPIDJSON_HAS_STDSTRING -D__arm__ -D__ARM_NEON -DLINUX -D_GNU_SOURCE -Wno-psabi -Wno-pointer-arith -fdata-sections -ffunction-sections
+KBUILD_CXXFLAGS += -mfloat-abi=hard -mcpu=cortex-a7 -mfpu=neon-vfpv4
+
+KBUILD_CFLAGS_KERNEL   := -D__STDC_CONSTANT_MACROS -D__OPTIMIZE__ -fdata-sections -ffunction-sections
+KBUILD_CXXFLAGS_KERNEL := -D__OPTIMIZE__ -DRAPIDJSON_HAS_STDSTRING -fdata-sections -ffunction-sections
+
+KBUILD_CXXFLAGS += -Wall -O2 \
+                -fno-strict-aliasing \
+                -fno-common \
+                -Wno-return-type \
+                -Wno-sign-compare \
+                -Wno-write-strings \
+                -Wno-conversion-null \
+                -Wno-literal-suffix \
+                -Wno-deprecated-declarations \
+                -Wno-unused-but-set-variable \
+                -Wno-unused-function \
+                -Wno-unused-result \
+                -Wno-unused-label \
+                -Wno-unused-variable \
+                -Wno-memset-elt-size \
+                -Wno-reorder \
+                -Wno-delete-incomplete \
+                -Wno-delete-non-virtual-dtor \
+                -Wno-stringop-truncation \
+                -Wno-format-truncation \
+                -Wno-stringop-overflow \
+                -Wno-class-memaccess \
+                -Wno-catch-value \
+                -Wno-maybe-uninitialized \
+                -Wno-narrowing \
+                -Wno-pessimizing-move \
+                -Wno-unused-value \
+                -Wno-sizeof-pointer-memaccess \
+                -Wno-unknown-pragmas \
+                -Wno-char-subscripts \
+                -Wno-array-bounds
+
+KBUILD_CFLAGS += -Wall -O2 \
+            -Wno-trigraphs \
+            -fno-strict-aliasing -fno-common \
+            -Wno-format-security \
+            -Wno-deprecated-declarations \
+            -Wno-unused-but-set-variable \
+            -fno-delete-null-pointer-checks \
+            -Wno-write-strings \
+            -Wno-pointer-arith \
+            -Wno-unused-function \
+            -Wno-unused-variable \
+            -Wno-int-to-pointer-cast \
+            -Wno-unused-result \
+            -Wno-tautological-compare \
+            -Wno-multichar \
+            -Wno-unused-label \
+            -Wno-memset-elt-size \
+            -Wno-format-overflow \
+            -Wno-format-truncation \
+            -Wno-stringop-truncation \
+            -Wno-stringop-overflow \
+            -Wno-sequence-point \
+            -Wno-char-subscripts \
+            -Wno-sign-compare \
+            -Wno-uninitialized \
+            -Wno-unused-value \
+            -Wno-maybe-uninitialized \
+            -Wno-narrowing \
+            -Wno-array-bounds \
+            -Wno-int-in-bool-context \
+            -Wno-restrict \
+            -Wno-array-compare
+
+export KBUILD_CPPFLAGS KBUILD_CXXFLAGS KBUILD_CFLAGS KBUILD_CFLAGS_KERNEL KBUILD_CXXFLAGS_KERNEL

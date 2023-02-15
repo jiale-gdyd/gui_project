@@ -573,7 +573,6 @@ value_t* value_set_wstr(value_t* v, const wchar_t* value);
 /**
  * @method value_str
  * 获取类型为字符串的值。
- * @annotation ["scriptable"]
  * @param {value_t*} v value对象。
  *
  * @return {const char*} 值。
