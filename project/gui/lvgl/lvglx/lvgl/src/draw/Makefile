@@ -1,10 +1,10 @@
 obj-y += sw/
 obj-y += sdl/
-obj-y += nxp/
 obj-y += arm2d/
 obj-y += gd32_ipa/
 obj-y += stm32_dma2d/
 obj-y += swm341_dma2d/
+obj-$(CONFIG_NXP) += nxp/
 
 obj-y += lv_draw.o
 obj-y += lv_img_buf.o
