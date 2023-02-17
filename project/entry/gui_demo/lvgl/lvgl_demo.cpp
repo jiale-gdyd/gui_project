@@ -26,7 +26,11 @@
 #include "printer/printer.h"
 #endif
 
-#define DISP_BUF_SIZE           (810 * 1440)
+#if defined(CONFIG_IMX6ULL)
+#define DISP_BUF_SIZE           (800 * 480)
+#else
+#define DISP_BUF_SIZE           (1440 * 810)
+#endif
 
 static lv_color_t buf0[DISP_BUF_SIZE];
 static lv_color_t buf1[DISP_BUF_SIZE];
@@ -86,7 +90,7 @@ int lvgl_demo_init(int argc, char *argv[])
     static lv_disp_drv_t disp_drv;
     static lv_disp_buf_t disp_buf;
     static lv_indev_drv_t indev_drv;
-    lv_coord_t width = 640, height = 480;
+    lv_coord_t width = 800, height = 480;
 
     lv_disp_drv_init(&disp_drv);
 
@@ -111,7 +115,7 @@ int lvgl_demo_init(int argc, char *argv[])
     lv_indev_drv_init(&indev_drv);
 
     indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.disp = disp;
+    // indev_drv.disp = disp;
     indev_drv.read_cb = evdev_read;
     lv_indev_drv_register(&indev_drv);
 #endif
@@ -125,7 +129,7 @@ int lvgl_demo_init(int argc, char *argv[])
     static lv_disp_drv_t disp_drv;
     static lv_indev_drv_t indev_drv;
     static lv_disp_draw_buf_t disp_buf;
-    lv_coord_t width = 640, height = 480;
+    lv_coord_t width = 800, height = 480;
 
     lv_disp_drv_init(&disp_drv);
 
@@ -148,7 +152,7 @@ int lvgl_demo_init(int argc, char *argv[])
     static lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
     lv_indev_drv_init(&indev_drv);
-    indev_drv.disp = disp;
+    // indev_drv.disp = disp;
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = evdev_read;
     static lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
@@ -185,8 +189,8 @@ int lvgl_demo_init(int argc, char *argv[])
         while ((poll(&wayland_pfd, 1, wayland_sleep) < 0) && (errno == EINTR));
 #else
         lv_task_handler();
-        usleep(1);
-        lv_tick_inc(1);
+        usleep(5000);
+        // lv_tick_inc(1);
 #endif
     }
 

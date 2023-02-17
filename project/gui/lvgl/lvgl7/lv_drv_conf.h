@@ -253,7 +253,7 @@
 #endif
 
 #if USE_LIBINPUT
-#define LIBINPUT_NAME                           "/dev/input/event0"
+#define LIBINPUT_NAME                           "/dev/input/event1"
 #endif
 
 #ifndef USE_EVDEV
@@ -265,7 +265,7 @@
 #endif
 
 #if USE_EVDEV || USE_BSD_EVDEV
-#define EVDEV_NAME                              "/dev/input/event0"     // 您可以使用"evtest" Linux 工具获取设备列表并对其进行测试
+#define EVDEV_NAME                              "/dev/input/event1"     // 您可以使用"evtest" Linux 工具获取设备列表并对其进行测试
 #define EVDEV_SWAP_AXES                         0                       // 交换触摸屏的x和y轴
 
 #define EVDEV_CALIBRATE                         0                       // 通过使用每个轴的最大值和最小值来缩放和偏移触摸屏坐标
