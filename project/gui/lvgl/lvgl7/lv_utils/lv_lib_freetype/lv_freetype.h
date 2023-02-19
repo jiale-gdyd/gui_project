@@ -13,6 +13,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lvgl/lvgl.h"
+
+#if LV_USE_FREETYPE
 #include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -98,6 +100,7 @@ void lv_ft_font_destroy(lv_font_t* font);
  *      MACROS
  **********************/
 
+#endif
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

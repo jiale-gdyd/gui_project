@@ -221,6 +221,7 @@ typedef struct _edit_t {
   uint8_t right_margin;
 
   bool_t is_key_inputing;
+  bool_t is_text_error;
 
   uint32_t idle_id;
   uint32_t timer_id;
@@ -452,7 +453,7 @@ ret_t edit_set_input_type(widget_t* widget, input_type_t type);
  * 设置软键盘上action按钮的文本。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {char*} action_text 软键盘上action按钮的文本。
+ * @param {const char*} action_text 软键盘上action按钮的文本。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -463,7 +464,7 @@ ret_t edit_set_action_text(widget_t* widget, const char* action_text);
  * 设置编辑器的输入提示。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {char*} tips 输入提示。
+ * @param {const char*} tips 输入提示。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -486,7 +487,7 @@ ret_t edit_set_tr_tips(widget_t* widget, const char* tr_tips);
  * 
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {char*} keyboard 键盘名称(相应UI资源必须存在)。
+ * @param {const char*} keyboard 键盘名称(相应UI资源必须存在)。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

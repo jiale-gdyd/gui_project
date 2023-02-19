@@ -191,7 +191,7 @@ ret_t assets_manager_set_locale_info(assets_manager_t* am, locale_info_t* locale
  * 向资源管理器中增加一个资源。
  * 备注：同一份资源多次调用会出现缓存叠加的问题，导致内存泄露
  * @param {assets_manager_t*} am asset manager对象。
- * @param {asset_info_t} info 待增加的资源。
+ * @param {const void*} info 待增加的资源。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_freetype.h"
-
+#if LV_USE_FREETYPE
 /*********************
  *      DEFINES
  *********************/
@@ -389,3 +389,4 @@ static const uint8_t * get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unic
     return get_glyph_bitmap_cb_nocache(font, unicode_letter);
 #endif
 }
+#endif

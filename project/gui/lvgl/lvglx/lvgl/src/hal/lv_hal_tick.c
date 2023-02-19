@@ -1,10 +1,4 @@
 #include "lv_hal_tick.h"
-#include "../misc/lv_types.h"
-
-#if LV_USE_ATOMICS == 1
-#include <stdatomic.h>
-#endif
-
 #include <stddef.h>
 
 #if (LV_TICK_CUSTOM == 1)
@@ -12,13 +6,8 @@
 #endif
 
 #if !LV_TICK_CUSTOM
-#if LV_USE_ATOMICS == 1
-static _Atomic(uint32_t) sys_time = 0;
-static atomic_int tick_irq_flag;
-#else
-static volatile uint32_t sys_time = 0;
-static volatile int tick_irq_flag;
-#endif
+static uint32_t sys_time = 0;
+static volatile uint8_t tick_irq_flag;
 #endif
 
 #if !LV_TICK_CUSTOM
