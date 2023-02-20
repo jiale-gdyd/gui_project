@@ -83,6 +83,7 @@ static const char *const modules[] = {
     "mxsfb-drm",
     "simpledrm",
     "imx-lcdif",
+    "vkms",
 };
 
 int util_open(const char *device, const char *module)

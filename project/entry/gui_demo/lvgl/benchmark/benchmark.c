@@ -404,6 +404,7 @@ static void txt_large_cb(void)
     txt_create(&style_common);
 }
 
+#if LV_USE_FONT_COMPRESSED
 static void txt_small_compr_cb(void)
 {
     lv_style_reset(&style_common);
@@ -427,6 +428,7 @@ static void txt_large_compr_cb(void)
     lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     txt_create(&style_common);
 }
+#endif
 
 static void line_cb(void)
 {
@@ -565,9 +567,11 @@ static scene_dsc_t scenes[] = {
     {.name = "Text medium",                    .create_cb = txt_medium_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 30},
     {.name = "Text large",                     .create_cb = txt_large_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 20},
 
+#if LV_USE_FONT_COMPRESSED
     {.name = "Text small compressed",          .create_cb = txt_small_compr_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 3},
     {.name = "Text medium compressed",         .create_cb = txt_medium_compr_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 5},
     {.name = "Text large compressed",          .create_cb = txt_large_compr_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
+#endif
 
     {.name = "Line",                           .create_cb = line_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
 
@@ -881,6 +885,11 @@ static void generate_report(void)
     if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
         lv_disp_t *disp = lv_disp_get_default();
         disp->driver->flush_cb = flush_cb_ori;
+        if (disp->refr_timer) {
+            lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
+        }
+
+        lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
     }
 
     uint32_t i;

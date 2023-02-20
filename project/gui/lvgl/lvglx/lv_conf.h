@@ -53,6 +53,11 @@
 #define LV_STRLEN                                   lv_strlen_builtin
 #define LV_STRNCPY                                  lv_strncpy_builtin
 
+#define LV_COLOR_EXTERN_INCLUDE                     <stdint.h>
+#define LV_COLOR_MIX                                lv_color_mix
+#define LV_COLOR_PREMULT                            lv_color_premult
+#define LV_COLOR_MIX_PREMULT                        lv_color_mix_premult
+
 // 使用自定义滴答源，以毫秒为单位告诉经过的时间。它消除了使用`lv_tick_inc()`手动更新刻度的需要
 #define LV_TICK_CUSTOM                              0
 

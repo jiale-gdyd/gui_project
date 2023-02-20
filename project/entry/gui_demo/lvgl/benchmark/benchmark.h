@@ -24,9 +24,11 @@ LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
 LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 
+#if LV_USE_FONT_COMPRESSED
 LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
 LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_compr_az);
 LV_FONT_DECLARE(lv_font_benchmark_montserrat_28_compr_az);
+#endif
 
 typedef enum {
     // 渲染场景并将它们显示在显示器上。测量渲染时间，但它可能包含LVGL等待驱动程序的额外时间。运行每个场景几秒钟，这样性能也可以用肉眼看到。由于仅测量渲染时间并将其转换为FPS，因此可能会有非常高的值(例如1000FPS）
