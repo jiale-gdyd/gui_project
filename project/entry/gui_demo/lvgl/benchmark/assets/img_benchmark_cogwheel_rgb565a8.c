@@ -214,7 +214,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_BENCH
 
 const lv_img_dsc_t img_benchmark_cogwheel_rgb565a8 = {
     .header = {
-        .cf          = LV_IMG_CF_RGB565A8,
+        .cf          = LV_COLOR_FORMAT_RGB565A8,
         .always_zero = 0,
         .reserved    = 0,
         .w           = 100,

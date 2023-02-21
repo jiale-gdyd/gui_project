@@ -57,6 +57,20 @@
    ./build.sh imx6ull_azure_gui         最终生成azure_gui可执行文件，可通过修改build.imx6ull.version中对应名字的版本号
    ```
 
+## 构建基于爱心元智AX620A的应用
++ 构建基于爱心元智AX620A soc的LVGL项目
+   ```shell
+   ./build.sh ax620a_lvgl_gui           最终生成lvgl_gui可执行文件，可通过修改build.ax620a.version中对应名字的版本号
+   ```
++ 构建基于爱心元智AX620A soc的AWTK项目
+   ```shell
+   ./build.sh ax620a_awtk_gui           最终生成awtk_gui可执行文件，可通过修改build.ax620a.version中对应名字的版本号
+   ```
++ 构建基于爱心元智AX620A soc的azure-rtos threadx+gui项目
+   ```shell
+   ./build.sh ax620a_azure_gui          最终生成azure_gui可执行文件，可通过修改build.ax620a.version中对应名字的版本号
+   ```
+
 ### 工程清理与帮助
 + 项目工程清理
    ```shell

@@ -1,0 +1,29 @@
+#
+# AXera Soc Vensor Kconfig
+# 
+
+menu "AXera Soc"
+
+config AXERA
+    bool "AXera"
+    default n
+    help
+      https://www.axera-tech.com
+
+choice
+    prompt "AXera soc choice"
+    depends on AXERA
+    default AX620A
+
+    config AX620A
+        bool "Quad Core Cortex-A7"
+        select AARCH32
+        select CORTEX_A7
+
+    config AX630A
+        bool "Quad Core Cortex-A53"
+        select AARCH32
+        select CORTEX_A53
+endchoice
+
+endmenu

@@ -7,21 +7,8 @@ menu "LittlevGL"
 config LVGL
     bool "Light and Versatile Embedded Graphics Library"
     depends on GUI
-    select LIBDRM
     default n
     help
       Light and Versatile Embedded Graphics Library
-
-choice
-    depends on LVGL
-    prompt "LittlevGL version choice"
-    default LVGL_NEW
-
-    config LVGL_V7
-        bool "LittlevGL version 7.x"
-
-    config LVGL_NEW
-        bool "LittlevGL new version"
-endchoice
 
 endmenu

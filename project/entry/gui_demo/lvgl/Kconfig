@@ -6,7 +6,6 @@ menu "LVGL GUI Demo Menu"
 
 choice
     prompt "LittlevGL demo choice"
-    depends on LVGL_NEW
     default LVGL_BENCHMARK_TEST
 
     config LVGL_BENCHMARK_TEST

@@ -15,7 +15,7 @@ extern "C" {
 #include <lvgl/lvgl.h>
 
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
-LV_IMG_DECLARE(img_benchmark_cogwheel_alpha16);
+LV_IMG_DECLARE(img_benchmark_cogwheel_alpha256);
 #if LV_DEMO_BENCHMARK_RGB565A8 && (LV_COLOR_DEPTH == 16)
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
 #else

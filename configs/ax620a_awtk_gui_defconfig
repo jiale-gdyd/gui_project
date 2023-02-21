@@ -1,0 +1,39 @@
+#
+# Automatically generated file; DO NOT EDIT.
+# Application Configuration
+#
+
+#
+# AWTK GUI
+#
+CONFIG_GUI=y
+CONFIG_AWTK=y
+
+#
+# display demo case
+#
+CONFIG_AWTK_UI_DEMO=y
+# CONFIG_AWTK_DESKTOP_DEMO is not set
+# CONFIG_AWTK_ANIMATOR_DEMO is not set
+
+#
+# display driver
+#
+CONFIG_DRM_DISP_DRIVER=y
+# CONFIG_FBDEV_DISP_DRIVER is not set
+
+#
+# libdrm tools
+#
+CONFIG_LIBDRM=y
+# CONFIG_LIBDRM_TOOLS is not set
+# CONFIG_LIBDRM_MODETEST is not set
+# CONFIG_LIBDRM_MODEPRINT is not set
+
+#
+# hardware platform
+#
+CONFIG_AXERA=y
+CONFIG_AX620A=y
+CONFIG_CORTEX_A7=y
+CONFIG_AARCH32=y

@@ -58,14 +58,13 @@ static bool scene_with_opa = true;
 static uint32_t render_start_time;
 static uint32_t last_flush_cb_call;
 
-static void (*flush_cb_ori)(lv_disp_drv_t *, const lv_area_t *, lv_color_t *);
+static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, lv_color_t *);
 
 static void fall_anim(lv_obj_t *obj);
 static void txt_create(lv_style_t *style);
 static void arc_create(lv_style_t *style);
 static void line_create(lv_style_t *style);
 static void rect_create(lv_style_t *style);
-static void monitor_cb(lv_disp_drv_t *drv, uint32_t time, uint32_t px);
 static void img_create(lv_style_t *style, const void * src, bool rotate, bool zoom, bool aa);
 
 static void rnd_reset(void);
@@ -75,12 +74,13 @@ static void benchmark_init(void);
 static void show_scene_report(void);
 static lv_res_t load_next_scene(void);
 static void calc_scene_statistics(void);
+static void benchmark_event_remove(void);
+static void benchmark_event_cb(lv_event_t *e);
 static void next_scene_timer_cb(lv_timer_t *timer);
 static void single_scene_finsih_timer_cb(lv_timer_t *timer);
 
 static void generate_report(void);
-static void render_start_cb(lv_disp_drv_t *drv);
-static void dummy_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colors);
+static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *colors);
 
 static void rectangle_cb(void)
 {
@@ -264,7 +264,7 @@ static void img_alpha_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_alpha16, false, false, false);
+    img_create(&style_common, &img_benchmark_cogwheel_alpha256, false, false, false);
 }
 
 static void img_rgb_recolor_cb(void)
@@ -618,18 +618,11 @@ static void benchmark_init(void)
 {
     lv_disp_t *disp = lv_disp_get_default();
 
-    if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
-        disp->driver->render_start_cb = render_start_cb;
-        flush_cb_ori = disp->driver->flush_cb;
-        disp->driver->flush_cb = dummy_flush_cb;
-    } else if (mode == LV_DEMO_BENCHMARK_MODE_REAL) {
-        flush_cb_ori = disp->driver->flush_cb;
-        disp->driver->flush_cb = dummy_flush_cb;
-    } else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        disp->driver->render_start_cb = render_start_cb;
-        disp->driver->monitor_cb = monitor_cb;
-        flush_cb_ori = disp->driver->flush_cb;
-        disp->driver->flush_cb = dummy_flush_cb;
+    lv_disp_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
+    flush_cb_ori = disp->flush_cb;
+    disp->flush_cb = dummy_flush_cb;
+
+    if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
         if (disp->refr_timer) {
             disp_ori_timer_period = disp->refr_timer->period;
             lv_timer_set_period(disp->refr_timer, 2);
@@ -660,6 +653,28 @@ static void benchmark_init(void)
     lv_style_init(&style_common);
 
     lv_obj_update_layout(scr);
+}
+
+static void benchmark_event_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_RENDER_START) {
+        render_start_time = lv_tick_get();
+    }
+}
+
+static void benchmark_event_remove(void)
+{
+    uint32_t i;
+    lv_disp_t *disp = lv_disp_get_default();
+
+    for (i = 0; i < lv_disp_get_event_count(disp); i++) {
+        lv_event_dsc_t *dsc = lv_disp_get_event_dsc(disp, i);
+        if (lv_event_dsc_get_cb(dsc) == benchmark_event_cb) {
+            lv_disp_remove_event(disp, i);
+            return;
+        }
+    }
 }
 
 int lvgl_demo_benchmark(int argc, char *argv[])
@@ -808,46 +823,32 @@ static void single_scene_finsih_timer_cb(lv_timer_t *timer)
     LV_UNUSED(timer);
     calc_scene_statistics();
 
-    if ((mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) || (mode == LV_DEMO_BENCHMARK_MODE_REAL)) {
-        lv_disp_t *disp = lv_disp_get_default();
-        disp->driver->flush_cb = flush_cb_ori;
+    lv_disp_t *disp = lv_disp_get_default();
+    disp->flush_cb = flush_cb_ori;
+
+    if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
+        if (disp->refr_timer) {
+            lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
+        }
+
+        lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
     }
 
+    benchmark_event_remove();
     show_scene_report();
     lv_obj_clean(scene_bg);
     lv_obj_invalidate(lv_scr_act());
 }
 
-static void monitor_cb(lv_disp_drv_t *drv, uint32_t time, uint32_t px)
-{
-    LV_UNUSED(drv);
-    LV_UNUSED(px);
-
-    time = lv_tick_elaps(render_start_time);
-
-    if (scene_with_opa) {
-        scenes[scene_act].refr_cnt_opa++;
-        scenes[scene_act].time_sum_opa += time;
-    } else {
-        scenes[scene_act].refr_cnt_normal++;
-        scenes[scene_act].time_sum_normal += time;
-    }
-}
-
-static void render_start_cb(lv_disp_drv_t *drv)
-{
-    LV_UNUSED(drv);
-    render_start_time = lv_tick_get();
-}
-
-static void dummy_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *colors)
+static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *colors)
 {
     LV_UNUSED(area);
     LV_UNUSED(colors);
 
     if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
-        bool last = lv_disp_flush_is_last(drv);
         flush_cb_ori(drv, area, colors);
+
+        bool last = lv_disp_flush_is_last(drv);
         if (last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if (scene_with_opa) {
@@ -877,20 +878,35 @@ static void dummy_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t
         }
     } else if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
         lv_disp_flush_ready(drv);
+
+        bool last = lv_disp_flush_is_last(drv);
+        if (last) {
+            uint32_t t = lv_tick_elaps(render_start_time);
+            if (scene_with_opa) {
+                scenes[scene_act].refr_cnt_opa ++;
+                scenes[scene_act].time_sum_opa += t;
+            } else {
+                scenes[scene_act].refr_cnt_normal ++;
+                scenes[scene_act].time_sum_normal += t;
+            }
+        }
     }
 }
 
 static void generate_report(void)
 {
+    lv_disp_t *disp = lv_disp_get_default();
+    disp->flush_cb = flush_cb_ori;
+
     if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        lv_disp_t *disp = lv_disp_get_default();
-        disp->driver->flush_cb = flush_cb_ori;
         if (disp->refr_timer) {
             lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
         }
 
         lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
     }
+
+    benchmark_event_remove();
 
     uint32_t i;
     uint32_t fps_sum = 0;

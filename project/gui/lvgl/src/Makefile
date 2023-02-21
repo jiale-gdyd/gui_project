@@ -1,0 +1,11 @@
+obj-y += core/
+obj-y += dev/
+obj-y += draw/
+obj-y += font/
+obj-y += hal/
+obj-y += layouts/
+obj-y += libs/
+obj-y += misc/
+obj-y += others/
+obj-y += themes/
+obj-y += widgets/

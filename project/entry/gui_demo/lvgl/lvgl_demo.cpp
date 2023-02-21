@@ -10,7 +10,6 @@
 
 #include "lvgl_demo.h"
 
-#if defined(CONFIG_LVGL_NEW)
 #if defined(CONFIG_LVGL_MUSIC_TEST)
 #include "music/music.h"
 #elif defined(CONFIG_LVGL_STRESS_TEST)
@@ -22,18 +21,21 @@
 #elif defined(CONFIG_LVGL_KEYPAD_ENCODER_TEST)
 #include "keypad/keypad_encoder.h"
 #endif
-#elif defined(CONFIG_LVGL_V7)
-#include "printer/printer.h"
-#endif
 
 #if defined(CONFIG_IMX6ULL)
-#define DISP_BUF_SIZE           (800 * 480)
+#define SCREEN_WIDTH            (800)
+#define SCREEN_HEIGHT           (480)
+#elif defined(CONFIG_RV1126)
+#define SCREEN_WIDTH            (1440)
+#define SCREEN_HEIGHT           (810)
 #else
-#define DISP_BUF_SIZE           (1440 * 810)
+#define SCREEN_WIDTH            (1440)
+#define SCREEN_HEIGHT           (810)
 #endif
 
-static lv_color_t buf0[DISP_BUF_SIZE];
-static lv_color_t buf1[DISP_BUF_SIZE];
+#define DISP_BUF_SIZE           (SCREEN_WIDTH * SCREEN_HEIGHT)
+
+static lv_color_t disp_buff[DISP_BUF_SIZE];
 
 uint32_t custom_tick_get(void)
 {
@@ -51,6 +53,21 @@ uint32_t custom_tick_get(void)
 
     uint32_t time_ms = now_ms - start_ms;
     return time_ms;
+}
+
+static void mouse_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+{
+    
+}
+
+static void keypad_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+{
+
+}
+
+static void encoder_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+{
+
 }
 
 #if defined(CONFIG_WAYLAND_DISP_DRIVER)
@@ -83,16 +100,10 @@ int lvgl_demo_init(int argc, char *argv[])
     evdev_init();
 #endif
 
-#if defined(CONFIG_LVGL_V7)
 #if defined(CONFIG_WAYLAND_DISP_DRIVER)
     wayland_handle_init();
 #else
-    static lv_disp_drv_t disp_drv;
-    static lv_disp_buf_t disp_buf;
-    static lv_indev_drv_t indev_drv;
-    lv_coord_t width = 800, height = 480;
-
-    lv_disp_drv_init(&disp_drv);
+    lv_coord_t width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
 
 #if defined(CONFIG_DRM_DISP_DRIVER)
     drm_get_sizes(&width, &height, NULL);
@@ -100,62 +111,26 @@ int lvgl_demo_init(int argc, char *argv[])
     fbdev_get_sizes(&width, &height, NULL);
 #endif
 
-    lv_disp_buf_init(&disp_buf, buf0, buf1, DISP_BUF_SIZE);
-
-    disp_drv.buffer = &disp_buf;
-#if defined(CONFIG_DRM_DISP_DRIVER)
-    disp_drv.flush_cb = drm_flush;
-#elif defined(CONFIG_FBDEV_DISP_DRIVER)
-    disp_drv.flush_cb = fbdev_flush;
-#endif
-    disp_drv.hor_res = width;
-    disp_drv.ver_res = height;
-    static lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
-
-    lv_indev_drv_init(&indev_drv);
-
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    // indev_drv.disp = disp;
-    indev_drv.read_cb = evdev_read;
-    lv_indev_drv_register(&indev_drv);
-#endif
-
-    lvgl_demo_printer(argc, argv);
-
-#elif defined(CONFIG_LVGL_NEW)
-#if defined(CONFIG_WAYLAND_DISP_DRIVER)
-    wayland_handle_init();
-#else
-    static lv_disp_drv_t disp_drv;
-    static lv_indev_drv_t indev_drv;
-    static lv_disp_draw_buf_t disp_buf;
-    lv_coord_t width = 800, height = 480;
-
-    lv_disp_drv_init(&disp_drv);
+    lv_disp_t *disp = lv_disp_create(width, height);
+    lv_disp_set_draw_buffers(disp, disp_buff, NULL, width * height, LV_DISP_RENDER_MODE_FULL);
 
 #if defined(CONFIG_DRM_DISP_DRIVER)
-    drm_get_sizes(&width, &height, NULL);
+    lv_disp_set_flush_cb(disp, drm_flush);
 #elif defined(CONFIG_FBDEV_DISP_DRIVER)
-    fbdev_get_sizes(&width, &height, NULL);
+    lv_disp_set_flush_cb(disp, fbdev_flush);
 #endif
 
-    lv_disp_draw_buf_init(&disp_buf, buf0, buf1, DISP_BUF_SIZE);
+    lv_indev_t *mouse_indev = lv_indev_create();
+    lv_indev_set_type(mouse_indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(mouse_indev, mouse_read_cb);
 
-    disp_drv.draw_buf = &disp_buf;
-#if defined(CONFIG_DRM_DISP_DRIVER)
-    disp_drv.flush_cb = drm_flush;
-#elif defined(CONFIG_FBDEV_DISP_DRIVER)
-    disp_drv.flush_cb = fbdev_flush;
-#endif
-    disp_drv.hor_res = width;
-    disp_drv.ver_res = height;
-    static lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
+    lv_indev_t *keypad_indev = lv_indev_create();
+    lv_indev_set_type(keypad_indev, LV_INDEV_TYPE_KEYPAD);
+    lv_indev_set_read_cb(keypad_indev, keypad_read_cb);
 
-    lv_indev_drv_init(&indev_drv);
-    // indev_drv.disp = disp;
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = evdev_read;
-    static lv_indev_t *indev = lv_indev_drv_register(&indev_drv);
+    lv_indev_t *encoder_indev = lv_indev_create();
+    lv_indev_set_type(encoder_indev, LV_INDEV_TYPE_ENCODER);
+    lv_indev_set_read_cb(encoder_indev, encoder_read_cb);
 #endif
 
 #if defined(CONFIG_LVGL_MUSIC_TEST)
@@ -168,7 +143,6 @@ int lvgl_demo_init(int argc, char *argv[])
     lvgl_demo_benchmark(argc, argv);
 #elif defined(CONFIG_LVGL_KEYPAD_ENCODER_TEST)
     lvgl_demo_keypad_encoder(argc, argv);
-#endif
 #endif
 
     while (1) {
@@ -190,7 +164,7 @@ int lvgl_demo_init(int argc, char *argv[])
 #else
         lv_task_handler();
         usleep(5000);
-        // lv_tick_inc(1);
+        lv_tick_inc(1);
 #endif
     }
 

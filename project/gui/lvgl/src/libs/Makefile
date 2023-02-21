@@ -1,0 +1,11 @@
+obj-y += barcode/
+obj-y += bmp/
+obj-y += ffmpeg/
+obj-y += freetype/
+obj-y += fsdrv/
+obj-y += gif/
+obj-y += png/
+obj-y += qrcode/
+obj-y += rlottie/
+obj-y += sjpg/
+obj-y += tiny_ttf/

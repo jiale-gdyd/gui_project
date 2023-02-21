@@ -75,6 +75,7 @@ choice
 endchoice
 
 source "project/platform/nxp/Kconfig"
+source "project/platform/axera/Kconfig"
 source "project/platform/rockchip/Kconfig"
 
 endmenu

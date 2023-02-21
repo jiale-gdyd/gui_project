@@ -43,6 +43,10 @@ function help()
     echo "    -    imx6ull_lvgl_gui      构建使用freescale/imx6ull soc板卡的lvgl gui项目"
     echo "    -    imx6ull_azure_gui     构建使用freescale/imx6ull soc板卡的azure gui项目"
     echo "================================================================================="
+    echo "    -    ax620a_awtk_gui       构建使用爱芯元智AX620a soc板卡的awtk gui项目"
+    echo "    -    ax620a_lvgl_gui       构建使用爱芯元智AX620a soc板卡的lvgl gui项目"
+    echo "    -    ax620a_azure_gui      构建使用爱芯元智AX620a soc板卡的azure gui项目"
+    echo "================================================================================="
 }
 
 if [ -z $1 ]; then
