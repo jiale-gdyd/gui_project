@@ -148,6 +148,13 @@ void mpp_frame_set_meta(MppFrame frame, MppMeta meta)
     p->meta = meta;
 }
 
+MppFrameStatus *mpp_frame_get_status(MppFrame frame)
+{
+    MppFrameImpl *p = (MppFrameImpl *)frame;
+
+    return &p->status;
+}
+
 void mpp_frame_set_stopwatch_enable(MppFrame frame, RK_S32 enable)
 {
     if (check_is_mpp_frame(frame))

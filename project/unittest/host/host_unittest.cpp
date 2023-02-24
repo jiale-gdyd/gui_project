@@ -13,6 +13,10 @@
 #include "live555/host_live555.h"
 #endif
 
+#if defined(CONFIG_HOST_UNITTEST_RTSP)
+#include "rtsp/rtsp.h"
+#endif
+
 int host_unittest_init(int argc, char *argv[])
 {
 #if defined(CONFIG_HOST_UNITTEST_LIBDRM)
@@ -20,6 +24,8 @@ int host_unittest_init(int argc, char *argv[])
 #elif defined(CONFIG_HOST_UNITTEST_SIGSLOT)
     return host_sigslot_unittest_init(argc, argv);
 #elif defined(CONFIG_HOST_UNITTEST_LIVE555)
+    return host_live555_unittest_init(argc, argv);
+#elif defined(CONFIG_HOST_UNITTEST_RTSP)
     return host_live555_unittest_init(argc, argv);
 #endif
 
@@ -33,6 +39,8 @@ int host_unittest_exit(void)
 #elif defined(CONFIG_HOST_UNITTEST_SIGSLOT)
     return host_sigslot_unittest_exit();
 #elif defined(CONFIG_HOST_UNITTEST_LIVE555)
+    return host_live555_unittest_exit();
+#elif defined(CONFIG_HOST_UNITTEST_RTSP)
     return host_live555_unittest_exit();
 #endif
 

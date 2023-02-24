@@ -865,7 +865,10 @@ static void write_picture(H264_StorePic_t *p, H264dVideoCtx_t *p_Vid)
         //!<  discard less than first i frame poc
         if ((p_err->i_slice_no < 2) && (p->poc < p_err->first_iframe_poc)) {
             if (p_err->used_ref_flag && p_err->first_iframe_is_output) {
-                mpp_frame_set_errinfo(mframe, MPP_FRAME_ERR_UNKNOW);
+                if ((p->slice_type % 5) == H264_B_SLICE)
+                    mpp_frame_set_discard(mframe, MPP_FRAME_ERR_UNKNOW);
+                else
+                    mpp_frame_set_errinfo(mframe, MPP_FRAME_ERR_UNKNOW);
             } else {
                 if (p_Vid->dpb_fast_out)
                     mpp_frame_set_discard(mframe, MPP_FRAME_ERR_UNKNOW);
@@ -1431,7 +1434,6 @@ MPP_RET store_picture_in_dpb(H264_DpbBuf_t *p_Dpb, H264_StorePic_t *p)
     H264dVideoCtx_t *p_Vid = p_Dpb->p_Vid;
 
     VAL_CHECK(ret, NULL != p);  //!< if frame, check for new store
-    p_Vid->last_pic = NULL;
     //!< set use flag
     if (p->mem_mark && (p->mem_mark->slot_idx >= 0)) {
         mpp_buf_slot_set_flag(p_Vid->p_Dec->frame_slots, p->mem_mark->slot_idx, SLOT_CODEC_USE);
@@ -1456,6 +1458,8 @@ MPP_RET store_picture_in_dpb(H264_DpbBuf_t *p_Dpb, H264_StorePic_t *p)
             FUN_CHECK(ret = insert_picture_in_dpb(p_Vid, p_Dpb->last_picture, p, 1));  //!< field_dpb_combine
             scan_dpb_output(p_Dpb, p);
         }
+        memcpy(&p_Vid->old_pic, p, sizeof(H264_StorePic_t));
+        p_Vid->last_pic = &p_Vid->old_pic;
         p_Dpb->last_picture = NULL;
         goto __RETURN;
     }
@@ -1483,7 +1487,7 @@ MPP_RET store_picture_in_dpb(H264_DpbBuf_t *p_Dpb, H264_StorePic_t *p)
         }
         //!< used for reference, but not find, then flush a frame in the first
         if ((!find_flag) || (p->poc < min_poc)) {
-            //min_pos = 0;
+            min_pos = 0;
             unmark_for_reference(p_Vid->p_Dec, p_Dpb->fs[min_pos]);
             if (!p_Dpb->fs[min_pos]->is_output) {
                 H264D_WARNNING("write_stored_frame, line %d", __LINE__);
@@ -1839,6 +1843,14 @@ RK_U32 get_field_dpb_combine_flag(H264_FrameStore_t *p_last, H264_StorePic_t *p)
                     combine_flag = 1;
 #endif
                 }
+            }
+            /* set err to unpaired filed */
+            if (!combine_flag) {
+                struct h264_store_pic_t *pic = NULL;
+
+                pic = p_last->structure == TOP_FIELD ? p_last->top_field : p_last->bottom_field;
+                if (pic && !pic->combine_flag)
+                    mpp_frame_set_errinfo(pic->mem_mark->mframe, 1);
             }
         }
     }

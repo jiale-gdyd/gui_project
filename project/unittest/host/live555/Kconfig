@@ -5,10 +5,10 @@
 menu "live555 Examples"
 
 config HOST_UNITTEST_LIVE555
-    bool "host signal slot unittest"
+    bool "host live555 unittest"
     default n
     help
-      host signal slot unittest
+      host live555 unittest
 
 choice
     depends on X86_64 && UNITTEST && HOST_UNITTEST_LIVE555

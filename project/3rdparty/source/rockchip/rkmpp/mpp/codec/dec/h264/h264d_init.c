@@ -552,6 +552,12 @@ static MPP_RET dpb_mark_malloc(H264dVideoCtx_t *p_Vid, H264_StorePic_t *dec_pic)
 
             impl->poc = dec_pic->poc;
             impl->viewid = dec_pic->layer_id;
+            impl->status.is_intra = dec_pic->slice_type == H264_I_SLICE;
+            impl->status.is_idr = dec_pic->idr_flag;
+            impl->status.is_non_ref = !dec_pic->used_for_reference;
+            impl->status.is_lt_ref = dec_pic->long_term_reference_flag;
+            impl->status.is_b_frame = ((dec_pic->slice_type % 5) == H264_B_SLICE);
+
             mpp_buf_slot_set_prop(p_Dec->frame_slots, cur_mark->slot_idx, SLOT_FRAME, p_Dec->curframe);
             mpp_buf_slot_get_prop(p_Dec->frame_slots, cur_mark->slot_idx, SLOT_FRAME_PTR, &cur_mark->mframe);
         }
@@ -591,22 +597,31 @@ __FAILED:
 static MPP_RET check_dpb_discontinuous(H264_StorePic_t *p_last, H264_StorePic_t *dec_pic, H264_SLICE_t *currSlice)
 {
     MPP_RET ret = MPP_ERR_UNKNOW;
-#if 1
+
     if (p_last && dec_pic && (dec_pic->slice_type != H264_I_SLICE)
         && (currSlice->p_Cur->sps.gaps_in_frame_num_value_allowed_flag == 0)) {
         RK_U32 error_flag = 0;
 
-        if (dec_pic->frame_num == p_last->frame_num ||
-            dec_pic->frame_num == ((p_last->frame_num + 1) % currSlice->p_Vid->max_frame_num))
-            error_flag = 0;
-        else
-            error_flag = 1;
+        if (dec_pic->combine_flag) {
+            if (dec_pic->frame_num != p_last->frame_num)
+                error_flag = 1;
+        } else {
+            RK_U32 frame_num = currSlice->p_Vid->last_ref_frame_num;
+
+            if (dec_pic->frame_num != frame_num &&
+                dec_pic->frame_num != ((frame_num + 1) % currSlice->p_Vid->max_frame_num))
+                error_flag = 1;
+        }
+
         currSlice->p_Dec->errctx.cur_err_flag |= error_flag ? 1 : 0;
+        currSlice->p_Dec->errctx.dpb_err_flag |= error_flag ? 1 : 0;
 
         H264D_DBG(H264D_DBG_DISCONTINUOUS, "[discontinuous] last_slice=%d, cur_slice=%d, last_fnum=%d, cur_fnum=%d, last_poc=%d, cur_poc=%d",
                   p_last->slice_type, dec_pic->slice_type, p_last->frame_num, dec_pic->frame_num, p_last->poc, dec_pic->poc);
     }
-#endif
+
+    if (dec_pic->idr_flag || dec_pic->used_for_reference)
+        currSlice->p_Vid->last_ref_frame_num = dec_pic->frame_num;
     return ret = MPP_OK;
 }
 
@@ -1339,12 +1354,12 @@ __FAILED:
 
 static RK_U32 get_short_term_pic(H264_SLICE_t *currSlice, RK_S32 picNum, H264_StorePic_t **find_pic)
 {
-    RK_U32 i = 0;
+    RK_S32 i = 0;
     H264_StorePic_t *ret_pic = NULL;
     H264_StorePic_t *near_pic = NULL;
     H264_DpbBuf_t *p_Dpb = currSlice->p_Dpb;
 
-    for (i = 0; i < p_Dpb->ref_frames_in_buffer; i++) {
+    for (i = p_Dpb->ref_frames_in_buffer - 1; i >= 0; i--) {
         if (currSlice->structure == FRAME) {
             if ((p_Dpb->fs_ref[i]->is_reference == 3)
                 && (!p_Dpb->fs_ref[i]->frame->is_long_term)) {
@@ -1816,6 +1831,8 @@ static MPP_RET prepare_init_ref_info(H264_SLICE_t *currSlice)
     }
     //!<------  set listB -------
     for (k = 0; k < 2; k++) {
+        RK_U32 tmp[16] = {0};
+
         min_poc =  0xFFFF;
         max_poc = -0xFFFF;
         near_dpb_idx = 0;
@@ -1843,8 +1860,10 @@ static MPP_RET prepare_init_ref_info(H264_SLICE_t *currSlice)
                 voidx = p_Dec->dpb_info[i].voidx;
                 is_used = p_Dec->dpb_info[i].is_used;
                 if (currSlice->structure == FRAME && refpic) {
-                    if (poc == MPP_MIN(TOP_POC, BOT_POC) && (layer_id == voidx))
+                    if (poc == MPP_MIN(TOP_POC, BOT_POC) && (layer_id == voidx) && !tmp[i]) {
+                        tmp[i] = 1;
                         break;
+                    }
                 } else {
                     if (is_used == 3) {
                         if ((poc == BOT_POC || poc == TOP_POC) && layer_id == voidx)

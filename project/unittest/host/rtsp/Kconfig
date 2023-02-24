@@ -1,0 +1,31 @@
+#
+# RTSP Kconfig
+#
+
+menu "rtsp example"
+
+config HOST_UNITTEST_RTSP
+    bool "host rtsp unittest"
+    default n
+    help
+      host rtsp unittest
+
+choice
+    depends on X86_64 && UNITTEST && HOST_UNITTEST_RTSP
+    prompt "host rtsp unittest demo"
+    default HOST_RTSP_UNK
+
+    config HOST_RTSP_CLIENT
+        select RTSP
+        bool "rtsp client unittest"
+
+    config HOST_RTSP_SERVER
+        select RTSP
+        bool "rtsp server unittest"
+
+    config HOST_RTSP_UNK
+        bool "rtsp Unknown"
+
+endchoice
+
+endmenu

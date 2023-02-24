@@ -2,6 +2,7 @@
 # host unittest Kconfig
 #
 
+source "project/unittest/host/rtsp/Kconfig"
 source "project/unittest/host/libdrm/Kconfig"
 source "project/unittest/host/live555/Kconfig"
 source "project/unittest/host/signalslot/Kconfig"

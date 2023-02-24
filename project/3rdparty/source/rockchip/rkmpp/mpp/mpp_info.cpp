@@ -24,7 +24,7 @@
 #include "inc/mpp_info.h"
 
 static const char *mpp_version = "rockchip-rkmpp - " __DATE__ " " __TIME__;
-static const char *mpp_last_commit_message = "2023-02-10 [h264d]: check frame slot index when need to combine frame";
+static const char *mpp_last_commit_message = "2023-02-22 [av1d]: fix loss frame when eos packet has one more frame";
 
 void show_mpp_version(void)
 {

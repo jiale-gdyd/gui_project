@@ -158,7 +158,6 @@ MPP_RET av1d_prepare(void *ctx, MppPacket pkt, HalDecTask *task)
 
     pts = mpp_packet_get_pts(pkt);
     dts = mpp_packet_get_dts(pkt);
-    av1_ctx->eos = mpp_packet_get_eos(pkt);
     buf = pos = mpp_packet_get_pos(pkt);
     length = (RK_S32)mpp_packet_get_length(pkt);
     if (mpp_packet_get_flag(pkt)& MPP_PACKET_FLAG_EXTRA_DATA) {
@@ -196,7 +195,8 @@ MPP_RET av1d_prepare(void *ctx, MppPacket pkt, HalDecTask *task)
 
     mpp_packet_set_pos(pkt, pos);
     mpp_packet_set_length(pkt, length - consumed);
-
+    if (!mpp_packet_get_length(pkt))
+        av1_ctx->eos = mpp_packet_get_eos(pkt);
     av1d_dbg(AV1D_DBG_STRMIN, "pkt_len=%d, pts=%lld , out_size %d consumed %d new frame %d eos %d\n",
              length, pts, out_size, consumed, av1_ctx->new_frame, av1_ctx->eos);
     if (out_size > 0) {
@@ -204,10 +204,8 @@ MPP_RET av1d_prepare(void *ctx, MppPacket pkt, HalDecTask *task)
         task->input_packet = av1_ctx->pkt;
         mpp_packet_set_pts(av1_ctx->pkt, pts);
         mpp_packet_set_dts(av1_ctx->pkt, dts);
-        task->flags.eos = av1_ctx->eos;
     } else {
         task->valid = 0;
-        task->flags.eos = av1_ctx->eos;
         if (av1_ctx->eos) {
             task->input_packet = av1_ctx->pkt;
             mpp_packet_set_length(av1_ctx->pkt, 0);
@@ -215,7 +213,10 @@ MPP_RET av1d_prepare(void *ctx, MppPacket pkt, HalDecTask *task)
             mpp_packet_set_dts(av1_ctx->pkt, dts);
         }
     }
-    if (av1_ctx->new_frame || (av1_ctx->eos)) {
+    if (av1_ctx->eos && !mpp_packet_get_length(pkt))
+        task->flags.eos = av1_ctx->eos;
+
+    if (av1_ctx->new_frame || (task->flags.eos)) {
         task->valid = 1;
         av1_ctx->stream_offset = 0;
     }
@@ -239,6 +240,32 @@ MPP_RET av1d_parser(void *ctx, HalDecTask *in_task)
     av1d_parser_frame(av1_ctx, in_task);
     return ret;
 }
+
+/*!
+ ***********************************************************************
+ * \brief
+ *   control
+ ***********************************************************************
+ */
+MPP_RET av1d_control(void *ctx, MpiCmd cmd, void *param)
+{
+    Av1CodecContext *av1_ctx = (Av1CodecContext *)ctx;
+    MPP_RET ret = MPP_OK;
+
+    if (!ctx || !param)
+        return MPP_ERR_VALUE;
+
+    switch (cmd) {
+    case MPP_DEC_SET_OUTPUT_FORMAT : {
+        av1_ctx->usr_set_fmt = *(MppFrameFormat*)param;;
+    } break;
+    default:
+        break;
+    }
+
+    return ret;
+}
+
 /*!
  ***********************************************************************
  * \brief
@@ -272,6 +299,6 @@ const ParserApi api_av1d_parser = {
     .parse = av1d_parser,
     .reset = av1d_reset,
     .flush = av1d_flush,
-    .control = NULL,
+    .control = av1d_control,
     .callback = av1d_callback,
 };

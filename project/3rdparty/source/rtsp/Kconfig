@@ -1,0 +1,20 @@
+#
+# RTSP Kconfig
+#
+
+menu "RTSP Server and Client"
+
+config RTSP
+    bool "implementation rtsp server and client"
+    default n
+    help
+      Implementation rtsp server and client
+
+config SIMPLE_RTSP_SERVER
+    bool "simple rtsp server with c language"
+    default n
+    depends on RTSP
+    help
+      Enable simple rtsp server.
+
+endmenu

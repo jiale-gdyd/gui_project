@@ -1044,14 +1044,17 @@ void vdpu_av1d_set_reference_frames(Av1dHalCtx *p_hal, VdpuAv1dRegCtx *ctx, DXVA
             dxva->primary_ref_frame < ALLOWED_REFS_PER_FRAME_EX) {
             // Primary ref frame is zero based
             RK_S32 prim_buf_idx = dxva->frame_refs[dxva->primary_ref_frame].Index;
+
             if (prim_buf_idx >= 0) {
-                MppBuffer buffer = NULL;
+                HalBuf *tile_out_buf;
+
                 y_stride = ctx->luma_size ;
                 uv_stride = y_stride / 2;
                 mv_offset = y_stride + uv_stride + 64;
-                mpp_buf_slot_get_prop(p_hal->slots, dxva->RefFrameMapTextureIndex[dxva->primary_ref_frame], SLOT_BUFFER, &buffer);
+
+                tile_out_buf = hal_bufs_get_buf(ctx->tile_out_bufs, prim_buf_idx);
                 regs->addr_cfg.swreg80.sw_segment_read_base_msb = 0;
-                regs->addr_cfg.swreg81.sw_segment_read_base_lsb = mpp_buffer_get_fd(buffer);
+                regs->addr_cfg.swreg81.sw_segment_read_base_lsb = mpp_buffer_get_fd(tile_out_buf->buf[0]);
                 mpp_dev_set_reg_offset(p_hal->dev, 81, mv_offset);
                 regs->swreg11.sw_use_temporal3_mvs = 1;
             }
@@ -1429,6 +1432,7 @@ void vdpu_av1d_set_global_model(Av1dHalCtx *p_hal, DXVA_PicParams_AV1 *dxva)
     VdpuAv1dRegSet *regs = ctx->regs;
     RK_U8 *dst = (RK_U8 *) mpp_buffer_get_ptr(ctx->global_model);
     RK_S32 ref_frame, i;
+
     for (ref_frame = 0; ref_frame < GM_GLOBAL_MODELS_PER_FRAME; ++ref_frame) {
         mpp_assert(dxva->frame_refs[ref_frame].wmtype <= 3);
 
@@ -2149,17 +2153,11 @@ MPP_RET vdpu_av1d_gen_regs(void *hal, HalTaskInfo *task)
             vir_right = 16 - ((vir_left + width) % 16);
         else
             vir_right = 0;
-        if (!bypass_filter) {
-            if (16 - (56 % 16))
-                vir_top = 16 - (56 % 16);
-            else
-                vir_top = 0;
-        } else {
-            if (((64 - (height % 64))) % 16)
-                vir_top = 16 - (((64 - (height % 64))) % 16);
-            else
-                vir_top = 0;
-        }
+
+        if (!bypass_filter)
+            vir_top = 8;
+        else
+            vir_top = 0;
 
         if (((vir_top + height) % 16))
             vir_bottom = 16 - ((vir_top + height) % 16);
@@ -2172,7 +2170,7 @@ MPP_RET vdpu_av1d_gen_regs(void *hal, HalTaskInfo *task)
         regs->vdpu_av1d_pp_cfg.swreg503.sw_pp0_virtual_right = vir_right;
         mpp_frame_set_offset_y(mframe, vir_top);
         mpp_frame_set_ver_stride(mframe, vir_top + height + vir_bottom);
-        regs->vdpu_av1d_pp_cfg.swreg322.sw_pp_out_format = 3;
+        regs->vdpu_av1d_pp_cfg.swreg322.sw_pp_out_format = 0;
         regs->vdpu_av1d_pp_cfg.swreg326.sw_pp_out_lu_base_lsb = mpp_buffer_get_fd(buffer);
         regs->vdpu_av1d_pp_cfg.swreg328.sw_pp_out_ch_base_lsb = mpp_buffer_get_fd(buffer);
         regs->vdpu_av1d_pp_cfg.swreg505.sw_pp0_afbc_tile_base_lsb = mpp_buffer_get_fd(buffer);
@@ -2180,16 +2178,21 @@ MPP_RET vdpu_av1d_gen_regs(void *hal, HalTaskInfo *task)
         RK_U32 out_w = hor_stride;
         RK_U32 out_h = ver_stride;
         RK_U32 y_stride = out_w * out_h;
-        regs->vdpu_av1d_pp_cfg.swreg322.sw_pp_out_format = 0;
+        RK_U32 out_fmt = 0;
+
+        if (mpp_frame_get_fmt(mframe) == MPP_FMT_YUV420SP)
+            out_fmt = 3;
+
+        /*
+         * out_fmt:
+         * 0 is 8bit or 10bit output by syntax
+         * 3 is force 8bit output
+         */
+        regs->vdpu_av1d_pp_cfg.swreg322.sw_pp_out_format = out_fmt;
         regs->vdpu_av1d_pp_cfg.swreg326.sw_pp_out_lu_base_lsb = mpp_buffer_get_fd(buffer);
         regs->vdpu_av1d_pp_cfg.swreg328.sw_pp_out_ch_base_lsb = mpp_buffer_get_fd(buffer);
         mpp_dev_set_reg_offset(p_hal->dev, 328, y_stride);
     }
-
-    /* RK_U32 i = 0;
-    for (i = 0; i < sizeof(VdpuAv1dRegSet) / sizeof(RK_U32); i++)
-        mpp_log("regs[%04d]=%08X\n", i, ((RK_U32 *)regs)[i]); */
-
 
 __RETURN:
     return ret = MPP_OK;
