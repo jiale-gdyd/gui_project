@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <libdrm/libdrm_macros.h>
 #include <libdrm/xf86drm.h>
 #include <libdrm/xf86drmHash.h>
+#include <libdrm/libdrm_macros.h>
 
 #define HASH_MAGIC                      0xdeadbeef
 

@@ -1,5 +1,5 @@
-#ifndef _UTIL_MATH_H_
-#define _UTIL_MATH_H_
+#ifndef LIBDRM_UTIL_MATH_H
+#define LIBDRM_UTIL_MATH_H
 
 #define MIN2(A, B)                      ((A)<(B) ? (A) : (B))
 #define MAX2(A, B)                      ((A)>(B) ? (A) : (B))

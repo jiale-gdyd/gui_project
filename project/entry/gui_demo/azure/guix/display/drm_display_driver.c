@@ -20,8 +20,8 @@
 
 #if defined(CONFIG_DRM_DISP_DRIVER)
 #include <libdrm/xf86drm.h>
+#include <libdrm/drm_fourcc.h>
 #include <libdrm/xf86drmMode.h>
-#include <libdrm/drm/drm_fourcc.h>
 #endif
 
 #include <gx_api.h>

@@ -1,22 +1,20 @@
+#include <stdio.h>
+#include <errno.h>
 #include <assert.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/ioctl.h>
-
-#include <stdio.h>
-#include <stdbool.h>
-
-#include <libdrm/libdrm_macros.h>
-#include <libdrm/xf86drmMode.h>
-#include <libdrm/xf86drm.h>
-#include <libdrm/drm/drm.h>
-#include <libdrm/drm/drm_fourcc.h>
-
-#include <errno.h>
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <sys/ioctl.h>
+
+#include <libdrm/drm.h>
+#include <libdrm/xf86drm.h>
+#include <libdrm/drm_fourcc.h>
+#include <libdrm/xf86drmMode.h>
+#include <libdrm/libdrm_macros.h>
 
 #define memclear(s)                         memset(&s, 0, sizeof(s))
 

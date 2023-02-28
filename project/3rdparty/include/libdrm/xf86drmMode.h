@@ -1,12 +1,12 @@
-#ifndef _XF86DRMMODE_H_
-#define _XF86DRMMODE_H_
+#ifndef LIBDRM_XF86DRMMODE_H
+#define LIBDRM_XF86DRMMODE_H
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-#include "drm/drm.h"
-#include "drm/drm_mode.h"
+#include "drm.h"
+#include "drm_mode.h"
 
 #include <stddef.h>
 #include <stdint.h>

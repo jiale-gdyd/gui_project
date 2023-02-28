@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <libdrm/libdrm_macros.h>
 #include <libdrm/xf86drm.h>
 #include <libdrm/xf86drmRandom.h>
+#include <libdrm/libdrm_macros.h>
 
 #define RANDOM_MAGIC                0xfeedbeef
 

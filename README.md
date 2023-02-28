@@ -8,10 +8,6 @@
 ## 一、构建应用，(默认master分支)可以根据configs/*_defconfig文件对功能进行裁剪
 
 ### 构建基于主机的应用
-+ 构建主机的单元测试项目
-   ```shell
-   ./build.sh host_unittest             最终生成host_unittest可执行文件，可通过修改build.host.version中对应名字的版本号
-   ```
 + 构建基于主机的LVGL项目
    ```shell
    ./build.sh host_lvgl_gui             最终生成lvgl_gui可执行文件，可通过修改build.host.version中对应名字的版本号
@@ -26,10 +22,6 @@
    ```
 
 ### 构建基于瑞星微rv1109/rv1126的应用
-+ 构建基于rv1109/rv1126 soc的单元测试项目
-   ```shell
-   ./build.sh rv11xx_unittest           最终生成rv11xx_unittest可执行文件，可通过修改build.rv11xx.version中对应名字的版本号
-   ```
 + 构建基于rv1109/rv1126 soc的LVGL项目
    ```shell
    ./build.sh rv11xx_lvgl_gui           最终生成lvgl_gui可执行文件，可通过修改build.rv11xx.version中对应名字的版本号

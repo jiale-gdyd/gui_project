@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <libdrm/libdrm_macros.h>
 #include <libdrm/xf86drm.h>
+#include <libdrm/libdrm_macros.h>
 
 #define SL_LIST_MAGIC                           0xfacade00LU
 #define SL_ENTRY_MAGIC                          0x00fab1edLU

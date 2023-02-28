@@ -17,25 +17,4 @@ config LIBDRM
       libdrm is a low-level library, typically used by graphics drivers such as the Mesa drivers, the X drivers,
       libva and similar projects.
 
-config LIBDRM_TOOLS
-    bool "libdrm tools"
-    depends on LIBDRM
-    default n
-    help
-      libdrm test
-
-config LIBDRM_MODEPRINT
-    bool "libdrm tools modeprint"
-    depends on LIBDRM_TOOLS
-    default n
-    help
-      libdrm tools modeprint
-
-config LIBDRM_MODETEST
-    bool "libdrm tools modetest"
-    depends on LIBDRM_TOOLS
-    default n
-    help
-      libdrm tools modetest
-
 endmenu

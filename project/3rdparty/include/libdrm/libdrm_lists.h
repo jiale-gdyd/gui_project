@@ -1,5 +1,5 @@
-#ifndef _LIBDRM_LISTS_H_
-#define _LIBDRM_LISTS_H_
+#ifndef LIBDRM_LIBDRM_LISTS_H
+#define LIBDRM_LIBDRM_LISTS_H
 
 #include <stddef.h>
 
@@ -9,7 +9,7 @@ typedef struct _drmMMListHead {
 } drmMMListHead;
 
 #define DRMINITLISTHEAD(__item)                 \
-    do{                                         \
+    do {                                        \
         (__item)->prev = (__item);              \
         (__item)->next = (__item);              \
     } while (0)

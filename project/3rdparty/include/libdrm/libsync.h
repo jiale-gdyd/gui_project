@@ -1,5 +1,5 @@
-#ifndef _LIBSYNC_H
-#define _LIBSYNC_H
+#ifndef LIBDRM_LIBSYNC_H
+#define LIBDRM_LIBSYNC_H
 
 #include <errno.h>
 #include <assert.h>

@@ -16,8 +16,8 @@
 #include <sys/types.h>
 
 #include <libdrm/xf86drm.h>
+#include <libdrm/drm_fourcc.h>
 #include <libdrm/xf86drmMode.h>
-#include <libdrm/drm/drm_fourcc.h>
 
 #define DIV_ROUND_UP(n, d)                  (((n) + (d) - 1) / (d))
 
