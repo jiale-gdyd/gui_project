@@ -13,6 +13,7 @@
 #include "lcd_linux/lcd_linux_fb.h"
 #include "lcd_linux/lcd_linux_drm.h"
 
+#include "devices.h"
 #include "main_loop_linux.h"
 
 #ifndef FB_DEVICE_FILENAME
@@ -35,9 +36,14 @@
 #define MICE_DEVICE_FILENAME        "/dev/input/mouse0"
 #endif
 
-static tk_thread_t *s_kb_thread = NULL;
-static tk_thread_t *s_ts_thread = NULL;
-static tk_thread_t *s_mice_thread = NULL;
+static slist_t s_device_threads_list;
+static device_info_t s_devices_default[] = {
+    {"fb",    FB_DEVICE_FILENAME},
+    {"drm",   DRM_DEVICE_FILENAME},
+    {"ts",    TS_DEVICE_FILENAME},
+    {"input", KB_DEVICE_FILENAME},
+    {"mouse", MICE_DEVICE_FILENAME}
+};
 
 static ret_t main_loop_linux_destroy(main_loop_t *l)
 {
@@ -109,29 +115,65 @@ ret_t input_dispatch_to_main_loop(void *ctx, const event_queue_req_t *evt, const
 
 static void on_app_exit(void)
 {
-    if (s_kb_thread != NULL) {
-        tk_thread_destroy(s_kb_thread);
-    }
-
-    if (s_mice_thread != NULL) {
-        tk_thread_destroy(s_mice_thread);
-    }
-
-    if (s_ts_thread != NULL) {
-        tk_thread_destroy(s_ts_thread);
-    }
-
+    slist_deinit(&s_device_threads_list);
     input_thread_global_deinit();
+    devices_unload();
+}
+
+static ret_t lcd_create_on_devices_visit(void *ctx, const device_info_t *info)
+{
+    lcd_t **p_lcd = (lcd_t **)ctx;
+
+#if defined(CONFIG_DRM_DISP_DRIVER)
+    if (tk_str_eq(info->type, "drm")) {
+        *p_lcd = lcd_linux_drm_create(info->path);
+    }
+#else
+    if (tk_str_eq(info->type, "fb")) {
+        *p_lcd = lcd_linux_fb_create(info->path);
+    }
+#endif
+
+    if (*p_lcd != NULL) {
+        return RET_STOP;
+    }
+
+    return RET_OK;
+}
+
+static ret_t device_thread_run_on_devices_visit(void *ctx, const device_info_t *info)
+{
+    ret_t ret = RET_OK;
+    tk_thread_t *thread = NULL;
+    main_loop_simple_t *loop = (main_loop_simple_t *)ctx;
+
+    if (tk_str_eq(info->type, "input")) {
+        thread = input_thread_run(info->path, input_dispatch_to_main_loop, loop, loop->w, loop->h);
+    } else if (tk_str_eq(info->type, "mouse")) {
+        thread = mouse_thread_run(info->path, input_dispatch_to_main_loop, loop, loop->w, loop->h);
+    } else if (tk_str_eq(info->type, "ts")) {
+#if defined(CONFIG_TSLIB)
+        thread = tslib_thread_run(info->path, input_dispatch_to_main_loop, loop, loop->w, loop->h);
+#endif
+    }
+
+    if (thread != NULL) {
+        ret = slist_append(&s_device_threads_list, thread);
+    }
+
+    return ret;
 }
 
 main_loop_t *main_loop_init(int w, int h)
 {
+    lcd_t *lcd = NULL;
     main_loop_simple_t *loop = NULL;
-#if defined(CONFIG_DRM_DISP_DRIVER)
-    lcd_t *lcd = lcd_linux_drm_create(DRM_DEVICE_FILENAME);
-#else
-    lcd_t *lcd = lcd_linux_fb_create(FB_DEVICE_FILENAME);
-#endif
+
+    if (RET_OK != devices_load()) {
+        log_warn("Devices load fail! Used default\n");
+        devices_set(s_devices_default, ARRAY_SIZE(s_devices_default));
+    }
+    devices_foreach(lcd_create_on_devices_visit, &lcd);
 
     return_value_if_fail(lcd != NULL, NULL);
 
@@ -141,13 +183,8 @@ main_loop_t *main_loop_init(int w, int h)
     loop->base.destroy = main_loop_linux_destroy;
 
     input_thread_global_init();
-
-#if defined(CONFIG_TSLIB)
-    s_ts_thread = tslib_thread_run(TS_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
-#endif
-
-    s_kb_thread = input_thread_run(KB_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
-    s_mice_thread = mouse_thread_run(MICE_DEVICE_FILENAME, input_dispatch_to_main_loop, loop, lcd->w, lcd->h);
+    slist_init(&s_device_threads_list, (tk_destroy_t)tk_thread_destroy, NULL);
+    devices_foreach(device_thread_run_on_devices_visit, loop);
 
     atexit(on_app_exit);
 
