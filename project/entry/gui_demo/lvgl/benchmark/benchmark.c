@@ -846,9 +846,8 @@ static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *co
     LV_UNUSED(colors);
 
     if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
-        flush_cb_ori(drv, area, colors);
-
         bool last = lv_disp_flush_is_last(drv);
+        flush_cb_ori(drv, area, colors);
         if (last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if (scene_with_opa) {
@@ -877,9 +876,8 @@ static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *co
             last_flush_cb_call = lv_tick_get();
         }
     } else if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        lv_disp_flush_ready(drv);
-
         bool last = lv_disp_flush_is_last(drv);
+        lv_disp_flush_ready(drv);
         if (last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if (scene_with_opa) {
