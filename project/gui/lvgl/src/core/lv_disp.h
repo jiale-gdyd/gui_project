@@ -52,9 +52,15 @@ typedef enum {
 
     /**
      * The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer.
-     * This way the buffer always contain the whole image.
+     * This way the buffer always contain the whole image. Only the changed ares will be updated.
+     * With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
      */
     LV_DISP_RENDER_MODE_DIRECT,
+
+    /**
+     * Always redraw the whole screen even if only one pixel has been changed.
+     * With 2 buffers in flush_cb only and address change is required.
+     */
     LV_DISP_RENDER_MODE_FULL,
 } lv_disp_render_mode_t;
 
@@ -227,13 +233,13 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
 
 /**
  * Set the buffers for a display
- * @param disp          pointer to a display
- * @param buf1          first buffer
- * @param buf2          second buffer (can be `NULL`)
- * @param buf_size_px   size of the buffer in pixels
- * @param render_mode   LV_DISP_RENDER_MODE_PARTIAL/DIRECT/FULL
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ * @param buf_size_byte     size of the buffer in bytes
+ * @param render_mode       LV_DISP_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_px,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
                               lv_disp_render_mode_t render_mode);
 
 /**

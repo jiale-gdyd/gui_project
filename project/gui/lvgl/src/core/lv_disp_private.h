@@ -65,7 +65,7 @@ extern "C" {
     /** Internal, used by the library*/
     void * draw_buf_act;
 
-    /** In pixel count*/
+    /** In byte count*/
     uint32_t draw_buf_size;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be

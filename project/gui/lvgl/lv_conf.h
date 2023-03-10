@@ -5,7 +5,7 @@
 
 #define LV_USE_DEV_VERSION
 
-// 色深: 1(每像素1字节)、8(RGB332)、16(RGB565)、32(ARGB8888)
+// 色深: 1(每像素1字节)、8(RGB332)、16(RGB565)、24 (RGB888)、32(ARGB8888)
 #define LV_COLOR_DEPTH                              32
 
 // 如果使用色度键控，则不会绘制具有此颜色的图像像素
@@ -16,7 +16,7 @@
 
 #if LV_USE_BUILTIN_MALLOC
 // `lv_malloc()`可用的内存大小(>= 2kB)
-#define LV_MEM_SIZE                                 (128U * 1024U)
+#define LV_MEM_SIZE                                 (48U * 1024U)
 
 // lv_malloc()的内存扩展大小(以字节为单位)
 #define LV_MEM_POOL_EXPAND_SIZE                     0
@@ -122,6 +122,9 @@
 
 #if LV_USE_DRAW_SDL
 #define LV_DRAW_SDL_INCLUDE_PATH                    <SDL2/SDL.h>
+
+// 建议仅用于模拟带有显示控制器的设置
+#define LV_SDL_PARTIAL_MODE                         0
 
 // 纹理缓存大小，默认8MB
 #define LV_DRAW_SDL_LRU_SIZE                        (1024 * 1024 * 8)

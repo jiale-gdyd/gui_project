@@ -1,10 +1,9 @@
-﻿
-/**
+﻿/**
  * File: gradient.h   
  * Author: AWTK Develop Team
  * Brief:  vector graphic gradient
  *
- * Copyright (c) 2021 - 2021 Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2021 - 2023 Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +34,7 @@ BEGIN_C_DECLS
 
 /**
  * @enum gradient_type_t
+ * @prefix GRADIENT_
  * 渐变色类型。
  */
 typedef enum _gradient_type_t {
@@ -214,32 +214,32 @@ ret_t gradient_add_stop(gradient_t* gradient, color_t color, float stop);
  * @method gradient_get_stop
  * 获取关键点。
  *
- * @param {gradient_t*} gradient gradient对象。
+ * @param {const gradient_t*} gradient gradient对象。
  * @param {uint32_t} index 序数。
  *
- * @return {gradient_stop_t*} 返回index指定的关键点。
+ * @return {const gradient_stop_t*} 返回index指定的关键点。
  */
-gradient_stop_t* gradient_get_stop(gradient_t* gradient, uint32_t index);
+const gradient_stop_t* gradient_get_stop(const gradient_t* gradient, uint32_t index);
 
 /**
  * @method gradient_get_first_color
  * 获取开始的颜色。
  *
- * @param {gradient_t*} gradient gradient对象。
+ * @param {const gradient_t*} gradient gradient对象。
  *
  * @return {color_t} 返回颜色。
  */
-color_t gradient_get_first_color(gradient_t* gradient);
+color_t gradient_get_first_color(const gradient_t* gradient);
 
 /**
  * @method gradient_get_last_color
  * 获取结束的颜色。
  *
- * @param {gradient_t*} gradient gradient对象。
+ * @param {const gradient_t*} gradient gradient对象。
  *
  * @return {color_t} 返回颜色。
  */
-color_t gradient_get_last_color(gradient_t* gradient);
+color_t gradient_get_last_color(const gradient_t* gradient);
 
 /**
  * @method gradient_get_color
