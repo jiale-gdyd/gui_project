@@ -123,9 +123,6 @@
 #if LV_USE_DRAW_SDL
 #define LV_DRAW_SDL_INCLUDE_PATH                    <SDL2/SDL.h>
 
-// 建议仅用于模拟带有显示控制器的设置
-#define LV_SDL_PARTIAL_MODE                         0
-
 // 纹理缓存大小，默认8MB
 #define LV_DRAW_SDL_LRU_SIZE                        (1024 * 1024 * 8)
 
@@ -520,6 +517,11 @@
 #define LV_USE_SDL                                  0
 #if LV_USE_SDL
 #define LV_SDL_INCLUDE_PATH                         <SDL2/SDL.h>
+
+// 建议仅用于模拟带有显示控制器的设置
+#define LV_SDL_PARTIAL_MODE                         0
+
+#define LV_SDL_FULLSCREEN                           0
 #endif
 
 // /dev/fb的驱动

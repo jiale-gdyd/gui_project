@@ -74,7 +74,28 @@ static const struct libinput_interface interface = {
  **********************/
 
 /**
- * find connected input device with specific capabilities
+ * Determine the capabilities of a specific libinput device.
+ * @param device the libinput device to query
+ * @return the supported input capabilities
+ */
+libinput_capability libinput_query_capability(struct libinput_device *device) {
+  libinput_capability capability = LIBINPUT_CAPABILITY_NONE;
+  if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)
+      && (libinput_device_keyboard_has_key(device, KEY_ENTER) || libinput_device_keyboard_has_key(device, KEY_KPENTER)))
+  {
+    capability |= LIBINPUT_CAPABILITY_KEYBOARD;
+  }
+  if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_POINTER)) {
+    capability |= LIBINPUT_CAPABILITY_POINTER;
+  }
+  if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_TOUCH)) {
+    capability |= LIBINPUT_CAPABILITY_TOUCH;
+  }
+  return capability;
+}
+
+/**
+ * Find connected input device with specific capabilities
  * @param capabilities required device capabilities
  * @param force_rescan erase the device cache (if any) and rescan the file system for available devices
  * @return device node path (e.g. /dev/input/event0) for the first matching device or NULL if no device was found.
@@ -87,7 +108,7 @@ char *libinput_find_dev(libinput_capability capabilities, bool force_rescan) {
 }
 
 /**
- * find connected input devices with specific capabilities
+ * Find connected input devices with specific capabilities
  * @param capabilities required device capabilities
  * @param devices pre-allocated array to store the found device node paths (e.g. /dev/input/event0). The pointers are
  *                safe to use until the next forceful device search.
@@ -121,7 +142,7 @@ size_t libinput_find_devs(libinput_capability capabilities, char **found, size_t
  */
 bool libinput_set_file(char* dev_name)
 {
-    return libinput_set_file_state(&default_state, dev_name);
+  return libinput_set_file_state(&default_state, dev_name);
 }
 
 /**
@@ -138,8 +159,8 @@ bool libinput_set_file_state(libinput_drv_state_t *state, char* dev_name)
   // citing libinput.h:libinput_path_remove_device:
   // > If no matching device exists, this function does nothing.
   if (state->libinput_device) {
-    state->libinput_device = libinput_device_unref(state->libinput_device);
     libinput_path_remove_device(state->libinput_device);
+    state->libinput_device = libinput_device_unref(state->libinput_device);
   }
 
   state->libinput_device = libinput_path_add_device(state->libinput_context, dev_name);
@@ -165,7 +186,7 @@ bool libinput_set_file_state(libinput_drv_state_t *state, char* dev_name)
  */
 void libinput_init(void)
 {
-    libinput_init_state(&default_state, LIBINPUT_NAME);
+  libinput_init_state(&default_state, LIBINPUT_NAME);
 }
 
 /**
@@ -176,15 +197,13 @@ void libinput_init(void)
  */
 void libinput_init_state(libinput_drv_state_t *state, char* path)
 {
-    state->libinput_device = NULL;
+  state->libinput_device = NULL;
   state->libinput_context = libinput_path_create_context(&interface, NULL);
 
-  
   if(path == NULL || !libinput_set_file_state(state, path)) {
       fprintf(stderr, "unable to add device \"%s\" to libinput context: %s\n", path ? path : "NULL", strerror(errno));
       return;
   }
-
   state->fd = libinput_get_fd(state->libinput_context);
 
   /* prepare poll */
@@ -192,9 +211,32 @@ void libinput_init_state(libinput_drv_state_t *state, char* path)
   state->fds[0].events = POLLIN;
   state->fds[0].revents = 0;
 
-  #if USE_XKB
+#if USE_XKB
   xkb_init_state(&(state->xkb_state));
 #endif
+}
+
+/**
+ * De-initialise a previously initialised driver state and free any dynamically allocated memory. Use this function if you want to
+ * reuse an existing driver state.
+ * @param state driver state to de-initialize
+ */
+void libinput_deinit_state(libinput_drv_state_t *state)
+{
+  if (state->libinput_device) {
+    libinput_path_remove_device(state->libinput_device);
+    libinput_device_unref(state->libinput_device);
+  }
+
+  if (state->libinput_context) {
+    libinput_unref(state->libinput_context);
+  }
+
+#if USE_XKB
+  xkb_deinit_state(&(state->xkb_state));
+#endif
+
+  lv_memzero(state, sizeof(libinput_drv_state_t));
 }
 
 /**
@@ -203,9 +245,9 @@ void libinput_init_state(libinput_drv_state_t *state, char* path)
  * @param indev_drv driver object itself
  * @param data store the libinput data here
  */
-void libinput_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
+void libinput_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    libinput_read_state(&default_state, indev_drv, data);
+  libinput_read_state(&default_state, indev_drv, data);
 }
 
 /**
@@ -215,7 +257,7 @@ void libinput_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
  * @param indev_drv driver object itself
  * @param data store the libinput data here
  */
-void libinput_read_state(libinput_drv_state_t * state, lv_indev_t * indev_drv, lv_indev_data_t * data)
+void libinput_read_state(libinput_drv_state_t * state, lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
   struct libinput_event *event;
   int rc = 0;
@@ -229,7 +271,6 @@ void libinput_read_state(libinput_drv_state_t * state, lv_indev_t * indev_drv, l
     default:
       break;
   }
-
   libinput_dispatch(state->libinput_context);
   while((event = libinput_get_event(state->libinput_context)) != NULL) {
     switch (indev_drv->type) {
@@ -244,7 +285,6 @@ void libinput_read_state(libinput_drv_state_t * state, lv_indev_t * indev_drv, l
     }
     libinput_event_destroy(event);
   }
-
 report_most_recent_state:
   data->point.x = state->most_recent_touch_point.x;
   data->point.y = state->most_recent_touch_point.y;
@@ -279,7 +319,7 @@ static bool rescan_devices(void) {
     }
 
     /* 11 characters for /dev/input/ + length of name + 1 NUL terminator */
-    char *path = (char *)malloc((11 + strlen(ent->d_name) + 1) * sizeof(char));
+    char *path = malloc((11 + strlen(ent->d_name) + 1) * sizeof(char));
     if (!path) {
       perror("could not allocate memory for device node path");
       libinput_unref(context);
@@ -300,18 +340,7 @@ static bool rescan_devices(void) {
      * as part of this function, we don't have to increase its reference count to keep it alive.
      * https://wayland.freedesktop.org/libinput/doc/latest/api/group__base.html#gaa797496f0150b482a4e01376bd33a47b */
 
-    libinput_capability capabilities = LIBINPUT_CAPABILITY_NONE;
-    if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD)
-        && (libinput_device_keyboard_has_key(device, KEY_ENTER) || libinput_device_keyboard_has_key(device, KEY_KPENTER)))
-    {
-      capabilities |= LIBINPUT_CAPABILITY_KEYBOARD;
-    }
-    if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_POINTER)) {
-      capabilities |= LIBINPUT_CAPABILITY_POINTER;
-    }
-    if (libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_TOUCH)) {
-      capabilities |= LIBINPUT_CAPABILITY_TOUCH;
-    }
+    libinput_capability capabilities = libinput_query_capability(device);
 
     libinput_path_remove_device(device);
 
@@ -468,10 +497,10 @@ static void read_keypad(libinput_drv_state_t *state, struct libinput_event *even
           state->key_val = 0;
           break;
       }
-#endif
-     if (state->key_val != 0) {
+#endif /* USE_XKB */
+      if (state->key_val != 0) {
         /* Only record button state when actual output is produced to prevent widgets from refreshing */
-        state->butto = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
+        state->button = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
       }
       break;
     default:
@@ -492,4 +521,4 @@ static void close_restricted(int fd, void *user_data)
   close(fd);
 }
 
-#endif
+#endif /* USE_LIBINPUT || USE_BSD_LIBINPUT */

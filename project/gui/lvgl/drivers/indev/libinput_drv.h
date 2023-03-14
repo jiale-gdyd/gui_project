@@ -70,7 +70,13 @@ typedef struct {
  **********************/
 
 /**
- * find connected input device with specific capabilities
+ * Determine the capabilities of a specific libinput device.
+ * @param device the libinput device to query
+ * @return the supported input capabilities
+ */
+libinput_capability libinput_query_capability(struct libinput_device *device);
+/**
+ * Find connected input device with specific capabilities
  * @param capabilities required device capabilities
  * @param force_rescan erase the device cache (if any) and rescan the file system for available devices
  * @return device node path (e.g. /dev/input/event0) for the first matching device or NULL if no device was found.
@@ -78,7 +84,7 @@ typedef struct {
  */
 char *libinput_find_dev(libinput_capability capabilities, bool force_rescan);
 /**
- * find connected input devices with specific capabilities
+ * Find connected input devices with specific capabilities
  * @param capabilities required device capabilities
  * @param devices pre-allocated array to store the found device node paths (e.g. /dev/input/event0). The pointers are
  *                safe to use until the next forceful device search.
@@ -87,7 +93,6 @@ char *libinput_find_dev(libinput_capability capabilities, bool force_rescan);
  * @return number of devices that were found
  */
 size_t libinput_find_devs(libinput_capability capabilities, char **found, size_t count, bool force_rescan);
-
 /**
  * Prepare for reading input via libinput using the default driver state. Use this function if you only want
  * to connect a single device.
@@ -100,6 +105,12 @@ void libinput_init(void);
  * @param path input device node path (e.g. /dev/input/event0)
  */
 void libinput_init_state(libinput_drv_state_t *state, char* path);
+/**
+ * De-initialise a previously initialised driver state and free any dynamically allocated memory. Use this function if you want to
+ * reuse an existing driver state.
+ * @param state driver state to de-initialize
+ */
+void libinput_deinit_state(libinput_drv_state_t *state);
 /**
  * Reconfigure the device file for libinput using the default driver state. Use this function if you only want
  * to connect a single device.
@@ -122,9 +133,8 @@ bool libinput_set_file_state(libinput_drv_state_t *state, char* dev_name);
  * to connect a single device.
  * @param indev_drv driver object itself
  * @param data store the libinput data here
- * @return false: because the points are not buffered, so no more data to be read
  */
-void libinput_read(lv_indev_t * indev_drv, lv_indev_data_t * data);
+void libinput_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 /**
  * Read available input events via libinput using a specific driver state. Use this function if you want to
  * connect multiple devices.
@@ -132,13 +142,13 @@ void libinput_read(lv_indev_t * indev_drv, lv_indev_data_t * data);
  * @param indev_drv driver object itself
  * @param data store the libinput data here
  */
-void libinput_read_state(libinput_drv_state_t * state, lv_indev_t * indev_drv, lv_indev_data_t * data);
+void libinput_read_state(libinput_drv_state_t * state, lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif
+#endif /* USE_LIBINPUT || USE_BSD_LIBINPUT */
 
 #ifdef __cplusplus
 } /* extern "C" */

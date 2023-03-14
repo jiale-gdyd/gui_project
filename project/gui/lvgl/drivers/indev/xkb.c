@@ -74,15 +74,30 @@ bool xkb_init_state(xkb_drv_state_t *state) {
 }
 
 /**
+ * De-initialise a previously initialised driver state and free any dynamically allocated memory. Use this function if you want to
+ * reuse an existing driver state.
+ * @param state XKB driver state to use
+ */
+void xkb_deinit_state(xkb_drv_state_t *state) {
+  if (state->state) {
+    xkb_state_unref(state->state);
+    state->state = NULL;
+  }
+
+  if (state->keymap) {
+    xkb_keymap_unref(state->keymap);
+    state->keymap = NULL;
+  }
+}
+
+/**
  * Set a new keymap to be used for processing future key events using the default driver state. Use
  * this function if you only want to connect a single device.
  * @param names XKB rule names structure (use NULL components for default values)
  * @return true if creating the keymap and associated state succeeded
  */
 bool xkb_set_keymap(struct xkb_rule_names names) {
-  //if (keymap) {
-     return xkb_set_keymap_state(&default_state, names);
-  //}
+  return xkb_set_keymap_state(&default_state, names);
 }
 
 /**
@@ -93,7 +108,7 @@ bool xkb_set_keymap(struct xkb_rule_names names) {
  * @return true if creating the keymap and associated state succeeded
  */
 bool xkb_set_keymap_state(xkb_drv_state_t *state, struct xkb_rule_names names) {
-    if (state->keymap) {
+  if (state->keymap) {
     xkb_keymap_unref(state->keymap);
     state->keymap = NULL;
   }
@@ -101,12 +116,6 @@ bool xkb_set_keymap_state(xkb_drv_state_t *state, struct xkb_rule_names names) {
   state->keymap = xkb_keymap_new_from_names(context, &names, XKB_KEYMAP_COMPILE_NO_FLAGS);
   if (!state->keymap) {
     perror("could not create XKB keymap");
-    return false;
-  }
-
-  state->keymap = xkb_keymap_ref(state->keymap);
-  if (!state->keymap) {
-    perror("could not reference XKB keymap");
     return false;
   }
 
@@ -121,12 +130,6 @@ bool xkb_set_keymap_state(xkb_drv_state_t *state, struct xkb_rule_names names) {
     return false;
   }
 
-  state->state = xkb_state_ref(state->state);
-  if (!state->state) {
-    perror("could not reference XKB state");
-    return false;
-  }
-
   return true;
 }
 
@@ -138,7 +141,7 @@ bool xkb_set_keymap_state(xkb_drv_state_t *state, struct xkb_rule_names names) {
  * @return the (first) UTF-8 character produced by the event or 0 if no output was produced
  */
 uint32_t xkb_process_key(uint32_t scancode, bool down) {
-    return xkb_process_key_state(&default_state, scancode, down);
+  return xkb_process_key_state(&default_state, scancode, down);
 }
 
 /**
