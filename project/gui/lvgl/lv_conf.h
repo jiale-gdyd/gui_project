@@ -225,9 +225,6 @@
 // 为旋转分配的最大缓冲区大小。仅在显示驱动程序中启用软件旋转时使用
 #define LV_DISP_ROT_MAX_BUF                         (10*1024)
 
-// 使用用户数据
-#define LV_USE_USER_DATA                            1
-
 // 垃圾收集器设置。如果lvgl绑定到更高级别的语言并且内存由该语言管理，则使用
 #define LV_ENABLE_GC                                0
 
