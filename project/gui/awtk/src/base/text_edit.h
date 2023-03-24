@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  text_edit
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,6 +42,12 @@ BEGIN_C_DECLS
 #define WCHAR_IS_LINE_BREAK(c) ((c) == (wchar_t)'\r' || (c) == (wchar_t)'\n')
 #define TWINS_WCHAR_IS_LINE_BREAK(c1, c2) ((c1) == (wchar_t)'\r' && (c2) == (wchar_t)'\n')
 
+typedef enum _delete_type_t {
+  DELETE_BY_INPUT,
+  DELETE_BY_KEY_DELETE,
+  DELETE_BY_KEY_BACKSPACE,
+} delete_type_t;
+
 /**
  * @class text_edit_state_t
  */
@@ -70,6 +76,8 @@ typedef struct _text_edit_state_t {
 } text_edit_state_t;
 
 typedef ret_t (*text_edit_on_state_changed_t)(void* ctx, text_edit_state_t* state);
+typedef ret_t (*text_edit_on_text_will_delete_t)(void* ctx, delete_type_t delete_type);
+typedef ret_t (*text_edit_on_char_will_input_t)(void* ctx, wchar_t c);
 
 /**
  * @class text_edit_t
@@ -381,6 +389,32 @@ ret_t text_edit_set_on_state_changed(text_edit_t* text_edit,
                                      text_edit_on_state_changed_t on_state_changed, void* ctx);
 
 /**
+ * @method text_edit_set_on_text_will_delete
+ * 设置文本删除回调函数。
+ * @param {text_edit_t*} text_edit text_edit对象。
+ * @param {text_edit_on_text_will_delete_t} on_text_will_delete 回调函数。
+ * @param {void*} ctx 回调函数上下文。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_edit_set_on_text_will_delete(text_edit_t* text_edit,
+                                        text_edit_on_text_will_delete_t on_text_will_delete,
+                                        void* ctx);
+
+/**
+ * @method text_edit_set_on_char_will_input
+ * 设置字符输入回调函数。
+ * @param {text_edit_t*} text_edit text_edit对象。
+ * @param {text_edit_on_char_will_input_t} on_char_will_input 回调函数。
+ * @param {void*} ctx 回调函数上下文。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_edit_set_on_char_will_input(text_edit_t* text_edit,
+                                       text_edit_on_char_will_input_t on_char_will_input,
+                                       void* ctx);
+
+/**
  * @method text_edit_destroy
  * 销毁text_edit对象。
  * @param {text_edit_t*} text_edit text_edit对象。
@@ -441,8 +475,8 @@ ret_t text_edit_insert_text(text_edit_t* text_edit, uint32_t offset, const char*
  * @method text_edit_show_context_menu
  * 显示上下文菜单。
  * @param {text_edit_t*} text_edit text_edit对象。
- * @param {uint32_t} x x位置。
- * @param {uint32_t} y y位置。
+ * @param {int32_t} x x位置。
+ * @param {int32_t} y y位置。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mledit
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -154,6 +154,8 @@ typedef struct _mledit_t {
 
   wstr_t temp;
   wstr_t saved_text;
+  wstr_t last_changing_text;
+  wstr_t last_changed_text;
 } mledit_t;
 
 /**
@@ -163,7 +165,7 @@ typedef struct _mledit_t {
 
 /**
  * @event {value_change_event_t} EVT_VALUE_CHANGED
- * 文本改变事件。
+ * 文本改变事件(编辑完成或设置文本时触发)。
  */
 
 /**
@@ -262,7 +264,7 @@ ret_t mledit_set_max_chars(widget_t* widget, uint32_t max_chars);
  * 设置编辑器的输入提示。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {char*} tips 输入提示。
+ * @param {const char*} tips 输入提示。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -285,7 +287,7 @@ ret_t mledit_set_tr_tips(widget_t* widget, const char* tr_tips);
  * 
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {char*} keyboard 键盘名称(相应UI资源必须存在)。
+ * @param {const char*} keyboard 键盘名称(相应UI资源必须存在)。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
