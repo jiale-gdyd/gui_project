@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  simple fs api
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -92,28 +92,6 @@ typedef ret_t (*fs_file_stat_t)(fs_file_t* file, fs_stat_info_t* fst);
 typedef ret_t (*fs_file_sync_t)(fs_file_t* file);
 typedef ret_t (*fs_file_close_t)(fs_file_t* file);
 
-/**
- * @class fs_file_t
- * @annotation ["fake"]
- * 文件接口。
- *
- * 示例：
- *
- * ```c
- * int32_t ret = 0;
- * const char* file_name = "test.txt";
- * int32_t len = file_get_size(file_name);
- * uint8_t* buff = (uint8_t*)TKMEM_ALLOC(len + 1);
- * return_value_if_fail(buff != NULL, NULL);
-
- * fs_file_t* fp = fs_open_file(os_fs(), file_name, "rb");
- * if (fp != NULL) {
- *   ret = fs_file_read(fp, buff, len);
- *   fs_file_close(fp);
- * }
- * ```
- *
- */
 typedef struct _fs_file_vtable_t {
   fs_file_read_t read;
   fs_file_write_t write;
@@ -128,6 +106,27 @@ typedef struct _fs_file_vtable_t {
   fs_file_close_t close;
 } fs_file_vtable_t;
 
+/**
+ * @class fs_file_t
+ * @annotation ["fake"]
+ * 文件接口。
+ *
+ * 示例：
+ *
+ * ```c
+ * int32_t ret = 0;
+ * const char* file_name = "test.txt";
+ * int32_t len = file_get_size(file_name);
+ * uint8_t* buff = (uint8_t*)TKMEM_ALLOC(len + 1);
+ * return_value_if_fail(buff != NULL, NULL);
+ * fs_file_t* fp = fs_open_file(os_fs(), file_name, "rb");
+ * if (fp != NULL) {
+ *   ret = fs_file_read(fp, buff, len);
+ *   fs_file_close(fp);
+ * }
+ * ```
+ *
+ */
 struct _fs_file_t {
   const fs_file_vtable_t* vt;
   void* data;
@@ -191,7 +190,7 @@ int32_t fs_file_printf(fs_file_t* file, const char* const format_str, ...);
  * 定位读写指针到指定的位置。
  *
  * @param {fs_file_t*} file 文件对象。
- * @param {uint32_t} offset 数据长度。
+ * @param {int32_t} offset 数据长度。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -204,7 +203,7 @@ ret_t fs_file_seek(fs_file_t* file, int32_t offset);
  *
  * @param {fs_file_t*} file 文件对象。
  * @param {int32_t} offset 数据长度。
- * 
+ *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t fs_file_truncate(fs_file_t* file, int32_t offset);
@@ -314,12 +313,6 @@ typedef ret_t (*fs_dir_rewind_t)(fs_dir_t* dir);
 typedef ret_t (*fs_dir_read_t)(fs_dir_t* dir, fs_item_t* item);
 typedef ret_t (*fs_dir_close_t)(fs_dir_t* dir);
 
-/**
- * @class fs_dir_t
- *
- * 文件夹接口。
- *
- */
 typedef struct _fs_dir_vtable_t {
   fs_dir_rewind_t rewind;
   fs_dir_read_t read;
@@ -327,6 +320,12 @@ typedef struct _fs_dir_vtable_t {
   void* data;
 } fs_dir_vtable_t;
 
+/**
+ * @class fs_dir_t
+ *
+ * 文件夹接口。
+ *
+ */
 struct _fs_dir_t {
   const fs_dir_vtable_t* vt;
   void* data;
@@ -635,7 +634,7 @@ int32_t fs_get_file_size(fs_t* fs, const char* name);
  * 获取文件系统信息。
  *
  * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
- * @param {const char*} value 卷名。
+ * @param {const char*} volume 卷名。
  * @param {int32_t*} free_kb 用于返回空闲空间大小(KB)
  * @param {int32_t*} total_kb 用于返回总共空间大小(KB)
  *
@@ -817,7 +816,7 @@ void* file_read(const char* name, uint32_t* size);
  * 从某个位置读取文件。
  *
  * @param {const char*} name 文件名。
- * @param {const void*} buffer 数据缓冲区。
+ * @param {void*} buff 数据缓冲区。
  * @param {uint32_t} size 数据长度。
  * @param {uint32_t} offset 偏移量。
  *
@@ -831,7 +830,7 @@ int32_t file_read_part(const char* name, void* buff, uint32_t size, uint32_t off
  * 写入文件。
  *
  * @param {const char*} name 文件名。
- * @param {const void*} buffer 数据缓冲区。
+ * @param {const void*} buff 数据缓冲区。
  * @param {uint32_t} size 数据长度。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。

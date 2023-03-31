@@ -505,6 +505,8 @@ static ret_t mledit_update_caret(const timer_info_t* timer) {
   return_value_if_fail(mledit != NULL && widget != NULL, RET_REMOVE);
 
   if (mledit->readonly) {
+    mledit->timer_id = TK_INVALID_ID;
+    text_edit_set_caret_visible(mledit->model, FALSE);
     return RET_REMOVE;
   }
 
@@ -522,12 +524,16 @@ static ret_t mledit_update_caret(const timer_info_t* timer) {
 
 static ret_t mledit_start_update_caret(mledit_t* mledit) {
 #define UPDATE_CARET_TIME 600
-  if (mledit->timer_id == TK_INVALID_ID) {
-    mledit->timer_id = timer_add(mledit_update_caret, WIDGET(mledit), UPDATE_CARET_TIME);
+  if (mledit->readonly) {
+    text_edit_set_caret_visible(mledit->model, FALSE);
   } else {
-    timer_reset(mledit->timer_id);
+    if (mledit->timer_id == TK_INVALID_ID) {
+      mledit->timer_id = timer_add(mledit_update_caret, WIDGET(mledit), UPDATE_CARET_TIME);
+    } else {
+      timer_reset(mledit->timer_id);
+    }
+    text_edit_set_caret_visible(mledit->model, TRUE);
   }
-  text_edit_set_caret_visible(mledit->model, TRUE);
   return RET_OK;
 }
 
@@ -792,9 +798,9 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
         mledit->is_key_inputing = FALSE;
         input_method_request(input_method(), NULL);
       }
-      text_edit_preedit_confirm(mledit->model);
-
       mledit_update_status(widget);
+      text_edit_preedit_confirm(mledit->model);
+      text_edit_unselect(mledit->model);
       mledit_dispatch_event(widget, EVT_VALUE_CHANGED);
       mledit_commit_text(widget);
       break;
