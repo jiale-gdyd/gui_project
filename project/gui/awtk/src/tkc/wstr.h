@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  width char
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,6 +64,9 @@ typedef struct _wstr_t {
    * 字符串。
    */
   wchar_t* str;
+
+  /*private*/
+  bool_t extendable;
 } wstr_t;
 
 /**
@@ -76,6 +79,28 @@ typedef struct _wstr_t {
  * @return {wstr_t*} str对象本身。
  */
 wstr_t* wstr_init(wstr_t* str, uint32_t capacity);
+
+/**
+ * @method wstr_attach
+ * 通过附加到一个buff来初始化str。 
+ * >可以避免str动态分配内存，同时也不会自动扩展内存，使用完成后无需调用str_reset。
+ *
+ *```c
+ * wstr_t s;
+ * wchar_t buff[32];
+ * wstr_attach(&s, buff, ARRAY_SIZE(buff));
+ * wstr_set(&s, L"abc");
+ * wstr_append(&s, L"123");
+ *```
+ *
+ * @annotation ["constructor"]
+ * @param {str_t*} str str对象。
+ * @param {wchar_t*} buff 缓冲区。
+ * @param {uint32_t} capacity 初始容量。
+ *
+ * @return {str_t*} str对象本身。
+ */
+wstr_t* wstr_attach(wstr_t* str, wchar_t* buff, uint32_t capacity);
 
 /**
  * @method wstr_set
@@ -234,6 +259,16 @@ bool_t wstr_equal(wstr_t* str, wstr_t* other);
 ret_t wstr_from_int(wstr_t* str, int32_t v);
 
 /**
+ * @method wstr_append_int
+ * 追加整数到字符串。
+ * @param {wstr_t*} str str对象。
+ * @param {int32_t} v 整数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t wstr_append_int(wstr_t* str, int32_t v);
+
+/**
  * @method wstr_from_float
  * 用浮点数初始化字符串。
  * @param {wstr_t*} str str对象。
@@ -247,7 +282,7 @@ ret_t wstr_from_float(wstr_t* str, double v);
  * @method wstr_from_value
  * 用value初始化字符串。
  * @param {wstr_t*} str str对象。
- * @param {const value_t} v value。
+ * @param {const value_t*} v value。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -339,7 +374,7 @@ const wchar_t* wcs_chr(const wchar_t* s, wchar_t c);
  * @param {wchar_t*} s1 目标串。
  * @param {const wchar_t*} s2 源串。
  *
- * @return {const wchar_t*} 复制后的串地址。
+ * @return {wchar_t*} 复制后的串地址。
  */
 wchar_t* wcs_cpy(wchar_t* s1, const wchar_t* s2);
 
@@ -351,7 +386,7 @@ wchar_t* wcs_cpy(wchar_t* s1, const wchar_t* s2);
  * @param {const wchar_t*} s2 源串。
  * @param {uint32_t} n 拷贝长度。
  *
- * @return {const wchar_t*} 复制后的串地址。
+ * @return {wchar_t*} 复制后的串地址。
  */
 wchar_t* wcs_ncpy(wchar_t* s1, const wchar_t* s2, uint32_t n);
 
@@ -398,7 +433,9 @@ size_t wcs_len(const wchar_t* s);
 wchar_t* wcs_dup(const wchar_t* s);
 
 #ifdef WITH_WCSXXX
+#ifndef WITH_WASM
 wchar_t* wcsdup(const wchar_t* s);
+#endif/*WITH_WASM*/
 #endif /*WITH_WCSXXX*/
 
 END_C_DECLS

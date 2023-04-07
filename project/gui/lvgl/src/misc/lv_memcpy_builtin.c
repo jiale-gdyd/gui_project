@@ -155,7 +155,7 @@ size_t lv_strlen_builtin(const char * str)
     size_t i = 0;
     while(str[i]) i++;
 
-    return i + 1;
+    return i;
 }
 
 char * lv_strncpy_builtin(char * dst, const char * src, size_t dest_size)

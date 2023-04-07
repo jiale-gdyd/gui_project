@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  events structs
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -309,6 +309,10 @@ int32_t event_from_name(const char* name) {
         return EVT_CLICK;
       } else if (tk_str_eq(name, "connect")) {
         return EVT_CONNECT;
+      } else if (tk_str_eq(name, STR_COMPONENT_OPEN)) {
+        return EVT_WIDGET_LOAD;
+      } else if (tk_str_eq(name, STR_COMPONENT_CLOSE)) {
+        return EVT_DESTROY;
       }
       break;
     }

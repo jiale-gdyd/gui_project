@@ -22,8 +22,6 @@
 #include "tkc/fs.h"
 #include "tkc/path.h"
 #include "tkc/thread.h"
-#include "tkc/data_reader_factory.h"
-#include "tkc/data_writer_factory.h"
 #endif/*WITH_WASM*/
 
 #include "tkc/mem.h"
@@ -32,6 +30,8 @@
 #include "tkc/utils.h"
 #include "tkc/object.h"
 #include "tkc/named_value.h"
+#include "tkc/data_reader_factory.h"
+#include "tkc/data_writer_factory.h"
 
 #ifndef HAS_STDIO
 #define HAS_STDIO 1

@@ -135,6 +135,12 @@ lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
     return NULL;
 }
 
+void lv_sdl_window_set_title(lv_disp_t * disp, const char * title)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowTitle(dsc->window, title);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -239,7 +245,7 @@ static void window_create(lv_disp_t * disp)
 
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);
-    dsc->window = SDL_CreateWindow("TFT Simulator",
+    dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
