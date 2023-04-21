@@ -31,7 +31,7 @@
 #endif
 #endif
 
-// 使能lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin
+// 使能lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin, lv_strcpy_builtin
 #define LV_USE_BUILTIN_MEMCPY                       1
 
 // 启用和配置内置(v)snprintf
@@ -54,6 +54,7 @@
 #define LV_VSNPRINTF                                lv_vsnprintf_builtin
 #define LV_STRLEN                                   lv_strlen_builtin
 #define LV_STRNCPY                                  lv_strncpy_builtin
+#define LV_STRCPY                                   lv_strcpy_builtin
 
 #define LV_COLOR_EXTERN_INCLUDE                     <stdint.h>
 #define LV_COLOR_MIX                                lv_color_mix

@@ -51,6 +51,8 @@
 #define SDL_INCLUDE_PATH                        <SDL2/SDL.h>
 
 #define SDL_DUAL_DISPLAY                        0
+
+#define SDL_WINDOW_TITLE                        "LVGL Simulator"
 #endif
 
 #ifndef USE_MONITOR

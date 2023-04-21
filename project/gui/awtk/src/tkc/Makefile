@@ -10,6 +10,7 @@ obj-y += color_parser.o
 obj-y += compressor.o
 obj-y += cond_var.o
 obj-y += crc.o
+obj-y += cmd_args.o
 obj-y += darray.o
 obj-y += data_reader.o
 obj-y += data_reader_factory.o
