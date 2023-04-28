@@ -652,6 +652,19 @@ static ret_t scroll_bar_update_dragger(widget_t* widget) {
   return RET_OK;
 }
 
+static ret_t scroll_bar_set_value_only_impl(widget_t* widget, int32_t value) {
+  scroll_bar_t* scroll_bar = SCROLL_BAR(widget);
+  return_value_if_fail(scroll_bar != NULL, RET_BAD_PARAMS);
+
+  if (scroll_bar->value != value) {
+    scroll_bar_set_value_only_impl(widget, value);
+    /*解决调用此接口设置value后，界面滑块位置没更新的问题。*/
+    scroll_bar_update_dragger(widget);
+  }
+
+  return RET_OK;
+}
+
 ret_t scroll_bar_set_value(widget_t* widget, int32_t value) {
   scroll_bar_t* scroll_bar = SCROLL_BAR(widget);
   return_value_if_fail(scroll_bar != NULL || value >= 0, RET_BAD_PARAMS);
@@ -663,7 +676,7 @@ ret_t scroll_bar_set_value(widget_t* widget, int32_t value) {
     value_set_int(&(evt.new_value), value);
 
     if (widget_dispatch(widget, (event_t*)&evt) != RET_STOP) {
-      scroll_bar_set_value_only(widget, value);
+      scroll_bar_set_value_only_impl(widget, value);
       evt.e.type = EVT_VALUE_CHANGED;
       widget_dispatch(widget, (event_t*)&evt);
       widget_invalidate(widget, NULL);

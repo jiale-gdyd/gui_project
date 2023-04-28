@@ -603,11 +603,13 @@ static ret_t window_manager_default_close_window(widget_t* widget, widget_t* win
   if (wm->animator) {
     if (widget_is_keyboard(window)) {
       input_method_t* im = input_method();
-      widget_t* win = widget_get_window(im->widget);
-      if (win == wm->animator->prev_win && widget_is_normal_window(wm->animator->curr_win)) {
-        /* 如果已经打开下一个窗口后，就直接释放上一个窗口的软键盘，不必播放软键盘的动画 */
-        window_manager_close_window_force(window->parent, window);
-        return RET_OK;
+      if (im != NULL) {
+        widget_t* win = widget_get_window(im->widget);
+        if (win == wm->animator->prev_win && widget_is_normal_window(wm->animator->curr_win)) {
+          /* 如果已经打开下一个窗口后，就直接释放上一个窗口的软键盘，不必播放软键盘的动画 */
+          window_manager_close_window_force(window->parent, window);
+          return RET_OK;
+        }
       }
     }
     wm->pending_close_window = window;
@@ -624,8 +626,10 @@ static ret_t window_manager_default_close_window(widget_t* widget, widget_t* win
     prev_win = window_manager_get_top_window(widget);
     if (widget_is_keyboard(prev_win)) {
       input_method_t* im = input_method();
-      if (im->keyboard != NULL && im->keyboard == prev_win) {
-        prev_win = widget_get_window(im->widget);
+      if (im != NULL) {
+        if (im->keyboard != NULL && im->keyboard == prev_win) {
+          prev_win = widget_get_window(im->widget);
+        }
       }
     }
     if (prev_win != NULL) {
@@ -878,14 +882,14 @@ static widget_t* window_manager_default_find_top_dialog_highlighter(widget_t* wi
 
 static ret_t window_manager_animate_done(widget_t* widget) {
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
-  bool_t curr_win_is_keyboard = widget_is_keyboard(wm->animator->curr_win);
-  bool_t curr_win_is_normal_window = widget_is_normal_window(wm->animator->curr_win);
 
   if (wm->animator != NULL) {
     bool_t is_open = wm->animator->open;
     widget_t* top_dialog_highligth = NULL;
     widget_t* prev_win = wm->animator->prev_win;
     widget_t* curr_win = wm->animator->curr_win;
+    bool_t curr_win_is_keyboard = widget_is_keyboard(wm->animator->curr_win);
+    bool_t curr_win_is_normal_window = widget_is_normal_window(wm->animator->curr_win);
     window_animator_destroy(wm->animator);
 
     wm->animator = NULL;
