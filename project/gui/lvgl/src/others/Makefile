@@ -5,4 +5,5 @@ obj-y += ime/
 obj-y += imgfont/
 obj-y += monkey/
 obj-y += msg/
+obj-y += sysmon/
 obj-y += snapshot/

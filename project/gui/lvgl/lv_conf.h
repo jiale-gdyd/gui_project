@@ -206,14 +206,17 @@
 #define LV_ASSERT_HANDLER_INCLUDE                   <stdint.h>
 #define LV_ASSERT_HANDLER                           while (1);
 
-// 1：显示CPU使用率和FPS计数
+// 1：显示CPU使用率和FPS计数; 需要LV_USE_MONITOR = 1，需要LV_USE_SYSMON = 1
 #define LV_USE_PERF_MONITOR                         1
 
 #if LV_USE_PERF_MONITOR
 #define LV_USE_PERF_MONITOR_POS                     LV_ALIGN_BOTTOM_RIGHT
+
+// 0:通过屏幕显示性能数据; 1:通过日志方式打印性能数据
+#define LV_USE_PERF_MONITOR_LOG_MDOE                0
 #endif
 
-// 1：显示已用内存和内存碎片。需要`LV_USE_BUILTIN_MALLOC = 1`
+// 1：显示已用内存和内存碎片。需要`LV_USE_BUILTIN_MALLOC = 1`，LV_USE_SYSMON = 1
 #define LV_USE_MEM_MONITOR                          0
 
 #if LV_USE_MEM_MONITOR
@@ -449,6 +452,9 @@
 
 // 1: 启用API对对象进行快照
 #define LV_USE_SNAPSHOT                             1
+
+// 1:开启系统监控组件
+#define LV_USE_SYSMON                               1
 
 // 1:使能Monkey测试
 #define LV_USE_MONKEY                               1

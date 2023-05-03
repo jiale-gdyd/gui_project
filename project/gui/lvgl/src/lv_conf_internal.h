@@ -856,7 +856,8 @@
  * Others
  *-----------*/
 
-/*1: Show CPU usage and FPS count*/
+/*1: Show CPU usage and FPS count
+ * Requires `LV_USE_SYSMON = 1`*/
 #ifndef LV_USE_PERF_MONITOR
     #ifdef CONFIG_LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
@@ -872,10 +873,20 @@
             #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
         #endif
     #endif
+
+    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+    #ifndef LV_USE_PERF_MONITOR_LOG_MODE
+        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+            #define LV_USE_PERF_MONITOR_LOG_MODE CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+        #else
+            #define LV_USE_PERF_MONITOR_LOG_MODE 0
+        #endif
+    #endif
 #endif
 
 /*1: Show the used memory and the memory fragmentation
- * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
+ * Requires `LV_USE_BUILTIN_MALLOC = 1`
+ * Requires `LV_USE_SYSMON = 1`*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -2326,6 +2337,15 @@
     #endif
 #endif
 
+/*1: Enable system monitor component*/
+#ifndef LV_USE_SYSMON
+    #ifdef CONFIG_LV_USE_SYSMON
+        #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
+    #else
+        #define LV_USE_SYSMON 0
+    #endif
+#endif
+
 /*1: Enable Monkey test*/
 #ifndef LV_USE_MONKEY
     #ifdef CONFIG_LV_USE_MONKEY
@@ -2541,139 +2561,6 @@
         #define LV_USE_TFT_ESPI         0
     #endif
 #endif
-
-// /*==================
-// * EXAMPLES
-// *==================*/
-
-// /*Enable the examples to be built with the library*/
-// #ifndef LV_BUILD_EXAMPLES
-//     #ifdef _LV_KCONFIG_PRESENT
-//         #ifdef CONFIG_LV_BUILD_EXAMPLES
-//             #define LV_BUILD_EXAMPLES CONFIG_LV_BUILD_EXAMPLES
-//         #else
-//             #define LV_BUILD_EXAMPLES 0
-//         #endif
-//     #else
-//         #define LV_BUILD_EXAMPLES 1
-//     #endif
-// #endif
-
-// /*===================
-//  * DEMO USAGE
-//  ====================*/
-
-// /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
-// #ifndef LV_USE_DEMO_WIDGETS
-//     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
-//         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
-//     #else
-//         #define LV_USE_DEMO_WIDGETS 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_WIDGETS
-//     #ifndef LV_DEMO_WIDGETS_SLIDESHOW
-//         #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-//             #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-//         #else
-//             #define LV_DEMO_WIDGETS_SLIDESHOW 0
-//         #endif
-//     #endif
-// #endif
-
-// /*Demonstrate the usage of encoder and keyboard*/
-// #ifndef LV_USE_DEMO_KEYPAD_AND_ENCODER
-//     #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-//         #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-//     #else
-//         #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
-//     #endif
-// #endif
-
-// /*Benchmark your system*/
-// #ifndef LV_USE_DEMO_BENCHMARK
-//     #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
-//         #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
-//     #else
-//         #define LV_USE_DEMO_BENCHMARK 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_BENCHMARK
-//     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-//     #ifndef LV_DEMO_BENCHMARK_RGB565A8
-//         #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-//             #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-//         #else
-//             #define LV_DEMO_BENCHMARK_RGB565A8 0
-//         #endif
-//     #endif
-// #endif
-
-// /*Stress test for LVGL*/
-// #ifndef LV_USE_DEMO_STRESS
-//     #ifdef CONFIG_LV_USE_DEMO_STRESS
-//         #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
-//     #else
-//         #define LV_USE_DEMO_STRESS 0
-//     #endif
-// #endif
-
-// /*Music player demo*/
-// #ifndef LV_USE_DEMO_MUSIC
-//     #ifdef CONFIG_LV_USE_DEMO_MUSIC
-//         #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
-//     #else
-//         #define LV_USE_DEMO_MUSIC 0
-//     #endif
-// #endif
-// #if LV_USE_DEMO_MUSIC
-//     #ifndef LV_DEMO_MUSIC_SQUARE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-//             #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-//         #else
-//             #define LV_DEMO_MUSIC_SQUARE    0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_LANDSCAPE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-//             #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-//         #else
-//             #define LV_DEMO_MUSIC_LANDSCAPE 0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_ROUND
-//         #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-//             #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-//         #else
-//             #define LV_DEMO_MUSIC_ROUND     0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_LARGE
-//         #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-//             #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-//         #else
-//             #define LV_DEMO_MUSIC_LARGE     0
-//         #endif
-//     #endif
-//     #ifndef LV_DEMO_MUSIC_AUTO_PLAY
-//         #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-//             #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-//         #else
-//             #define LV_DEMO_MUSIC_AUTO_PLAY 0
-//         #endif
-//     #endif
-// #endif
-
-// /*Flex layout demo*/
-// #ifndef LV_USE_DEMO_FLEX_LAYOUT
-//     #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
-//         #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
-//     #else
-//         #define LV_USE_DEMO_FLEX_LAYOUT 0
-//     #endif
-// #endif
-
-
 
 /*----------------------------------
  * End of parsing lv_conf_template.h
