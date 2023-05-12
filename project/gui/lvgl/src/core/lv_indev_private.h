@@ -49,12 +49,16 @@ typedef struct {
     bool continue_reading;  /**< If set to true, the read callback is invoked again*/
 } lv_indev_data_t;
 
+struct _lv_indev_t;
+
+typedef void (*lv_indev_read_cb_t)(struct _lv_indev_t * indev, lv_indev_data_t * data);
+
 struct _lv_indev_t {
     /**< Input device type*/
     lv_indev_type_t type;
 
     /**< Function pointer to read input device data.*/
-    void (*read_cb)(struct _lv_indev_t * indev, lv_indev_data_t * data);
+    lv_indev_read_cb_t read_cb;
 
     /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/

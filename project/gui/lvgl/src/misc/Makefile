@@ -15,6 +15,7 @@ obj-y += lv_math.o
 obj-y += lv_mem.o
 obj-y += lv_memcpy_builtin.o
 obj-y += lv_printf.o
+obj-y += lv_profiler.o
 obj-y += lv_style_gen.o
 obj-y += lv_style.o
 obj-y += lv_templ.o
