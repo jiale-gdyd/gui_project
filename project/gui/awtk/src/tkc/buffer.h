@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   buffer.h
  * Author: AWTK Develop Team
  * Brief:  buffer

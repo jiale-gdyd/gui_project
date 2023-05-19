@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   theme_data.c
  * Author: AWTK Develop Team
  * Brief:  theme data

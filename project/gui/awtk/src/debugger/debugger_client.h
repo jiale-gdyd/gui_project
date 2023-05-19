@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_client.h
  * Author: AWTK Develop Team
  * Brief:  debugger_client

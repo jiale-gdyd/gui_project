@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   fscript.h
  * Author: AWTK Develop Team
  * Brief:  a simple functional script language

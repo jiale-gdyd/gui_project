@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   vgcanvas.h
  * Author: AWTK Develop Team
  * Brief:  vector graphics canvas interface.

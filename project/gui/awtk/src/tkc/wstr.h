@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   wstr.h
  * Author: AWTK Develop Team
  * Brief:  width char

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   async.h
  * Author: AWTK Develop Team
  * Brief:  async

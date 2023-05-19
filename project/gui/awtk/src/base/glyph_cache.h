@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   glyph_cache.h
  * Author: AWTK Develop Team
  * Brief:  glyph cache

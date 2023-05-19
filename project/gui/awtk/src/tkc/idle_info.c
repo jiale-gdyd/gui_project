@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   idle_info.h
  * Author: AWTK Develop Team
  * Brief:  idle info

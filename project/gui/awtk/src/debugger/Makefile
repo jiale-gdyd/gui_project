@@ -7,3 +7,4 @@ obj-y += debugger_global.o
 obj-y += debugger_message.o
 obj-y += debugger_server.o
 obj-y += debugger_server_tcp.o
+obj-y += debugger_lldb.o

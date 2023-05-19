@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_reader_factory.h
  * Author: AWTK Develop Team
  * Brief:  data reader factory

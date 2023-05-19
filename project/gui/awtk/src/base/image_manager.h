@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   image_manager.h
  * Author: AWTK Develop Team
  * Brief:  image manager

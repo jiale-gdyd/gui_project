@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_reader_mem.h
  * Author: AWTK Develop Team
  * Brief:  data_reader mem

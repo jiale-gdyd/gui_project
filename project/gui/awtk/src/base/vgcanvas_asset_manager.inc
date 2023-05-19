@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   vgcanvas_asset_manager.c
  * Author: AWTK Develop Team
  * Brief:  vgcanvas asset manger.

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_compositor.h
  * Author: AWTK Develop Team
  * Brief:  compositor two objects into one

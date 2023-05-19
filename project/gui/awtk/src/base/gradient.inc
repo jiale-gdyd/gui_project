@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File: gradient.c
  * Author: AWTK Develop Team
  * Brief:  vector graphic gradient

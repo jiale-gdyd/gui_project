@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   self_layouter_factory.c
  * Author: AWTK Develop Team
  * Brief:  self layouter factory

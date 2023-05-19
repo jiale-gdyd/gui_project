@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   hscrollable.h
  * Author: AWTK Develop Team
  * Brief:  input method text hscrollable

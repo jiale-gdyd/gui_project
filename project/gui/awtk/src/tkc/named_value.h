@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   named_value.h
  * Author: AWTK Develop Team
  * Brief:  named value

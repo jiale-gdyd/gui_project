@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   layout.h
  * Author: AWTK Develop Team
  * Brief:  widget layout

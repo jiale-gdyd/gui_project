@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget_vtable.h
  * Author: AWTK Develop Team
  * Brief:  widget vtable default impl

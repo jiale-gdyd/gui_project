@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event_source_idle.h
  * Author: AWTK Develop Team
  * Brief:  event source idle

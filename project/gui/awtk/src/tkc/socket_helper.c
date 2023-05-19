@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   socket_helper.h
  * Author: AWTK Develop Team
  * Brief:  socket helper functions

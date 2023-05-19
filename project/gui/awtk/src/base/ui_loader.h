@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   ui_loader.h
  * Author: AWTK Develop Team
  * Brief:  ui_loader interface

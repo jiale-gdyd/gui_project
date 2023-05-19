@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   time.h
  * Author: AWTK Develop Team
  * Brief:  time

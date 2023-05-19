@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   children_layouter.h
  * Author: AWTK Develop Team
  * Brief:  children layouter

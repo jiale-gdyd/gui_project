@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   plugin_manager.c
  * Author: AWTK Develop Team
  * Brief:  plugin manager

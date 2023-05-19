@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   style_factory.h
  * Author: AWTK Develop Team
  * Brief:  style factory

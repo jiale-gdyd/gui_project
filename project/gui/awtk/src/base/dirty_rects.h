@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dirty_rects.h
  * Author: AWTK Develop Team
  * Brief:  multiple dirty rects

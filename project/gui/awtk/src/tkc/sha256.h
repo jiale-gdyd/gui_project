@@ -1,4 +1,4 @@
-﻿
+
 #ifndef TK_SHA256_H
 #define TK_SHA256_H
 

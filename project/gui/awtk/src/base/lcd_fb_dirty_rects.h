@@ -1,4 +1,4 @@
-﻿#ifndef TK_LCD_FB_DIRTY_RECTS_H
+#ifndef TK_LCD_FB_DIRTY_RECTS_H
 #define TK_LCD_FB_DIRTY_RECTS_H
 
 #include "tkc/mem.h"

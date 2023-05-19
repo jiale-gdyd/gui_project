@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   int_str.h
  * Author: AWTK Develop Team
  * Brief:  map between int and str

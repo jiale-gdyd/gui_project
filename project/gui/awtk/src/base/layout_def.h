@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   layout_def.h
  * Author: AWTK Develop Team
  * Brief:  layout type def

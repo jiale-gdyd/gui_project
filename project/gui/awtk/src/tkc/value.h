@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   value.h
  * Author: AWTK Develop Team
  * Brief:  generic value type
@@ -850,6 +850,16 @@ value_t* value_cast(value_t* value);
  * @return {uint32_t} 返回对应数据类型的长度。
  */
 uint32_t value_type_size(value_type_t type);
+
+/**
+ * @method value_type_name
+ * 获取指定类型数据的名称。
+ * @annotation ["static"]
+ * @param {value_type_t} type 类型。
+ *
+ * @return {const char*} 返回对应数据类型的名称。
+ */
+const char* value_type_name(value_type_t type);
 
 /**
  * @method value_id

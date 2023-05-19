@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   velocity.h
  * Author: AWTK Develop Team
  * Brief:  velocity tracker

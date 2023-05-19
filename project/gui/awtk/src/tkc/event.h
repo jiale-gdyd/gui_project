@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event.h
  * Author: AWTK Develop Team
  * Brief:  event

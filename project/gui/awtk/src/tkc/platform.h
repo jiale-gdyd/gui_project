@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   platform.h
  * Author: AWTK Develop Team
  * Brief:  platform struct and utils functions.

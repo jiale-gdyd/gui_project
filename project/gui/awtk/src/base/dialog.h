@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog.h
  * Author: AWTK Develop Team
  * Brief:  dialog

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   input_engine.h
  * Author: AWTK Develop Team
  * Brief:  input method engine

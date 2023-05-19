@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_writer.c
  * Author: AWTK Develop Team
  * Brief:  data_writer

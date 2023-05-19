@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dl.h
  * Author: AWTK Develop Team
  * Brief:  dynamic libaray api

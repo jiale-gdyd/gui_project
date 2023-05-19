@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿/**
  * File:   slide_view.h
  * Author: AWTK Develop Team
  * Brief:  slide_view

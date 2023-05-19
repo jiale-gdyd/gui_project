@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   asset_loader_default.c
  * Author: AWTK Develop Team
  * Brief:  asset_loader_default

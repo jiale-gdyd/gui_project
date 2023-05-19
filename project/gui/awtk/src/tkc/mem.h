@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   mem.h
  * Author: AWTK Develop Team
  * Brief:  memory manager functions.

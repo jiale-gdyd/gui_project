@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   typed_array.c
  * Author: AWTK Develop Team
  * Brief:  dynamic typed_array.

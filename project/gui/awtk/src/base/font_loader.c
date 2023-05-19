@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   font_loader.h
  * Author: AWTK Develop Team
  * Brief:  font_loader interface

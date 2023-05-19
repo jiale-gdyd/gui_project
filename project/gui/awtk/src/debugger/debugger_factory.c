@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_factory.c
  * Author: AWTK Develop Team
  * Brief:  debugger factory

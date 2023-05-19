@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   value_desc.h
  * Author: AWTK Develop Team
  * Brief:  value_desc

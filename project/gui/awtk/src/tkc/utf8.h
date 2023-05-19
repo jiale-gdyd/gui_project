@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   utf8.h
  * Author: AWTK Develop Team
  * Brief:  utf8 encode decode

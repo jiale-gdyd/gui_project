@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   waitable_ring_buffer.c
  * Author: AWTK Develop Team
  * Brief:  waitable_ring_buffer

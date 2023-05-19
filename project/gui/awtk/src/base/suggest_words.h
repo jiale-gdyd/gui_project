@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   suggest_words.h
  * Author: AWTK Develop Team
  * Brief:  suggest_words

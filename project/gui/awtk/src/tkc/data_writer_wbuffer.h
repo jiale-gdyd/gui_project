@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_writer_wbuffer.h
  * Author: AWTK Develop Team
  * Brief:  data_writer wbuffer

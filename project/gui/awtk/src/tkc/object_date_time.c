@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_date_time.c
  * Author: AWTK Develop Team
  * Brief:  wrap typed array to an object.

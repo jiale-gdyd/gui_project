@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   action_queue.h
  * Author: AWTK Develop Team
  * Brief:  action_queue

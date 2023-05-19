@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_writer_factory.c
  * Author: AWTK Develop Team
  * Brief:  data writer factory

@@ -26,7 +26,7 @@
 /*  APPLICATION INTERFACE DEFINITION                       RELEASE        */
 /*                                                                        */
 /*    tx_api.h                                            PORTABLE SMP    */
-/*                                                           6.2.1        */
+/*                                                           6.x          */
 /*  AUTHOR                                                                */
 /*                                                                        */
 /*    William E. Lamie, Microsoft Corporation                             */
@@ -85,6 +85,10 @@
 /*  03-08-2023      Tiejun Zhou             Modified comment(s),          */
 /*                                            update patch number,        */
 /*                                            resulting in version 6.2.1  */
+/*  xx-xx-xxxx      Xiuwen Cai              Modified comment(s),          */
+/*                                            added option for random     */
+/*                                            number stack filling,       */
+/*                                            resulting in version 6.x    */
 /*                                                                        */
 /**************************************************************************/
 
@@ -163,7 +167,7 @@ extern   "C" {
 #define TX_NO_ACTIVATE                  ((UINT)   0)
 #define TX_TRUE                         ((UINT)   1)
 #define TX_FALSE                        ((UINT)   0)
-#define TX_NULL                         /*((void *) 0)*/NULL
+#define TX_NULL                         ((void *) 0)
 #define TX_INHERIT                      ((UINT)   1)
 #define TX_NO_INHERIT                   ((UINT)   0)
 #define TX_THREAD_ENTRY                 ((UINT)   0)
@@ -172,7 +176,11 @@ extern   "C" {
 #define TX_NO_MESSAGES                  ((UINT)   0)
 #define TX_EMPTY                        ((ULONG)  0)
 #define TX_CLEAR_ID                     ((ULONG)  0)
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
+#define TX_STACK_FILL                   (thread_ptr -> tx_thread_stack_fill_value)
+#else
 #define TX_STACK_FILL                   ((ULONG)  0xEFEFEFEFUL)
+#endif
 
 
 /* Thread execution state values.  */
@@ -234,11 +242,6 @@ extern   "C" {
 #define TX_INVALID_CEILING              ((UINT) 0x22)
 #define TX_FEATURE_NOT_ENABLED          ((UINT) 0xFF)
 
-#if defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64) || defined(__aarch64__) || defined(__ARM64__) || defined(_M_ARM64)
-#ifndef TX_64_BIT
-#define TX_64_BIT
-#endif
-#endif
 
 #ifdef TX_64_BIT
 
@@ -643,6 +646,12 @@ typedef struct TX_THREAD_STRUCT
     /* Define suspension sequence number.  This is used to ensure suspension is still valid when
        cleanup routine executes.  */
     ULONG               tx_thread_suspension_sequence;
+
+#if defined(TX_ENABLE_RANDOM_NUMBER_STACK_FILLING) && defined(TX_ENABLE_STACK_CHECKING)
+       
+    /* Define the random stack fill number. This can be used to detect stack overflow.  */
+    ULONG               tx_thread_stack_fill_value;
+#endif
 
     /* Define the user extension field.  This typically is defined
        to white space, but some ports of ThreadX may need to have
@@ -1891,6 +1900,21 @@ UINT        _tx_trace_interrupt_control(UINT new_posture);
 #endif
 
 
+/* Add a default macro that can be re-defined in tx_port.h to add processing to the initialize random number generator.
+   By default, this is simply defined as whitespace.  */
+
+#ifndef TX_INITIALIZE_RANDOM_GENERATOR_INITIALIZATION
+#define TX_INITIALIZE_RANDOM_GENERATOR_INITIALIZATION
+#endif
+
+
+/* Define the TX_RAND macro to the standard library function, if not already defined.  */
+
+#ifndef TX_RAND
+#define TX_RAND()                                       rand()
+#endif
+
+
 /* Check for MISRA compliance requirements.  */
 
 #ifdef TX_MISRA_ENABLE
@@ -2345,4 +2369,3 @@ void __ghs_rnerr(char *errMsg, int stackLevels, int stackTraceDisplay, void *hex
 #endif
 
 #endif
-

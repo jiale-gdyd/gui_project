@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   url.c
  * Author: AWTK Develop Team
  * Brief:  URL parser 

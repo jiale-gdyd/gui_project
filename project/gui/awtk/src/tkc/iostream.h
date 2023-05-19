@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   tk_iostream.h
  * Author: AWTK Develop Team
  * Brief:  input/ouput stream interface

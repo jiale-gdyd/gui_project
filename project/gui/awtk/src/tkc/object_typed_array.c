@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_typed_array.c
  * Author: AWTK Develop Team
  * Brief:  wrap typed array to an object.

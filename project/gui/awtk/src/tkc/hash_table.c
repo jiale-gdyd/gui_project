@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   hash_table.c
  * Author: AWTK Develop Team
  * Brief:  hash table

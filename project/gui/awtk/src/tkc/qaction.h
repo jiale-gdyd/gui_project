@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   qaction.h
  * Author: AWTK Develop Team
  * Brief:  qaction

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   func_call_parser.h
  * Author: AWTK Develop Team
  * Brief:  func_call_parser

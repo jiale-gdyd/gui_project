@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   theme.c
  * Author: AWTK Develop Team
  * Brief:  theme manager

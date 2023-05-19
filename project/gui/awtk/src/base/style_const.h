@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   style_const.h
  * Author: AWTK Develop Team
  * Brief:  const style(can not be changed)

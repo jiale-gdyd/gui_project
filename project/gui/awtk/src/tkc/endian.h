@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   endian.h
  * Author: AWTK Develop Team
  * Brief:  endian related functions.

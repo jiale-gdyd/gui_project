@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   shortcut.h
  * Author: AWTK Develop Team
  * Brief:  shortcut

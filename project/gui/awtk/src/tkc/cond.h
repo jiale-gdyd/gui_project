@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   cond.h
  * Author: AWTK Develop Team
  * Brief:  cond

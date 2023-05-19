@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   clip_board.h
  * Author: AWTK Develop Team
  * Brief:  clip_board interface

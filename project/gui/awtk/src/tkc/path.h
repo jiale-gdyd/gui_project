@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   path.h
  * Author: AWTK Develop Team
  * Brief:  path

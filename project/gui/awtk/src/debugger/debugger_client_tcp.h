@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_client_tcp.h
  * Author: AWTK Develop Team
  * Brief:  debugger client_tcp

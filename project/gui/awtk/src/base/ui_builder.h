@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   ui_builder.h
  * Author: AWTK Develop Team
  * Brief:  ui_builder

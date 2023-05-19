@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   data_reader_file.h
  * Author: AWTK Develop Team
  * Brief:  data_reader file

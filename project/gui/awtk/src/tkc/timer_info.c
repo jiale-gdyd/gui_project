@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   timer_info.h
  * Author: AWTK Develop Team
  * Brief:  timer info

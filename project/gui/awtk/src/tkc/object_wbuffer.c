@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_wbuffer.c
  * Author: AWTK Develop Team
  * Brief:  wrap wbuffer to an object.

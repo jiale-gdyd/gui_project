@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   mutex_nest.h
  * Author: AWTK Develop Team
  * Brief:  mutex recursive

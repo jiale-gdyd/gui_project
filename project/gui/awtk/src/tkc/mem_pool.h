@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   mem_pool.h
  * Author: AWTK Develop Team
  * Brief:  mem_pool

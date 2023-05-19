@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   ring_buffer.h
  * Author: AWTK Develop Team
  * Brief:  ring_buffer

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event_queue.c
  * Author: AWTK Develop Team
  * Brief:  event_queue

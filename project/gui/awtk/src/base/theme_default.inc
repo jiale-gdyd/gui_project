@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   theme_default.c
  * Author: AWTK Develop Team
  * Brief:  theme default impl

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   date_time.h
  * Author: AWTK Develop Team
  * Brief:  date time

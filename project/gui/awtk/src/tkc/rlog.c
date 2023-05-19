@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   rlog.c
  * Author: AWTK Develop Team
  * Brief:  rotate log api

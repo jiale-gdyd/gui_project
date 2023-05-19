@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   window.h
  * Author: AWTK Develop Team
  * Brief:  window

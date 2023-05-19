@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog_highlighter_factory.h
  * Author: AWTK Develop Team
  * Brief:  dialog highlighter factory

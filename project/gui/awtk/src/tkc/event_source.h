@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event_source.h
  * Author: AWTK Develop Team
  * Brief:  event source interface.

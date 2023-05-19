@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_global.c
  * Author: AWTK Develop Team
  * Brief:  debugger global

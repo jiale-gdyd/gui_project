@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   semaphore.h
  * Author: AWTK Develop Team
  * Brief:  semaphore

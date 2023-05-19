@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   socket_pair.h
  * Author: AWTK Develop Team
  * Brief:  socket pair

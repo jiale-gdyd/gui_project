@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   style_mutable.h
  * Author: AWTK Develop Team
  * Brief:  mutable style

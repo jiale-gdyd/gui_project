@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   waitable_action_darray.c
  * Author: AWTK Develop Team
  * Brief:  waitable_action_darray

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   asset_info.h
  * Author: AWTK Develop Team
  * Brief:  asset info

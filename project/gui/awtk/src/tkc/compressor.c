@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   compressor.c
  * Author: AWTK Develop Team
  * Brief:  compressor interface

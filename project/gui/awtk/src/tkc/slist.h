@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   slist.h
  * Author: AWTK Develop Team
  * Brief:  single link list
@@ -203,6 +203,15 @@ void* slist_tail_pop(slist_t* slist);
  * @return {void*} 成功返回最后一个元素，失败返回NULL。
  */
 void* slist_head_pop(slist_t* slist);
+
+/**
+ * @method slist_is_empty
+ * 列表是否为空。
+ * @param {slist_t*} slist 单向链表对象。
+ *
+ * @return {bool_t} 返回 TRUE 表示空列表，返回 FALSE 表示列表有数据。
+ */
+bool_t slist_is_empty(slist_t* slist);
 
 /**
  * @method slist_size

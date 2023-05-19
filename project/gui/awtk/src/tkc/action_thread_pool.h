@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   action_thread_pool.h
  * Author: AWTK Develop Team
  * Brief:  action_thread_pool

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   locale_info.c
  * Author: AWTK Develop Team
  * Brief:  locale_info

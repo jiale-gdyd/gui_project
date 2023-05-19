@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget_animator.h
  * Author: AWTK Develop Team
  * Brief:  widget animator interface

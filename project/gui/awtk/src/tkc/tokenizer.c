@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   tokenizer.c
  * Author: AWTK Develop Team
  * Brief:  tokenizer

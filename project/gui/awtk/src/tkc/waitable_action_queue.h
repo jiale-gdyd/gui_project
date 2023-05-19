@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   waitable_action_queue.h
  * Author: AWTK Develop Team
  * Brief:  waitable_action_queue

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   children_layouter_factory.h
  * Author: AWTK Develop Team
  * Brief:  children layouter factory

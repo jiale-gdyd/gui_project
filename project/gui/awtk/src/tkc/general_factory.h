@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   general_factory.h
  * Author: AWTK Develop Team
  * Brief:  data writer factory

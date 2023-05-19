@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   ui_feedback.h
  * Author: AWTK Develop Team
  * Brief:  ui_feedback

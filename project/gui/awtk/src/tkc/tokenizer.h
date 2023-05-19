@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   tokenizer.h
  * Author: AWTK Develop Team
  * Brief:  tokenizer

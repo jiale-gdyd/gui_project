@@ -461,9 +461,12 @@
 
 // 1:启用运行时性能分析器
 #define LV_USE_PROFILER                             1
+#if LV_USE_PROFILER
 #define LV_PROFILER_INCLUDE                         <stdint.h>
+
 #define LV_PROFILER_BEGIN
 #define LV_PROFILER_END
+#endif
 
 // 1:启用网格导航
 #define LV_USE_GRIDNAV                              1

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_rbuffer.c
  * Author: AWTK Develop Team
  * Brief:  wrap rbuffer to an object.

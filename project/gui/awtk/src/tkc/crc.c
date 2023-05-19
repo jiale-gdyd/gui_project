@@ -1,4 +1,4 @@
-﻿/*
+/*
     Copyright 2016 (C) Alexey Dynda
     This file is part of Tiny Protocol Library.
     Protocol Library is free software: you can redistribute it and/or modify

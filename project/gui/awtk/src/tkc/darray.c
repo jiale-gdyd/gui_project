@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   darray.c
  * Author: AWTK Develop Team
  * Brief:  dynamic darray.

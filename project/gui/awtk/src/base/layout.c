@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   layout.c
  * Author: AWTK Develop Team
  * Brief:  widget layout

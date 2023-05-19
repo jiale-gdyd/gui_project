@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_widget.c
  * Author: AWTK Develop Team
  * Brief:  wrap widget to an object.

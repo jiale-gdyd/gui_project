@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   mmap.h
  * Author: AWTK Develop Team
  * Brief:  mmap

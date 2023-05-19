@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   input_device_status.h
  * Author: AWTK Develop Team
  * Brief:  input device status

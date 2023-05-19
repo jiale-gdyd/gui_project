@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   object_locker.c
  * Author: AWTK Develop Team
  * Brief:  decorate object with lock

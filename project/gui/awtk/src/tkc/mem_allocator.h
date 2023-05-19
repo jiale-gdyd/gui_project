@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   mem_allocator.h
  * Author: AWTK Develop Team
  * Brief:  mem_allocator

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog_highlighter_builts.h
  * Author: AWTK Develop Team
  * Brief:  builts dialog_highlighter

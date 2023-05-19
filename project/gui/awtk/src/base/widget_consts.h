@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget_consts.h
  * Author: AWTK Develop Team
  * Brief:  widget property names

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   async.c
  * Author: AWTK Develop Team
  * Brief:  async call

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   svg_image.h
  * Author: AWTK Develop Team
  * Brief:  svg_image

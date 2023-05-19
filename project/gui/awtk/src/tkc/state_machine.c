@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   state_machine.c
  * Author: AWTK Develop Team
  * Brief:  state_machine

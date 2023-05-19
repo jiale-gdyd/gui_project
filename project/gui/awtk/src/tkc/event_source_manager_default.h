@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event_source_manager_default.h
  * Author: AWTK Develop Team
  * Brief:  event manager manager implement with default

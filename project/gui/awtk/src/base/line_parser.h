@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   line_parser.h
  * Author: AWTK Develop Team
  * Brief:  line_parser structs.

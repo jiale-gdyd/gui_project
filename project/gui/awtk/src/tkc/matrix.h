@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   matrix.h
  * Author: AWTK Develop Team
  * Brief:  matrix struct and utils functions.

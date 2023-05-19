@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   str_to_str.c
  * Author: AWTK Develop Team
  * Brief:  map one str to another str

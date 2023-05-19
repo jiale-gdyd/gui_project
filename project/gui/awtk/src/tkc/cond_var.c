@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   cond_var_simple.h
  * Author: AWTK Develop Team
  * Brief:  cond_var simple

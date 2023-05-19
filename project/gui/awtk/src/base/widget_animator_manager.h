@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget_animator_manager.h
  * Author: AWTK Develop Team
  * Brief:  animator manager

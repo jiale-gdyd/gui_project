@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   event_source_manager.c
  * Author: AWTK Develop Team
  * Brief:  event manager manager

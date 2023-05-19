@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_server.h
  * Author: AWTK Develop Team
  * Brief:  debugger server

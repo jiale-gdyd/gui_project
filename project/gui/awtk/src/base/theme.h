@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   theme.h
  * Author: AWTK Develop Team
  * Brief:  theme interface

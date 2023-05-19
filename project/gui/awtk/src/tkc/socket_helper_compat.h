@@ -1,4 +1,4 @@
-﻿#ifndef USE_TK_PREFIX
+#ifndef USE_TK_PREFIX
 #define tcp_listen tk_tcp_listen
 #define tcp_accept tk_tcp_accept
 #define tcp_connect tk_tcp_connect

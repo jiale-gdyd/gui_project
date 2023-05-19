@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   line_break.h
  * Author: AWTK Develop Team
  * Brief:  line break and work break algorithm.

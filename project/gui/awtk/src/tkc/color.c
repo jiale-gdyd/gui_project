@@ -1,4 +1,4 @@
-﻿#include "tkc/mem.h"
+#include "tkc/mem.h"
 #include "tkc/color.h"
 #include "tkc/utils.h"
 

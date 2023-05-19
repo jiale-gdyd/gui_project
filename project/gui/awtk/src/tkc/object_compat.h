@@ -1,4 +1,4 @@
-﻿#ifndef USE_TK_PREFIX
+#ifndef USE_TK_PREFIX
 #define object_can_exec tk_object_can_exec
 #define object_can_exec_by_path tk_object_can_exec_by_path
 #define object_can_exec_t tk_object_can_exec_t

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget_factory.h
  * Author: AWTK Develop Team
  * Brief:  widget factory

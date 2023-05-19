@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   widget.h
  * Author: AWTK Develop Team
  * Brief:  basic class of all widget
@@ -2140,6 +2140,16 @@ bool_t widget_is_system_bar(widget_t* widget);
  * @return {bool_t} 返回FALSE表示不是，否则表示是。
  */
 bool_t widget_is_normal_window(widget_t* widget);
+
+/**
+ * @method widget_is_fullscreen_window
+ * 检查控件是否是全屏窗口。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @return {bool_t} 返回FALSE表示不是，否则表示是。
+ */
+bool_t widget_is_fullscreen_window(widget_t* widget);
 
 /**
  * @method widget_is_dialog
