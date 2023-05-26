@@ -444,6 +444,12 @@ typedef enum _image_draw_type_t {
   IMAGE_DRAW_SCALE_H,
 
   /**
+   * @const IMAGE_DRAW_FILL
+   * 填充整个区域。将图片缩放至目标矩形的高度或宽度，包装填满整个目标区域，超出不部分不显示。
+   */
+  IMAGE_DRAW_FILL,
+
+  /**
    * @const IMAGE_DRAW_REPEAT
    * 平铺显示。
    */

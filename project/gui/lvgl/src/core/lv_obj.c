@@ -432,8 +432,6 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr == NULL) {
-        static uint32_t x = 0;
-        x++;
         obj->spec_attr = lv_malloc(sizeof(_lv_obj_spec_attr_t));
         LV_ASSERT_MALLOC(obj->spec_attr);
         if(obj->spec_attr == NULL) return;
@@ -571,10 +569,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= w;
-        coords.x2 += w;
-        coords.y1 -= h;
-        coords.y2 += h;
+        lv_area_increase(&coords, w, h);
 
         if(_lv_area_is_in(info->area, &coords, r) == false) {
             info->res = LV_COVER_RES_NOT_COVER;
@@ -603,10 +598,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= w;
-        coords.x2 += w;
-        coords.y1 -= h;
-        coords.y2 += h;
+        lv_area_increase(&coords, w, h);
 
         lv_obj_draw_part_dsc_t part_dsc;
         lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
@@ -677,10 +669,7 @@ static void lv_obj_draw(lv_event_t * e)
             lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
-            coords.x1 -= w;
-            coords.x2 += w;
-            coords.y1 -= h;
-            coords.y2 += h;
+            lv_area_increase(&coords, w, h);
 
             lv_obj_draw_part_dsc_t part_dsc;
             lv_obj_draw_dsc_init(&part_dsc, draw_ctx);

@@ -3009,7 +3009,7 @@ ret_t widget_on_multi_gesture(widget_t* widget, multi_gesture_event_t* e) {
   return ret;
 }
 
-static ret_t widget_dispatch_leave_event(widget_t* widget, pointer_event_t* e) {
+ret_t widget_dispatch_leave_event(widget_t* widget, pointer_event_t* e) {
   ret_t ret = RET_OK;
   widget_t* target = widget;
 
@@ -3716,7 +3716,7 @@ ret_t widget_to_screen_ex(widget_t* widget, widget_t* parent, point_t* p) {
 
   while (iter != NULL && iter != parent) {
     xy_t offset_x, offset_y;
-    if (iter != widget && widget_get_offset(iter, &offset_x, &offset_y) == RET_OK) {
+    if (widget_get_offset(iter, &offset_x, &offset_y) == RET_OK) {
       p->x -= offset_x;
       p->y -= offset_y;
     }
@@ -4080,8 +4080,10 @@ bool_t widget_is_point_in(widget_t* widget, xy_t x, xy_t y, bool_t is_local) {
   point_t p = {x, y};
   return_value_if_fail(widget != NULL, FALSE);
 
-  if (!is_local) {
-    widget_to_local(widget, &p);
+  if (!is_local && widget->parent != NULL) {
+    widget_to_local(widget->parent, &p);
+    p.x -= widget->x;
+    p.y -= widget->y;
   }
 
   if (widget->vt->is_point_in != NULL) {

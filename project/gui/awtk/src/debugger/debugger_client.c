@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger.c
  * Author: AWTK Develop Team
  * Brief:  debugger

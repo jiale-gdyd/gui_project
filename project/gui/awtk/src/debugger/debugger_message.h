@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   debugger_message.h
  * Author: AWTK Develop Team
  * Brief:  debugger message

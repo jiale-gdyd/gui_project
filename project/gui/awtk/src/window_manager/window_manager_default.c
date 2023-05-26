@@ -547,7 +547,8 @@ static ret_t window_manager_create_animator(window_manager_default_t* wm, widget
       log_debug("ignore_user_input\n");
     }
   } else {
-    widget_invalidate_force(prev_win, NULL);
+    /* 动画播放完毕后刷新wm，避免出现高亮残留 */
+    widget_invalidate_force(WIDGET(wm), NULL);
     if (widget_get_prop(curr_win, WIDGET_PROP_HIGHLIGHT, &v) == RET_OK) {
       wm->curr_win = curr_win;
       window_manager_invalidate_system_bar(WIDGET(wm));
@@ -1183,23 +1184,23 @@ static ret_t window_manager_default_paint_always_on_top(widget_t* widget, canvas
 
 static ret_t window_manager_default_on_paint_children(widget_t* widget, canvas_t* c) {
   int32_t start = 0;
+  bool_t cover_highlighter = FALSE;
   bool_t has_fullscreen_win = FALSE;
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(widget != NULL && c != NULL, RET_BAD_PARAMS);
 
   WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
-  if (wm->dialog_highlighter != NULL) {
-    if (wm->dialog_highlighter->dialog == iter) {
-      start = i;
-      break;
-    }
+  if (wm->dialog_highlighter != NULL && wm->dialog_highlighter->dialog == iter) {
+    start = i;
+    break;
   } else if (iter->visible && widget_is_normal_window(iter)) {
     start = i;
+    cover_highlighter = TRUE;
     break;
   }
   WIDGET_FOR_EACH_CHILD_END()
 
-  if (wm->dialog_highlighter != NULL) {
+  if (!cover_highlighter && wm->dialog_highlighter != NULL) {
     dialog_highlighter_draw(wm->dialog_highlighter, 1);
   } else {
     /*paint normal windows*/
@@ -1737,6 +1738,16 @@ static ret_t window_manager_default_dispatch_native_window_event(widget_t* widge
                                                                  void* handle) {
   if (e->type == EVT_NATIVE_WINDOW_RESIZED) {
     window_manager_default_native_window_resized(widget, handle);
+  } else if (e->type == EVT_NATIVE_WINDOW_ENTER) {
+    int32_t x = ((pointer_event_t*)e)->x;
+    int32_t y = ((pointer_event_t*)e)->y;
+    window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
+    input_device_status_t* ids = &wm->input_device_status;
+    input_device_status_on_pointer_enter(ids, widget, x, y);
+  } else if (e->type == EVT_NATIVE_WINDOW_LEAVE) {
+    window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
+    input_device_status_t* ids = &wm->input_device_status;
+    input_device_status_on_pointer_leave(ids, widget);
   }
 
   return RET_OK;
