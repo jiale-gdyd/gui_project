@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   conf_xml.h
  * Author: AWTK Develop Team
  * Brief:  xml 

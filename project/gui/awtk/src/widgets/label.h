@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   label.h
  * Author: AWTK Develop Team
  * Brief:  label

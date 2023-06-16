@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   app_conf_init_json.c
  * Author: AWTK Develop Team
  * Brief:  ini config for app

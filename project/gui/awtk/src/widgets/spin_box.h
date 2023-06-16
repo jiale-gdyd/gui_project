@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   spin_box.h
  * Author: AWTK Develop Team
  * Brief:  spin_box

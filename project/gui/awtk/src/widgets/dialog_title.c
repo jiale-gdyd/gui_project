@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog_title.c
  * Author: AWTK Develop Team
  * Brief:  dialog title

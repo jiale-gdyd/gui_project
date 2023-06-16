@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   digit_clock.h
  * Author: AWTK Develop Team
  * Brief:  digit_clock

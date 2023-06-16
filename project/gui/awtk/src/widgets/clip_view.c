@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   clip_view.c
  * Author: AWTK Develop Team
  * Brief:  clip view

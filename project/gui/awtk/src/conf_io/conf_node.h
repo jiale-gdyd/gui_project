@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   conf_node.h
  * Author: AWTK Develop Team
  * Brief:  conf node
@@ -557,6 +557,11 @@ typedef enum _conf_node_value_t {
    */
   CONF_NODE_VALUE_STRING,
   /**
+   * @const CONF_NODE_VALUE_WSTRING
+   * 宽字符串类型。
+   */
+  CONF_NODE_VALUE_WSTRING,
+  /**
    * @const CONF_NODE_VALUE_SMALL_STR
    * 短字符(len<=7)串类型。
    */
@@ -617,6 +622,7 @@ struct _conf_node_t {
     float f32;
     double f64;
     char* str;
+    wchar_t* wstr;
     char small_str[8];
     conf_node_t* first_child;
   } value;
@@ -684,7 +690,7 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v);
 /**
  * @method conf_node_get_value
  *
- * 设置节点的值。
+ * 获取节点的值。
  *
  * @param {conf_node_t*} node 节点对象。
  * @param {value_t*} v 值(返回)。
@@ -692,6 +698,32 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t conf_node_get_value(conf_node_t* node, value_t* v);
+
+/**
+ * @method conf_node_get_child_value
+ *
+ * 获取子节点的值。
+ *
+ * @param {conf_node_t*} node 节点对象。
+ * @param {const char*} name 子节点名称。
+ * @param {value_t*} v 值(返回)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_node_get_child_value(conf_node_t* node, const char* name, value_t* v);
+
+/**
+ * @method conf_node_get_child_value_by_index
+ *
+ * 获取子节点的值。
+ *
+ * @param {conf_node_t*} node 节点对象。
+ * @param {uint32_t} index 子节点的序数。
+ * @param {value_t*} v 值(返回)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_node_get_child_value_by_index(conf_node_t* node, uint32_t index, value_t* v);
 
 /**
  * @method conf_node_get_first_child

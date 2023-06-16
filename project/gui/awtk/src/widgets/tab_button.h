@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   tab_button.h
  * Author: AWTK Develop Team
  * Brief:  tab_button

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   calibration_win.h
  * Author: AWTK Develop Team
  * Brief:  touch screen calibration win

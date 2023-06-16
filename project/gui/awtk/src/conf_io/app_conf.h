@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   app_conf.h
  * Author: AWTK Develop Team
  * Brief:  config for application

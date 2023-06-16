@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   button.h
  * Author: AWTK Develop Team
  * Brief:  button

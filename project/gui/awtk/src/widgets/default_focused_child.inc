@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   default_focused_child.inc
  * Author: AWTK Develop Team
  * Brief:  default_focused_child function

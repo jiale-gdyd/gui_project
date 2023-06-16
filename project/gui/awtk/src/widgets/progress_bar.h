@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   progress_bar.h
  * Author: AWTK Develop Team
  * Brief:  progress_bar

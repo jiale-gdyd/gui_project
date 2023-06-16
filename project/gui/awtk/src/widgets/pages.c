@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   pages.c
  * Author: AWTK Develop Team
  * Brief:  pages

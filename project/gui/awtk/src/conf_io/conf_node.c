@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  conf node
  *
- * Copyright (c) 2020 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -192,6 +192,9 @@ ret_t conf_doc_destroy_node(conf_doc_t* doc, conf_node_t* node) {
 
   if (node->value_type == CONF_NODE_VALUE_STRING) {
     TKMEM_FREE(node->value.str);
+  }
+  if (node->value_type == CONF_NODE_VALUE_WSTRING) {
+    TKMEM_FREE(node->value.wstr);
   }
 
   memset(node, 0x00, sizeof(*node));
@@ -419,6 +422,10 @@ conf_node_t* conf_node_find_child_by_index(conf_node_t* node, int32_t index) {
   conf_node_t* first_child = conf_node_get_first_child(node);
   return_value_if_fail(node != NULL, NULL);
 
+  if (first_child == NULL) {
+    return NULL;
+  }
+
   return conf_node_find_sibling_by_index(first_child, index);
 }
 
@@ -441,6 +448,9 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v) {
 
   if (node->value_type == CONF_NODE_VALUE_STRING) {
     TKMEM_FREE(node->value.str);
+  }
+  if (node->value_type == CONF_NODE_VALUE_WSTRING) {
+    TKMEM_FREE(node->value.wstr);
   }
 
   switch (v->type) {
@@ -517,6 +527,17 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v) {
       }
       break;
     }
+    case VALUE_TYPE_WSTRING: {
+      const wchar_t* str = value_wstr(v);
+      node->value_type = CONF_NODE_VALUE_WSTRING;
+      if (str == NULL) {
+        node->value.str = NULL;
+      } else {
+        node->value.wstr = wcsdup(str);
+        return_value_if_fail(node->value.wstr != NULL, RET_OOM);
+      }
+      break;
+    }
     default: {
       return RET_NOT_IMPL;
     }
@@ -577,6 +598,10 @@ ret_t conf_node_get_value(conf_node_t* node, value_t* v) {
     }
     case CONF_NODE_VALUE_STRING: {
       value_set_str(v, node->value.str);
+      break;
+    }
+    case CONF_NODE_VALUE_WSTRING: {
+      value_set_wstr(v, node->value.wstr);
       break;
     }
     case CONF_NODE_VALUE_SMALL_STR: {
@@ -926,4 +951,18 @@ ret_t conf_doc_set_float(conf_doc_t* doc, const char* path, float v) {
 ret_t conf_doc_set_str(conf_doc_t* doc, const char* path, const char* v) {
   value_t vv;
   return conf_doc_set(doc, path, value_set_str(&vv, v));
+}
+
+ret_t conf_node_get_child_value(conf_node_t* node, const char* name, value_t* v) {
+  conf_node_t* child = conf_node_find_child(node, name);
+  return_value_if_fail(child != NULL && v != NULL, RET_BAD_PARAMS);
+
+  return conf_node_get_value(child, v);
+}
+
+ret_t conf_node_get_child_value_by_index(conf_node_t* node, uint32_t index, value_t* v) {
+  conf_node_t* child = conf_node_find_child_by_index(node, index);
+  return_value_if_fail(child != NULL && v != NULL, RET_BAD_PARAMS);
+
+  return conf_node_get_value(child, v);
 }

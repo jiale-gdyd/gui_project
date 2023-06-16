@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   button_group.h
  * Author: AWTK Develop Team
  * Brief:  button_group

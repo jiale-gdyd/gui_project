@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   ini.h
  * Author: AWTK Develop Team
  * Brief:  ini 

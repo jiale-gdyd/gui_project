@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   grid.c
  * Author: AWTK Develop Team
  * Brief:  网格。

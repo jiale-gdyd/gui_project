@@ -1,4 +1,4 @@
-﻿#include "widgets/edit_pattern.h"
+#include "widgets/edit_pattern.h"
 
 #define EDIT_IPV4_SEP '.'
 #define EDIT_IPV4_SEP_NR 3

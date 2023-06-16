@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   json.h
  * Author: AWTK Develop Team
  * Brief:  json 

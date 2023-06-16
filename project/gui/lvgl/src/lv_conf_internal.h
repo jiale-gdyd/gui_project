@@ -2355,26 +2355,49 @@
     #endif
 #endif
 #if LV_USE_PROFILER
+    /*1: Enable the built-in profiler*/
+    #ifndef LV_USE_PROFILER_BUILTIN
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_PROFILER_BUILTIN
+                #define LV_USE_PROFILER_BUILTIN CONFIG_LV_USE_PROFILER_BUILTIN
+            #else
+                #define LV_USE_PROFILER_BUILTIN 0
+            #endif
+        #else
+            #define LV_USE_PROFILER_BUILTIN 1
+        #endif
+    #endif
+    #if LV_USE_PROFILER_BUILTIN
+        /*Default profiler trace buffer size*/
+        #ifndef LV_PROFILER_BUILTIN_BUF_SIZE
+            #ifdef CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+                #define LV_PROFILER_BUILTIN_BUF_SIZE CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+            #else
+                #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /*[bytes]*/
+            #endif
+        #endif
+    #endif
+
     /*Header to include for the profiler*/
     #ifndef LV_PROFILER_INCLUDE
         #ifdef CONFIG_LV_PROFILER_INCLUDE
             #define LV_PROFILER_INCLUDE CONFIG_LV_PROFILER_INCLUDE
         #else
-            #define LV_PROFILER_INCLUDE <stdint.h>
+            #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
         #endif
     #endif
     /*Header to include for the profiler*/
-    #ifndef LV_PROFILER_INCLUDE
-        #ifdef CONFIG_LV_PROFILER_INCLUDE
-            #define LV_PROFILER_INCLUDE CONFIG_LV_PROFILER_INCLUDE
+    #ifndef LV_PROFILER_BEGIN
+        #ifdef CONFIG_LV_PROFILER_BEGIN
+            #define LV_PROFILER_BEGIN CONFIG_LV_PROFILER_BEGIN
         #else
-            #define LV_PROFILER_INCLUDE <stdint.h>
+            #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
         #endif
     #endif
     /*Profiler end point function*/
     #ifndef LV_PROFILER_END
         #ifdef CONFIG_LV_PROFILER_END
-            #define LV_PROFILER_END CONFIG_LV_PROFILER_END
+            #define LV_PROFILER_END LV_PROFILER_BUILTIN_END
         #else
             #define LV_PROFILER_END
         #endif
@@ -2568,6 +2591,17 @@
             #define LV_SDL_FULLSCREEN      0
         #endif
     #endif
+    #ifndef LV_SDL_DIRECT_EXIT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_SDL_DIRECT_EXIT
+                #define LV_SDL_DIRECT_EXIT CONFIG_LV_SDL_DIRECT_EXIT
+            #else
+                #define LV_SDL_DIRECT_EXIT 0
+            #endif
+        #else
+            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+        #endif
+    #endif
 #endif
 
 /*Driver for /dev/fb*/
@@ -2585,6 +2619,15 @@
         #else
             #define LV_LINUX_FBDEV_BSD  0
         #endif
+    #endif
+#endif
+
+/*Driver for /dev/dri/card*/
+#ifndef LV_USE_LINUX_DRM
+    #ifdef CONFIG_LV_USE_LINUX_DRM
+        #define LV_USE_LINUX_DRM CONFIG_LV_USE_LINUX_DRM
+    #else
+        #define LV_USE_LINUX_DRM        0
     #endif
 #endif
 

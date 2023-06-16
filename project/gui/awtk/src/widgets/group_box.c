@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   group_box.h
  * Author: AWTK Develop Team
  * Brief:  group_box

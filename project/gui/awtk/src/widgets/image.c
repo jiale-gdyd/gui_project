@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   image.h
  * Author: AWTK Develop Team
  * Brief:  image

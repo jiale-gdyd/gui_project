@@ -120,11 +120,22 @@ void lv_init(void)
 
     LV_LOG_INFO("begin");
 
+    /*First initialize Garbage Collection if needed*/
+#ifdef LV_GC_INIT
+    LV_GC_INIT();
+#endif
+
     /*Initialize the misc modules*/
 #if LV_USE_BUILTIN_MALLOC
     lv_mem_init_builtin();
 #endif
     _lv_timer_core_init();
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+    lv_profiler_builtin_config_t profiler_config;
+    lv_profiler_builtin_config_init(&profiler_config);
+    lv_profiler_builtin_init(&profiler_config);
+#endif
 
     _lv_fs_init();
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   input_method_null.c
  * Author: AWTK Develop Team
  * Brief:  input method null

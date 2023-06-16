@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   system_bar.h
  * Author: AWTK Develop Team
  * Brief:  system_bar

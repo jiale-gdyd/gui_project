@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog_toast.inc
  * Author: AWTK Develop Team
  * Brief:  dialog toast

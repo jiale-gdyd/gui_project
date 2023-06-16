@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   combo_box.h
  * Author: AWTK Develop Team
  * Brief:  combo_box

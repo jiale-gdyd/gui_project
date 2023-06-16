@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   popup.h
  * Author: AWTK Develop Team
  * Brief:  popup

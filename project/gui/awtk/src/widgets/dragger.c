@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dragger.h
  * Author: AWTK Develop Team
  * Brief:  dragger

@@ -103,7 +103,7 @@ static widget_t* window_manager_find_prev_window(widget_t* widget) {
     nr = widget->children->size;
     for (i = nr - 2; i >= 0; i--) {
       widget_t* iter = (widget_t*)(widget->children->elms[i]);
-      if (widget_is_normal_window(iter) || widget_is_dialog(iter) || widget_is_popup(iter)) {
+      if (widget_is_normal_window(iter) || widget_is_dialog(iter) || widget_is_popup(iter) || (widget_is_overlay(iter) && !widget_is_always_on_top(iter))) {
         return iter;
       }
     }
@@ -195,7 +195,7 @@ static ret_t window_manager_default_snap_prev_window_draw_dialog_highlighter_and
   return_value_if_fail(widget != NULL && c != NULL, RET_BAD_PARAMS);
   if (widget_get_prop(widget, WIDGET_PROP_HIGHLIGHT, &v) == RET_OK) {
     const char* args = value_str(&v);
-    if (args != NULL) {
+    if (args != NULL && *args != '\0') {
       dialog_highlighter_factory_t* f = dialog_highlighter_factory();
       dialog_highlighter_t* dialog_highlighter =
           dialog_highlighter_factory_create_highlighter(f, args, widget);
@@ -245,13 +245,14 @@ static bool_t window_manager_default_snap_prev_window_check_paint_system_bar(sli
 }
 
 static ret_t window_manager_default_snap_prev_window_get_system_bar_rect_diff_on_visit(void* ctx, const void* data) {
+  uint32_t i = 0;
   rect_t diff_rects[4];
   void** arges = (void**)ctx;
   rect_t* rect = (rect_t*)data;
   rect_t* r = (rect_t*)arges[1];
   slist_t* diff_rect_list = (slist_t*)arges[0];
   if (rect_diff(rect, r, &diff_rects[0], &diff_rects[1], &diff_rects[2], &diff_rects[3])) {
-    for (uint32_t i = 0; i < ARRAY_SIZE(diff_rects); i++) {
+    for (i = 0; i < ARRAY_SIZE(diff_rects); i++) {
       if (diff_rects[i].w != 0 && diff_rects[i].h != 0) {
         rect_t* data = TKMEM_ZALLOC(rect_t);
         break_if_fail(data != NULL);
@@ -352,7 +353,7 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
       if (iter != wm->curr_win) {
         rect_t iter_rect = rect_init(iter->x, iter->y, iter->w, iter->h);
         /* 给前面的高亮对话框叠加黑色色块 */
-        if (widget_is_dialog(iter)) {
+        if (widget_is_support_highlighter(iter)) {
           uint8_t a = 0x0;
           if (window_manager_default_snap_prev_window_draw_dialog_highlighter_and_get_alpha(iter, canvas, &a) == RET_OK) {
             /* 计算最终叠加后的透明度值 */
@@ -380,7 +381,7 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
       slist_foreach(&system_bar_top_rect_list, window_manager_default_snap_prev_window_system_bar_top_push_clip_rect, dialog_highlighter);
       slist_foreach(&system_bar_bottom_rect_list, window_manager_default_snap_prev_window_system_bar_bottom_push_clip_rect, dialog_highlighter);
     }
-    if (curr_highlight != NULL) {
+    if (curr_highlight != NULL && *curr_highlight != '\0') {
       dialog_highlighter_set_system_bar_alpha(dialog_highlighter, 0xFF - alpha);
       dialog_highlighter_set_win(dialog_highlighter, prev_win);
       /* 把没有遮罩的 system_bar 绘制到离线画布上 */
@@ -440,7 +441,7 @@ static ret_t window_manager_default_create_dialog_highlighter(widget_t* widget,
     wm->dialog_highlighter = dialog_highlighter = NULL;
   }
 
-  if (dialog_highlighter == NULL && (widget_is_dialog(curr_win) || widget_is_popup(curr_win)) &&
+  if (dialog_highlighter == NULL && widget_is_support_highlighter(curr_win) &&
       curr_highlight != NULL) {
     dialog_highlighter_factory_t* f = dialog_highlighter_factory();
     dialog_highlighter = dialog_highlighter_factory_create_highlighter(f, curr_highlight, curr_win);
@@ -458,8 +459,8 @@ static ret_t window_manager_default_create_dialog_highlighter(widget_t* widget,
     /* 把 dialog_highlighter 给键盘窗口使用 */
     dialog_highlighter->used_by_others = TRUE;
   }
-  /* 因为当 dialog 的窗口销毁的时候会释放 dialog_highlighter 局部, 防止非 dialog 的窗口使用 dialog_highlighter 高亮贴图。 */
-  else if (dialog_highlighter != NULL && !widget_is_dialog(curr_win)) {
+  /* 因为当支持高亮的窗口销毁的时候会释放 dialog_highlighter 局部, 防止非 dialog 的窗口使用 dialog_highlighter 高亮贴图。 */
+  else if (dialog_highlighter != NULL && !widget_is_support_highlighter(curr_win)) {
     wm->dialog_highlighter = NULL;
   }
 
@@ -987,7 +988,7 @@ static bool_t window_manager_default_is_dialog_highlighter(widget_t* widget) {
   value_t v;
   return_value_if_fail(widget != NULL, FALSE);
 
-  if (widget_is_dialog(widget) && widget_get_prop(widget, WIDGET_PROP_HIGHLIGHT, &v) == RET_OK) {
+  if (widget_is_support_highlighter(widget) && widget_get_prop(widget, WIDGET_PROP_HIGHLIGHT, &v) == RET_OK) {
     return TRUE;
   }
 

@@ -24,3 +24,4 @@ obj-y += lv_tlsf.o
 obj-y += lv_txt_ap.o
 obj-y += lv_txt.o
 obj-y += lv_utils.o
+obj-y += lv_profiler_builtin.o

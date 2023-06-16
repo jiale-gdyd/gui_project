@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   dialog_client.c
  * Author: AWTK Develop Team
  * Brief:  dialog client

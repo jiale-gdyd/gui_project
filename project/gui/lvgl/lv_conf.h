@@ -462,10 +462,16 @@
 // 1:启用运行时性能分析器
 #define LV_USE_PROFILER                             1
 #if LV_USE_PROFILER
-#define LV_PROFILER_INCLUDE                         <stdint.h>
 
-#define LV_PROFILER_BEGIN
-#define LV_PROFILER_END
+#define LV_USE_PROFILER_BUILTIN                     1
+#if LV_USE_PROFILER_BUILTIN
+#define LV_PROFILER_BUILTIN_BUF_SIZE                (16 * 1024)
+#endif
+
+#define LV_PROFILER_INCLUDE                         "lvgl/src/misc/lv_profiler_builtin.h"
+
+#define LV_PROFILER_BEGIN                           LV_PROFILER_BUILTIN_BEGIN
+#define LV_PROFILER_END                             LV_PROFILER_BUILTIN_END
 #endif
 
 // 1:启用网格导航
@@ -535,6 +541,8 @@
 #define LV_SDL_PARTIAL_MODE                         0
 
 #define LV_SDL_FULLSCREEN                           0
+
+#define LV_SDL_DIRECT_EXIT                          1
 #endif
 
 // /dev/fb的驱动
@@ -542,6 +550,9 @@
 #if LV_USE_LINUX_FBDEV
 #define LV_LINUX_FBDEV_BSD                          0
 #endif
+
+// /dev/dri/card 的驱动
+#define LV_USE_LINUX_DRM                            0
 
 #define LV_USE_TFT_ESPI                             0
 

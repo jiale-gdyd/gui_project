@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   color_tile.h
  * Author: AWTK Develop Team
  * Brief:  color_tile

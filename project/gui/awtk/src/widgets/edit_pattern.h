@@ -1,4 +1,4 @@
-﻿#include "widgets/edit.h"
+#include "widgets/edit.h"
 
 #ifndef EDIT_PATTERN_H
 #define EDIT_PATTERN_H

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   slider.h
  * Author: AWTK Develop Team
  * Brief:  slider

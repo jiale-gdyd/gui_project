@@ -33,6 +33,7 @@ extern "C" {
 #include "src/misc/lv_async.h"
 #include "src/misc/lv_anim_timeline.h"
 #include "src/misc/lv_printf.h"
+#include "src/misc/lv_profiler_builtin.h"
 
 #include "src/hal/lv_hal.h"
 
@@ -118,6 +119,7 @@ extern "C" {
 #include "src/dev/sdl/lv_sdl_mousewheel.h"
 #include "src/dev/sdl/lv_sdl_keyboard.h"
 
+#include "src/dev/disp/drm/lv_linux_drm.h"
 #include "src/dev/disp/fb/lv_linux_fbdev.h"
 
 #include "src/lvgl_private.h"

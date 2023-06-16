@@ -1,4 +1,4 @@
-﻿#include "widgets/edit_pattern.h"
+#include "widgets/edit_pattern.h"
 
 #define EDIT_TIME_SEP ':'
 #define EDIT_TIME_SEP_NR 1

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   app_conf_init_ini.h
  * Author: AWTK Develop Team
  * Brief:  ini config for app

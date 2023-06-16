@@ -1,4 +1,4 @@
-﻿#include "widgets/edit_pattern.h"
+#include "widgets/edit_pattern.h"
 
 #define EDIT_DATE_SEP '/'
 #define EDIT_DATE_SEP_NR 2

@@ -47,6 +47,7 @@
 #include "base/window_base.h"
 #include "base/assets_manager.h"
 #include "blend/image_g2d.h"
+#include "base/style_const.h"
 
 #ifndef WITH_FS_RES
 #define WITH_FS_RES 1
@@ -4614,6 +4615,38 @@ static ret_t widget_ensure_style_mutable(widget_t* widget) {
   return RET_OK;
 }
 
+ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* value) {
+  char state[64];
+  const char* name = NULL;
+  const char* p_state = NULL;
+  return_value_if_fail(widget != NULL && state_and_name != NULL && *state_and_name != '\0' && value != NULL, RET_BAD_PARAMS);
+  memset(state, 0x0, sizeof(state));
+
+  name = strchr(state_and_name, ':');
+  if (name == NULL) {
+    name = strchr(state_and_name, '.');
+  }
+  if (name == NULL) {
+    name = state_and_name;
+    p_state = WIDGET_STATE_NORMAL;
+  } else {
+    memcpy(state, state_and_name, tk_pointer_to_int((void*)(name - state_and_name)));
+    p_state = state;
+    name = name + 1;
+  }
+
+  if (tk_str_eq(p_state, widget_get_prop_str(widget, WIDGET_PROP_STATE_FOR_STYLE, NULL))) {
+    return style_get(widget->astyle, p_state, name, value);
+  } else {
+    const char* style_name = (widget->style != NULL && *widget->style != '\0') ? widget->style : TK_DEFAULT_STYLE;
+    const void* data = widget_get_const_style_data_for_state(widget, style_name, p_state);
+    if (data == NULL && !tk_str_eq(p_state, WIDGET_STATE_NORMAL)) {
+      data = widget_get_const_style_data_for_state(widget, style_name, WIDGET_STATE_NORMAL);
+    }
+    return style_data_get_value((uint8_t*)data, name, value);
+  }
+}
+
 ret_t widget_set_style(widget_t* widget, const char* state_and_name, const value_t* value) {
   char str[256];
   uint32_t len = 0;
@@ -4722,10 +4755,22 @@ bool_t widget_is_popup(widget_t* widget) {
   return widget->vt->is_window && tk_str_eq(widget->vt->type, WIDGET_TYPE_POPUP);
 }
 
+bool_t widget_is_support_highlighter(widget_t* widget) {
+  return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
+
+  return widget->vt->is_window && (tk_str_eq(widget->vt->type, WIDGET_TYPE_POPUP) || tk_str_eq(widget->vt->type, WIDGET_TYPE_DIALOG));
+}
+
 bool_t widget_is_overlay(widget_t* widget) {
   return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
 
   return widget->vt->is_window && tk_str_eq(widget->vt->type, WIDGET_TYPE_OVERLAY);
+}
+
+bool_t widget_is_always_on_top(widget_t* widget) {
+  return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
+
+  return widget->vt->is_window && widget_get_prop_bool(widget, WIDGET_PROP_ALWAYS_ON_TOP, FALSE);
 }
 
 bool_t widget_is_opened_dialog(widget_t* widget) {

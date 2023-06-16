@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   tab_control.h
  * Author: AWTK Develop Team
  * Brief:  tab_control

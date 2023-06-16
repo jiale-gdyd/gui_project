@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   grid_item.h
  * Author: AWTK Develop Team
  * Brief:  grid_item

@@ -1028,6 +1028,16 @@ ret_t widget_get_window_theme(widget_t* widget, theme_t** win_theme, theme_t** d
 bool_t widget_is_style_exist(widget_t* widget, const char* style_name, const char* state_name);
 
 /**
+ * @method widget_is_support_highlighter
+ * 判断widget是否支持高亮。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ *
+ * @return {bool_t} 支持返回 TRUE，不支持返回 FALSE。
+ */
+bool_t widget_is_support_highlighter(widget_t* widget);
+
+/**
  * @method widget_use_style
  * 启用指定的style。
  * @annotation ["scriptable"]
@@ -2182,6 +2192,16 @@ bool_t widget_is_popup(widget_t* widget);
 bool_t widget_is_overlay(widget_t* widget);
 
 /**
+ * @method widget_is_always_on_top
+ * 检查控件是否总在最上层。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @return {bool_t} 返回FALSE表示不是，否则表示是。
+ */
+bool_t widget_is_always_on_top(widget_t* widget);
+
+/**
  * @method widget_is_opened_dialog
  * 检查控件弹出对话框控件是否已经打开了（而非挂起状态）。
  *
@@ -3157,6 +3177,17 @@ ret_t widget_end_wait_pointer_cursor(widget_t* widget);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t widget_set_style(widget_t* widget, const char* state_and_name, const value_t* value);
+
+/**
+ * @method widget_get_style
+ * 获取widget样式。
+ * @param {widget_t*} widget 控件对象。
+ * @param {const char*} state_and_name 样式对应类型与名字。
+ * @param {value_t*} value 返回样式数据值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* value);
 
 /**
  * @method widget_get_content_area
