@@ -109,6 +109,26 @@ static bool_t widget_is_strongly_focus(widget_t* widget) {
   }
 }
 
+static ret_t widget_reload_style(widget_t* widget) {
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  widget->need_update_style = TRUE;
+  widget_update_style(widget);
+  widget_invalidate_force(widget, NULL);
+  return RET_OK;
+}
+
+ret_t widget_reload_style_recursive(widget_t* widget) {
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  widget_reload_style(widget);
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  widget_reload_style_recursive(iter);
+  WIDGET_FOR_EACH_CHILD_END();
+
+  return RET_OK;
+}
+
 ret_t widget_set_need_update_style(widget_t* widget) {
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
@@ -4619,6 +4639,7 @@ ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* va
   char state[64];
   const char* name = NULL;
   const char* p_state = NULL;
+  ret_t ret = RET_NOT_FOUND;
   return_value_if_fail(widget != NULL && state_and_name != NULL && *state_and_name != '\0' && value != NULL, RET_BAD_PARAMS);
   memset(state, 0x0, sizeof(state));
 
@@ -4635,16 +4656,18 @@ ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* va
     name = name + 1;
   }
 
-  if (tk_str_eq(p_state, widget_get_prop_str(widget, WIDGET_PROP_STATE_FOR_STYLE, NULL))) {
-    return style_get(widget->astyle, p_state, name, value);
-  } else {
+  if (style_is_mutable(widget->astyle) || tk_str_eq(p_state, widget_get_prop_str(widget, WIDGET_PROP_STATE_FOR_STYLE, NULL))) {
+    ret = style_get(widget->astyle, p_state, name, value);
+  }
+  if (ret != RET_OK) {
     const char* style_name = (widget->style != NULL && *widget->style != '\0') ? widget->style : TK_DEFAULT_STYLE;
     const void* data = widget_get_const_style_data_for_state(widget, style_name, p_state);
     if (data == NULL && !tk_str_eq(p_state, WIDGET_STATE_NORMAL)) {
       data = widget_get_const_style_data_for_state(widget, style_name, WIDGET_STATE_NORMAL);
     }
-    return style_data_get_value((uint8_t*)data, name, value);
+    ret =  style_data_get_value((uint8_t*)data, name, value);
   }
+  return ret;
 }
 
 ret_t widget_set_style(widget_t* widget, const char* state_and_name, const value_t* value) {
