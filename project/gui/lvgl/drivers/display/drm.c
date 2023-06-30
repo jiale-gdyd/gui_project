@@ -766,11 +766,7 @@ void drm_flush(lv_disp_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 }
 
 #if (LV_COLOR_DEPTH == 32)
-#if defined(CONFIG_X86_64)
 #define DRM_FOURCC      DRM_FORMAT_XRGB8888
-#else
-#define DRM_FOURCC      DRM_FORMAT_ARGB8888
-#endif
 #elif (LV_COLOR_DEPTH == 16)
 #define DRM_FOURCC      DRM_FORMAT_RGB565
 #else
