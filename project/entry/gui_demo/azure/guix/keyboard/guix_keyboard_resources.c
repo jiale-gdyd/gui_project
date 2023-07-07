@@ -1945,7 +1945,6 @@ static GX_CONST GX_FONT DEFAULT_THEME_MIDSIZE =
 /* Font Table                                                                  */
 
 
-// extern GX_FONT _gx_system_font_8bpp;
 GX_CONST GX_FONT *display_1_default_theme_font_table[] =
 {
     &_gx_system_font_8bpp,

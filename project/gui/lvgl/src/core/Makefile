@@ -1,7 +1,4 @@
-obj-y += lv_disp.o
 obj-y += lv_group.o
-obj-y += lv_indev_scroll.o
-obj-y += lv_indev.o
 obj-y += lv_obj_class.o
 obj-y += lv_obj_draw.o
 obj-y += lv_obj_event.o
@@ -12,4 +9,3 @@ obj-y += lv_obj_style.o
 obj-y += lv_obj_tree.o
 obj-y += lv_obj.o
 obj-y += lv_refr.o
-obj-y += lv_theme.o

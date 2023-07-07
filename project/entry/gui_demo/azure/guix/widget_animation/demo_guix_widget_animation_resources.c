@@ -1511,7 +1511,6 @@ static GX_CONST GX_FONT THEME_1_Title =
 /* Font Table                                                                  */
 
 
-//extern GX_FONT _gx_system_font_8bpp;
 GX_CONST GX_FONT *Primary_theme_1_font_table[] =
 {
     &_gx_system_font_8bpp,

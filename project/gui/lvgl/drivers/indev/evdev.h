@@ -19,8 +19,8 @@ extern "C" {
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
-#include "../../src/core/lv_indev_private.h"
-#include "../../src/core/lv_indev.h"
+#include "../../src/indev/lv_indev_private.h"
+#include "../../src/indev/lv_indev.h"
 #endif
 
 /**

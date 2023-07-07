@@ -10,7 +10,8 @@
 #if LV_USE_SPINBOX
 
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_indev.h"
+#include "../../indev/lv_indev.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -484,7 +485,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 
     /*Add leading zeros*/
     int32_t i;
-    const int digits_len = (int)lv_strlen(digits);
+    const int digits_len = (int) lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
     if(leading_zeros_cnt) {

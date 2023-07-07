@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include <lvgl/src/disp/lv_disp_private.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
@@ -58,7 +59,7 @@ static bool scene_with_opa = true;
 static uint32_t render_start_time;
 static uint32_t last_flush_cb_call;
 
-static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, lv_color_t *);
+static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, uint8_t *);
 
 static void fall_anim(lv_obj_t *obj);
 static void txt_create(lv_style_t *style);
@@ -80,7 +81,7 @@ static void next_scene_timer_cb(lv_timer_t *timer);
 static void single_scene_finsih_timer_cb(lv_timer_t *timer);
 
 static void generate_report(void);
-static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *colors);
+static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, uint8_t *pxmap);
 
 static void rectangle_cb(void)
 {
@@ -246,13 +247,6 @@ static void img_argb_cb(void)
 #endif
 }
 
-static void img_ckey_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_chroma_keyed, false, false, false);
-}
-
 static void img_index_cb(void)
 {
     lv_style_reset(&style_common);
@@ -286,14 +280,6 @@ static void img_argb_recolor_cb(void)
 #else
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
 #endif
-}
-
-static void img_ckey_recolor_cb(void)
-{
-    lv_style_reset(&style_common);
-    lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
-    img_create(&style_common, &img_benchmark_cogwheel_chroma_keyed, false, false, false);
 }
 
 static void img_index_recolor_cb(void)
@@ -545,13 +531,11 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Image RGB",                      .create_cb = img_rgb_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 20},
     {.name = "Image ARGB",                     .create_cb = img_argb_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 20},
-    {.name = "Image chorma keyed",             .create_cb = img_ckey_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 5},
     {.name = "Image indexed",                  .create_cb = img_index_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 5},
     {.name = "Image alpha only",               .create_cb = img_alpha_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 5},
 
     {.name = "Image RGB recolor",              .create_cb = img_rgb_recolor_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 5},
     {.name = "Image ARGB recolor",             .create_cb = img_argb_recolor_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 20},
-    {.name = "Image chorma keyed recolor",     .create_cb = img_ckey_recolor_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 3},
     {.name = "Image indexed recolor",          .create_cb = img_index_recolor_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 3},
 
     {.name = "Image RGB rotate",               .create_cb = img_rgb_rot_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 3},
@@ -840,14 +824,13 @@ static void single_scene_finsih_timer_cb(lv_timer_t *timer)
     lv_obj_invalidate(lv_scr_act());
 }
 
-static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *colors)
+static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, uint8_t *pxmap)
 {
     LV_UNUSED(area);
-    LV_UNUSED(colors);
 
     if (mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
         bool last = lv_disp_flush_is_last(drv);
-        flush_cb_ori(drv, area, colors);
+        flush_cb_ori(drv, area, pxmap);
         if (last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if (scene_with_opa) {
@@ -860,7 +843,7 @@ static void dummy_flush_cb(lv_disp_t *drv, const lv_area_t *area, lv_color_t *co
         }
     } else if (mode == LV_DEMO_BENCHMARK_MODE_REAL) {
         bool last = lv_disp_flush_is_last(drv);
-        flush_cb_ori(drv, area, colors);
+        flush_cb_ori(drv, area, pxmap);
         if (last) {
             if (last_flush_cb_call != 0) {
                 uint32_t t = lv_tick_elaps(last_flush_cb_call);

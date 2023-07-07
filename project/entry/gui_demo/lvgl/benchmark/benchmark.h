@@ -22,7 +22,6 @@ LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 #endif
 LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
-LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 
 #if LV_USE_FONT_COMPRESSED
 LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);

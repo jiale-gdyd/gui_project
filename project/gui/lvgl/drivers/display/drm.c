@@ -725,7 +725,7 @@ void drm_wait_vsync(lv_disp_t *disp_drv)
     drm_dev.req = NULL;
 }
 
-void drm_flush(lv_disp_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+void drm_flush(lv_disp_t *disp_drv, const lv_area_t *area, uint8_t *color_p)
 {
     int i, y;
     uint32_t w = (area->x2 - area->x1 + 1);

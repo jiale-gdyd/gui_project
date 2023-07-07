@@ -10311,7 +10311,6 @@ static GX_CONST GX_FONT DEFAULT_THEME_NORMAL =
 /* Font Table                                                                  */
 
 
-// extern GX_FONT _gx_system_font_8bpp;
 GX_CONST GX_FONT *main_display_default_theme_font_table[] =
 {
     &_gx_system_font_8bpp,

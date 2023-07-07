@@ -6,7 +6,6 @@ obj-y += lv_font_dejavu_16_persian_hebrew.o
 obj-y += lv_font_montserrat_8.o
 obj-y += lv_font_montserrat_10.o
 obj-y += lv_font_montserrat_12.o
-obj-y += lv_font_montserrat_12_subpx.o
 obj-y += lv_font_montserrat_14.o
 obj-y += lv_font_montserrat_16.o
 obj-y += lv_font_montserrat_18.o

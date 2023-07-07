@@ -20,6 +20,12 @@
 #include "benchmark/benchmark.h"
 #elif defined(CONFIG_LVGL_KEYPAD_ENCODER_TEST)
 #include "keypad/keypad_encoder.h"
+#elif defined(CONFIG_LVGL_MULTILANG_TEST)
+#include "multilang/demo_multilang.h"
+#elif defined(CONFIG_LVGL_TRANSFORM_TEST)
+#include "transform/demo_transform.h"
+#elif defined(CONFIG_LVGL_FLEX_LAYOUT_TEST)
+#include "flex_layout/demo_flex_layout.h"
 #endif
 
 #if defined(CONFIG_IMX6ULL)
@@ -143,6 +149,12 @@ int lvgl_demo_init(int argc, char *argv[])
     lvgl_demo_benchmark(argc, argv);
 #elif defined(CONFIG_LVGL_KEYPAD_ENCODER_TEST)
     lvgl_demo_keypad_encoder(argc, argv);
+#elif defined(CONFIG_LVGL_MULTILANG_TEST)
+    lvgl_demo_multilang(argc, argv);
+#elif defined(CONFIG_LVGL_TRANSFORM_TEST)
+    lvgl_demo_transform(argc, argv);
+#elif defined(CONFIG_LVGL_FLEX_LAYOUT_TEST)
+    lvgl_demo_flex_layout(argc, argv);
 #endif
 
     while (1) {

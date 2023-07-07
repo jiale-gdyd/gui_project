@@ -1,0 +1,12 @@
+obj-y += img_emoji_artist_palette.o
+obj-y += img_emoji_books.o
+obj-y += img_emoji_camera_with_flash.o
+obj-y += img_emoji_cat_face.o
+obj-y += img_emoji_deciduous_tree.o
+obj-y += img_emoji_dog_face.o
+obj-y += img_emoji_earth_globe_europe_africa.o
+obj-y += img_emoji_flexed_biceps.o
+obj-y += img_emoji_movie_camera.o
+obj-y += img_emoji_red_heart.o
+obj-y += img_emoji_rocket.o
+obj-y += img_emoji_soccer_ball.o

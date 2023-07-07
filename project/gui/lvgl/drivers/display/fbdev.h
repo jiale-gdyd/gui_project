@@ -27,8 +27,8 @@ extern "C" {
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
-#include "../../src/core/lv_disp_private.h"
-#include "../../src/core/lv_disp.h"
+#include "../../src/disp/lv_disp_private.h"
+#include "../../src/disp/lv_disp.h"
 #endif
 
 /*********************

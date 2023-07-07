@@ -827,7 +827,7 @@ static void drm_wait_vsync(drm_dev_t * drm_dev)
     drm_dev->req = NULL;
 }
 
-static void drm_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void drm_flush(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     drm_dev_t * drm_dev = lv_disp_get_driver_data(disp);
     drm_buffer_t * fbuf = drm_dev->cur_bufs[1];

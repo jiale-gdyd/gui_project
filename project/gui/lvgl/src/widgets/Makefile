@@ -7,7 +7,6 @@ obj-y += calendar/
 obj-y += canvas/
 obj-y += chart/
 obj-y += checkbox/
-obj-y += colorwheel/
 obj-y += dropdown/
 obj-y += img/
 obj-y += imgbtn/

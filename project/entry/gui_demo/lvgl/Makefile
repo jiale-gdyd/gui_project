@@ -4,7 +4,10 @@ else
 obj-$(CONFIG_LVGL_MUSIC_TEST) += music/
 obj-$(CONFIG_LVGL_STRESS_TEST) += stress/
 obj-$(CONFIG_LVGL_WIDGET_TEST) += widget/
+obj-$(CONFIG_LVGL_TRANSFORM_TEST) += transform/
+obj-$(CONFIG_LVGL_MULTILANG_TEST) += multilang/
 obj-$(CONFIG_LVGL_BENCHMARK_TEST) += benchmark/
+obj-$(CONFIG_LVGL_FLEX_LAYOUT_TEST) += flex_layout/
 obj-$(CONFIG_LVGL_KEYPAD_ENCODER_TEST) += keypad/
 endif
 

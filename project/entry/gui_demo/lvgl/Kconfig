@@ -22,6 +22,15 @@ choice
 
     config LVGL_KEYPAD_ENCODER_TEST
         bool "LittlevGL keypad test"
+
+    config LVGL_MULTILANG_TEST
+        bool "LittlevGL multilang test"
+
+    config LVGL_TRANSFORM_TEST
+        bool "LittlevGL transform test"
+    
+    config LVGL_FLEX_LAYOUT_TEST
+        bool "LittlevGL flex layout test"
 endchoice
 
 endmenu
