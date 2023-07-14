@@ -742,7 +742,6 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             return;
         }
 
-        lv_point_t poly[4];
         lv_point_t center;
         center.x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
         center.y = obj->coords.y1 + lv_obj_get_height(obj) / 2;

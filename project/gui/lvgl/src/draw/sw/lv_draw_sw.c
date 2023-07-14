@@ -71,7 +71,6 @@ void lv_draw_sw_init(void)
         draw_sw_unit->idx = i;
 
 #if LV_USE_OS
-        lv_thread_sync_init(&draw_sw_unit->sync);
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, 8 * 1024, draw_sw_unit);
 #endif
     }
@@ -132,20 +131,15 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
         }
     }
 
-#if LV_USE_OS
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
+#if LV_USE_OS
     /*Let the render thread work*/
     lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_sw_unit->base_unit.target_layer = layer;
-    draw_sw_unit->base_unit.clip_area = &t->clip_area;
-    draw_sw_unit->task_act = t;
-
     execute_drawing(draw_sw_unit);
 
     draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
@@ -282,6 +276,8 @@ static void render_thread_cb(void * ptr)
 {
     lv_draw_sw_unit_t * u = ptr;
 
+    lv_thread_sync_init(&u->sync);
+
     while(1) {
         while(u->task_act == NULL) {
             lv_thread_sync_wait(&u->sync);
@@ -328,7 +324,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_sw_line((lv_draw_unit_t *)u, t->draw_dsc);
             break;
-        case LV_DRAW_TASK_TYPE_TRIANLGE:
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
             lv_draw_sw_triangle((lv_draw_unit_t *)u, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
