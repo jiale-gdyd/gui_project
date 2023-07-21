@@ -1140,6 +1140,18 @@
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
+#ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+        #else
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE 0
+        #endif
+    #else
+        #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
+    #endif
+#endif
+
 #ifndef LV_USE_ANIMIMG
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ANIMIMG
@@ -2327,6 +2339,31 @@
             #define LV_LINUX_FBDEV_BUFFER_SIZE CONFIG_LV_LINUX_FBDEV_BUFFER_SIZE
         #else
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+        #endif
+    #endif
+#endif
+
+/*Driver for /dev/lcd*/
+#ifndef LV_USE_NUTTX_LCD
+    #ifdef CONFIG_LV_USE_NUTTX_LCD
+        #define LV_USE_NUTTX_LCD CONFIG_LV_USE_NUTTX_LCD
+    #else
+        #define LV_USE_NUTTX_LCD      0
+    #endif
+#endif
+#if LV_USE_NUTTX_LCD
+    #ifndef LV_NUTTX_LCD_BUFFER_COUNT
+        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+            #define LV_NUTTX_LCD_BUFFER_COUNT CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+        #else
+            #define LV_NUTTX_LCD_BUFFER_COUNT    0
+        #endif
+    #endif
+    #ifndef LV_NUTTX_LCD_BUFFER_SIZE
+        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+            #define LV_NUTTX_LCD_BUFFER_SIZE CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+        #else
+            #define LV_NUTTX_LCD_BUFFER_SIZE     60
         #endif
     #endif
 #endif

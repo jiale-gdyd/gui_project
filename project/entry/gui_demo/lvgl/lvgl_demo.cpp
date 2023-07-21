@@ -26,6 +26,8 @@
 #include "transform/demo_transform.h"
 #elif defined(CONFIG_LVGL_FLEX_LAYOUT_TEST)
 #include "flex_layout/demo_flex_layout.h"
+#elif defined(CONFIG_LVGL_SCROLL_TEST)
+#include "scroll/demo_scroll.h"
 #endif
 
 #if defined(CONFIG_IMX6ULL)
@@ -155,6 +157,8 @@ int lvgl_demo_init(int argc, char *argv[])
     lvgl_demo_transform(argc, argv);
 #elif defined(CONFIG_LVGL_FLEX_LAYOUT_TEST)
     lvgl_demo_flex_layout(argc, argv);
+#elif defined(CONFIG_LVGL_SCROLL_TEST)
+    lvgl_demo_scroll(argc, argv);
 #endif
 
     while (1) {

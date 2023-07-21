@@ -28,9 +28,12 @@ choice
 
     config LVGL_TRANSFORM_TEST
         bool "LittlevGL transform test"
-    
+
     config LVGL_FLEX_LAYOUT_TEST
         bool "LittlevGL flex layout test"
+
+    config LVGL_SCROLL_TEST
+        bool "LittlevGL scroll test"
 endchoice
 
 endmenu

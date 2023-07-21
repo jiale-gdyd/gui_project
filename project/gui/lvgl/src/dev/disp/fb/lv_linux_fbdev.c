@@ -122,7 +122,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
     if(dsc->fbfd > 0) close(dsc->fbfd);
 
-    // Open the file for reading and writing
+    /* Open the file for reading and writing*/
     dsc->fbfd = open(dsc->devname, O_RDWR);
     if(dsc->fbfd == -1) {
         perror("Error: cannot open framebuffer device");
@@ -131,10 +131,10 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
 #if !LV_LINUX_FBDEV_NUTTX
-    // Make sure that the display is on.
+    /* Make sure that the display is on.*/
     if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
         perror("ioctl(FBIOBLANK)");
-        // Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.
+        /* Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK. */
     }
 #endif /* !LV_LINUX_FBDEV_NUTTX */
 

@@ -460,7 +460,7 @@ static ret_t window_manager_default_create_dialog_highlighter(widget_t* widget,
     dialog_highlighter->used_by_others = TRUE;
   }
   /* 因为当支持高亮的窗口销毁的时候会释放 dialog_highlighter 局部, 防止非 dialog 的窗口使用 dialog_highlighter 高亮贴图。 */
-  else if (dialog_highlighter != NULL && !widget_is_support_highlighter(curr_win)) {
+  else if (dialog_highlighter != NULL && !widget_has_highlighter(curr_win)) {
     wm->dialog_highlighter = NULL;
   }
 
@@ -773,6 +773,7 @@ static ret_t window_manager_default_close_window(widget_t* widget, widget_t* win
     }
     if (prev_win != NULL) {
       if (!widget_is_keyboard(window)) {
+        wm->curr_win = prev_win;
         window_manager_dispatch_window_event(prev_win, EVT_WINDOW_TO_FOREGROUND);
         window_manager_create_highlighter(widget, prev_win);
       }
@@ -1501,7 +1502,7 @@ static ret_t window_manager_default_layout_not_system_bar(widget_t* widget, widg
     h = window->h;
   }
 
-  widget_move_resize(window, x, y, w, h);
+  widget_move_resize_ex(window, x, y, w, h, FALSE);
   widget_layout(window);
 
   return RET_OK;
