@@ -20,6 +20,7 @@ obj-y += lcd/
 obj-y += main_loop/
 obj-y += native_window/
 obj-y += platforms/
+obj-y += romfs/
 obj-y += streams/
 obj-y += svg/
 obj-y += tkc/
