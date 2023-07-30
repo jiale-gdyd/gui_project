@@ -282,6 +282,9 @@ static romfs_dir_t* romfs_dir_create(fs_t* fs, const char* name) {
   romfs_fs_t* rfs = (romfs_fs_t*)fs;
   conf_node_t* node = romfs_find_node(rfs->doc->root, name);
   return_value_if_fail(node != NULL, NULL);
+  node = conf_node_find_child(node, "children");
+  return_value_if_fail(node != NULL, NULL);
+  node = conf_node_get_first_child(node);
 
   dir = TKMEM_ZALLOC(romfs_dir_t);
   return_value_if_fail(dir != NULL, NULL);
@@ -450,6 +453,8 @@ fs_t* romfs_get(void) {
 
 #if defined(WITH_ROMFS_AS_OS_FS) || defined(AWTK_WEB)
 fs_t* os_fs(void) {
+  return_value_if_fail(s_romfs_fs.doc != NULL, NULL);
+
   return (fs_t*)&s_romfs_fs;
 }
 #endif /*WITH_ROMFS_AS_OS_FS*/
