@@ -32,7 +32,6 @@ const lv_img_dsc_t img_multilang_like = {
     .header = {
         .cf          = LV_COLOR_FORMAT_ARGB8888,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 20,
         .h           = 17
     },

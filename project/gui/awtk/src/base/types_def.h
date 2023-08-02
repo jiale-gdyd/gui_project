@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   types_def.h
  * Author: AWTK Develop Team
  * Brief:  basic types definitions.
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,6 +42,7 @@
 
 /**
  * @enum keyboard_type_t
+ * @prefix KEYBOARD_
  * 键盘的类型
  */
 typedef enum _keyboard_type_t {
@@ -71,6 +72,7 @@ typedef enum _keyboard_type_t {
 
 /**
  * @enum lcd_orientation_t
+ * @prefix LCD_ORIENTATION_
  * LCD旋转角度。
  */
 typedef enum _lcd_orientation_t {
@@ -98,6 +100,7 @@ typedef enum _lcd_orientation_t {
 
 /**
  * @enum align_v_t
+ * @prefix ALIGN_V_
  * @annotation ["scriptable"]
  * 垂直对齐的常量定义。
  */
@@ -126,6 +129,7 @@ typedef enum _align_v_t {
 
 /**
  * @enum align_h_t
+ * @prefix ALIGN_H_
  * @annotation ["scriptable"]
  * 水平对齐的常量定义。
  */
@@ -154,6 +158,7 @@ typedef enum _align_h_t {
 
 /**
  * @enum border_type_t
+ * @prefix BORDER_
  * 控件边框类型。
  */
 typedef enum _border_type_t {
@@ -330,9 +335,11 @@ typedef struct _widget_animator_t widget_animator_t;
 #define TK_GET_VTABLE(vt) vt##_get_widget_vtable()
 #define TK_GET_PARENT_VTABLE(vt) vt##_get_widget_vtable
 #define TK_PARENT_VTABLE(vt) NULL, .get_parent_vt = TK_GET_PARENT_VTABLE(vt)
-#define TK_DECL_VTABLE(vt)                                                                          \
-  extern const widget_vtable_t g_##vt##_vtable;                                                     \
-  const widget_vtable_t* vt##_get_widget_vtable(void) { return &g_##vt##_vtable; }                  \
+#define TK_DECL_VTABLE(vt)                              \
+  extern const widget_vtable_t g_##vt##_vtable;         \
+  const widget_vtable_t* vt##_get_widget_vtable(void) { \
+    return &g_##vt##_vtable;                            \
+  }                                                     \
   const widget_vtable_t g_##vt##_vtable
 #define TK_EXTERN_VTABLE(vt) const widget_vtable_t* vt##_get_widget_vtable(void);
 
@@ -552,6 +559,9 @@ typedef struct _input_engine_t input_engine_t;
 
 struct _canvas_t;
 typedef struct _canvas_t canvas_t;
+
+struct _font_manager_t;
+typedef struct _font_manager_t font_manager_t;
 
 struct _lcd_t;
 typedef struct _lcd_t lcd_t;

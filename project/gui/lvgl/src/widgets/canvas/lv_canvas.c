@@ -237,6 +237,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 
     uint32_t x;
     uint32_t y;
+
     if(dsc->header.cf == LV_COLOR_FORMAT_RGB565) {
         uint16_t c16 = lv_color_to_u16(color);
         for(y = 0; y < dsc->header.h; y++) {
@@ -291,10 +292,9 @@ void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
     lv_area_t canvas_area = {0, 0, dsc->header.w - 1,  dsc->header.h - 1};
     lv_memzero(layer, sizeof(*layer));
 
-    layer->color_format = dsc->header.cf;
-    layer->buf_area = canvas_area;
+    lv_draw_buf_init(&layer->draw_buf, dsc->header.w, dsc->header.h, dsc->header.cf);
+    layer->draw_buf.buf = (uint8_t *)dsc->data;
     layer->clip_area = canvas_area;
-    layer->buf = (uint8_t *)dsc->data;
 }
 
 

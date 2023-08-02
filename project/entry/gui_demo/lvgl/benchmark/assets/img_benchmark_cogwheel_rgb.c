@@ -324,7 +324,6 @@ const lv_img_dsc_t img_benchmark_cogwheel_rgb = {
     .header = {
 		.cf 		 = LV_COLOR_FORMAT_NATIVE,
 		.always_zero = 0,
-		.reserved 	 = 0,
 		.w 			 = 100,
 		.h 			 = 100
 	},

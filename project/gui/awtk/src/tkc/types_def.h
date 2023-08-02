@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   types_def.h
  * Author: AWTK Develop Team
  * Brief:  basic types definitions.
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,13 +30,6 @@
 #define END_C_DECLS
 #endif
 
-#ifndef WITH_WASM
-#include <math.h>
-#include <time.h>
-#include <wchar.h>
-#include <assert.h>
-#endif /*WITH_WASM*/
-
 #include <stdarg.h>
 #include <ctype.h>
 #include <errno.h>
@@ -54,58 +47,13 @@
 #define LINUX   1
 #endif
 
-#ifdef WITH_WASM
-#include <stdio.h>
-
-#ifndef PRIu64
-#if UINTPTR_MAX == 0xffffffff
-#define __PRI64_PREFIX "ll"
+#ifndef WITH_WASM
+#include <math.h>
+#include <time.h>
+#include <wchar.h>
+#include <assert.h>
 #else
-#define __PRI64_PREFIX "l"
-#endif
-#define PRIu64 __PRI64_PREFIX "u"
-#define PRId64 __PRI64_PREFIX "d"
-#endif/*PRIu64*/
-
-#define INFINITY 3.40282347E+38f
-#define assert(__pp) wasm_assert(__pp, #__pp)
-
-#define WITH_WCSXXX 1
-#define WITHOUT_FSCRIPT
-
-#define log_impl printf
-#define floor(a) (int)(a)
-#define abs(a) ((a) > 0 ? (a) : -(a))
-#define fabs(a) ((a) > 0 ? (a) : -(a))
-
-#ifndef __cplusplus
-typedef int wchar_t;
-#endif/*_cplusplus*/
-
-BEGIN_C_DECLS
-
-int iswspace(wchar_t ch);
-size_t wcslen(const wchar_t* s);
-int wcscmp(const wchar_t* s1, const wchar_t* s2);
-int wcscasecmp(const wchar_t* s1, const wchar_t* s2);
-int wcsncmp(const wchar_t* s1, const wchar_t* s2, size_t n);
-
-wchar_t* wcsdup(const wchar_t* s);
-wchar_t* wcschr(const wchar_t* s, wchar_t c);
-wchar_t* wcscpy(wchar_t* s1, const wchar_t* s2);
-wchar_t* wcsncpy(wchar_t* s1, const wchar_t* s2, uint32_t n);
-
-double atof(const char* str);
-char* strrchr(const char* s, int c);
-void wasm_assert(int p, const char* text);
-int strcasecmp(const char* s1, const char* s2);
-long strtol(const char* str, char** endptr, int base);
-long long strtoll(const char* str, char** endptr, int base);
-unsigned long strtoul(const char* str, char** endptr, int base);
-unsigned long long strtoull(const char* str, char** endptr, int base);
-
-END_C_DECLS
-
+#include "tkc/wasm_helper.h"
 #endif /*WITH_WASM*/
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
@@ -144,10 +92,6 @@ typedef int socklen_t;
 #endif /*WIN32*/
 #endif /*WITH_SOCKET*/
 
-#ifndef HAS_STDIO
-#define HAS_STDIO 1
-#endif
-
 #if defined(HAS_STDIO) || defined(AWTK_WEB)
 #include <stdio.h>
 #else
@@ -156,9 +100,9 @@ typedef int socklen_t;
 
 #ifndef TK_WEAK
 #if defined(__CC_ARM) || \
-    (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* ARM Compiler */
+    (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))            /* ARM Compiler */
 #define TK_WEAK __attribute__((weak))
-#elif defined(__IAR_SYSTEMS_ICC__) /* for IAR Compiler */
+#elif defined(__IAR_SYSTEMS_ICC__)                                        /* for IAR Compiler */
 #define TK_WEAK __weak
 #elif defined(__GNUC__) && !defined(__MINGW32__) && !defined(__MINGW64__) /* GNU GCC Compiler */
 #define TK_WEAK __attribute__((weak))
@@ -219,6 +163,7 @@ typedef struct _tk_object_t tk_object_t;
 
 /**
  * @enum ret_t
+ * @prefix RET_
  * @annotation ["scriptable"]
  * 函数返回值常量定义。
  */
@@ -490,7 +435,7 @@ enum { TK_NAME_LEN = 31, TK_FUNC_NAME_LEN = 63 };
 #endif /*M_PI*/
 
 #ifndef M_E
-#define M_E 2.71828f 
+#define M_E 2.71828f
 #endif /*M_E*/
 
 #ifndef M_SQRT2

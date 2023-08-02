@@ -132,7 +132,6 @@ const lv_img_dsc_t img_benchmark_cogwheel_indexed16 = {
 	.header = {
 		.cf 		 = LV_COLOR_FORMAT_I4,
 		.always_zero = 0,
-		.reserved 	 = 0,
 		.w 			 = 100,
 		.h 			 = 100
 	},

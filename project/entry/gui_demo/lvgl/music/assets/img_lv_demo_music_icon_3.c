@@ -94,7 +94,6 @@ const lv_img_dsc_t img_lv_demo_music_icon_3 = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 24,
         .h           = 24
     },

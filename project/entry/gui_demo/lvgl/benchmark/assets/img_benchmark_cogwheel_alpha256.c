@@ -115,7 +115,6 @@ const lv_img_dsc_t img_benchmark_cogwheel_alpha256 = {
 	.header = {
 		.cf 		 = LV_COLOR_FORMAT_A8,
 		.always_zero = 0,
-		.reserved 	 = 0,
 		.w 			 = 100,
 		.h 			 = 100
 	},

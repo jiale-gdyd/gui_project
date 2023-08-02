@@ -37,6 +37,10 @@
 
 #define LV_DPI_DEF                          130
 
+#define LV_DRAW_BUF_STRIDE_ALIGN            1
+
+#define LV_DRAW_BUF_ALIGN                   4
+
 #define LV_LAYER_MAX_MEMORY_USAGE           150
 
 #define LV_USE_DRAW_SW                      1

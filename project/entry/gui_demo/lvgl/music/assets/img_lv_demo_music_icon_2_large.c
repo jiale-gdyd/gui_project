@@ -119,7 +119,6 @@ const lv_img_dsc_t img_lv_demo_music_icon_2 = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 31,
         .h           = 31
     },

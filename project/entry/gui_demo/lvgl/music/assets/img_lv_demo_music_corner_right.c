@@ -75,7 +75,6 @@ const lv_img_dsc_t img_lv_demo_music_corner_right = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 18,
         .h           = 18
     },

@@ -423,7 +423,6 @@ const lv_img_dsc_t img_benchmark_cogwheel_argb = {
 	.header = {
 		.cf 		 = LV_COLOR_DEPTH == 16 ? LV_COLOR_FORMAT_RGB565A8 : LV_COLOR_FORMAT_ARGB8888,
 		.always_zero = 0,
-		.reserved 	 = 0,
 		.w 			 = 100,
 		.h 			 = 100
 	},

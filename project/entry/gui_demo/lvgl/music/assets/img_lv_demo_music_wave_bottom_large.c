@@ -248,7 +248,6 @@ const lv_img_dsc_t img_lv_demo_music_wave_bottom = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 479,
         .h           = 74
     },

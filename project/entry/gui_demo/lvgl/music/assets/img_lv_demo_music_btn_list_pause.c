@@ -201,7 +201,6 @@ const lv_img_dsc_t img_lv_demo_music_btn_list_pause = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
         .always_zero = 0,
-        .reserved    = 0,
         .w           = 58,
         .h           = 60
     },
