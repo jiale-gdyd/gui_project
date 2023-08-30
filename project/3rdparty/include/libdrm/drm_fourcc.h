@@ -1,5 +1,5 @@
-#ifndef DRM_FOURCC_H
-#define DRM_FOURCC_H
+#ifndef LIBDRM_DRM_FOURCC_H
+#define LIBDRM_DRM_FOURCC_H
 
 #include "drm.h"
 
@@ -188,6 +188,7 @@ extern "C" {
 #define DRM_FORMAT_MOD_VENDOR_ARM                       0x08
 #define DRM_FORMAT_MOD_VENDOR_ALLWINNER                 0x09
 #define DRM_FORMAT_MOD_VENDOR_AMLOGIC                   0x0a
+#define DRM_FORMAT_MOD_VENDOR_ROCKCHIP                  0x0b
 
 #define DRM_FORMAT_RESERVED                             ((1ULL << 56) - 1)
 
@@ -204,6 +205,8 @@ extern "C" {
 
 #define DRM_FORMAT_MOD_NONE                             0
 
+#define DRM_FORMAT_MOD_ROCKCHIP_10BITS                  fourcc_mod_code(ROCKCHIP, 1)
+
 #define I915_FORMAT_MOD_X_TILED                         fourcc_mod_code(INTEL, 1)
 #define I915_FORMAT_MOD_Y_TILED                         fourcc_mod_code(INTEL, 2)
 #define I915_FORMAT_MOD_Yf_TILED                        fourcc_mod_code(INTEL, 3)
@@ -219,6 +222,9 @@ extern "C" {
 #define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS              fourcc_mod_code(INTEL, 10)
 #define I915_FORMAT_MOD_4_TILED_DG2_MC_CCS              fourcc_mod_code(INTEL, 11)
 #define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS_CC           fourcc_mod_code(INTEL, 12)
+#define I915_FORMAT_MOD_4_TILED_MTL_RC_CCS              fourcc_mod_code(INTEL, 13)
+#define I915_FORMAT_MOD_4_TILED_MTL_MC_CCS              fourcc_mod_code(INTEL, 14)
+#define I915_FORMAT_MOD_4_TILED_MTL_RC_CCS_CC           fourcc_mod_code(INTEL, 15)
 
 #define DRM_FORMAT_MOD_SAMSUNG_64_32_TILE               fourcc_mod_code(SAMSUNG, 1)
 #define DRM_FORMAT_MOD_SAMSUNG_16_16_TILE               fourcc_mod_code(SAMSUNG, 2)

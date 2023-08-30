@@ -45,6 +45,7 @@
 #include "default/inc/ui/auto_play_landscape.data"
 #include "default/inc/ui/color_picker_simple.data"
 #include "default/inc/ui/bidi.data"
+#include "default/inc/ui/animator_fscript.data"
 #include "default/inc/ui/slide_view_v3.data"
 #include "default/inc/ui/dialog_highlight_update_bg.data"
 #include "default/inc/ui/progress_circle.data"
@@ -71,6 +72,7 @@
 #include "default/inc/ui/locale.data"
 #include "default/inc/ui/kb_ascii_t9.data"
 #include "default/inc/ui/kb_default_t9.data"
+#include "default/inc/ui/animator_layout.data"
 #include "default/inc/ui/kb_int.data"
 #include "default/inc/ui/tab_control.data"
 #include "default/inc/ui/slide_view_v2.data"
@@ -590,6 +592,7 @@ ret_t assets_init_default(void) {
   assets_manager_add(am, ui_auto_play_landscape);
   assets_manager_add(am, ui_color_picker_simple);
   assets_manager_add(am, ui_bidi);
+  assets_manager_add(am, ui_animator_fscript);
   assets_manager_add(am, ui_slide_view_v3);
   assets_manager_add(am, ui_dialog_highlight_update_bg);
   assets_manager_add(am, ui_progress_circle);
@@ -616,6 +619,7 @@ ret_t assets_init_default(void) {
   assets_manager_add(am, ui_locale);
   assets_manager_add(am, ui_kb_ascii_t9);
   assets_manager_add(am, ui_kb_default_t9);
+  assets_manager_add(am, ui_animator_layout);
   assets_manager_add(am, ui_kb_int);
   assets_manager_add(am, ui_tab_control);
   assets_manager_add(am, ui_slide_view_v2);

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utils struct and utils functions.
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -377,7 +377,7 @@ uint32_t tk_strlen(const char* str);
  * 获取字符串的长度。str为空时返回0。
  *
  * @param {const char*} str 字符串。
- * @param {uint32_t} 最大长度。
+ * @param {uint32_t} maxlen 最大长度。
  *
  * @return {uint32_t} 返回字符串的长度。
  */
@@ -479,7 +479,7 @@ uint32_t* tk_memcpy32(uint32_t* dst, uint32_t* src, uint32_t size);
  * 已bpp字节为标准拷贝数据。
  *
  * @param {void*} dst 目标
- * @param {void*} src 源。
+ * @param {const void*} src 源。
  * @param {uint32_t} size 个数。
  * @param {uint8_t} bpp 单个数据的字节数。
  *
@@ -519,7 +519,7 @@ int tk_vsnprintf(char* str, size_t size, const char* format, va_list ap);
  *
  * 从字符串读取格式化输入。
  *
- * @param {char*} str 要输入的字符串。
+ * @param {const char*} str 要输入的字符串。
  * @param {const char*} format 格式化字符串。
  *
  * @return {int} 返回成功匹配和赋值的个数。
@@ -572,7 +572,7 @@ ret_t xml_file_expand_read(const char* filename, str_t* s);
  * > XXX: 要求dst为NULL或内存块的首地址，本函数调用之后，dst可能无效，请保留返回的地址
  * 该函数会自动申请内存，调用后需要使用TKMEM_FREE释放。
  *
- * @param {const char*} dst 目标字符串。
+ * @param {char*} dst 目标字符串。
  * @param {const char*} src 源字符串。
  *
  * @return {char*} 返回指向的复制字符串指针，如果失败则返回NULL。
@@ -739,11 +739,22 @@ char* tk_str_tolower(char* str);
  *
  * 将utf8字符串拷贝为UCS字符串。
  *
- * @param {char*} str utf8编码的字符串。
+ * @param {const char*} str utf8编码的字符串。
  *
  * @return {wchar_t*} 返回UCS字符串(需要调用TKMEM_FREE释放)。
  */
 wchar_t* tk_wstr_dup_utf8(const char* str);
+
+/**
+ * @method tk_utf8_dup_wstr
+ *
+ * 将UCS字符串拷贝为utf8字符串。
+ *
+ * @param {const wchar_t*} str 字符串。
+ *
+ * @return {char*} 返回UTF-8字符串(需要调用TKMEM_FREE释放)。
+ */
+char* tk_utf8_dup_wstr(const wchar_t* str);
 
 /**
  * @method tk_wstr_count_c
@@ -910,15 +921,14 @@ char* tk_replace_char(char* str, char from, char to);
  * @method tk_is_ui_thread
  * 
  * 判断当前线程是否是UI线程。
+ * 
  * @return {bool_t} 返回TRUE表示是，否则表示否。
  */
 bool_t tk_is_ui_thread(void);
 
 /**
  * @method tk_set_ui_thread
- *
  * 设置UI线程的ID。
- *
  * @param {uint64_t} ui_thread_id UI线程的ID。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
@@ -927,6 +937,10 @@ ret_t tk_set_ui_thread(uint64_t ui_thread_id);
 
 /**
  * @method tk_replace_locale
+ * 将文本中的$locale$替换为对应的语言。
+ * @param {const char*} name 文本。
+ * @param {char*} out 替换后保存的字符串。
+ * @param {const char*} locale 语言。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -934,7 +948,11 @@ ret_t tk_replace_locale(const char* name, char out[TK_NAME_LEN + 1], const char*
 
 /**
  * @method tk_normalize_key_name
+ * 标准化key_name
+ * @param {const char*} name key_name。
+ * @param {char*} fixed_name 保存标准化后的字符串。
  *
+ * @return {const char*} 返回标准化后的字符串。
  */
 const char* tk_normalize_key_name(const char* name, char fixed_name[TK_NAME_LEN + 1]);
 
@@ -942,10 +960,10 @@ const char* tk_normalize_key_name(const char* name, char fixed_name[TK_NAME_LEN 
  * @method file_read_as_unix_text
  * 读取文本文件。并将windows换行(\r\n)或macos换行(\r)转换为uinux换行(\n)。
  *
- * @param {const char*} name 文件名。
+ * @param {const char*} filename 文件名。
  * @param {uint32_t*} size 返回实际读取的长度。
  *
- * @return {void*} 返回读取的数据，需要调用TKMEM_FREE释放。
+ * @return {char*} 返回读取的数据，需要调用TKMEM_FREE释放。
  */
 char* file_read_as_unix_text(const char* filename, uint32_t* size);
 
@@ -968,14 +986,75 @@ const char* ret_code_to_name(ret_t ret);
  */
 ret_t ret_code_from_name(const char* name);
 
-/*public for test*/
-ret_t xml_file_expand(const char* filename, str_t* s, const char* data);
+/**
+ * @method bits_stream_get
+ * 从buff中获取第index位的值。
+ * @param {const uint8_t*} buff 数据。
+ * @param {uint32_t} size 数据长度。
+ * @param {uint32_t} index 位索引。
+ * @param {bool_t*} value 返回值。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t bits_stream_get(const uint8_t* buff, uint32_t size, uint32_t index, bool_t* value);
+
+/**
+ * @method bits_stream_set
+ * 设置buff中第index位的值。
+ * @param {uint8_t*} buff 数据。
+ * @param {uint32_t} size 数据长度。
+ * @param {uint32_t} index 位索引。
+ * @param {bool_t} value 值。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t bits_stream_set(uint8_t* buff, uint32_t size, uint32_t index, bool_t value);
+
+/**
+ * @method tk_to_utf8_argv
+ * 将宽字符串数组转换成utf8字符串数组。
+ * @param {int} argc 参数个数。
+ * @param {wchar_t*} argv 参数。
+ * @return {char**} 返回utf8字符串数组。
+ */
+char** tk_to_utf8_argv(int argc, wchar_t** argv);
+
+/**
+ * @method tk_free_utf8_argv
+ * 释放utf8字符串数组。
+ * @param {int} argc 参数个数。
+ * @param {char**} argv 参数。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+*/
+ret_t tk_free_utf8_argv(int argc, char** argv);
 
 #define TK_STRDUP(str) ((str) != NULL) ? strdup(str) : NULL
 #define TK_STRNDUP(str) ((str) != NULL) ? strndup(str) : NULL
 
 #define tk_str_cmp tk_strcmp
 #define tk_str_icmp tk_stricmp
+
+#if defined(WIN32) && !defined(MINGW)
+#define MAIN()                            \
+  int wmain(int argc, wchar_t* wargv[]) { \
+    char** argv = tk_to_utf8_argv(argc, wargv);
+
+#define END_MAIN(code)                 \
+    tk_free_utf8_argv(argc, argv); \
+    return code; \
+  }
+#define MAIN_RETURN(code)                 \
+    tk_free_utf8_argv(argc, argv); \
+    return code; 
+#else
+#define MAIN() int main(int argc, char* argv[]) {
+#define MAIN_RETURN(code)                 \
+    return code; 
+#define END_MAIN(code)                 \
+    return code; \
+  }
+#endif
+
+/*public for test*/
+ret_t xml_file_expand(const char* filename, str_t* s, const char* data);
 
 END_C_DECLS
 

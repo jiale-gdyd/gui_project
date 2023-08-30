@@ -23,12 +23,12 @@
 #define WIN32_LEAN_AND_MEAN 1
 #endif /*WIN32_LEAN_AND_MEAN*/
 
-#include "tkc/mem.h"
-#include "tkc/socket_helper.h"
-
 #ifndef WITH_SOCKET
 #define WITH_SOCKET 1
 #endif
+
+#include "tkc/mem.h"
+#include "tkc/socket_helper.h"
 
 #ifdef WITH_SOCKET
 
@@ -82,7 +82,7 @@ ret_t tk_socket_bind_ex(int sock, const char* ip, int port) {
   memset(&s, 0, sizeof(s));
 
   if (ip != NULL) {
-    socket_resolve(ip, port, &s);
+    tk_socket_resolve(ip, port, &s);
   } else {
     s.sin_family = AF_INET;
     s.sin_port = htons(port);
@@ -155,7 +155,7 @@ int tk_udp_listen(int port) {
 
 #define h_addr h_addr_list[0]
 
-struct sockaddr* socket_resolve(const char* host, int port, struct sockaddr_in* addr) {
+struct sockaddr* tk_socket_resolve(const char* host, int port, struct sockaddr_in* addr) {
   struct hostent* h = NULL;
   return_value_if_fail(host != NULL && addr != NULL, NULL);
 
@@ -175,7 +175,7 @@ struct sockaddr* socket_resolve(const char* host, int port, struct sockaddr_in* 
 int tk_tcp_connect(const char* host, int port) {
   int sock = 0;
   struct sockaddr_in s_in;
-  struct sockaddr* addr = socket_resolve(host, port, &s_in);
+  struct sockaddr* addr = tk_socket_resolve(host, port, &s_in);
   return_value_if_fail(addr != NULL, -1);
 
   if ((sock = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
@@ -195,7 +195,7 @@ int tk_tcp_connect(const char* host, int port) {
 int tk_udp_connect(const char* host, int port) {
   int sock = 0;
   struct sockaddr_in s_in;
-  struct sockaddr* addr = socket_resolve(host, port, &s_in);
+  struct sockaddr* addr = tk_socket_resolve(host, port, &s_in);
   return_value_if_fail(addr != NULL, -1);
 
   if ((sock = (int)socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -258,7 +258,7 @@ ret_t tk_socket_wait_for_data(int sock, uint32_t timeout_ms) {
   return ret > 0 ? RET_OK : RET_TIMEOUT;
 }
 
-bool_t socket_last_io_has_error(void) {
+bool_t tk_socket_last_io_has_error(void) {
 #ifndef WIN32
   int eno = errno;
   return eno != EAGAIN && eno != 0;
@@ -266,6 +266,52 @@ bool_t socket_last_io_has_error(void) {
   int eno = GetLastError();
   return eno != 1237 && eno != 0;
 #endif /*WIN32*/
+}
+
+uint32_t tk_socket_get_client_ip(int sockfd) {
+  struct sockaddr_in addr;
+  socklen_t addrLen = sizeof(addr);
+
+  if (getpeername(sockfd, (struct sockaddr*)&addr, &addrLen) == 0) {
+    return addr.sin_addr.s_addr;
+  }
+
+  return 0;
+}
+
+uint32_t tk_socket_get_self_ip(int sockfd) {
+  struct sockaddr_in addr;
+  socklen_t addrLen = sizeof(addr);
+
+  if (getsockname(sockfd, (struct sockaddr*)&addr, &addrLen) == 0) {
+    return addr.sin_addr.s_addr;
+  }
+
+  return 0;
+}
+
+const char* tk_socket_get_client_ip_str(int sockfd, char* ip, int len) {
+  struct sockaddr_in addr;
+  socklen_t addrLen = sizeof(addr);
+  return_value_if_fail(ip != NULL && len > 0, NULL);
+
+  if (getpeername(sockfd, (struct sockaddr*)&addr, &addrLen) == 0) {
+    return inet_ntop(AF_INET, &(addr.sin_addr), ip, len);
+  }
+
+  return NULL;
+}
+
+const char* tk_socket_get_self_ip_str(int sockfd, char* ip, int len) {
+  struct sockaddr_in addr;
+  socklen_t addrLen = sizeof(addr);
+  return_value_if_fail(ip != NULL && len > 0, NULL);
+
+  if (getsockname(sockfd, (struct sockaddr*)&addr, &addrLen) == 0) {
+    return inet_ntop(AF_INET, &(addr.sin_addr), ip, len);
+  }
+
+  return NULL;
 }
 
 #endif /*WITH_SOCKET*/

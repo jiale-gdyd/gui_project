@@ -1,5 +1,5 @@
-#ifndef LIBDRM_U_DOUBLE_LIST_H
-#define LIBDRM_U_DOUBLE_LIST_H
+#ifndef LIBDRM_UTIL_DOUBLE_LIST_H
+#define LIBDRM_UTIL_DOUBLE_LIST_H
 
 #include <stddef.h>
 

@@ -9,13 +9,14 @@
 #include "lv_draw.h"
 #include "sw/lv_draw_sw.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
-#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define _draw_cache LV_GLOBAL_DEFAULT()->draw_cache
 
 /**********************
  *      TYPEDEFS
@@ -29,13 +30,6 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_OS
-    static lv_thread_sync_t sync;
-#else
-    static int dispatch_req = 0;
-#endif
-
-static uint32_t used_memory_for_layers_kb = 0;
 
 /**********************
  *  STATIC VARIABLES
@@ -52,7 +46,7 @@ static uint32_t used_memory_for_layers_kb = 0;
 void lv_draw_init(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_init(&sync);
+    lv_thread_sync_init(&_draw_cache.sync);
 #endif
 }
 
@@ -61,8 +55,8 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc(size);
     lv_memzero(new_unit, size);
 
-    new_unit->next = LV_GC_ROOT(_lv_draw_unit_head);
-    LV_GC_ROOT(_lv_draw_unit_head) = new_unit;
+    new_unit->next = _draw_cache.unit_head;
+    _draw_cache.unit_head = new_unit;
 
     return new_unit;
 }
@@ -102,14 +96,15 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *and not on the draw tasks added in the event.
      *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
      *Dispatching might remove the "main" draw task while it's still being used in the event*/
-    static bool running = false;
-    if(running == false) {
-        running = true;
+    lv_draw_cache_t * cache = &_draw_cache;
+
+    if(cache->task_running == false) {
+        cache->task_running = true;
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
         }
         lv_draw_dispatch();
-        running = false;
+        cache->task_running = false;
     }
 }
 
@@ -150,13 +145,13 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
                 lv_draw_img_dsc_t * draw_img_dsc = t->draw_dsc;
                 lv_layer_t * layer_drawn = (lv_layer_t *)draw_img_dsc->src;
 
-                if(layer_drawn->draw_buf.buf) {
+                if(lv_draw_buf_get_buf(&layer_drawn->draw_buf)) {
                     uint32_t layer_size_byte = layer_drawn->draw_buf.height * lv_draw_buf_width_to_stride(layer_drawn->draw_buf.width,
                                                                                                           layer_drawn->draw_buf.color_format);
 
-                    used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-                    LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
-                    lv_free(layer_drawn->draw_buf.buf);
+                    _draw_cache.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
+                    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
+                    lv_draw_buf_free(&layer_drawn->draw_buf);
                 }
 
                 /*Remove the layer from  the display's*/
@@ -216,7 +211,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
             uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
                                                                                             layer->draw_buf.color_format);
             uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-            if(used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
+            if(_draw_cache.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
                 layer_ok = false;
             }
         }
@@ -224,7 +219,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
         if(layer_ok) {
             /*Find a draw unit which is not busy and can take at least one task*/
             /*Let all draw units to pick draw tasks*/
-            lv_draw_unit_t * u = LV_GC_ROOT(_lv_draw_unit_head);
+            lv_draw_unit_t * u = _draw_cache.unit_head;
             while(u) {
                 int32_t taken_cnt = u->dispatch(u, layer);
                 if(taken_cnt < 0) {
@@ -243,19 +238,19 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
 void lv_draw_dispatch_wait_for_request(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_wait(&sync);
+    lv_thread_sync_wait(&_draw_cache.sync);
 #else
-    while(!dispatch_req);
-    dispatch_req = 0;
+    while(!_draw_cache.dispatch_req);
+    _draw_cache.dispatch_req = 0;
 #endif
 }
 
 void lv_draw_dispatch_request(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_signal(&sync);
+    lv_thread_sync_signal(&_draw_cache.sync);
 #else
-    dispatch_req = 1;
+    _draw_cache.dispatch_req = 1;
 #endif
 }
 
@@ -324,12 +319,31 @@ void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area)
     lv_area_move(area, layer->draw_buf_ofs.x, layer->draw_buf_ofs.y);
 }
 
-void lv_draw_add_used_layer_size(uint32_t kb)
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
-    used_memory_for_layers_kb += kb;
-    LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
-}
+    /*If the buffer of the layer is not allocated yet, allocate it now*/
+    if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
+        uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
+                                                                                        layer->draw_buf.color_format);
 
+        lv_draw_buf_malloc(&layer->draw_buf);
+        if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
+            LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
+            return NULL;
+        }
+
+        uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
+        _draw_cache.used_memory_for_layers_kb += kb;
+        LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
+
+
+        if(lv_color_format_has_alpha(layer->draw_buf.color_format)) {
+            lv_draw_buf_clear(&layer->draw_buf, NULL);
+        }
+    }
+
+    return lv_draw_buf_get_buf(&layer->draw_buf);
+}
 
 
 /**********************
@@ -362,4 +376,3 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 
     return true;
 }
-

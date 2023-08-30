@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget animator interface
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +35,11 @@ static ret_t widget_animator_on_widget_destroy(void* ctx, event_t* e) {
   return RET_OK;
 }
 
+static ret_t widget_animator_dispatch_to_widget(void* ctx, event_t* e) {
+  widget_t* widget = WIDGET(ctx);
+  return widget_dispatch(widget, e);
+}
+
 ret_t widget_animator_init(widget_animator_t* animator, widget_t* widget, uint32_t duration,
                            uint32_t delay, easing_func_t easing) {
   return_value_if_fail(animator != NULL && widget != NULL, RET_BAD_PARAMS);
@@ -52,6 +57,9 @@ ret_t widget_animator_init(widget_animator_t* animator, widget_t* widget, uint32
   widget_animator_set_destroy_when_done(animator, TRUE);
 
   widget_animator_manager_add(widget_animator_manager(), animator);
+  widget_animator_on(animator, EVT_ANIM_END, widget_animator_dispatch_to_widget, widget);
+  widget_animator_on(animator, EVT_ANIM_ONCE, widget_animator_dispatch_to_widget, widget);
+  widget_animator_on(animator, EVT_ANIM_START, widget_animator_dispatch_to_widget, widget);
 
   return RET_OK;
 }
@@ -93,10 +101,12 @@ ret_t widget_animator_time_elapse(widget_animator_t* animator, uint32_t delta_ti
   }
 
   widget_animator_update(animator, animator->easing(time_percent));
-
+  if (animator->relayout) {
+    widget_set_need_relayout(animator->widget);
+  }
   if (animator->now >= end_time) {
+    widget_animator_event_t event;
     if (animator->repeat_times > 0) {
-      event_t e = event_init(EVT_ANIM_ONCE, animator);
       animator->start_time = animator->now;
       animator->repeat_times--;
 
@@ -104,9 +114,8 @@ ret_t widget_animator_time_elapse(widget_animator_t* animator, uint32_t delta_ti
         animator->repeat_times = TK_UINT32_MAX;
       }
 
-      emitter_dispatch(&(animator->emitter), &e);
+      emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_ONCE, animator->widget, animator));
     } else if (animator->yoyo_times > 0) {
-      event_t e = event_init(EVT_ANIM_ONCE, animator);
       animator->start_time = animator->now;
       animator->reversed = !animator->reversed;
 
@@ -118,14 +127,12 @@ ret_t widget_animator_time_elapse(widget_animator_t* animator, uint32_t delta_ti
         animator->yoyo_times = TK_UINT32_MAX;
       }
 
-      emitter_dispatch(&(animator->emitter), &e);
+      emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_ONCE, animator->widget, animator));
     }
 
     if (animator->repeat_times == 0 && animator->yoyo_times == 0) {
-      event_t e = event_init(EVT_ANIM_END, animator);
-
       animator->state = ANIMATOR_DONE;
-      emitter_dispatch(&(animator->emitter), &e);
+      emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_END, animator->widget, animator));
 
       if (animator->destroy_when_done) {
         widget_animator_destroy(animator);
@@ -137,7 +144,7 @@ ret_t widget_animator_time_elapse(widget_animator_t* animator, uint32_t delta_ti
 }
 
 ret_t widget_animator_start(widget_animator_t* animator) {
-  event_t e = event_init(EVT_ANIM_START, animator);
+  widget_animator_event_t event;
   return_value_if_fail(animator != NULL, RET_BAD_PARAMS);
 
   if (animator->state == ANIMATOR_RUNNING) {
@@ -153,7 +160,7 @@ ret_t widget_animator_start(widget_animator_t* animator) {
   }
 
   animator->state = ANIMATOR_RUNNING;
-  emitter_dispatch(&(animator->emitter), &e);
+  emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_START, animator->widget, animator));
   if (animator->delay == 0) {
     widget_invalidate_force(animator->widget, NULL);
     widget_animator_update(animator, 0);
@@ -164,7 +171,7 @@ ret_t widget_animator_start(widget_animator_t* animator) {
 }
 
 ret_t widget_animator_stop(widget_animator_t* animator) {
-  event_t e = event_init(EVT_ANIM_STOP, animator);
+  widget_animator_event_t event;
   return_value_if_fail(animator != NULL, RET_BAD_PARAMS);
 
   if (animator->state == ANIMATOR_RUNNING) {
@@ -172,7 +179,7 @@ ret_t widget_animator_stop(widget_animator_t* animator) {
     animator->start_time = 0;
     animator->reversed = FALSE;
     animator->state = ANIMATOR_STOPPED;
-    emitter_dispatch(&(animator->emitter), &e);
+    emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_STOP, animator->widget, animator));
     widget_invalidate_force(animator->widget, NULL);
     widget_animator_update(animator, 0);
     widget_invalidate_force(animator->widget, NULL);
@@ -183,12 +190,12 @@ ret_t widget_animator_stop(widget_animator_t* animator) {
 }
 
 ret_t widget_animator_pause(widget_animator_t* animator) {
-  event_t e = event_init(EVT_ANIM_PAUSE, animator);
+  widget_animator_event_t event;
   return_value_if_fail(animator != NULL, RET_BAD_PARAMS);
 
   if (animator->state == ANIMATOR_RUNNING) {
     animator->state = ANIMATOR_PAUSED;
-    emitter_dispatch(&(animator->emitter), &e);
+    emitter_dispatch(&(animator->emitter), widget_animator_event_init(&event, EVT_ANIM_PAUSE, animator->widget, animator));
 
     return RET_OK;
   } else {
@@ -200,6 +207,12 @@ static ret_t widget_animator_update(widget_animator_t* animator, float_t percent
   return_value_if_fail(animator != NULL && animator->update != NULL, RET_BAD_PARAMS);
 
   return animator->update(animator, percent);
+}
+
+ret_t widget_animator_set_relayout(widget_animator_t* animator, bool_t relayout) {
+  return_value_if_fail(animator != NULL, RET_BAD_PARAMS);
+  animator->relayout = relayout;
+  return RET_OK;
 }
 
 ret_t widget_animator_set_yoyo(widget_animator_t* animator, uint32_t yoyo_times) {

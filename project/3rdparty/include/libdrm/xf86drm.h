@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 #ifndef DRM_MAX_MINOR
-#define DRM_MAX_MINOR                                       16
+#define DRM_MAX_MINOR                                       64
 #endif
 
 #define DRM_IOCTL_NR(n)                                     _IOC_NR(n)
@@ -40,7 +40,7 @@ extern "C" {
 #define DRM_RENDER_DEV_NAME                                 "%s/" DRM_RENDER_MINOR_NAME "%d"
 
 #define DRM_NODE_NAME_MAX \
-    (sizeof(DRM_DIR_NAME) + 1 + MAX3(sizeof(DRM_PRIMARY_MINOR_NAME), sizeof(DRM_CONTROL_MINOR_NAME), sizeof(DRM_RENDER_MINOR_NAME)) + sizeof("144") + 1)
+    (sizeof(DRM_DIR_NAME) + 1 + MAX3(sizeof(DRM_PRIMARY_MINOR_NAME), sizeof(DRM_CONTROL_MINOR_NAME), sizeof(DRM_RENDER_MINOR_NAME)) + sizeof("1048575") + 1)
 
 #define DRM_ERR_NO_DEVICE                                   (-1001)
 #define DRM_ERR_NO_ACCESS                                   (-1002)
@@ -369,7 +369,7 @@ typedef struct _drmSetVersion {
     || defined (__ARM_ARCH_6K__) || defined(__ARM_ARCH_6T2__)   \
     || defined (__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__)     \
     || defined(__ARM_ARCH_7R__) || defined(__ARM_ARCH_7M__)     \
-    || defined(__ARM_ARCH_7EM__)
+    || defined(__ARM_ARCH_7EM__) || defined(__arm__)
 #undef DRM_DEV_MODE
 #define DRM_DEV_MODE                                        (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 
@@ -722,6 +722,7 @@ extern int drmSyncobjTimelineWait(int fd, uint32_t *handles, uint64_t *points, u
 extern int drmSyncobjQuery(int fd, uint32_t *handles, uint64_t *points, uint32_t handle_count);
 extern int drmSyncobjQuery2(int fd, uint32_t *handles, uint64_t *points, uint32_t handle_count, uint32_t flags);
 extern int drmSyncobjTransfer(int fd, uint32_t dst_handle, uint64_t dst_point, uint32_t src_handle, uint64_t src_point, uint32_t flags);
+extern int drmSyncobjEventfd(int fd, uint32_t handle, uint64_t point, int ev_fd, uint32_t flags);
 
 extern char *drmGetFormatModifierVendor(uint64_t modifier);
 extern char *drmGetFormatModifierName(uint64_t modifier);

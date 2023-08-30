@@ -56,7 +56,6 @@ typedef struct _lv_obj_class_t {
     const struct _lv_obj_class_t * base_class;
     void (*constructor_cb)(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * obj);
     void (*destructor_cb)(const struct _lv_obj_class_t * class_p, struct _lv_obj_t * obj);
-
     void (*event_cb)(const struct _lv_obj_class_t * class_p,
                      struct _lv_event_t * e);  /**< Widget type specific event function*/
     void * user_data;

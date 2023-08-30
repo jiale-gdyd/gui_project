@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget animator interface
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,13 +56,6 @@ struct _widget_animator_t {
    * 控件对象。
    */
   widget_t* widget;
-
-  /**
-   * @property {bool_t} reversed
-   * @annotation ["private"]
-   * 逆向运行，在yoyo模式下自动设置。
-   */
-  bool_t reversed;
 
   /**
    * @property {uint32_t} yoyo_times
@@ -121,25 +114,11 @@ struct _widget_animator_t {
   animator_state_t state;
 
   /**
-   * @property {uint32_t} emitter
+   * @property {emitter_t} emitter
    * @annotation ["private"]
    * emitter
    */
   emitter_t emitter;
-
-  /**
-   * @property {bool_t} destroy_when_done;
-   * @annotation ["private"]
-   * 播放完成时是否自动销毁(缺省销毁)。
-   */
-  bool_t destroy_when_done;
-
-  /**
-   * @property {bool_t} forever
-   * @annotation ["private"]
-   * 是否永远播放(yoyo_times/repeat_times为0时，自动设置此标志)。
-   */
-  bool_t forever;
 
   /**
    * @property {uint32_t} widget_destroy_id
@@ -169,6 +148,34 @@ struct _widget_animator_t {
    */
   widget_animator_destroy_t destroy;
 
+  /**
+   * @property {bool_t} reversed
+   * @annotation ["private"]
+   * 逆向运行，在yoyo模式下自动设置。
+   */
+  bool_t reversed;
+
+  /**
+   * @property {bool_t} relayout
+   * @annotation ["private"]
+   * 播放时是否自动重新布局（默认为 FALSE）。
+   */
+  bool_t relayout;
+
+  /**
+   * @property {bool_t} destroy_when_done
+   * @annotation ["private"]
+   * 播放完成时是否自动销毁(缺省销毁)。
+   */
+  bool_t destroy_when_done;
+
+  /**
+   * @property {bool_t} forever
+   * @annotation ["private"]
+   * 是否永远播放(yoyo_times/repeat_times为0时，自动设置此标志)。
+   */
+  bool_t forever;
+
   /*private*/
   bool_t to_dispatch;
   struct _widget_animator_t* next;
@@ -184,7 +191,7 @@ struct _widget_animator_t {
  * @param {widget_t*} widget 控件对象。
  * @param {uint32_t} duration 动画持续时间。
  * @param {uint32_t} delay 动画执行时间。
- * @param {easing_func_t} 插值函数。
+ * @param {easing_func_t} easing 插值函数。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -242,12 +249,21 @@ ret_t widget_animator_set_reversed(widget_animator_t* animator, bool_t value);
 ret_t widget_animator_set_time_scale(widget_animator_t* animator, float_t time_scale);
 
 /**
+ * @method widget_animator_set_relayout
+ * 设置每帧是否重新布局。
+ * @param {widget_animator_t*} animator 动画对象。
+ * @param {bool_t} relayout 是否重新布局。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t widget_animator_set_relayout(widget_animator_t* animator, bool_t relayout);
+
+/**
  * @method widget_animator_on
  * 注册指定事件的处理函数。
  * @annotation ["scriptable:custom"]
  * @param {widget_animator_t*} animator 动画对象。
- * @param {event_type_t} type
- * 事件类型。目前支持：EVT_ANIM_START,EVT_ANIM_STOP,EVT_ANIM_PAUSE,EVT_ANIM_ONCE和EVT_ANIM_END。
+ * @param {event_type_t} type 事件类型。目前支持：EVT_ANIM_START,EVT_ANIM_STOP,EVT_ANIM_PAUSE,EVT_ANIM_ONCE和EVT_ANIM_END。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *

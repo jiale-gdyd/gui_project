@@ -1,5 +1,5 @@
-#ifndef LIBDRM_ATOMICS_H
-#define LIBDRM_ATOMICS_H
+#ifndef LIBDRM_XF86ATOMICS_H
+#define LIBDRM_XF86ATOMICS_H
 
 #define HAS_ATOMIC_OPS                  1
 

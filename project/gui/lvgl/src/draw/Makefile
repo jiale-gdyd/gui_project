@@ -1,8 +1,8 @@
 obj-y += sw/
-obj-y += draw_buf/
 
 obj-y += lv_draw_arc.o
 obj-y += lv_draw_img.o
+obj-y += lv_draw_buf.o
 obj-y += lv_draw_label.o
 obj-y += lv_draw_line.o
 obj-y += lv_draw_mask.o

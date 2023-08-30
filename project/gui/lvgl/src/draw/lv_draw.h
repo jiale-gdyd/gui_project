@@ -20,7 +20,8 @@ extern "C" {
 #include "../misc/lv_profiler.h"
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
-#include "draw_buf/lv_draw_buf.h"
+#include "../osal/lv_os.h"
+#include "lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -102,7 +103,7 @@ typedef struct _lv_draw_unit_t {
      * @param layer         pointer to a layer on which the draw task should be drawn
      * @return              >=0:    The number of taken draw task
      *                      -1:     There where no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
+     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
      */
     int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 } lv_draw_unit_t;
@@ -140,6 +141,18 @@ typedef struct {
     uint32_t id2;
     lv_layer_t * layer;
 } lv_draw_dsc_base_t;
+
+typedef struct {
+    lv_draw_unit_t * unit_head;
+    uint32_t used_memory_for_layers_kb;
+#if LV_USE_OS
+    lv_thread_sync_t sync;
+    lv_mutex_t circle_cache_mutex;
+#else
+    int dispatch_req;
+#endif
+    bool task_running;
+} lv_draw_cache_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -191,10 +204,11 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
 
 /**
- * Call to tell that a layer buffer with X kB size was allocated
- * @param kb        size of the layer buffer in kB (if < 1024 use 1)
+ * Try to allocate a buffer for the layer.
+ * @param layer         pointer to a layer
+ * @return              pointer to the allocated aligned buffer or NULL on failure
  */
-void lv_draw_add_used_layer_size(uint32_t kb);
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL VARIABLES

@@ -25,7 +25,6 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-
 enum _lv_key_t {
     LV_KEY_UP        = 17,  /*0x11*/
     LV_KEY_DOWN      = 18,  /*0x12*/
@@ -46,6 +45,7 @@ typedef _lv_key_t lv_key_t;
 #else
 typedef uint8_t lv_key_t;
 #endif /*DOXYGEN*/
+
 
 
 /**********************

@@ -1,12 +1,12 @@
-#ifndef LIBDRM_LIBDRM_H
-#define LIBDRM_LIBDRM_H
+#ifndef LIBDRM_LIBDRM_MACROS_H
+#define LIBDRM_LIBDRM_MACROS_H
 
 #define drm_private             __attribute__((visibility("hidden")))
 #define drm_public              __attribute__((visibility("default")))
 
 #define STATIC_ASSERT(COND)                                 \
     do {                                                    \
-        /*(void) sizeof(char [1 - 2*!(COND)]);*/            \
+        /*(void) sizeof(char [1 - 2*!(COND)]);*/                \
     } while (0)
 
 #include <sys/mman.h>

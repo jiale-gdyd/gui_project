@@ -36,6 +36,7 @@ typedef struct {
     uint32_t filter;
 } lv_event_dsc_t;
 
+
 /**
  * Type of event being sent to the object.
  */
@@ -133,6 +134,12 @@ typedef struct _lv_event_t {
     uint8_t stop_processing : 1;
     uint8_t stop_bubbling : 1;
 } lv_event_t;
+
+/**
+ * @brief Event callback.
+ * Events are used to notify the user of some action being taken on the object.
+ * For details, see ::lv_event_t.
+ */
 
 /**********************
  * GLOBAL PROTOTYPES

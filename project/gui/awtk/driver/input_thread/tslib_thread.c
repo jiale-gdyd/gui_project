@@ -3,8 +3,8 @@
 #include <unistd.h>
 
 #include "tkc/mem.h"
-#include "base/keys.h"
 #include "tkc/utils.h"
+#include "base/keys.h"
 #include "tkc/thread.h"
 #include "tslib/tslib.h"
 #include "tslib_thread.h"
@@ -21,7 +21,11 @@ typedef struct _run_info_t {
 
 static ret_t tslib_dispatch(run_info_t *info)
 {
-    ret_t ret = info->dispatch(info->dispatch_ctx, &(info->req), "tslib");
+    ret_t ret = RET_FAIL;
+    char message[MAX_PATH + 1] = {0};
+    tk_snprintf(message, sizeof(message) - 1, "ts[%s]", info->filename);
+
+    ret = info->dispatch(info->dispatch_ctx, &(info->req), message);
     info->req.event.type = EVT_NONE;
 
     return ret;

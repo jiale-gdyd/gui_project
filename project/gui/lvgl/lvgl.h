@@ -108,7 +108,7 @@ extern "C" {
 
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 
-#include "src/layouts/lv_layouts.h"
+#include "src/layouts/lv_layout.h"
 
 #include "src/draw/lv_draw.h"
 
@@ -127,6 +127,7 @@ extern "C" {
 
 #include "src/dev/input/touchscreen/lv_nuttx_touchscreen.h"
 
+#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

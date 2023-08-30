@@ -18,7 +18,34 @@
     #endif
 #endif
 
-#include "../lv_conf.h" 
+/*If "lv_conf.h" is available from here try to use it later.*/
+#ifdef __has_include
+    #if __has_include("lv_conf.h")
+        #ifndef LV_CONF_INCLUDE_SIMPLE
+            #define LV_CONF_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
+
+/*If lv_conf.h is not skipped include it*/
+#ifndef LV_CONF_SKIP
+    #ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
+        #define __LV_TO_STR_AUX(x) #x
+        #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
+        #include __LV_TO_STR(LV_CONF_PATH)
+        #undef __LV_TO_STR_AUX
+        #undef __LV_TO_STR
+    #elif defined(LV_CONF_INCLUDE_SIMPLE)         /*Or simply include lv_conf.h is enabled*/
+        #include "../lv_conf.h"
+    #else
+        #include "../lv_conf.h"                /*Else assume lv_conf.h is next to the lvgl folder*/
+    #endif
+    #if !defined(LVGL_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
+        /* #include will sometimes silently fail when __has_include is used */
+        /* https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80753 */
+        #pragma message("Possible failure to include lv_conf.h, please read the comment in this file if you get errors")
+    #endif
+#endif
 
 #ifdef CONFIG_LV_COLOR_DEPTH
     #define _LV_KCONFIG_PRESENT
@@ -145,35 +172,6 @@
     #endif
 #endif
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#ifndef LV_TICK_CUSTOM
-    #ifdef CONFIG_LV_TICK_CUSTOM
-        #define LV_TICK_CUSTOM CONFIG_LV_TICK_CUSTOM
-    #else
-        #define LV_TICK_CUSTOM 0
-    #endif
-#endif
-#if LV_TICK_CUSTOM
-    #ifndef LV_TICK_CUSTOM_INCLUDE
-        #ifdef CONFIG_LV_TICK_CUSTOM_INCLUDE
-            #define LV_TICK_CUSTOM_INCLUDE CONFIG_LV_TICK_CUSTOM_INCLUDE
-        #else
-            #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-        #endif
-    #endif
-    #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #ifdef CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-        #endif
-    #endif
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI_DEF
@@ -187,6 +185,26 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
+    #else
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
+    #endif
+#endif
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
+    #endif
+#endif
 
 /*Align the stride of all layers and images to this bytes*/
 #ifndef LV_DRAW_BUF_STRIDE_ALIGN
@@ -233,7 +251,7 @@
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
-     * > 1 means multply threads will render the screen in parallel */
+     * > 1 means multiply threads will render the screen in parallel */
     #ifndef LV_DRAW_SW_DRAW_UNIT_CNT
         #ifdef _LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_DRAW_UNIT_CNT
@@ -326,7 +344,6 @@
         #endif
     #endif
 #endif
-
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -653,24 +670,23 @@
     #endif
 #endif
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#ifndef LV_ENABLE_GC
-    #ifdef CONFIG_LV_ENABLE_GC
-        #define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
+#ifndef LV_ENABLE_GLOBAL_CUSTOM
+    #ifdef CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+        #define LV_ENABLE_GLOBAL_CUSTOM CONFIG_LV_ENABLE_GLOBAL_CUSTOM
     #else
-        #define LV_ENABLE_GC 0
+        #define LV_ENABLE_GLOBAL_CUSTOM 0
     #endif
 #endif
-#if LV_ENABLE_GC != 0
-    #ifndef LV_GC_INCLUDE
-        #ifdef CONFIG_LV_GC_INCLUDE
-            #define LV_GC_INCLUDE CONFIG_LV_GC_INCLUDE
+#if LV_ENABLE_GLOBAL_CUSTOM
+    /*Header to include for the custom 'lv_global' function"*/
+    #ifndef LV_GLOBAL_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_GLOBAL_CUSTOM_INCLUDE
+            #define LV_GLOBAL_CUSTOM_INCLUDE CONFIG_LV_GLOBAL_CUSTOM_INCLUDE
         #else
-            #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
+            #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
         #endif
     #endif
-#endif /*LV_ENABLE_GC*/
+#endif
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.
@@ -698,11 +714,25 @@
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#ifndef lv_color_mix_ROUND_OFS
+#ifndef LV_COLOR_MIX_ROUND_OFS
     #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
-        #define lv_color_mix_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
+        #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
     #else
-        #define lv_color_mix_ROUND_OFS 0
+        #define LV_COLOR_MIX_ROUND_OFS 0
+    #endif
+#endif
+
+
+/* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
+#ifndef LV_OBJ_STYLE_CACHE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+        #else
+            #define LV_OBJ_STYLE_CACHE 0
+        #endif
+    #else
+        #define  LV_OBJ_STYLE_CACHE 1
     #endif
 #endif
 
@@ -2292,18 +2322,29 @@
             #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
         #endif
     #endif
-    #ifndef LV_SDL_PARTIAL_MODE
-        #ifdef CONFIG_LV_SDL_PARTIAL_MODE
-            #define LV_SDL_PARTIAL_MODE CONFIG_LV_SDL_PARTIAL_MODE
+    #ifndef LV_SDL_RENDER_MODE
+        #ifdef CONFIG_LV_SDL_RENDER_MODE
+            #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
+            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+        #endif
+    #endif
+    #ifndef LV_SDL_BUF_COUNT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_SDL_BUF_COUNT
+                #define LV_SDL_BUF_COUNT CONFIG_LV_SDL_BUF_COUNT
+            #else
+                #define LV_SDL_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
         #ifdef CONFIG_LV_SDL_FULLSCREEN
             #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
         #else
-            #define LV_SDL_FULLSCREEN      0
+            #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
         #endif
     #endif
     #ifndef LV_SDL_DIRECT_EXIT

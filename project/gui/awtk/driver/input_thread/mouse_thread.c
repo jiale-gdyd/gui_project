@@ -4,9 +4,10 @@
 #include <linux/input.h>
 
 #include "tkc/mem.h"
-#include "base/keys.h"
 #include "tkc/utils.h"
+#include "base/keys.h"
 #include "tkc/thread.h"
+#include "common_coord.h"
 #include "mouse_thread.h"
 
 #ifndef EV_SYN
@@ -27,14 +28,18 @@ typedef struct _run_info_t {
         struct input_event e;
     } data;
     bool_t            left_pressed;
-    bool_t            rigth_pressed;
+    bool_t            right_pressed;
     bool_t            middle_pressed;
     event_queue_req_t req;
 } run_info_t;
 
 static ret_t input_dispatch(run_info_t *info)
 {
-    ret_t ret = info->dispatch(info->dispatch_ctx, &(info->req), "mouse");
+    ret_t ret = RET_FAIL;
+    char message[MAX_PATH + 1] = {0};
+    tk_snprintf(message, sizeof(message) - 1, "mouse[%s]", info->filename);
+
+    ret = info->dispatch(info->dispatch_ctx, &(info->req), message);
     info->req.event.type = EVT_NONE;
 
     return ret;
@@ -43,15 +48,15 @@ static ret_t input_dispatch(run_info_t *info)
 static ret_t input_dispatch_set_mouse_event(run_info_t* info, event_queue_req_t* req, bool_t left, bool_t right, bool_t middle, bool_t normal)
 {
     if (normal) {
-        if (info->left_pressed || info->rigth_pressed || info->middle_pressed) {
+        if (info->left_pressed || info->right_pressed || info->middle_pressed) {
             if (info->left_pressed) {
                 info->left_pressed = FALSE;
                 req->event.type = EVT_POINTER_UP;
                 req->pointer_event.pressed = FALSE;
             }
 
-            if (info->rigth_pressed) {
-                info->rigth_pressed = FALSE;
+            if (info->right_pressed) {
+                info->right_pressed = FALSE;
                 req->event.type = EVT_CONTEXT_MENU;
             }
 
@@ -77,7 +82,7 @@ static ret_t input_dispatch_set_mouse_event(run_info_t* info, event_queue_req_t*
             req->event.type = EVT_KEY_DOWN;
             req->key_event.key = TK_KEY_WHEEL;
         } else if (right) {      
-            info->rigth_pressed = TRUE;
+            info->right_pressed = TRUE;
             req->event.type = EVT_POINTER_MOVE;
         } else {
             req->event.type = EVT_POINTER_MOVE;
@@ -123,6 +128,12 @@ static ret_t input_dispatch_one_event(run_info_t *info)
         bool_t right = info->data.d[0] & 0x2;
         bool_t middle = info->data.d[0] & 0x4;
         bool_t normal = !(info->data.d[0] & 0x7);
+
+        point_t common_coord = {info->x, info->y};
+        if (RET_OK == common_coord_get(&common_coord)) {
+            info->x = common_coord.x;
+            info->y = common_coord.y;
+        }
 
         info->x += x;
         info->y -= y;
@@ -183,6 +194,11 @@ static ret_t input_dispatch_one_event(run_info_t *info)
             }
 
             case EV_REL: {
+                point_t common_coord = {info->x, info->y};
+                if (RET_OK == common_coord_get(&common_coord)) {
+                    info->x = common_coord.x;
+                    info->y = common_coord.y;
+                }
                 switch (info->data.e.code) {
                     case REL_X: {
                         info->x += info->data.e.value;

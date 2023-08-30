@@ -42,7 +42,6 @@ typedef _lv_scrollbar_mode_t lv_scrollbar_mode_t;
 typedef uint8_t lv_scrollbar_mode_t;
 #endif /*DOXYGEN*/
 
-
 /** Scroll span align options. Tells where to align the snappable children when scroll stops.*/
 enum _lv_scroll_snap_t {
     LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is*/

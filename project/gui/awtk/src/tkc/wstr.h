@@ -70,8 +70,29 @@ typedef struct _wstr_t {
 } wstr_t;
 
 /**
+ * @method wstr_create
+ * 创建str对象。
+ * 备注：最后调用wstr\_destroy释放内存
+ * @annotation ["constructor"]
+ * @param {uint32_t} capacity 初始容量。
+ *
+ * @return {wstr_t*} str对象。
+ */
+wstr_t* wstr_create(uint32_t capacity);
+
+/**
+ * @method wstr_destroy
+ * 销毁str对象。
+ * @param {wstr_t*} str str对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t wstr_destroy(wstr_t* str);
+
+/**
  * @method wstr_init
  * 初始化字符串对象。
+ * 备注：最后调用wstr\_reset释放内存
  * @annotation ["constructor"]
  * @param {wstr_t*} str str对象。
  * @param {uint32_t} capacity 初始容量。
@@ -94,11 +115,11 @@ wstr_t* wstr_init(wstr_t* str, uint32_t capacity);
  *```
  *
  * @annotation ["constructor"]
- * @param {str_t*} str str对象。
+ * @param {wstr_t*} str str对象。
  * @param {wchar_t*} buff 缓冲区。
  * @param {uint32_t} capacity 初始容量。
  *
- * @return {str_t*} str对象本身。
+ * @return {wstr_t*} str对象本身。
  */
 wstr_t* wstr_attach(wstr_t* str, wchar_t* buff, uint32_t capacity);
 
@@ -198,6 +219,29 @@ ret_t wstr_insert(wstr_t* str, uint32_t offset, const wchar_t* text, uint32_t nr
 ret_t wstr_append(wstr_t* str, const wchar_t* text);
 
 /**
+ * @method wstr_append_more
+ * 追加多个字符串。以NULL结束。
+ *
+ * 示例：
+ *
+ * ```c
+ *  wstr_t s;
+ *  wstr_init(&s, 0);
+ *
+ *  wstr_append_more(&s, L"abc", L"123", NULL);
+ *  log_debug("%s\n", s.str);
+ *
+ *  wstr_reset(&s);
+ * ```
+ * @param {wstr_t*} str str对象。
+ * @param {const wchar_t*} text 要追加的字符串。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t wstr_append_more(wstr_t* str, const wchar_t* text, ...);
+
+
+/**
  * @method wstr_append_with_len
  * 追加字符串。
  * @param {wstr_t*} str str对象。
@@ -239,6 +283,16 @@ ret_t wstr_pop(wstr_t* str);
 ret_t wstr_push_int(wstr_t* str, const char* format, int32_t value);
 
 /**
+ * @method wstr_eq
+ * 判断两个字符串是否相等。
+ * @param {wstr_t*} str str对象。
+ * @param {const wchar_t*} text 待比较的字符串。
+ *
+ * @return {bool_t} 返回是否相等。
+ */
+bool_t wstr_eq(wstr_t* str, const wchar_t* text);
+
+/**
  * @method wstr_equal
  * 判断两个字符是否相同。
  * @param {wstr_t*} str str对象。
@@ -262,7 +316,7 @@ ret_t wstr_from_int(wstr_t* str, int32_t v);
  * @method wstr_from_int64
  * 用整数初始化字符串。
  * @param {wstr_t*} str str对象。
- * @param {int32_t} v 整数。
+ * @param {int64_t} v 整数。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -455,8 +509,14 @@ wchar_t* wcs_dup(const wchar_t* s);
 #ifdef WITH_WCSXXX
 #ifndef WITH_WASM
 wchar_t* wcsdup(const wchar_t* s);
-#endif/*WITH_WASM*/
+#endif /*WITH_WASM*/
 #endif /*WITH_WCSXXX*/
+
+#define WSTR_DESTROY(str) \
+  if (str != NULL) {      \
+    wstr_destroy(str);    \
+    str = NULL;           \
+  }
 
 END_C_DECLS
 

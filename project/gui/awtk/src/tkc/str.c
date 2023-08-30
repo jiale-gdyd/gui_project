@@ -505,6 +505,26 @@ bool_t str_eq(str_t* str, const char* text) {
   return strcmp(str->str, text) == 0;
 }
 
+bool_t str_equal(str_t* str, str_t* other) {
+  if (str == other) {
+    return TRUE;
+  }
+
+  if (str == NULL || other == NULL) {
+    return FALSE;
+  }
+
+  if (str->str == other->str) {
+    return TRUE;
+  }
+
+  if (str->str == NULL || other->str == NULL) {
+    return FALSE;
+  }
+
+  return strcmp(str->str, other->str) == 0;
+}
+
 ret_t str_from_int(str_t* str, int32_t value) {
   char buff[TK_NUM_MAX_LEN + 1];
   return_value_if_fail(str != NULL, RET_BAD_PARAMS);
@@ -748,6 +768,7 @@ ret_t str_replace(str_t* str, const char* text, const char* new_text) {
       TKMEM_FREE(str->str);
       str->str = temp_str;
       str->size = size;
+      str->capacity = capacity;
     } else {
       return_value_if_fail(str->extendable, RET_FAIL);
     }

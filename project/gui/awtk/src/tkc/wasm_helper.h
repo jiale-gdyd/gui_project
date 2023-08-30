@@ -29,6 +29,8 @@ BEGIN_C_DECLS
 typedef int wchar_t;
 #endif /*_cplusplus*/
 
+#define ret_t_init(r) *r = RET_OK;
+
 double sin(double x);
 double cos(double x);
 double tan(double x);
@@ -51,7 +53,16 @@ double floor(double x);
 double ceil(double x);
 #endif/*WIN32*/
 
+int iswupper(wchar_t ch);
+int iswlower(wchar_t ch);
+int iswdigit(wchar_t ch);
+int iswxdigit(wchar_t ch);
+int iswalpha(wchar_t ch);
+int iswalnum(wchar_t ch);
 int iswspace(wchar_t ch);
+
+int islower(int c);
+
 size_t wcslen(const wchar_t* s);
 int wcscmp(const wchar_t* s1, const wchar_t* s2);
 int wcscasecmp(const wchar_t* s1, const wchar_t* s2);
@@ -73,6 +84,9 @@ unsigned long strtoul(const char* str, char** endptr, int base);
 unsigned long long strtoull(const char* str, char** endptr, int base);
 
 void qsort (void *, size_t, size_t, int (*)(const void *, const void *));
+
+#define towlower(c) tolower(c)
+#define towupper(c) toupper(c)
 
 END_C_DECLS
 

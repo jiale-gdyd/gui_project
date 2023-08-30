@@ -121,6 +121,7 @@ static const struct drmFormatModifierVendorInfo drm_format_modifier_vendor_table
     { DRM_FORMAT_MOD_VENDOR_ARM, "ARM" },
     { DRM_FORMAT_MOD_VENDOR_ALLWINNER, "ALLWINNER" },
     { DRM_FORMAT_MOD_VENDOR_AMLOGIC, "AMLOGIC" },
+    { DRM_FORMAT_MOD_VENDOR_ROCKCHIP, "ROCKCHIP" },
 };
 
 struct drmVendorInfo {
@@ -773,9 +774,6 @@ static const char *drmGetDeviceName(int type)
         case DRM_NODE_PRIMARY:
             return DRM_DEV_NAME;
 
-        case DRM_NODE_CONTROL:
-            return DRM_CONTROL_DEV_NAME;
-
         case DRM_NODE_RENDER:
             return DRM_RENDER_DEV_NAME;
     }
@@ -949,9 +947,6 @@ static int drmGetMinorBase(int type)
         case DRM_NODE_PRIMARY:
             return 0;
 
-        case DRM_NODE_CONTROL:
-            return 64;
-
         case DRM_NODE_RENDER:
             return 128;
 
@@ -962,21 +957,23 @@ static int drmGetMinorBase(int type)
 
 static int drmGetMinorType(int major, int minor)
 {
-    int type = minor >> 6;
+    int i;
+    const char *dev_name;
+    char path[DRM_NODE_NAME_MAX];
 
-    if (minor < 0) {
-        return -1;
+    for (i = DRM_NODE_PRIMARY; i < DRM_NODE_MAX; i++) {
+        dev_name = drmGetDeviceName(i);
+        if (!dev_name) {
+           continue;
+        }
+
+        snprintf(path, sizeof(path), dev_name, DRM_DIR_NAME, minor);
+        if (!access(path, F_OK)) {
+           return i;
+        }
     }
 
-    switch (type) {
-        case DRM_NODE_PRIMARY:
-        case DRM_NODE_CONTROL:
-        case DRM_NODE_RENDER:
-            return type;
-
-        default:
-            return -1;
-    }
+    return -1;
 }
 
 static const char *drmGetMinorName(int type)
@@ -984,9 +981,6 @@ static const char *drmGetMinorName(int type)
     switch (type) {
         case DRM_NODE_PRIMARY:
             return DRM_PRIMARY_MINOR_NAME;
-
-        case DRM_NODE_CONTROL:
-            return DRM_CONTROL_MINOR_NAME;
 
         case DRM_NODE_RENDER:
             return DRM_RENDER_MINOR_NAME;
@@ -1065,11 +1059,23 @@ static int drmOpenByName(const char *name, int type)
                     drmFreeVersion(version);
                     id = drmGetBusid(fd);
                     drmMsg("drmGetBusid returned '%s'\n", id ? id : "NULL");
+#if defined(CONFIG_ROCKCHIP)
                     if (id) {
                         drmFreeBusid(id);
                     }
 
                     return fd;
+#else
+                    if (!id || !*id) {
+                        if (id) {
+                            drmFreeBusid(id);
+                        }
+
+                        return fd;
+                    } else {
+                        drmFreeBusid(id);
+                    }
+#endif
                 } else {
                     drmFreeVersion(version);
                 }
@@ -1145,7 +1151,7 @@ drm_public int drmOpenWithType(const char *name, const char *busid, int type)
 
 drm_public int drmOpenControl(int minor)
 {
-    return drmOpenMinor(minor, 0, DRM_NODE_CONTROL);
+    return -EINVAL;
 }
 
 drm_public int drmOpenRender(int minor)
@@ -3003,10 +3009,6 @@ drm_public int drmDevicesEqual(drmDevicePtr a, drmDevicePtr b)
 
 static int drmGetNodeType(const char *name)
 {
-    if (strncmp(name, DRM_CONTROL_MINOR_NAME, sizeof(DRM_CONTROL_MINOR_NAME) - 1) == 0) {
-        return DRM_NODE_CONTROL;
-    }
-
     if (strncmp(name, DRM_RENDER_MINOR_NAME, sizeof(DRM_RENDER_MINOR_NAME) - 1) == 0) {
         return DRM_NODE_RENDER;
     }
@@ -4061,6 +4063,19 @@ drm_public int drmSyncobjTransfer(int fd, uint32_t dst_handle, uint64_t dst_poin
 
     ret = drmIoctl(fd, DRM_IOCTL_SYNCOBJ_TRANSFER, &args);
     return ret;
+}
+
+drm_public int drmSyncobjEventfd(int fd, uint32_t handle, uint64_t point, int ev_fd, uint32_t flags)
+{
+    struct drm_syncobj_eventfd args;
+
+    memclear(args);
+    args.handle = handle;
+    args.point = point;
+    args.fd = ev_fd;
+    args.flags = flags;
+
+    return drmIoctl(fd, DRM_IOCTL_SYNCOBJ_EVENTFD, &args);
 }
 
 static char *drmGetFormatModifierFromSimpleTokens(uint64_t modifier)

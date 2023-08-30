@@ -29,16 +29,9 @@
 
 #define LV_DEF_REFR_PERIOD                  33
 
-#define LV_TICK_CUSTOM                      0
-#if LV_TICK_CUSTOM
-#define LV_TICK_CUSTOM_INCLUDE              "Arduino.h"
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR        (millis())
-#endif
-
 #define LV_DPI_DEF                          130
 
 #define LV_DRAW_BUF_STRIDE_ALIGN            1
-
 #define LV_DRAW_BUF_ALIGN                   4
 
 #define LV_LAYER_MAX_MEMORY_USAGE           150
@@ -112,15 +105,16 @@
 
 #define LV_DISP_ROT_MAX_BUF                 (10*1024)
 
-#define LV_ENABLE_GC                        0
-
-#if LV_ENABLE_GC != 0
-#define LV_GC_INCLUDE                       "gc.h"
+#define LV_ENABLE_GLOBAL_CUSTOM             0
+#if LV_ENABLE_GLOBAL_CUSTOM
+#define LV_GLOBAL_CUSTOM_INCLUDE            <stdint.h>
 #endif
 
 #define LV_IMG_CACHE_DEF_SIZE               0
 #define LV_GRADIENT_MAX_STOPS               2
-#define lv_color_mix_ROUND_OFS              0
+#define LV_COLOR_MIX_ROUND_OFS              0
+
+#define LV_OBJ_STYLE_CACHE                  1
 
 #define LV_BIG_ENDIAN_SYSTEM                0
 
@@ -372,7 +366,8 @@
 #define LV_USE_SDL                          0
 #if LV_USE_SDL
 #define LV_SDL_INCLUDE_PATH                 <SDL2/SDL.h>
-#define LV_SDL_PARTIAL_MODE                 0
+#define LV_SDL_RENDER_MODE                  LV_DISP_RENDER_MODE_DIRECT
+#define LV_SDL_BUF_COUNT                    1
 #define LV_SDL_FULLSCREEN                   0
 #define LV_SDL_DIRECT_EXIT                  1
 #endif
