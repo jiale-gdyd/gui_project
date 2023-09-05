@@ -88,6 +88,8 @@ void qsort (void *, size_t, size_t, int (*)(const void *, const void *));
 #define towlower(c) tolower(c)
 #define towupper(c) toupper(c)
 
+#define HAS_NO_VSSCANF 1
+
 END_C_DECLS
 
 #endif /*WASM_HELPER_H*/

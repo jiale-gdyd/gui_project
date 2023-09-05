@@ -55,7 +55,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD libray
+#define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD library
 
 //NEVER EDIT THESE OFFSET VALUES
 #define SJPEG_VERSION_OFFSET            8
@@ -132,7 +132,11 @@ void lv_split_jpeg_init(void)
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
+    /*
+    Disabled for now
     lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
+    */
+    LV_UNUSED(decoder_read_line);
 }
 
 /**********************

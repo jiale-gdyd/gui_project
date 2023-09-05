@@ -21,6 +21,7 @@ obj-y += msgbox/
 obj-y += objx_templ/
 obj-y += roller/
 obj-y += slider/
+obj-y += scale/
 obj-y += span/
 obj-y += spinbox/
 obj-y += spinner/

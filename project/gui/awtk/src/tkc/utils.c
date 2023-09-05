@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utils struct and utils functions.
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,11 +18,12 @@
  * 2018-02-21 Li XianJing <xianjimli@hotmail.com> created
  *
  */
+
 #ifndef WITH_WASM
 #include "tkc/fs.h"
 #include "tkc/path.h"
 #include "tkc/thread.h"
-#endif/*WITH_WASM*/
+#endif /*WITH_WASM*/
 
 #include "tkc/mem.h"
 #include "tkc/utf8.h"
@@ -577,16 +578,6 @@ int tk_vsnprintf(char* str, size_t size, const char* format, va_list ap) {
   return_value_if_fail(str != NULL && format != NULL, 0);
 
   return vsnprintf(str, size, format, ap);
-}
-
-int tk_sscanf(const char* str, const char* format, ...) {
-  int ret = 0;
-  va_list va;
-  va_start(va, format);
-  ret = vsscanf(str, format, va);
-  va_end(va);
-
-  return ret;
 }
 
 ret_t filename_to_name_ex(const char* filename, char* str, uint32_t size, bool_t remove_extname) {
@@ -1607,20 +1598,20 @@ bool_t tk_is_ui_thread(void) {
 }
 
 char* file_read_as_unix_text(const char* filename, uint32_t* size) {
-    str_t str;
-    uint32_t s = 0;
-    char* data = (char*)file_read(filename, &s);
-    return_value_if_fail(data != NULL, NULL);
+  str_t str;
+  uint32_t s = 0;
+  char* data = (char*)file_read(filename, &s);
+  return_value_if_fail(data != NULL, NULL);
 
-    str_attach_with_size(&str, data, s, s+1);
-    str_replace(&str, "\r\n", "\n");
-    str_replace(&str, "\r", "\n");
-    *size = str.size;
-    str_reset(&str);
+  str_attach_with_size(&str, data, s, s + 1);
+  str_replace(&str, "\r\n", "\n");
+  str_replace(&str, "\r", "\n");
+  *size = str.size;
+  str_reset(&str);
 
-    return data;
+  return data;
 }
-#endif/*WITH_WASM*/
+#endif /*WITH_WASM*/
 
 static const char* s_ret_names[] = {[RET_OK] = "RET_OK",
                                     [RET_OOM] = "RET_OOM",
@@ -1733,3 +1724,221 @@ ret_t tk_free_utf8_argv(int argc, char** argv) {
 
   return RET_OK;
 }
+
+static const char* str_skip_xint(const char* str) {
+  if (*str == '+' || *str == '-') {
+    str++;
+  }
+
+  while (*str && tk_isxdigit(*str)) {
+    str++;
+  }
+
+  return str;
+}
+
+static const char* str_skip_int(const char* str) {
+  if (*str == '+' || *str == '-') {
+    str++;
+  }
+
+  while (*str && tk_isdigit(*str)) {
+    str++;
+  }
+
+  return str;
+}
+
+static const char* str_skip_float(const char* str) {
+  if (*str == '+' || *str == '-') {
+    str++;
+  }
+
+  while (*str && tk_isdigit(*str)) {
+    str++;
+  }
+
+  if (*str == '.' || *str == 'e' || *str == 'E') {
+    str++;
+    if (*str == '+' || *str == '-') {
+      str++;
+    }
+    while (*str && tk_isdigit(*str)) {
+      str++;
+    }
+  }
+
+  return str;
+}
+
+int tk_vsscanf_simple(const char* str, const char* format, va_list args) {
+  int assignments = 0;
+
+  while (*format && *str) {
+    if (*format != '%') {
+      if (*format != *str) 
+        break;
+
+      format++;
+      str++;
+    } else {
+      /* 跳过 % */
+      format++;
+
+      /*跳过空白字符*/
+      while (isspace(*str)) str++;
+
+      if (tk_isdigit(*format)) {
+        /*%02x*/
+        /*%02d*/
+        int n = tk_atoi(format);
+        char temp[256] = {0};
+        const char* s = temp;
+        tk_strncpy(temp, str, tk_min_int(n, sizeof(temp) - 1));
+
+        while (tk_isdigit(*format)) format++;
+
+        switch (*format) {
+          case 'd': {
+            int* p = va_arg(args, int*);
+            *p = (int)tk_strtol(s, NULL, 10);
+            assignments++;
+            format++;
+            break;
+          }
+          case 'x': {
+            unsigned int* p = va_arg(args, unsigned int*);
+            *p = (unsigned int)tk_strtol(s, NULL, 16);
+            assignments++;
+            format++;
+            break;
+          }
+          case 'u': {
+            unsigned int* p = va_arg(args, unsigned int*);
+            *p = (unsigned int)tk_strtol(s, NULL, 10);
+            assignments++;
+            format++;
+            break;
+          }
+          case 's': {
+            char* p = va_arg(args, char*);
+            tk_strcpy(p, temp);
+            assignments++;
+            format++;
+            break;
+          }
+          default: {
+            log_warn("tk_sscanf_simple: not support %s\n", format);
+            format++;
+            break;
+          }
+        }
+        str += n;
+        continue;
+      }
+      switch (*format) {
+        case 'u': {
+          unsigned int* p = va_arg(args, unsigned int*);
+          *p = (uint32_t)tk_strtol(str, NULL, 10);
+          str = str_skip_int(str);
+          assignments++;
+          format++;
+          break;
+        }
+        case 'd': {
+          int* p = va_arg(args, int*);
+          *p = (int)tk_strtol(str, NULL, 10);
+          str = str_skip_int(str);
+          assignments++;
+          format++;
+          break;
+        }
+        case 'f': {
+          float* p = va_arg(args, float*);
+          *p = (float)tk_atof(str);
+          str = str_skip_float(str);
+          assignments++;
+          format++;
+          break;
+        }
+        case 'x': {
+          unsigned int* p = va_arg(args, unsigned int*);
+          *p = (unsigned int)tk_strtol(str, NULL, 16);
+          str = str_skip_xint(str);
+          assignments++;
+          format++;
+          break;
+        }
+        case 'p': {
+          void** p = va_arg(args, void**);
+          if (strncasecmp(str, "0x", 2) == 0) {
+            str += 2;
+          }
+          *p = (void*)tk_strtol(str, NULL, 16);
+          str = str_skip_xint(str);
+          assignments++;
+          format++;
+          break;
+        }
+        case 'l': {
+          format++;
+          if (*format == 'd') {
+            long* p = va_arg(args, long*);
+            *p = (long)tk_strtol(str, NULL, 10);
+            str = str_skip_int(str);
+            assignments++;
+          } else if (*format == 'u') {
+            unsigned long* p = va_arg(args, unsigned long*);
+            *p = (unsigned long)tk_strtol(str, NULL, 10);
+            str = str_skip_int(str);
+            assignments++;
+            assignments++;
+          } else if (*format == 'f') {
+            double* p = va_arg(args, double*);
+            *p = (double)tk_atof(str);
+            str = str_skip_float(str);
+            assignments++;
+          }
+          format++;
+          break;
+        }
+        default:
+          break;
+      }
+    }
+  }
+
+  return assignments;
+}
+
+int tk_sscanf_simple(const char* str, const char* format, ...) {
+  int ret = 0;
+  va_list va;
+  va_start(va, format);
+  ret = tk_vsscanf_simple(str, format, va);
+  va_end(va);
+
+  return ret;
+}
+
+#ifdef HAS_NO_VSSCANF
+int tk_sscanf(const char* str, const char* format, ...) {
+  int ret = 0;
+  va_list va;
+  va_start(va, format);
+  ret = tk_vsscanf_simple(str, format, va);
+  va_end(va);
+
+  return ret;
+}
+#else
+int tk_sscanf(const char* str, const char* format, ...) {
+  int ret = 0;
+  va_list va;
+  va_start(va, format);
+  ret = vsscanf(str, format, va);
+  va_end(va);
+
+  return ret;
+}
+#endif/*HAS_NO_VSSCANF*/

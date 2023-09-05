@@ -229,6 +229,7 @@
 #define LV_USE_METER                        1
 #define LV_USE_MSGBOX                       1
 #define LV_USE_ROLLER                       1
+#define LV_USE_SCALE                        1
 #define LV_USE_SLIDER                       1
 #define LV_USE_SPAN                         1
 
@@ -288,6 +289,11 @@
 #if LV_USE_FS_FATFS
 #define LV_FS_FATFS_LETTER                  '\0'
 #define LV_FS_FATFS_CACHE_SIZE              0
+#endif
+
+#define LV_USE_FS_MEMFS                     0
+#if LV_USE_FS_MEMFS
+#define LV_FS_MEMFS_LETTER                  '\0'
 #endif
 
 #define LV_USE_PNG                          1
