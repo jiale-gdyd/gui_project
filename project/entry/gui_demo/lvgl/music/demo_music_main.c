@@ -71,6 +71,7 @@ static uint32_t spectrum_lane_ofs_start = 0;
 static const lv_font_t *font_small;
 static const lv_font_t *font_large;
 static lv_timer_t *sec_counter_timer;
+static lv_timer_t *stop_start_anim_timer;
 
 static lv_obj_t *play_obj;
 static lv_coord_t start_anim_values[40];
@@ -219,8 +220,8 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_t a;
     start_anim = true;
 
-    lv_timer_t *timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
-    lv_timer_set_repeat_count(timer, 1);
+    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
+    lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
     lv_anim_set_path_cb(&a, lv_anim_path_bounce);
@@ -861,6 +862,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             poly[2].x = center.x - x2_in;
             poly[3].x = center.x - x2_out;
             lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+        }
+    } else if (code == LV_EVENT_DELETE) {
+        lv_anim_del(NULL, start_anim_cb);
+        lv_anim_del(NULL, spectrum_anim_cb);
+        if (start_anim && stop_start_anim_timer) {
+            lv_timer_del(stop_start_anim_timer);
         }
     }
 }
