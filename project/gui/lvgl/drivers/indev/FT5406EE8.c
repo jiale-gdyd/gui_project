@@ -105,7 +105,7 @@ bool ft5406ee8_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 
     data->point.x = x;
     data->point.y = y;
-    data->state = valid == false ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
+    data->state = valid == false ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
     return false;
 }
 

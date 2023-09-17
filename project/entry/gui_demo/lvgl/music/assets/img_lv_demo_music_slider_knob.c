@@ -131,14 +131,14 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_slider_knob_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_slider_knob = {
+const lv_image_dsc_t img_lv_demo_music_slider_knob = {
     .header = {
-        .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
+        .cf          = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
         .always_zero = 0,
         .w           = 36,
         .h           = 38
     },
-    .data_size       = 1368 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .data_size       = 1368 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_slider_knob_map
 };
 

@@ -185,6 +185,7 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
+
 /*Align the stride of all layers and images to this bytes*/
 #ifndef LV_DRAW_BUF_STRIDE_ALIGN
     #ifdef _LV_KCONFIG_PRESENT
@@ -688,19 +689,17 @@
     #endif
 #endif
 
-/*Default image cache size. Image caching keeps some images opened.
- *If only the built-in image formats are used there is no real advantage of caching.
- *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
- *However the opened images consume additional RAM.
- *0: to disable caching*/
-#ifndef LV_IMG_CACHE_DEF_SIZE
-    #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
-        #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
+/*Default cache size in bytes.
+ *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Data larger than the size of the cache also can be allocated but
+ *will be dropped immediately after usage.*/
+#ifndef LV_CACHE_DEF_SIZE
+    #ifdef CONFIG_LV_CACHE_DEF_SIZE
+        #define LV_CACHE_DEF_SIZE CONFIG_LV_CACHE_DEF_SIZE
     #else
-        #define LV_IMG_CACHE_DEF_SIZE 0
+        #define LV_CACHE_DEF_SIZE       0
     #endif
 #endif
-
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -2225,11 +2224,11 @@
     #endif
 
     /*1: Use img cache to buffer header information*/
-    #ifndef LV_IMGFONT_USE_IMG_CACHE_HEADER
-        #ifdef CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
-            #define LV_IMGFONT_USE_IMG_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+    #ifndef LV_IMGFONT_USE_IMAGE_CACHE_HEADER
+        #ifdef CONFIG_LV_IMGFONT_USE_IMAGE_CACHE_HEADER
+            #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMAGE_CACHE_HEADER
         #else
-            #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+            #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
         #endif
     #endif
 #endif
@@ -2485,6 +2484,23 @@
         #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
     #else
         #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
+/*==================
+* EXAMPLES
+*==================*/
+
+/*Enable the examples to be built with the library*/
+#ifndef LV_BUILD_EXAMPLES
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_BUILD_EXAMPLES
+            #define LV_BUILD_EXAMPLES CONFIG_LV_BUILD_EXAMPLES
+        #else
+            #define LV_BUILD_EXAMPLES 0
+        #endif
+    #else
+        #define LV_BUILD_EXAMPLES 1
     #endif
 #endif
 

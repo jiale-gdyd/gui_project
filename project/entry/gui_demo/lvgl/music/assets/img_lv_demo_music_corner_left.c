@@ -71,14 +71,14 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_corner_left_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_corner_left = {
+const lv_image_dsc_t img_lv_demo_music_corner_left = {
     .header = {
-        .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
+        .cf          = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
         .always_zero = 0,
         .w           = 18,
         .h           = 18
     },
-    .data_size       = 324 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .data_size       = 324 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_corner_left_map
 };
 

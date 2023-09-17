@@ -14,14 +14,14 @@ extern "C" {
 
 #include <lvgl/lvgl.h>
 
-LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
-LV_IMG_DECLARE(img_benchmark_cogwheel_alpha256);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_alpha256);
 #if LV_DEMO_BENCHMARK_RGB565A8 && (LV_COLOR_DEPTH == 16)
-LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb565a8);
 #else
-LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
 #endif
-LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
+LV_IMAGE_DECLARE(img_benchmark_cogwheel_indexed16);
 
 #if LV_USE_FONT_COMPRESSED
 LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);

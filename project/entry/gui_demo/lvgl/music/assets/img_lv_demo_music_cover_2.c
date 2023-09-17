@@ -543,7 +543,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_cover_2_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_cover_2 = {
+const lv_image_dsc_t img_lv_demo_music_cover_2 = {
     .header = {
         .cf          = LV_COLOR_FORMAT_NATIVE,
         .always_zero = 0,

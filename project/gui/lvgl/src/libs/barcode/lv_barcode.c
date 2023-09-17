@@ -176,8 +176,10 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(img, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
     if(!img->data) {
         LV_LOG_INFO("canvas buffer is NULL");
@@ -195,7 +197,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w)
     LV_ASSERT_NULL(obj);
     LV_ASSERT(w > 0);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
     void * buf = (void *)img->data;
 
     uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, 1);

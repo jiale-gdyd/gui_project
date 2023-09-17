@@ -61,7 +61,7 @@ bool evdev_set_file(char *dev_name)
     evdev_root_x = 0;
     evdev_root_y = 0;
     evdev_key_val = 0;
-    evdev_button = LV_INDEV_STATE_REL;
+    evdev_button = LV_INDEV_STATE_RELEASED;
 
     return true;
 }
@@ -112,17 +112,17 @@ void evdev_read(lv_indev_t *drv, lv_indev_data_t *data)
 #endif
             } else if (in.code == ABS_MT_TRACKING_ID) {
                 if (in.value == -1) {
-                    evdev_button = LV_INDEV_STATE_REL;
+                    evdev_button = LV_INDEV_STATE_RELEASED;
                 } else if (in.value == 0) {
-                    evdev_button = LV_INDEV_STATE_PR;
+                    evdev_button = LV_INDEV_STATE_PRESSED;
                 }
             }
         } else if (in.type == EV_KEY) {
             if ((in.code == BTN_MOUSE) || (in.code == BTN_TOUCH)) {
                 if (in.value == 0) {
-                    evdev_button = LV_INDEV_STATE_REL;
+                    evdev_button = LV_INDEV_STATE_RELEASED;
                 } else if (in.value == 1) {
-                    evdev_button = LV_INDEV_STATE_PR;
+                    evdev_button = LV_INDEV_STATE_PRESSED;
                 }
             } else if (drv->type == LV_INDEV_TYPE_KEYPAD) {
 #if USE_XKB
@@ -171,7 +171,7 @@ void evdev_read(lv_indev_t *drv, lv_indev_data_t *data)
                 }
 #endif
                 if (data->key != 0) {
-                    data->state = (in.value) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+                    data->state = (in.value) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
                 }
     
                 evdev_key_val = data->key;

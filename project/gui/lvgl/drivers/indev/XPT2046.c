@@ -92,14 +92,14 @@ void xpt2046_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 
         last_x = x;
         last_y = y;
-		data->state = LV_INDEV_STATE_PR;
+		data->state = LV_INDEV_STATE_PRESSED;
 
         LV_DRV_INDEV_SPI_CS(1);
     } else {
         x = last_x;
         y = last_y;
         avg_last = 0;
-		data->state = LV_INDEV_STATE_REL;
+		data->state = LV_INDEV_STATE_RELEASED;
     }
 
     data->point.x = x;

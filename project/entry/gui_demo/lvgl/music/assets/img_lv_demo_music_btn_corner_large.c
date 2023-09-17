@@ -6,11 +6,11 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_CORNER
-#define LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_CORNER
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_CORNER
+#define LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_CORNER
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_CORNER uint8_t img_lv_demo_music_btn_corner_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_CORNER uint8_t img_lv_demo_music_btn_corner_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
     0x49, 0x07, 0x49, 0x04, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00, 0x49, 0x00,
@@ -118,14 +118,14 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DE
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_btn_corner = {
+const lv_image_dsc_t img_lv_demo_music_btn_corner = {
     .header = {
-        .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
+        .cf          = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
         .always_zero = 0,
         .w           = 32,
         .h           = 32
     },
-    .data_size       = 1024 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .data_size       = 1024 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_corner_map
 };
 

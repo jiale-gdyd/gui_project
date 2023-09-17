@@ -110,7 +110,7 @@
 #define LV_GLOBAL_CUSTOM_INCLUDE            <stdint.h>
 #endif
 
-#define LV_IMG_CACHE_DEF_SIZE               0
+#define LV_CACHE_DEF_SIZE                   0
 #define LV_GRADIENT_MAX_STOPS               2
 #define LV_COLOR_MIX_ROUND_OFS              0
 
@@ -347,7 +347,7 @@
 #define LV_USE_IMGFONT                      1
 #if LV_USE_IMGFONT
 #define LV_IMGFONT_PATH_MAX_LEN             64
-#define LV_IMGFONT_USE_IMG_CACHE_HEADER     0
+#define LV_IMGFONT_USE_IMAGE_CACHE_HEADER   0
 #endif
 
 #define LV_USE_MSG                          0

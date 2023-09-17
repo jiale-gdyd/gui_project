@@ -56,7 +56,7 @@ static unsigned char run_gtk;
 
 static lv_coord_t mouse_x;
 static lv_coord_t mouse_y;
-static lv_indev_state_t mouse_btn = LV_INDEV_STATE_REL;
+static lv_indev_state_t mouse_btn = LV_INDEV_STATE_RELEASED;
 static lv_key_t last_key;
 static lv_indev_state_t last_key_state;
 
@@ -214,7 +214,7 @@ static void gtkdrv_handler(void * p)
 static gboolean mouse_pressed(GtkWidget *widget, GdkEventButton *event,
     gpointer user_data)
 {
-    mouse_btn = LV_INDEV_STATE_PR;
+    mouse_btn = LV_INDEV_STATE_PRESSED;
     // Important, if this function returns TRUE the window cannot be moved around inside the browser
     // when using broadway
     return FALSE;
@@ -224,7 +224,7 @@ static gboolean mouse_pressed(GtkWidget *widget, GdkEventButton *event,
 static gboolean mouse_released(GtkWidget *widget, GdkEventButton *event,
     gpointer user_data)
 {
-    mouse_btn = LV_INDEV_STATE_REL;
+    mouse_btn = LV_INDEV_STATE_RELEASED;
     // Important, if this function returns TRUE the window cannot be moved around inside the browser
     // when using broadway
     return FALSE;
@@ -298,7 +298,7 @@ static gboolean keyboard_press(GtkWidget *widget, GdkEventKey *event,
     }
 
      last_key = ascii_key;
-     last_key_state = LV_INDEV_STATE_PR;
+     last_key_state = LV_INDEV_STATE_PRESSED;
      // For other codes refer to https://developer.gnome.org/gdk3/stable/gdk3-Event-Structures.html#GdkEventKey
 
      return TRUE;
@@ -308,7 +308,7 @@ static gboolean keyboard_release(GtkWidget *widget, GdkEventKey *event,
     gpointer user_data)
 {
      last_key = 0;
-     last_key_state = LV_INDEV_STATE_REL;
+     last_key_state = LV_INDEV_STATE_RELEASED;
      // For other codes refer to https://developer.gnome.org/gdk3/stable/gdk3-Event-Structures.html#GdkEventKey
 
      return TRUE;

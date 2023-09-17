@@ -174,7 +174,7 @@ bool libinput_set_file_state(libinput_drv_state_t *state, char* dev_name)
     return false;
   }
 
-  state->button = LV_INDEV_STATE_REL;
+  state->button = LV_INDEV_STATE_RELEASED;
   state->key_val = 0;
 
   return true;
@@ -427,10 +427,10 @@ static void read_pointer(libinput_drv_state_t *state, struct libinput_event *eve
       }
       state->most_recent_touch_point.x = x_touch;
       state->most_recent_touch_point.y = y_touch;
-      state->button = LV_INDEV_STATE_PR;
+      state->button = LV_INDEV_STATE_PRESSED;
       break;
     case LIBINPUT_EVENT_TOUCH_UP:
-      state->button = LV_INDEV_STATE_REL;
+      state->button = LV_INDEV_STATE_RELEASED;
       break;
     case LIBINPUT_EVENT_POINTER_MOTION:
       pointer_event = libinput_event_get_pointer_event(event);
@@ -452,7 +452,7 @@ static void read_pointer(libinput_drv_state_t *state, struct libinput_event *eve
     case LIBINPUT_EVENT_POINTER_BUTTON:
       pointer_event = libinput_event_get_pointer_event(event);
       enum libinput_button_state button_state = libinput_event_pointer_get_button_state(pointer_event); 
-      state->button = button_state == LIBINPUT_BUTTON_STATE_RELEASED ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
+      state->button = button_state == LIBINPUT_BUTTON_STATE_RELEASED ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
       break;
     default:
       break;
@@ -510,7 +510,7 @@ static void read_keypad(libinput_drv_state_t *state, struct libinput_event *even
 #endif /* USE_XKB */
       if (state->key_val != 0) {
         /* Only record button state when actual output is produced to prevent widgets from refreshing */
-        state->button = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
+        state->button = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
       }
       break;
     default:

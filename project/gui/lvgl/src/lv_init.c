@@ -19,7 +19,8 @@
 #include "libs/png/lv_png.h"
 #include "libs/sjpg/lv_sjpg.h"
 #include "draw/lv_draw.h"
-#include "draw/lv_img_cache_builtin.h"
+#include "misc/lv_cache.h"
+#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 
@@ -145,9 +146,13 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_img_decoder_init();
+    _lv_image_decoder_init();
 
-    _lv_img_cache_builtin_init();
+    _lv_cache_init();
+    _lv_cache_builtin_init();
+    lv_cache_lock();
+    lv_cache_set_max_size(LV_CACHE_DEF_SIZE);
+    lv_cache_unlock();
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";

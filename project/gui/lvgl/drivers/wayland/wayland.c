@@ -434,7 +434,7 @@ static void pointer_handle_button(void *data, struct wl_pointer *wl_pointer,
 {
     struct application *app = data;
     const lv_indev_state_t lv_state =
-        (state == WL_POINTER_BUTTON_STATE_PRESSED) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+        (state == WL_POINTER_BUTTON_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if (!app->pointer_obj)
     {
@@ -824,7 +824,7 @@ static void keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
 
     const lv_key_t lv_key = keycode_xkb_to_lv(sym);
     const lv_indev_state_t lv_state =
-        (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+        (state == WL_KEYBOARD_KEY_STATE_PRESSED) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 
     if (lv_key != 0)
     {
@@ -874,7 +874,7 @@ static void touch_handle_down(void *data, struct wl_touch *wl_touch,
 
     app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
     app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_PR;
+    app->touch_obj->input.touch.state = LV_INDEV_STATE_PRESSED;
 
 #if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     struct window *window = app->touch_obj->window;
@@ -912,7 +912,7 @@ static void touch_handle_up(void *data, struct wl_touch *wl_touch,
         return;
     }
 
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_REL;
+    app->touch_obj->input.touch.state = LV_INDEV_STATE_RELEASED;
 
 #if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     struct window *window = app->touch_obj->window;

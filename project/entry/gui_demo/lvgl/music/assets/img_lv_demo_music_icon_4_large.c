@@ -6,11 +6,11 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_ICN_HEART
-#define LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_ICN_HEART
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_ICN_HEART
+#define LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_ICN_HEART
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_ICN_HEART uint8_t img_lv_demo_music_icon_4_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_ICN_HEART uint8_t img_lv_demo_music_icon_4_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
     0x21, 0x00, 0x25, 0x00, 0x21, 0x00, 0x21, 0x00, 0x21, 0x00, 0x21, 0x00, 0x21, 0x43, 0x21, 0x93, 0x21, 0xc7, 0x21, 0xeb, 0x21, 0xf4, 0x21, 0xe4, 0x21, 0xbc, 0x21, 0x87, 0x21, 0x33, 0x21, 0x00, 0x21, 0x00, 0x21, 0x2c, 0x21, 0x83, 0x21, 0xbb, 0x21, 0xe3, 0x21, 0xf4, 0x21, 0xeb, 0x21, 0xc8, 0x21, 0x97, 0x21, 0x48, 0x21, 0x00, 0x21, 0x00, 0x21, 0x00, 0x21, 0x00, 0x25, 0x00, 0x21, 0x00,
@@ -112,14 +112,14 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DE
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_icon_4 = {
+const lv_image_dsc_t img_lv_demo_music_icon_4 = {
     .header = {
-        .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
+        .cf          = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
         .always_zero = 0,
         .w           = 32,
         .h           = 30
     },
-    .data_size       = 960 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .data_size       = 960 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_icon_4_map
 };
 

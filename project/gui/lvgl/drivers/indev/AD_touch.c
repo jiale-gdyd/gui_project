@@ -116,11 +116,11 @@ bool ad_touch_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
         data->point.y = y;
         last_x = data->point.x;
         last_y = data->point.y;
-        data->state = LV_INDEV_STATE_PR;
+        data->state = LV_INDEV_STATE_PRESSED;
     } else {
         data->point.x = last_x;
         data->point.y = last_y;
-        data->state = LV_INDEV_STATE_REL;
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 
     return false;

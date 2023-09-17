@@ -18,8 +18,8 @@ extern "C" {
 #include "../misc/lv_style.h"
 #include "../misc/lv_txt.h"
 #include "../misc/lv_profiler.h"
-#include "lv_img_decoder.h"
-#include "lv_img_cache.h"
+#include "../misc/lv_cache.h"
+#include "lv_image_decoder.h"
 #include "../osal/lv_os.h"
 #include "lv_draw_buf.h"
 
@@ -32,7 +32,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_img_dsc_t;
+struct _lv_draw_image_dsc_t;
 struct _lv_disp_t;
 
 typedef enum {
@@ -170,10 +170,10 @@ typedef struct {
     uint32_t used_memory_for_layers_kb;
 #if LV_USE_OS
     lv_thread_sync_t sync;
-    lv_mutex_t circle_cache_mutex;
 #else
     int dispatch_req;
 #endif
+    lv_mutex_t circle_cache_mutex;
     bool task_running;
 } lv_draw_global_info_t;
 
@@ -247,7 +247,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
  *********************/
 #include "lv_draw_rect.h"
 #include "lv_draw_label.h"
-#include "lv_draw_img.h"
+#include "lv_draw_image.h"
 #include "lv_draw_arc.h"
 #include "lv_draw_line.h"
 #include "lv_draw_triangle.h"

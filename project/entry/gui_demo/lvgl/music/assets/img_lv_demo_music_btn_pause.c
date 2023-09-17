@@ -248,14 +248,14 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_pause_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_btn_pause = {
+const lv_image_dsc_t img_lv_demo_music_btn_pause = {
     .header = {
-        .cf          = LV_COLOR_FORMAT_NATIVE_ALPHA,
+        .cf          = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
         .always_zero = 0,
         .w           = 79,
         .h           = 77
     },
-    .data_size       = 6083 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .data_size       = 6083 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_pause_map
 };
 

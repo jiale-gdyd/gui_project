@@ -92,7 +92,7 @@ void _lv_img_cache_builtin_init(void)
  * Open an image using the image decoder interface and cache it.
  * The image will be left open meaning if the image decoder open callback allocated memory then it will remain.
  * The image is closed if a new image is opened and the new image takes its place in the cache.
- * @param src source of the image. Path to file or pointer to an `lv_img_dsc_t` variable
+ * @param src source of the image. Path to file or pointer to an `lv_image_dsc_t` variable
  * @param color color The color of the image with `LV_IMG_CF_ALPHA_...`
  * @return pointer to the cache entry or NULL if can open the image
  */
@@ -213,7 +213,7 @@ static void lv_img_cache_set_size_builtin(uint16_t new_entry_cnt)
 /**
  * Invalidate an image source in the cache.
  * Useful if the image source is updated therefore it needs to be cached again.
- * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
+ * @param src an image source path to a file or pointer to an `lv_image_dsc_t` variable.
  */
 static void lv_img_cache_invalidate_src_builtin(const void * src)
 {
