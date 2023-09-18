@@ -896,11 +896,11 @@ const char* tk_under_score_to_camel(const char* name, char* out, uint32_t max_ou
 }
 
 int32_t tk_pointer_to_int(const void* p) {
-  return (char*)p - (char*)(NULL);
+  return (int32_t)(intptr_t)p;
 }
 
 void* tk_pointer_from_int(int32_t v) {
-  return ((char*)NULL) + v;
+  return (void*)(intptr_t)v;
 }
 
 char* tk_str_toupper(char* str) {
@@ -1538,6 +1538,7 @@ ret_t xml_file_expand(const char* filename, str_t* s, const char* data) {
       int size = 0;
       char* str_end = NULL;
       char* include_string_end = strstr(p, "?>");
+      ENSURE(include_string_end);
       if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_PROPERTY) {
         str_end = TAG_PROPERTY;
         size = tk_strlen(TAG_PROPERTY);
@@ -1613,7 +1614,7 @@ char* file_read_as_unix_text(const char* filename, uint32_t* size) {
 }
 #endif /*WITH_WASM*/
 
-static const char* s_ret_names[] = {[RET_OK] = "RET_OK",
+static const char* s_ret_names[RET_MAX_NR] = {[RET_OK] = "RET_OK",
                                     [RET_OOM] = "RET_OOM",
                                     [RET_FAIL] = "RET_FAIL",
                                     [RET_NOT_IMPL] = "RET_NOT_IMPL",
@@ -1651,7 +1652,7 @@ ret_t ret_code_from_name(const char* name) {
 }
 
 const char* ret_code_to_name(ret_t ret) {
-  if (ret >= RET_OK && ret <= RET_MAX_NR) {
+  if (ret >= RET_OK && ret < RET_MAX_NR) {
     return s_ret_names[ret];
   } else {
     return "";

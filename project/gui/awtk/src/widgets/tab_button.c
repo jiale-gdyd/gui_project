@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_button
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -162,7 +162,7 @@ static ret_t tab_button_sync_pages(void* ctx, event_t* e) {
   if (pages != NULL) {
     if (tab_button == NULL || tab_button->load_ui == NULL) {
       int32_t index = tab_button_index_of(widget);
-      pages_t *pages_widgets = PAGES(pages);
+      pages_t* pages_widgets = PAGES(pages);
       return_value_if_fail(index >= 0, RET_BAD_PARAMS);
 
       if (!pages_widgets->has_active) {
@@ -223,6 +223,7 @@ ret_t tab_button_set_value(widget_t* widget, bool_t value) {
 
 ret_t tab_button_set_load_ui(widget_t* widget, const char* name) {
   tab_button_t* tab_button = TAB_BUTTON(widget);
+  ENSURE(tab_button);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   tab_button->load_ui = tk_str_copy(tab_button->load_ui, name);
@@ -232,6 +233,7 @@ ret_t tab_button_set_load_ui(widget_t* widget, const char* name) {
 
 static int32_t tab_button_get_min_w(widget_t* widget) {
   tab_button_t* tab_button = TAB_BUTTON(widget);
+  ENSURE(tab_button);
   int32_t text_w = widget_measure_text(widget, widget->text.str) + widget->h / 2;
 
   if (widget->astyle != NULL) {
@@ -316,6 +318,7 @@ TK_DECL_VTABLE(tab_button) = {.size = sizeof(tab_button_t),
 
 ret_t tab_button_set_icon(widget_t* widget, const char* name) {
   tab_button_t* tab_button = TAB_BUTTON(widget);
+  ENSURE(tab_button);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   TKMEM_FREE(tab_button->icon);
@@ -326,6 +329,7 @@ ret_t tab_button_set_icon(widget_t* widget, const char* name) {
 
 ret_t tab_button_set_active_icon(widget_t* widget, const char* name) {
   tab_button_t* tab_button = TAB_BUTTON(widget);
+  ENSURE(tab_button);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   TKMEM_FREE(tab_button->active_icon);

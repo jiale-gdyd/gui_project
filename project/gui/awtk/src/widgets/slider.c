@@ -51,6 +51,7 @@ static uint32_t slider_get_bar_size(widget_t* widget) {
 static uint32_t slider_get_dragger_size(widget_t* widget) {
   bitmap_t img;
   slider_t* slider = SLIDER(widget);
+  ENSURE(slider);
   uint32_t dragger_size = slider->dragger_size;
   if (slider->auto_get_dragger_size) {
     dragger_size = slider_get_bar_size(widget) * 1.5f;
@@ -69,6 +70,7 @@ static rect_t slider_get_dirty_rect(widget_t* widget) {
   int32_t tolerance = 0;
   uint32_t dragger_size = 0;
   slider_t* slider = SLIDER(widget);
+  ENSURE(slider);
   rect_t r = rect_init(widget->x, widget->y, widget->w, widget->h);
 
   if (widget->initializing) {
@@ -156,7 +158,7 @@ static ret_t slider_update_dragger_rect(widget_t* widget, canvas_t* c) {
   dragger_size = slider_get_dragger_size(widget);
   max_gap = tk_roundi(dragger_size / 2);
   margin = margin > -max_gap ? margin : -max_gap;
-  
+
   if (slider->vertical) {
     fvalue = 1.0f - fvalue;
     r->x = 0;
@@ -258,6 +260,7 @@ static ret_t slider_paint_dragger(widget_t* widget, canvas_t* c) {
   uint32_t radius;
   style_t* style = widget->astyle;
   slider_t* slider = SLIDER(widget);
+  ENSURE(slider);
   rect_t* r = &(slider->dragger_rect);
   color_t trans = color_init(0, 0, 0, 0);
 
@@ -428,13 +431,14 @@ static ret_t slider_change_value_by_pointer_event(widget_t* widget, pointer_even
   uint32_t max_gap = 0;
   point_t p = {evt->x, evt->y};
   slider_t* slider = SLIDER(widget);
+  ENSURE(slider);
   double range = slider->max - slider->min;
   uint32_t dragger_size = slider_get_dragger_size(widget);
   int32_t margin = slider->no_dragger_icon ? 0 : style_get_int(widget->astyle, STYLE_ID_MARGIN, 0);
 
   max_gap = tk_roundi(dragger_size / 2);
   margin = margin > -max_gap ? margin : -max_gap;
-  
+
   widget_to_local(widget, &p);
   if (slider->vertical) {
     if (slider->no_dragger_icon) {
@@ -803,13 +807,13 @@ TK_DECL_VTABLE(slider) = {.size = sizeof(slider_t),
                           .create = slider_create,
                           .on_event = slider_on_event,
                           .on_paint_self = slider_on_paint_self,
-                          .on_paint_border = widget_on_paint_null,       
+                          .on_paint_border = widget_on_paint_null,
                           .on_paint_background = widget_on_paint_null,
                           .invalidate = slider_on_invalidate,
                           .is_point_in = slider_on_is_point_in,
                           .on_destroy = slider_on_destroy,
                           .get_prop = slider_get_prop,
-                          .set_prop = slider_set_prop };
+                          .set_prop = slider_set_prop};
 
 widget_t* slider_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   widget_t* widget = widget_create(parent, TK_REF_VTABLE(slider), x, y, w, h);
