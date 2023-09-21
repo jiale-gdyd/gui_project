@@ -133,7 +133,7 @@ void sharp_mip_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
   LV_DRV_DISP_SPI_WR_ARRAY(buf, buf_size);
   LV_DRV_DISP_SPI_CS(0);
 
-  lv_disp_flush_ready(disp_drv);
+  lv_display_flush_ready(disp_drv);
 }
 
 void sharp_mip_set_px(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa) {

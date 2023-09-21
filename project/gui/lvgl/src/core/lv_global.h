@@ -49,7 +49,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_disp_t;
+struct _lv_display_t;
 struct _lv_group_t;
 struct _my_theme_t;
 struct _lv_indev_t;
@@ -68,13 +68,13 @@ typedef struct _lv_global_t {
     bool inited;
 
     lv_ll_t disp_ll;
-    struct _lv_disp_t * disp_refresh;
-    struct _lv_disp_t * disp_default;
+    struct _lv_display_t * disp_refresh;
+    struct _lv_display_t * disp_default;
 
     lv_ll_t style_trans_ll;
     bool style_refresh;
     uint32_t style_custom_table_size;
-    uint16_t style_last_custom_prop_id;
+    uint32_t style_last_custom_prop_id;
     uint8_t * style_custom_prop_flag_lookup_table;
 
     lv_ll_t group_ll;
@@ -185,7 +185,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_IME_PINYIN != 0
-    uint16_t ime_cand_len;
+    size_t ime_cand_len;
 #endif
 } lv_global_t;
 

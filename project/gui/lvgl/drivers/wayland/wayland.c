@@ -2090,7 +2090,7 @@ skip:
         window->body->pending_buffer = NULL;
     }
 done:
-    lv_disp_flush_ready(disp_drv);
+    lv_display_flush_ready(disp_drv);
 }
 
 static void _lv_wayland_handle_input(void)

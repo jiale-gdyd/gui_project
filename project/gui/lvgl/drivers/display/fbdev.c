@@ -140,7 +140,7 @@ void fbdev_exit(void)
 void fbdev_flush(lv_disp_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
     if ((fbp == NULL) || (area->x2 < 0) || (area->y2 < 0) || (area->x1 > ((int32_t)vinfo.xres - 1)) || (area->y1 > ((int32_t)vinfo.yres - 1))) {
-        lv_disp_flush_ready(drv);
+        lv_display_flush_ready(drv);
         return;
     }
 
@@ -218,7 +218,7 @@ void fbdev_flush(lv_disp_t * drv, const lv_area_t * area, lv_color_t * color_p)
         }
     }
 
-    lv_disp_flush_ready(drv);
+    lv_display_flush_ready(drv);
 }
 
 void fbdev_get_sizes(lv_coord_t *width, lv_coord_t *height, lv_coord_t *dpi)

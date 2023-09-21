@@ -695,7 +695,7 @@ static int drm_setup_buffers(void)
     return 0;
 }
 
-void drm_wait_vsync(lv_disp_t *disp_drv)
+void drm_wait_vsync(lv_display_t *disp_drv)
 {
     LV_UNUSED(disp_drv);
 
@@ -725,7 +725,7 @@ void drm_wait_vsync(lv_disp_t *disp_drv)
     drm_dev.req = NULL;
 }
 
-void drm_flush(lv_disp_t *disp_drv, const lv_area_t *area, uint8_t *color_p)
+void drm_flush(lv_display_t *disp_drv, const lv_area_t *area, uint8_t *color_p)
 {
     int i, y;
     uint32_t w = (area->x2 - area->x1 + 1);
@@ -762,7 +762,7 @@ void drm_flush(lv_disp_t *disp_drv, const lv_area_t *area, uint8_t *color_p)
     }
     drm_dev.cur_bufs[0] = fbuf;
 
-    lv_disp_flush_ready(disp_drv);
+    lv_display_flush_ready(disp_drv);
 }
 
 #if (LV_COLOR_DEPTH == 32)

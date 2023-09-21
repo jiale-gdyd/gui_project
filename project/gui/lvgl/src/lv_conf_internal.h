@@ -36,7 +36,7 @@
         #undef __LV_TO_STR_AUX
         #undef __LV_TO_STR
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /*Or simply include lv_conf.h is enabled*/
-        #include "../lv_conf.h"
+        #include "lv_conf.h"
     #else
         #include "../lv_conf.h"                /*Else assume lv_conf.h is next to the lvgl folder*/
     #endif
@@ -316,6 +316,24 @@
                 #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
             #endif
         #endif
+    #endif
+#endif
+
+/* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_VGLITE
+    #ifdef CONFIG_LV_USE_DRAW_VGLITE
+        #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
+    #else
+        #define LV_USE_DRAW_VGLITE 0
+    #endif
+#endif
+
+/* Use NXP's PXP on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_PXP
+    #ifdef CONFIG_LV_USE_DRAW_PXP
+        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+    #else
+        #define LV_USE_DRAW_PXP 0
     #endif
 #endif
 
@@ -663,11 +681,11 @@
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#ifndef LV_DISP_ROT_MAX_BUF
-    #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
-        #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#ifndef LV_DISPLAY_ROT_MAX_BUF
+    #ifdef CONFIG_LV_DISPLAY_ROT_MAX_BUF
+        #define LV_DISPLAY_ROT_MAX_BUF CONFIG_LV_DISPLAY_ROT_MAX_BUF
     #else
-        #define LV_DISP_ROT_MAX_BUF (10*1024)
+        #define LV_DISPLAY_ROT_MAX_BUF (10*1024)
     #endif
 #endif
 
@@ -690,7 +708,7 @@
 #endif
 
 /*Default cache size in bytes.
- *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #ifndef LV_CACHE_DEF_SIZE
@@ -766,7 +784,7 @@
     #endif
 #endif
 
-/*Define a custom attribute to `lv_disp_flush_ready` function*/
+/*Define a custom attribute to `lv_display_flush_ready` function*/
 #ifndef LV_ATTRIBUTE_FLUSH_READY
     #ifdef CONFIG_LV_ATTRIBUTE_FLUSH_READY
         #define LV_ATTRIBUTE_FLUSH_READY CONFIG_LV_ATTRIBUTE_FLUSH_READY
@@ -1937,12 +1955,12 @@
     #endif
 #endif
 
-/*PNG decoder library*/
-#ifndef LV_USE_PNG
-    #ifdef CONFIG_LV_USE_PNG
-        #define LV_USE_PNG CONFIG_LV_USE_PNG
+/*LODEPNG decoder library*/
+#ifndef LV_USE_LODEPNG
+    #ifdef CONFIG_LV_USE_LODEPNG
+        #define LV_USE_LODEPNG CONFIG_LV_USE_LODEPNG
     #else
-        #define LV_USE_PNG 0
+        #define LV_USE_LODEPNG 0
     #endif
 #endif
 
@@ -1957,11 +1975,11 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#ifndef LV_USE_SJPG
-    #ifdef CONFIG_LV_USE_SJPG
-        #define LV_USE_SJPG CONFIG_LV_USE_SJPG
+#ifndef LV_USE_TJPGD
+    #ifdef CONFIG_LV_USE_TJPGD
+        #define LV_USE_TJPGD CONFIG_LV_USE_TJPGD
     #else
-        #define LV_USE_SJPG 0
+        #define LV_USE_TJPGD 0
     #endif
 #endif
 
@@ -2355,7 +2373,7 @@
         #ifdef CONFIG_LV_SDL_RENDER_MODE
             #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+            #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
         #endif
     #endif
     #ifndef LV_SDL_BUF_COUNT
@@ -2416,7 +2434,7 @@
         #ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE
             #define LV_LINUX_FBDEV_RENDER_MODE CONFIG_LV_LINUX_FBDEV_RENDER_MODE
         #else
-            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
         #endif
     #endif
     #ifndef LV_LINUX_FBDEV_BUFFER_COUNT

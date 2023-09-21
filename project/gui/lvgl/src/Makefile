@@ -1,6 +1,6 @@
 obj-y += core/
 obj-y += dev/
-obj-y += disp/
+obj-y += display/
 obj-y += draw/
 obj-y += font/
 obj-y += indev/

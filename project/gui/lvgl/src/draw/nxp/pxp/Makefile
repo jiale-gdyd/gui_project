@@ -1,0 +1,9 @@
+obj-y += lv_draw_buf_pxp.o
+obj-y += lv_draw_pxp_bg_img.o
+obj-y += lv_draw_pxp_fill.o
+obj-y += lv_draw_pxp_img.o
+obj-y += lv_draw_pxp_layer.o
+obj-y += lv_draw_pxp.o
+obj-y += lv_pxp_cfg.o
+obj-y += lv_pxp_osa.o
+obj-y += lv_pxp_utils.o

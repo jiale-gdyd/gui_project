@@ -198,7 +198,7 @@ void ssd1963_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t 
     }
 #endif
 
-    lv_disp_flush_ready(disp_drv);
+    lv_display_flush_ready(disp_drv);
 }
 
 /**********************

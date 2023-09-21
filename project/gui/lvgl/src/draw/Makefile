@@ -1,4 +1,5 @@
 obj-y += sw/
+obj-y += nxp/
 
 obj-y += lv_draw_arc.o
 obj-y += lv_draw_image.o

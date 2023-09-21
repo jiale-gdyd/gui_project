@@ -1,0 +1,14 @@
+obj-y += lv_draw_buf_vglite.o
+obj-y += lv_draw_vglite_arc.o
+obj-y += lv_draw_vglite_bg_img.o
+obj-y += lv_draw_vglite_border.o
+obj-y += lv_draw_vglite_fill.o
+obj-y += lv_draw_vglite_img.o
+obj-y += lv_draw_vglite_label.o
+obj-y += lv_draw_vglite_layer.o
+obj-y += lv_draw_vglite_line.o
+obj-y += lv_draw_vglite.o
+obj-y += lv_vglite_buf.o
+obj-y += lv_vglite_matrix.o
+obj-y += lv_vglite_path.o
+obj-y += lv_vglite_utils.o

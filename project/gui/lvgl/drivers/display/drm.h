@@ -19,15 +19,15 @@ extern "C" {
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
-#include "../../src/disp/lv_disp_private.h"
-#include "../../src/disp/lv_disp.h"
+#include "../../src/display/lv_display_private.h"
+#include "../../src/display/lv_display.h"
 #endif
 
 void drm_init(void);
 void drm_exit(void);
 
-void drm_wait_vsync(lv_disp_t *drv);
-void drm_flush(lv_disp_t *drv, const lv_area_t *area, uint8_t *color_p);
+void drm_wait_vsync(lv_display_t *drv);
+void drm_flush(lv_display_t *drv, const lv_area_t *area, uint8_t *color_p);
 void drm_get_sizes(lv_coord_t *width, lv_coord_t *height, uint32_t *dpi);
 
 #endif

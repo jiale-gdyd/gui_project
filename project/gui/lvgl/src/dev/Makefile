@@ -1,3 +1,3 @@
 obj-y += sdl/
-obj-y += disp/
+obj-y += display/
 obj-y += input/

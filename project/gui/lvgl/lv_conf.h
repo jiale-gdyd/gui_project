@@ -51,6 +51,9 @@
 #endif
 #endif
 
+#define LV_USE_DRAW_VGLITE                  0
+#define LV_USE_DRAW_PXP                     0
+
 #define LV_USE_OS                           LV_OS_NONE
 
 #if LV_USE_OS == LV_OS_CUSTOM
@@ -103,7 +106,7 @@
 #define LV_USE_MEM_MONITOR_POS              LV_ALIGN_BOTTOM_LEFT
 #endif
 
-#define LV_DISP_ROT_MAX_BUF                 (10*1024)
+#define LV_DISPLAY_ROT_MAX_BUF                 (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM             0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -296,9 +299,9 @@
 #define LV_FS_MEMFS_LETTER                  '\0'
 #endif
 
-#define LV_USE_PNG                          1
+#define LV_USE_LODEPNG                      1
 #define LV_USE_BMP                          1
-#define LV_USE_SJPG                         1
+#define LV_USE_JPG                          1
 #define LV_USE_GIF                          1
 #define LV_USE_QRCODE                       1
 #define LV_USE_BARCODE                      1
@@ -331,7 +334,7 @@
 #if LV_USE_PROFILER
 #define LV_USE_PROFILER_BUILTIN             1
 #if LV_USE_PROFILER_BUILTIN
-#define LV_PROFILER_BUILTIN_BUF_SIZE         (16 * 1024)
+#define LV_PROFILER_BUILTIN_BUF_SIZE        (16 * 1024)
 #endif
 
 #define LV_PROFILER_INCLUDE                 "lvgl/src/misc/lv_profiler_builtin.h"
@@ -372,7 +375,7 @@
 #define LV_USE_SDL                          0
 #if LV_USE_SDL
 #define LV_SDL_INCLUDE_PATH                 <SDL2/SDL.h>
-#define LV_SDL_RENDER_MODE                  LV_DISP_RENDER_MODE_DIRECT
+#define LV_SDL_RENDER_MODE                  LV_DISPLAY_RENDER_MODE_DIRECT
 #define LV_SDL_BUF_COUNT                    1
 #define LV_SDL_FULLSCREEN                   0
 #define LV_SDL_DIRECT_EXIT                  1
@@ -384,7 +387,7 @@
 #if LV_USE_LINUX_FBDEV
 #define LV_LINUX_FBDEV_BSD                  0
 #define LV_LINUX_FBDEV_NUTTX                0
-#define LV_LINUX_FBDEV_RENDER_MODE          LV_DISP_RENDER_MODE_PARTIAL
+#define LV_LINUX_FBDEV_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL
 #define LV_LINUX_FBDEV_BUFFER_COUNT         0
 #define LV_LINUX_FBDEV_BUFFER_SIZE          60
 #endif

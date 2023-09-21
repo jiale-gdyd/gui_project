@@ -334,7 +334,7 @@ void ili9341_init(void)
 void ili9341_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
 {
     if(area->x2 < 0 || area->y2 < 0 || area->x1 > (ILI9341_HOR_RES - 1) || area->y1 > (ILI9341_VER_RES - 1)) {
-        lv_disp_flush_ready(drv);
+        lv_display_flush_ready(drv);
         return;
     }
 
@@ -372,7 +372,7 @@ void ili9341_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * col
         color_p += w;
     }
 
-    lv_disp_flush_ready(drv);
+    lv_display_flush_ready(drv);
 }
 
 void ili9341_rotate(int degrees, bool bgr)

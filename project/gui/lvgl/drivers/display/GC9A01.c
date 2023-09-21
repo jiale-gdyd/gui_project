@@ -573,7 +573,7 @@ void GC9A01_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
   LV_DRV_DISP_SPI_WR_ARRAY((char*)color_p, len);
 
   LV_DRV_DISP_SPI_CS(1);
-  lv_disp_flush_ready(disp_drv);         /* Indicate you are ready with the flushing*/
+  lv_display_flush_ready(disp_drv);         /* Indicate you are ready with the flushing*/
 }
 
 #endif
