@@ -46,6 +46,7 @@ lv_chart_tick_dsc_t * get_tick_gsc(lv_obj_t * obj, lv_chart_axis_t axis);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_chart_class = {
     .constructor_cb = lv_chart_constructor,
     .destructor_cb = lv_chart_destructor,
@@ -53,7 +54,8 @@ const lv_obj_class_t lv_chart_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_chart_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "chart",
 };
 
 /**********************
@@ -277,7 +279,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(id >= chart->point_cnt) {
-        LV_LOG_WARN("Invalid index: %d", id);
+        LV_LOG_WARN("Invalid index: %"LV_PRIu32, id);
         p_out->x = 0;
         p_out->y = 0;
         return;

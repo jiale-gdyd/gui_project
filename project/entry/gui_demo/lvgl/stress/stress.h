@@ -10,6 +10,7 @@ extern "C" {
 
 #include <lvgl/lvgl.h>
 
+bool lvgl_demo_stress_finished(void);
 int lvgl_demo_stress(int argc, char *argv[]);
 
 #ifdef __cplusplus

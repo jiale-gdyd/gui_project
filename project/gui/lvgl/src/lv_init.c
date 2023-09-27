@@ -17,7 +17,9 @@
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
 #include "libs/tjpgd/lv_tjpgd.h"
+#include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
+#include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
 #include "misc/lv_cache_builtin.h"
@@ -233,8 +235,16 @@ void lv_init(void)
     lv_lodepng_init();
 #endif
 
+#if LV_USE_LIBPNG
+    lv_libpng_init();
+#endif
+
 #if LV_USE_TJPGD
     lv_tjpgd_init();
+#endif
+
+#if LV_USE_LIBJPEG_TURBO
+    lv_libjpeg_turbo_init();
 #endif
 
 #if LV_USE_BMP
@@ -299,6 +309,10 @@ void lv_deinit(void)
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
+#endif
+
+#if LV_USE_OBJ_ID_BUILTIN
+    lv_objid_builtin_destroy();
 #endif
 }
 #endif

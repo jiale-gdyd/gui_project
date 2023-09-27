@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   hash_table.c
  * Author: AWTK Develop Team
  * Brief:  hash table
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -110,6 +110,24 @@ ret_t hash_table_remove_all(hash_table_t* hash_table, tk_compare_t cmp, void* ct
   }
 
   return RET_OK;
+}
+
+int32_t hash_table_size(hash_table_t* hash_table) {
+  uint32_t i = 0;
+  uint32_t n = 0;
+  int32_t count = 0;
+  darray_t** arrs = NULL;
+  return_value_if_fail(hash_table != NULL, 0);
+
+  n = hash_table->buckets.size;
+  arrs = (darray_t**)(hash_table->buckets.elms);
+
+  for (i = 0; i < n; i++) {
+    darray_t* iter = arrs[i];
+    count += iter->size;
+  }
+
+  return count;
 }
 
 int32_t hash_table_count(hash_table_t* hash_table, tk_compare_t cmp, void* ctx) {

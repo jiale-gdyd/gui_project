@@ -61,6 +61,7 @@ obj-y += rect.o
 obj-y += ring_buffer.o
 obj-y += rlog.o
 obj-y += rom_fs.o
+obj-y += serial_helper.o
 obj-y += sha256.o
 obj-y += slist.o
 obj-y += socket_helper.o

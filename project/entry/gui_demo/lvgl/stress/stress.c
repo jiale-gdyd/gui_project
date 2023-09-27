@@ -14,6 +14,7 @@ static lv_obj_t * main_page;
 static lv_obj_t * ta;
 static const char * mbox_buttons[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
+static int16_t g_state = -1;
 /**********************
  *      MACROS
  **********************/
@@ -25,8 +26,14 @@ static uint32_t mem_free_start = 0;
 int lvgl_demo_stress(int argc, char *argv[])
 {
     LV_LOG_USER("Starting stress test. (< 100 bytes permanent memory leak is normal due to fragmentation)");
-    lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    lv_timer_t * t = lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    lv_timer_ready(t); /*Prepare the test right now in first state change.*/
     return 0;
+}
+
+bool lvgl_demo_stress_finished(void)
+{
+    return g_state == -1;
 }
 
 /**********************
@@ -36,12 +43,11 @@ int lvgl_demo_stress(int argc, char *argv[])
 static void obj_test_task_cb(lv_timer_t * tmr)
 {
     (void) tmr;    /*Unused*/
-    static int16_t state = -1;
 
     lv_anim_t a;
     lv_obj_t * obj;
 
-    switch(state) {
+    switch(g_state) {
         case -1: {
                 lv_result_t res = lv_mem_test();
                 if(res != LV_RESULT_OK) {
@@ -385,13 +391,13 @@ static void obj_test_task_cb(lv_timer_t * tmr)
         case 31:
             lv_obj_clean(lv_scr_act());
             main_page = NULL;
-            state = -2;
+            g_state = -2;
             break;
         default:
             break;
     }
 
-    state++;
+    g_state++;
 }
 
 static void auto_del(lv_obj_t * obj, uint32_t delay)

@@ -31,9 +31,6 @@
 
 #define LV_DPI_DEF                          130
 
-#define LV_DRAW_BUF_STRIDE_ALIGN            1
-#define LV_DRAW_BUF_ALIGN                   4
-
 #define LV_LAYER_MAX_MEMORY_USAGE           150
 
 #define LV_USE_DRAW_SW                      1
@@ -78,6 +75,7 @@
 #define LV_LOG_TRACE_LAYOUT                 1
 #define LV_LOG_TRACE_ANIM                   1
 #define LV_LOG_TRACE_MSG                    1
+#define LV_LOG_TRACE_CACHE                  1
 #endif
 
 #define LV_USE_ASSERT_NULL                  1
@@ -117,7 +115,10 @@
 #define LV_GRADIENT_MAX_STOPS               2
 #define LV_COLOR_MIX_ROUND_OFS              0
 
-#define LV_OBJ_STYLE_CACHE                  1
+#define LV_OBJ_STYLE_CACHE                  0
+
+#define LV_USE_OBJ_ID                       0
+#define LV_USE_OBJ_ID_BUILTIN               0
 
 #define LV_BIG_ENDIAN_SYSTEM                0
 
@@ -300,8 +301,10 @@
 #endif
 
 #define LV_USE_LODEPNG                      1
+#define LV_USE_LIBPNG                       0
 #define LV_USE_BMP                          1
-#define LV_USE_JPG                          1
+#define LV_USE_TJPGD                        1
+#define LV_USE_LIBJPEG_TURBO                0
 #define LV_USE_GIF                          1
 #define LV_USE_QRCODE                       1
 #define LV_USE_BARCODE                      1
@@ -386,11 +389,12 @@
 #define LV_USE_LINUX_FBDEV                  0
 #if LV_USE_LINUX_FBDEV
 #define LV_LINUX_FBDEV_BSD                  0
-#define LV_LINUX_FBDEV_NUTTX                0
 #define LV_LINUX_FBDEV_RENDER_MODE          LV_DISPLAY_RENDER_MODE_PARTIAL
 #define LV_LINUX_FBDEV_BUFFER_COUNT         0
 #define LV_LINUX_FBDEV_BUFFER_SIZE          60
 #endif
+
+#define LV_LINUX_FBDEV_NUTTX                0
 
 #define LV_USE_LINUX_DRM                    0
 

@@ -57,13 +57,15 @@ const lv_obj_class_t lv_roller_class = {
     .instance_size = sizeof(lv_roller_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "roller",
 };
 
 const lv_obj_class_t lv_roller_label_class  = {
     .event_cb = lv_roller_label_event,
     .instance_size = sizeof(lv_label_t),
-    .base_class = &lv_label_class
+    .base_class = &lv_label_class,
+    .name = "roller-label",
 };
 
 /**********************
@@ -179,7 +181,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t a
             uint32_t act_opt = roller->sel_opt_id - current_page * real_option_cnt;
             int32_t sel_opt_signed = sel_opt;
             /*Huge jump? Probably from last to first or first to last option.*/
-            if((uint32_t)LV_ABS((int16_t)act_opt - sel_opt) > real_option_cnt / 2) {
+            if((uint32_t)LV_ABS((int16_t)(act_opt - sel_opt)) > real_option_cnt / 2) {
                 if(act_opt > sel_opt) sel_opt_signed += real_option_cnt;
                 else sel_opt_signed -= real_option_cnt;
             }

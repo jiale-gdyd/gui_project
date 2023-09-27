@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   hash_table.h
  * Author: AWTK Develop Team
  * Brief:  hash table
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,6 +46,81 @@ BEGIN_C_DECLS
  * ...
  * hash_table_destroy(hash_table);
  * ```
+ *
+ * 示例
+ * 
+ *```c
+ *  typedef struct _motor_t
+ *  {
+ *      int id;
+ *      int position;
+ *      int velocity;
+ *      int acceleration;
+ *  } motor_t;
+ *
+ *  motor_t *motor_create(int id)
+ *  {
+ *      motor_t *motor = new motor_t;
+ *      motor->id = id;
+ *      motor->position = 0;
+ *      motor->velocity = 0;
+ *      motor->acceleration = 0;
+ *      return motor;
+ *  }
+ *
+ *  ret_t motor_destroy(motor_t *motor)
+ *  {
+ *      delete motor;
+ *      return RET_OK;
+ *  }
+ *
+ *  int motor_compare(const void *a, const void *b)
+ *  {
+ *      motor_t *motor_a = (motor_t *)a;
+ *      motor_t *motor_b = (motor_t *)b;
+ *
+ *      return motor_a->id - motor_b->id;
+ *  }
+ *
+ *  ret_t visist_motor(void *ctx, const void *data)
+ *  {
+ *      motor_t *motor = (motor_t *)data;
+ *      log_debug("motor id: %d\n", motor->id);
+ *      return RET_OK;
+ *  }
+ *
+ *  uint32_t motor_hash(const void *data)
+ *  {
+ *      motor_t *motor = (motor_t *)data;
+ *      return motor->id;
+ *  }
+ *
+ *  void demo(void)
+ *  {
+ *      hash_table_t motors;
+ *      motor_t *motor = NULL;
+ *
+ *      // 初始化哈希表
+ *      hash_table_init(&motors, 10, (tk_destroy_t)motor_destroy, (tk_compare_t)motor_compare, motor_hash);
+ *
+ *      motor = motor_create(1);
+ *      // 将motor添加到哈希表
+ *      hash_table_add(&motors, motor, TRUE);
+ *      ENSURE(hash_table_find(&motors, NULL, motor) == motor);
+ *
+ *      motor = motor_create(2);
+ *      // 将motor添加到哈希表
+ *      hash_table_add(&motors, motor, TRUE);
+ *      ENSURE(hash_table_find(&motors, NULL, motor) == motor);
+ *
+ *      // 遍历哈希表
+ *      log_debug("motors size: %d\n", hash_table_size(&motors));
+ *      hash_table_foreach(&motors, visist_motor, NULL);
+ *
+ *      // 释放哈希表
+ *      hash_table_deinit(&motors);
+ *  }
+ *```
  *
  */
 typedef struct _hash_table_t {
@@ -151,9 +226,18 @@ ret_t hash_table_remove(hash_table_t* hash_table, tk_compare_t cmp, void* ctx);
 ret_t hash_table_remove_all(hash_table_t* hash_table, tk_compare_t cmp, void* ctx);
 
 /**
+ * @method hash_table_size
+ * 返回全部元素个数。
+ * @param {hash_table_t*} hash_table 哈希表对象。
+ *
+ * @return {int32_t} 返回元素个数。
+ */
+int32_t hash_table_size(hash_table_t* hash_table);
+
+/**
  * @method hash_table_count
  * 返回满足条件元素的个数。
- * @param {hash_table_t*} hash_table 单向链表对象。
+ * @param {hash_table_t*} hash_table 哈希表对象。
  * @param {tk_compare_t} cmp 比较函数，为NULL则使用内置的比较函数。
  * @param {void*} ctx 比较函数的上下文。
  *

@@ -9,3 +9,4 @@ obj-y += lv_obj_style.o
 obj-y += lv_obj_tree.o
 obj-y += lv_obj.o
 obj-y += lv_refr.o
+obj-y += lv_obj_id_builtin.o
