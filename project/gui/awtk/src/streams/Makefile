@@ -7,3 +7,5 @@ obj-y += shdlc/
 obj-y += noisy/
 obj-y += misc/
 obj-y += statistics/
+
+obj-y += stream_factory.o

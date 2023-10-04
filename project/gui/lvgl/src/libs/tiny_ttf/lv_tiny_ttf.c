@@ -119,7 +119,7 @@ static void * ttf_cache_add(ttf_cache_handle_t handle, int key, int size)
         }
     }
     while(cache->total_size > 0 && (cache->max_size < cache->total_size + size)) {
-        // expire entries
+        /* expire entries*/
         unsigned long long oldest = ttf_cache_get_oldest_age(handle);
         if(oldest == 0) {
             break;
@@ -219,7 +219,7 @@ static void ttf_cache_destroy(ttf_cache_handle_t handle)
     TTF_CACHE_FREE((ttf_cache_t *)handle);
 }
 #if LV_TINY_TTF_FILE_SUPPORT !=0
-// a hydra stream that can be in memory or from a file
+/* a hydra stream that can be in memory or from a file*/
 typedef struct ttf_cb_stream {
     lv_fs_file_t * file;
     const void * data;
@@ -338,7 +338,8 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
             return NULL;
         }
         memset(buffer, 0, buffer_size);
-        stbtt_MakeGlyphBitmap(info, buffer, w, h, w, dsc->scale, dsc->scale, g1);
+        uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
+        stbtt_MakeGlyphBitmap(info, buffer, w, h, stride, dsc->scale, dsc->scale, g1);
     }
     return buffer; /*Or NULL if not found*/
 }

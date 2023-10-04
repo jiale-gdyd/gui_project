@@ -283,7 +283,11 @@ typedef enum _ret_t {
    * 没有权限。
    */
   RET_NO_PERMISSION,
-
+  /**
+   * @const RET_INVALID_ADDR
+   * 无效地址。
+   */
+  RET_INVALID_ADDR,
   /**
    * @const RET_MAX_NR
    * 最大值。
@@ -525,6 +529,8 @@ typedef struct _event_source_manager_t event_source_manager_t;
 #define STR_SCHEMA_FTP "ftp://"
 #define STR_SCHEMA_HTTP "http://"
 #define STR_SCHEMA_HTTPS "https://"
+#define STR_SCHEMA_SERIAL "serial://"
+#define STR_SCHEMA_MEM "mem://"
 
 #define TK_STR_IS_EMPTY(s) (s == NULL || *s == '\0')
 #define TK_STR_IS_NOT_EMPTY(s) ((s != NULL) && *s)
