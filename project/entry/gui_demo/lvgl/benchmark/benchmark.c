@@ -424,7 +424,7 @@ static void line_cb(void)
     line_create(&style_common);
 }
 
-static void arc_think_cb(void)
+static void arc_thin_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_arc_width(&style_common, ARC_WIDTH_THIN);
@@ -559,7 +559,7 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Line",                           .create_cb = line_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
 
-    {.name = "Arc think",                      .create_cb = arc_think_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
+    {.name = "Arc thin",                       .create_cb = arc_thin_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
     {.name = "Arc thick",                      .create_cb = arc_thick_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
 
     {.name = "Substr. rectangle",              .create_cb = sub_rectangle_cb, .time_sum_normal = 0, .time_sum_opa = 0, .refr_cnt_normal = 0, .refr_cnt_opa = 0, .fps_normal = 0, .fps_opa = 0, .weight = 10},
