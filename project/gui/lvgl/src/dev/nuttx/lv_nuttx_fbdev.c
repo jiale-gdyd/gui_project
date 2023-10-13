@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_nuttx_fbdev.h"
-#if LV_USE_NUTTX_FBDEV
+#if LV_USE_NUTTX
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,8 +18,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <nuttx/video/fb.h>
+
 #include <lvgl/lvgl.h>
-#include "../../../lvgl_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -153,6 +154,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
+
+    /* Skip the non-last flush */
+
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
     if(dsc->mem == NULL ||
        area->x2 < 0 || area->y2 < 0 ||
        area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
@@ -278,4 +287,4 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     return 0;
 }
 
-#endif /*LV_USE_NUTTX_FBDEV*/
+#endif /*LV_USE_NUTTX*/

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   utils.h
  * Author: AWTK Develop Team
  * Brief:  utils struct and utils functions.
@@ -769,6 +769,21 @@ char* tk_utf8_dup_wstr(const wchar_t* str);
 uint32_t tk_wstr_count_c(const wchar_t* str, wchar_t c);
 
 /**
+ * @method tk_wstr_select_word
+ * @export none
+ * 获取字符串中距离某个位置最近的单词（中文或英文字符）或数字字符的范围，选取的范围由标点符号或空格分隔开，得到的范围由left与right两个指针获取。
+ *
+ * @param {const wchar_t*} str 字符串。
+ * @param {uint32_t} len 字符串的长度。
+ * @param {uint32_t} index 字符串中某个位置的下标。
+ * @param {int32_t*} left int32_t指针，用来获取范围结果的左边界值
+ * @param {int32_t*} right int32_t指针，用来获取范围结果的右边界值
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t tk_wstr_select_word(const wchar_t* str, uint32_t len, uint32_t index, int32_t* left, int32_t* right);
+
+/**
  * @method image_region_parse
  *
  * 解析子图的区域信息。
@@ -1012,7 +1027,7 @@ ret_t bits_stream_set(uint8_t* buff, uint32_t size, uint32_t index, bool_t value
  * @method tk_to_utf8_argv
  * 将宽字符串数组转换成utf8字符串数组。
  * @param {int} argc 参数个数。
- * @param {wchar_t*} argv 参数。
+ * @param {wchar_t**} argv 参数。
  * @return {char**} 返回utf8字符串数组。
  */
 char** tk_to_utf8_argv(int argc, wchar_t** argv);

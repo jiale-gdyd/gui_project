@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../display/lv_display.h"
+#include "lv_nuttx_entry.h"
 
-#if LV_USE_NUTTX_FBDEV
+#if LV_USE_NUTTX
 
 /*********************
  *      DEFINES
@@ -37,7 +37,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file);
  *      MACROS
  **********************/
 
-#endif /* LV_USE_NUTTX_FBDEV */
+#endif /* LV_USE_NUTTX */
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   window_base.h
  * Author: AWTK Develop Team
  * Brief:  window_base
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -137,7 +137,7 @@ typedef struct _window_base_t {
   char* close_anim_hint;
 
   /**
-   * @property {char*} stage
+   * @property {window_stage_t} stage
    * @annotation ["readable", "get_prop"]
    * 窗口当前处于的状态。
    */
@@ -433,9 +433,9 @@ widget_t* window_base_cast(widget_t* widget);
  * @method window_base_set_need_relayout
  * 设置是否需要relayout
  * @param {widget_t*} widget window_base对象。
- * @param {bool_t} need_relayout
+ * @param {bool_t} need_relayout 是否需要relayout。
  *
- * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t window_base_set_need_relayout(widget_t* widget, bool_t need_relayout);
 
@@ -463,6 +463,12 @@ TK_EXTERN_VTABLE(window_base);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t window_base_auto_scale_children(widget_t* widget);
+
+/*public for internal use*/
+assets_manager_t* window_base_get_assets_manager(widget_t* widget);
+font_manager_t* window_base_get_font_manager(widget_t* widget);
+locale_info_t* window_base_get_locale_info(widget_t* widget);
+image_manager_t* window_base_get_image_manager(widget_t* widget);
 
 END_C_DECLS
 

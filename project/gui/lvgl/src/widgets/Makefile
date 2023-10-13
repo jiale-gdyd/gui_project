@@ -16,7 +16,6 @@ obj-y += led/
 obj-y += line/
 obj-y += list/
 obj-y += menu/
-obj-y += meter/
 obj-y += msgbox/
 obj-y += objx_templ/
 obj-y += roller/

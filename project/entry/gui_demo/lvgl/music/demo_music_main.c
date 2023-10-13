@@ -255,11 +255,11 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_start(&a);
 
     LV_IMAGE_DECLARE(img_lv_demo_music_logo);
-    lv_obj_t *logo = lv_image_create(lv_scr_act());
+    lv_obj_t *logo = lv_image_create(lv_screen_active());
     lv_image_set_src(logo, &img_lv_demo_music_logo);
     lv_obj_move_foreground(logo);
 
-    lv_obj_t *title = lv_label_create(lv_scr_act());
+    lv_obj_t *title = lv_label_create(lv_screen_active());
     lv_label_set_text(title, "LVGL Demo\nMusic player");
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(title, font_large, 0);
@@ -273,7 +273,7 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_time(&a, 400);
     lv_anim_set_delay(&a, INTRO_TIME + 800);
     lv_anim_set_values(&a, LV_SCALE_NONE, 10);
-    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 
     lv_obj_update_layout(main_cont);
@@ -338,20 +338,20 @@ void _lv_demo_music_pause(void)
     playing = false;
     spectrum_i_pause = spectrum_i;
     spectrum_i = 0;
-    lv_anim_del(spectrum_obj, spectrum_anim_cb);
+    lv_anim_delete(spectrum_obj, spectrum_anim_cb);
     lv_obj_invalidate(spectrum_obj);
     lv_image_set_zoom(album_image_obj, LV_SCALE_NONE);
     if (sec_counter_timer) {
         lv_timer_pause(sec_counter_timer);
     }
-    lv_obj_clear_state(play_obj, LV_STATE_CHECKED);
+    lv_obj_remove_state(play_obj, LV_STATE_CHECKED);
 }
 
 static lv_obj_t *create_cont(lv_obj_t *parent)
 {
     main_cont = lv_obj_create(parent);
-    lv_obj_clear_flag(main_cont, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_clear_flag(main_cont, LV_OBJ_FLAG_SCROLL_ELASTIC);
+    lv_obj_remove_flag(main_cont, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(main_cont, LV_OBJ_FLAG_SCROLL_ELASTIC);
     lv_obj_remove_style_all(main_cont);
     lv_obj_set_size(main_cont, lv_pct(100), lv_pct(100));
     lv_obj_set_scroll_snap_y(main_cont, LV_SCROLL_SNAP_CENTER);
@@ -363,7 +363,7 @@ static lv_obj_t *create_cont(lv_obj_t *parent)
 #else
     lv_obj_set_size(player, LV_HOR_RES, LV_VER_RES + LV_DEMO_MUSIC_HANDLE_SIZE * 2);
 #endif
-    lv_obj_clear_flag(player, LV_OBJ_FLAG_SNAPPABLE);
+    lv_obj_remove_flag(player, LV_OBJ_FLAG_SNAPPABLE);
 
     lv_obj_set_style_bg_color(player, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_border_width(player, 0, 0);
@@ -372,20 +372,20 @@ static lv_obj_t *create_cont(lv_obj_t *parent)
 
     lv_obj_t *placeholder1 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder1);
-    lv_obj_clear_flag(placeholder1, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(placeholder1, LV_OBJ_FLAG_CLICKABLE);
     // lv_obj_set_style_bg_color(placeholder1, lv_color_hex(0xff0000), 0);
     // lv_obj_set_style_bg_opa(placeholder1, LV_OPA_50, 0);
 
     lv_obj_t *placeholder2 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder2);
-    lv_obj_clear_flag(placeholder2, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(placeholder2, LV_OBJ_FLAG_CLICKABLE);
     // lv_obj_set_style_bg_color(placeholder2, lv_color_hex(0x00ff00), 0);
     // lv_obj_set_style_bg_opa(placeholder2, LV_OPA_50, 0);
 
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
     lv_obj_t *placeholder3 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder3);
-    lv_obj_clear_flag(placeholder3, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(placeholder3, LV_OBJ_FLAG_CLICKABLE);
     // lv_obj_set_style_bg_color(placeholder3, lv_color_hex(0x0000ff), 0);
     // lv_obj_set_style_bg_opa(placeholder3, LV_OPA_20, 0);
 
@@ -510,7 +510,7 @@ static lv_obj_t *create_spectrum_obj(lv_obj_t *parent)
 #else
     lv_obj_set_height(obj, 250);
 #endif
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event(obj, spectrum_draw_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(obj);
     album_image_obj = album_image_create(obj);
@@ -682,7 +682,7 @@ static void track_load(uint32_t id)
 #endif
 
     lv_anim_set_exec_cb(&a, _obj_set_x_anim_cb);
-    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 
     lv_anim_set_path_cb(&a, lv_anim_path_linear);
@@ -733,7 +733,7 @@ static void del_counter_timer_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if ((code == LV_EVENT_DELETE) && sec_counter_timer) {
-        lv_timer_del(sec_counter_timer);
+        lv_timer_delete(sec_counter_timer);
         sec_counter_timer = NULL;
     }
 }
@@ -875,10 +875,10 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             lv_draw_triangle(layer, &draw_dsc);
         }
     } else if (code == LV_EVENT_DELETE) {
-        lv_anim_del(NULL, start_anim_cb);
-        lv_anim_del(NULL, spectrum_anim_cb);
+        lv_anim_delete(NULL, start_anim_cb);
+        lv_anim_delete(NULL, spectrum_anim_cb);
         if (start_anim && stop_start_anim_timer) {
-            lv_timer_del(stop_start_anim_timer);
+            lv_timer_delete(stop_start_anim_timer);
         }
     }
 }
@@ -957,7 +957,7 @@ static lv_obj_t *album_image_create(lv_obj_t *parent)
     lv_image_set_antialias(img, false);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event(img, album_gesture_event_cb, LV_EVENT_GESTURE, NULL);
-    lv_obj_clear_flag(img, LV_OBJ_FLAG_GESTURE_BUBBLE);
+    lv_obj_remove_flag(img, LV_OBJ_FLAG_GESTURE_BUBBLE);
     lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
 
     return img;

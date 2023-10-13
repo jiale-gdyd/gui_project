@@ -50,6 +50,8 @@ int gui_app_start_ex(size_t disp_width, size_t disp_height, int app_type, const 
     assets_manager_set_res_root(assets_manager(), "");
     log_debug("Load assets from zip:[%s]\n", ASSETS_ZIP);
     assets_manager_set_loader(assets_manager(), asset_loader_zip_create(ASSETS_ZIP));
+#elif defined(ASSETS_CUSTOM_INIT)
+    ASSETS_CUSTOM_INIT();
 #endif
 
 #if defined(WITH_LCD_PORTRAIT)

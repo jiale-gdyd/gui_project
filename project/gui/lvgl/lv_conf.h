@@ -65,6 +65,7 @@
 #define LV_LOG_PRINTF                       0
 
 #define LV_LOG_USE_TIMESTAMP                1
+#define LV_LOG_USE_FILE_LINE                1
 
 #define LV_LOG_TRACE_MEM                    1
 #define LV_LOG_TRACE_TIMER                  1
@@ -357,6 +358,7 @@
 #endif
 
 #define LV_USE_MSG                          0
+#define LV_USE_OBSERVER                     0
 
 #define LV_USE_IME_PINYIN                   0
 #if LV_USE_IME_PINYIN
@@ -394,8 +396,9 @@
 #define LV_LINUX_FBDEV_BUFFER_SIZE          60
 #endif
 
-#define LV_LINUX_FBDEV_NUTTX                0
-
+#define LV_USE_NUTTX                        0
+#define LV_USE_NUTTX_CUSTOM_INIT            0
+#define LV_USE_NUTTX_TOUCHSCREEN            0
 #define LV_USE_LINUX_DRM                    0
 
 #define LV_USE_NUTTX_LCD                    0
@@ -403,7 +406,5 @@
 #define LV_NUTTX_LCD_BUFFER_COUNT           0
 #define LV_NUTTX_LCD_BUFFER_SIZE            60
 #endif
-
-#define LV_USE_NUTTX_TOUCHSCREEN            0
 
 #endif

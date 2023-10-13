@@ -4,6 +4,6 @@ obj-y += gridnav/
 obj-y += ime/
 obj-y += imgfont/
 obj-y += monkey/
-obj-y += msg/
 obj-y += sysmon/
 obj-y += snapshot/
+obj-y += observer/

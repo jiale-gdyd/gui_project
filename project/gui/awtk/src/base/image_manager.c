@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   image_manager.c
  * Author: AWTK Develop Team
  * Brief:  bitmap manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -458,7 +458,7 @@ ret_t image_managers_unref(image_manager_t* imm) {
   assert(imm->refcount > 0);
   if (imm->refcount == 1) {
     assets_managers_unref(imm->assets_manager);
-    darray_remove(s_image_managers, imm);
+    darray_remove(s_image_managers, imm->name);
     if (s_image_managers->size == 0) {
       darray_destroy(s_image_managers);
       s_image_managers = NULL;

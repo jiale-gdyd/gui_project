@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   widget.h
  * Author: AWTK Develop Team
  * Brief:  basic class of all widget
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -182,7 +182,7 @@ struct _widget_vtable_t {
   widget_is_point_in_t is_point_in;
   /**
    * 该函数指针返回的偏移值，最好和 WIDGET_PROP_X/YOFFSET 的属性一致，如果两者不同的话，容易出现问题。
-   * 注意：偏移值一般使用在动画，脏矩形以及点击等事件上面，所以一定要保持一致。
+   * 注意：偏移值一般使用在动画，脏矩形以及点击等事件上面，所以一定要保持一致。详情请看 docs/how_to_use_offset_in_custom_widget.md 
    */
   widget_get_offset_t get_offset;
   widget_auto_adjust_size_t auto_adjust_size;
@@ -442,7 +442,7 @@ struct _widget_t {
    */
   uint8_t destroying : 1;
   /**
-   * @property {uint8_t} state
+   * @property {char*} state
    * @annotation ["readable"]
    * 控件的状态(取值参考widget_state_t)。
    */
@@ -536,13 +536,11 @@ struct _widget_t {
   tk_object_t* custom_props;
 
   /**
-   * @property {widget_vtable_t} vt
+   * @property {const widget_vtable_t*} vt
    * @annotation ["readable"]
    * 虚函数表。
    */
   const widget_vtable_t* vt;
-  /*private*/
-  assets_manager_t* assets_manager;
 };
 
 /**
@@ -1043,7 +1041,7 @@ bool_t widget_is_support_highlighter(widget_t* widget);
  * @annotation ["scriptable"]
  * @param {widget_t*} widget 控件对象。
  *
- * @return {bool_t} 支持返回 TRUE，不支持返回 FALSE。
+ * @return {bool_t} 拥有返回 TRUE，没有返回 FALSE。
  */
 bool_t widget_has_highlighter(widget_t* widget);
 
@@ -1719,7 +1717,7 @@ ret_t widget_set_sensitive(widget_t* widget, bool_t sensitive);
  * 注册指定事件的处理函数。
  * @annotation ["scriptable:custom"]
  * @param {widget_t*} widget 控件对象。
- * @param {event_type_t} type 事件类型。
+ * @param {uint32_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  * 使用示例：
@@ -1741,7 +1739,7 @@ uint32_t widget_on(widget_t* widget, uint32_t type, event_func_t on_event, void*
  * > 注册时指定一个tag，可用widget\_off\_by\_tag注销相同tag的事件处理函数。
  *
  * @param {widget_t*} widget 控件对象。
- * @param {event_type_t} type 事件类型。
+ * @param {uint32_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  * @param {uint32_t} tag tag。
@@ -1768,7 +1766,7 @@ ret_t widget_off(widget_t* widget, uint32_t id);
  * 递归查找指定名称的子控件，然后为其注册指定事件的处理函数。
  * @param {widget_t*} widget 控件对象。
  * @param {const char*} name 子控件的名称。
- * @param {event_type_t} type 事件类型。
+ * @param {uint32_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *
@@ -1781,7 +1779,7 @@ uint32_t widget_child_on(widget_t* widget, const char* name, uint32_t type, even
  * @method widget_off_by_func
  * 注销指定函数的事件处理函数。
  * @param {widget_t*} widget 控件对象。
- * @param {event_type_t} type 事件类型。
+ * @param {uint32_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *
@@ -1917,6 +1915,7 @@ ret_t widget_dispatch_recursive(widget_t* widget, event_t* e);
 /**
  * @method widget_get_prop
  * 获取控件指定属性的值。
+ * @annotation ["scriptable"]
  * @param {widget_t*} widget 控件对象。
  * @param {const char*} name 属性的名称。
  * @param {value_t*} v 返回属性的值。
@@ -1939,9 +1938,10 @@ ret_t widget_get_prop_default_value(widget_t* widget, const char* name, value_t*
 /**
  * @method widget_set_prop
  * 设置控件指定属性的值。
+ * @annotation ["scriptable"]
  * @param {widget_t*} widget 控件对象。
  * @param {const char*} name 属性的名称。
- * @param {value_t*} v 属性的值。
+ * @param {const value_t*} v 属性的值。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -2682,7 +2682,7 @@ ret_t widget_prepare_text_style_ex(widget_t* widget, canvas_t* c, color_t defaul
  * 字体由控件当前的状态和style决定。
  *
  * @param {widget_t*} widget 控件对象。
- * @param {wchar_t*} text 文本。
+ * @param {const wchar_t*} text 文本。
  *
  * @return {float_t} 返回文本的宽度。
  */
@@ -2762,7 +2762,7 @@ ret_t widget_re_translate_text(widget_t* widget);
  * @depreated
  * @param {widget_t*} widget widget对象。
  * @param {widget_t*} parent widget的父控件。
- * @param {widget_vtable_t*} vt 虚表。
+ * @param {const widget_vtable_t*} vt 虚表。
  * @param {xy_t}   x x坐标
  * @param {xy_t}   y y坐标
  * @param {wh_t}   w 宽度
@@ -2777,7 +2777,7 @@ widget_t* widget_init(widget_t* widget, widget_t* parent, const widget_vtable_t*
  * @method widget_create
  * 创建控件。仅在子类控件构造函数中使用。
  * @param {widget_t*} parent widget的父控件。
- * @param {widget_vtable_t*} vt 虚表。
+ * @param {const widget_vtable_t*} vt 虚表。
  * @param {xy_t}   x x坐标
  * @param {xy_t}   y y坐标
  * @param {wh_t}   w 宽度
@@ -3074,7 +3074,7 @@ ret_t widget_on_paint_border(widget_t* widget, canvas_t* c);
  * @method widget_is_instance_of
  * 检查控件是否是指定的类型。
  * @param {widget_t*} widget 控件对象。
- * @param {widget_vtable_t*} vt 虚表。
+ * @param {const widget_vtable_t*} vt 虚表。
  *
  *  @return {bool_t} 返回TRUE表示是，FALSE表示否。
  */
@@ -3214,6 +3214,15 @@ rect_t widget_get_content_area(widget_t* widget);
 /**
  * @method widget_calc_icon_text_rect
  * 计算icon text的位置。
+ * @param {const rect_t*} ir ir。
+ * @param {int32_t} font_size 字体大小。
+ * @param {float_t} text_size 文本大小。
+ * @param {int32_t} icon_at icon的位置。
+ * @param {uint32_t} img_w 图像宽度。
+ * @param {uint32_t} img_h 图像高度。
+ * @param {int32_t} spacer 间距。
+ * @param {rect_t*} r_text 返回文本的矩形区域。
+ * @param {rect_t*} r_icon 返回icon的矩形区域。
  * 
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

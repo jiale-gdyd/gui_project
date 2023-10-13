@@ -1,14 +1,10 @@
 /**
- * @file lv_nuttx_touchscreen.h
+ * @file lv_nuttx_lcd.h
  *
  */
 
-/*********************
- *      INCLUDES
- *********************/
-
-#ifndef LV_NUTTX_TOUCHSCREEN_H
-#define LV_NUTTX_TOUCHSCREEN_H
+#ifndef LV_NUTTX_LCD_H
+#define LV_NUTTX_LCD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../indev/lv_indev.h"
+#include "lv_nuttx_entry.h"
 
-#if LV_USE_NUTTX_TOUCHSCREEN
+#if LV_USE_NUTTX_LCD
 
 /*********************
  *      DEFINES
@@ -34,16 +30,16 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path);
+lv_display_t * lv_nuttx_lcd_create(const char * dev_path);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /* LV_USE_NUTTX_TOUCHSCREEN */
+#endif /* LV_USE_NUTTX_LCD */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_NUTTX_TOUCHSCREEN_H */
+#endif /* LV_NUTTX_LCD_H */
