@@ -297,6 +297,24 @@
             #endif
         #endif
     #endif
+
+    #ifndef LV_USE_DRAW_SW_ASM
+        #ifdef CONFIG_LV_USE_DRAW_SW_ASM
+            #define LV_USE_DRAW_SW_ASM CONFIG_LV_USE_DRAW_SW_ASM
+        #else
+            #define  LV_USE_DRAW_SW_ASM     LV_DRAW_SW_ASM_NONE
+        #endif
+    #endif
+
+    #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+        #ifndef LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+            #ifdef CONFIG_LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+                #define LV_DRAW_SW_ASM_CUSTOM_INCLUDE CONFIG_LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+            #else
+                #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
+            #endif
+        #endif
+    #endif
 #endif
 
 /* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
@@ -502,17 +520,6 @@
             #endif
         #else
             #define LV_LOG_TRACE_ANIM       1
-        #endif
-    #endif
-    #ifndef LV_LOG_TRACE_MSG
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_LOG_TRACE_MSG
-                #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
-            #else
-                #define LV_LOG_TRACE_MSG 0
-            #endif
-        #else
-            #define LV_LOG_TRACE_MSG        1
         #endif
     #endif
     #ifndef LV_LOG_TRACE_CACHE
@@ -2286,15 +2293,6 @@
         #else
             #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
         #endif
-    #endif
-#endif
-
-/*1: Enable a published subscriber based messaging system */
-#ifndef LV_USE_MSG
-    #ifdef CONFIG_LV_USE_MSG
-        #define LV_USE_MSG CONFIG_LV_USE_MSG
-    #else
-        #define LV_USE_MSG 0
     #endif
 #endif
 

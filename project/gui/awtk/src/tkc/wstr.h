@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   wstr.h
  * Author: AWTK Develop Team
  * Brief:  width char
@@ -100,6 +100,16 @@ ret_t wstr_destroy(wstr_t* str);
  * @return {wstr_t*} str对象本身。
  */
 wstr_t* wstr_init(wstr_t* str, uint32_t capacity);
+
+/**
+ * @method wstr_extend
+ * 扩展字符串到指定的容量。
+ * @param {wstr_t*} str wstr对象。
+ * @param {uint32_t} capacity 初始容量。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t wstr_extend(wstr_t* str, uint32_t capacity);
 
 /**
  * @method wstr_attach

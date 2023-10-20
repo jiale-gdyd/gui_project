@@ -388,13 +388,13 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         uint32_t total_tick_count = scale->total_tick_count;
         uint32_t tick_idx = 0;
         uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
+        for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
             if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
             if(is_major_tick) major_tick_idx++;
 
-            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, scale->range_min, scale->range_max);
+            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
 
             /* Overwrite label and tick properties if tick value is within section range */
             lv_scale_section_t * section;
@@ -477,13 +477,13 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         uint32_t label_gap = 15U; /* TODO: Add to style properties */
         uint32_t tick_idx = 0;
         uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
+        for(tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
             if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
             if(is_major_tick) major_tick_idx++;
 
-            const int32_t tick_value = lv_map(tick_idx, 0U, scale->total_tick_count, scale->range_min, scale->range_max);
+            const int32_t tick_value = lv_map(tick_idx, 0U, scale->total_tick_count - 1, scale->range_min, scale->range_max);
 
             /* Overwrite label and tick properties if tick value is within section range */
             lv_scale_section_t * section;
@@ -528,7 +528,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
 
                 /* Also take into consideration the letter space of the style */
-                int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
+                int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
                 angle_upscale += scale->rotation * 10U;
 
                 uint32_t radius_text = 0;
@@ -838,13 +838,14 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             /* Vertical position starts at y2 of the scale main line, we start at y2 because the ticks are drawn from bottom to top */
             lv_coord_t vertical_position = obj->coords.y2 - (pad_bottom + tick_pad_bottom);
 
-            if(scale->total_tick_count == tick_idx) {
+            if((scale->total_tick_count - 1U) == tick_idx) {
                 vertical_position = y_ofs;
             }
             /* Increment the tick offset depending of its index */
             else if(0 != tick_idx) {
                 const lv_coord_t scale_total_height = lv_obj_get_height(obj) - (pad_top + pad_bottom + tick_pad_top + tick_pad_bottom);
-                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_height) / (lv_coord_t) scale->total_tick_count;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_height) / (lv_coord_t)(
+                                        scale->total_tick_count - 1);
                 vertical_position -= offset;
             }
             else { /* Nothing to do */ }
@@ -858,13 +859,14 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             /* Horizontal position starts at x1 of the scale main line */
             lv_coord_t horizontal_position = x_ofs;
             /* Position the last tick at the x2 scale coordinate */
-            if(scale->total_tick_count == tick_idx) {
+            if((scale->total_tick_count - 1U) == tick_idx) {
                 horizontal_position = obj->coords.x2 - (pad_left + tick_pad_left);
             }
             /* Increment the tick offset depending of its index */
             else if(0U != tick_idx) {
                 const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left + tick_pad_right + tick_pad_left);
-                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t) scale->total_tick_count;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t)(
+                                        scale->total_tick_count - 1);
                 horizontal_position += offset;
             }
             else { /* Nothing to do */ }
@@ -885,7 +887,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
         angle_upscale += scale->rotation * 10U;
 
         /* Draw a little bit longer lines to be sure the mask will clip them correctly
@@ -1139,11 +1141,11 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
 
     /* Section handling */
     uint32_t tick_idx = 0;
-    for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
 
-        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, min_out, max_out);
 
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {

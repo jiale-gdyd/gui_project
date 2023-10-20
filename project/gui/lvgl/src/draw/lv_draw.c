@@ -94,15 +94,6 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 
     lv_draw_global_info_t * info = &_draw_info;
 
-    /*Let the draw units set their preference score*/
-    t->preference_score = 100;
-    t->preferred_draw_unit_id = 0;
-    lv_draw_unit_t * u = info->unit_head;
-    while(u) {
-        if(u->evaluate_cb) u->evaluate_cb(u, t);
-        u = u->next;
-    }
-
     /*Send LV_EVENT_DRAW_TASK_ADDED and dispatch only on the "main" draw_task
      *and not on the draw tasks added in the event.
      *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
@@ -113,8 +104,28 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
         }
+
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
+
         lv_draw_dispatch();
         info->task_running = false;
+    }
+    else {
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
     }
 }
 
@@ -328,8 +339,8 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     if(layer->buf == NULL) {
-        int32_t h = lv_area_get_height(&layer->buf_area);
         int32_t w = lv_area_get_width(&layer->buf_area);
+        int32_t h = lv_area_get_height(&layer->buf_area);
         int32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
         uint32_t layer_size_byte = h * stride;
         layer->buf_unaligned = lv_draw_buf_malloc(layer_size_byte, layer->color_format);
@@ -347,7 +358,12 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
 
         if(lv_color_format_has_alpha(layer->color_format)) {
-            lv_draw_buf_clear(layer->buf, stride, layer->color_format, &layer->buf_area);
+            lv_area_t a;
+            a.x1 = 0;
+            a.y1 = 0;
+            a.x2 = w - 1;
+            a.y2 = h - 1;
+            lv_draw_buf_clear(layer->buf, w, h, layer->color_format, &a);
         }
     }
 

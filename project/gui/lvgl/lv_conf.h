@@ -46,6 +46,12 @@
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE        0
 #define LV_DRAW_SW_CIRCLE_CACHE_SIZE        4
 #endif
+
+#define LV_USE_DRAW_SW_ASM                  LV_DRAW_SW_ASM_NONE
+
+#if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
+#define LV_DRAW_SW_ASM_CUSTOM_INCLUDE       ""
+#endif
 #endif
 
 #define LV_USE_DRAW_VGLITE                  0
@@ -75,7 +81,6 @@
 #define LV_LOG_TRACE_OBJ_CREATE             1
 #define LV_LOG_TRACE_LAYOUT                 1
 #define LV_LOG_TRACE_ANIM                   1
-#define LV_LOG_TRACE_MSG                    1
 #define LV_LOG_TRACE_CACHE                  1
 #endif
 
@@ -357,7 +362,6 @@
 #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER   0
 #endif
 
-#define LV_USE_MSG                          0
 #define LV_USE_OBSERVER                     0
 
 #define LV_USE_IME_PINYIN                   0

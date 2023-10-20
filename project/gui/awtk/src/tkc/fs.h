@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   fs.h
  * Author: AWTK Develop Team
  * Brief:  simple fs api
@@ -77,6 +77,21 @@ typedef struct _fs_stat_info_t {
   bool_t is_reg_file;
 } fs_stat_info_t;
 
+/**
+ * @method fs_stat_info_create
+ * 创建文件状态信息对象。
+ * @return {fs_stat_info_t*} 返回文件状态信息对象。
+*/
+fs_stat_info_t* fs_stat_info_create(void);
+
+/**
+ * @method fs_stat_info_destroy
+ * 销毁文件状态信息对象。
+ * @param {fs_stat_info_t*} fst 文件状态信息对象。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+*/
+ret_t fs_stat_info_destroy(fs_stat_info_t* fst);
+
 struct _fs_file_t;
 typedef struct _fs_file_t fs_file_t;
 
@@ -119,6 +134,7 @@ typedef struct _fs_file_vtable_t {
  * int32_t len = file_get_size(file_name);
  * uint8_t* buff = (uint8_t*)TKMEM_ALLOC(len + 1);
  * return_value_if_fail(buff != NULL, NULL);
+
  * fs_file_t* fp = fs_open_file(os_fs(), file_name, "rb");
  * if (fp != NULL) {
  *   ret = fs_file_read(fp, buff, len);
@@ -305,6 +321,26 @@ typedef struct _fs_item_t {
    */
   char name[MAX_PATH + 1];
 } fs_item_t;
+
+/**
+ * @method fs_item_create
+ *
+ * 创建文件或目录对象。
+ *
+ * @return {fs_item_t*} 返回文件或目录对象。
+ */
+fs_item_t* fs_item_create(void);
+
+/**
+ * @method fs_item_destroy
+ *
+ * 销毁文件或目录对象。
+ *
+ * @param {fs_item_t*} item 文件或目录对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_item_destroy(fs_item_t* item);
 
 struct _fs_dir_t;
 typedef struct _fs_dir_t fs_dir_t;
