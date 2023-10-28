@@ -359,7 +359,7 @@ const lv_image_dsc_t img_lv_demo_music_btn_prev = {
         .w           = 110,
         .h           = 110
     },
-    .data_size       = 12100 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 12100 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_prev_map
 };
 

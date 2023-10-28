@@ -455,7 +455,7 @@ const lv_image_dsc_t img_lv_demo_music_btn_play = {
         .w           = 141,
         .h           = 142
     },
-    .data_size       = 20022 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 20022 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_play_map
 };
 

@@ -119,7 +119,7 @@ const lv_image_dsc_t img_lv_demo_music_icon_4 = {
         .w           = 32,
         .h           = 30
     },
-    .data_size       = 960 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 960 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_icon_4_map
 };
 

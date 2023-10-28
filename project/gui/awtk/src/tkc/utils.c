@@ -34,18 +34,6 @@
 #include "tkc/data_reader_factory.h"
 #include "tkc/data_writer_factory.h"
 
-#ifndef HAS_STDIO
-#define HAS_STDIO 1
-#endif
-
-#ifndef LINUX
-#define LINUX 1
-#endif
-
-#ifndef HAS_FAST_MEMCPY
-#define HAS_FAST_MEMCPY 1
-#endif
-
 #ifndef WITH_DATA_READER_WRITER
 #define WITH_DATA_READER_WRITER 1
 #endif
@@ -1997,6 +1985,20 @@ int tk_sscanf_simple(const char* str, const char* format, ...) {
 }
 
 #ifdef HAS_NO_VSSCANF
+int sscanf(const char* str, const char* format, ...) {
+  int ret = 0;
+  va_list va;
+  va_start(va, format);
+  ret = tk_vsscanf_simple(str, format, va);
+  va_end(va);
+
+  return ret;
+}
+
+int vsscanf(const char* str, const char* format, va_list args) {
+  return tk_vsscanf_simple(str, format, args);
+}
+
 int tk_sscanf(const char* str, const char* format, ...) {
   int ret = 0;
   va_list va;

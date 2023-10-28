@@ -20,14 +20,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*If image pixels contains alpha we need to know how much byte is a pixel*/
-#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 2
-#elif LV_COLOR_DEPTH == 16
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 3
-#elif LV_COLOR_DEPTH == 32
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 4
-#endif
 
 #define LV_IMAGE_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_DEPTH / 8) * (w) * (h))
 #define LV_IMAGE_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_DEPTH / 8) * (w) * (h))
@@ -120,10 +112,12 @@ void lv_image_buf_free(lv_image_dsc_t * dsc);
  * @param w width of the rectangle to transform
  * @param h height of the rectangle to transform
  * @param angle angle of rotation
- * @param zoom zoom, (256 no zoom)
+ * @param zoom_x zoom in x direction, (256 no zoom)
+ * @param zoom_y zoom in y direction, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom,
+void _lv_image_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, lv_coord_t angle, uint16_t zoom_x,
+                                        uint16_t zoom_y,
                                         const lv_point_t * pivot);
 
 /**********************

@@ -125,7 +125,7 @@ const lv_image_dsc_t img_lv_demo_music_corner_right = {
         .w           = 32,
         .h           = 32
     },
-    .data_size       = 1024 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 1024 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_corner_right_map
 };
 

@@ -114,12 +114,20 @@ void lv_obj_set_style_translate_y(struct _lv_obj_t * obj, lv_coord_t value, lv_s
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_Y, v, selector);
 }
 
-void lv_obj_set_style_transform_scale(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_transform_scale_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE_X, v, selector);
+}
+
+void lv_obj_set_style_transform_scale_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SCALE_Y, v, selector);
 }
 
 void lv_obj_set_style_transform_rotation(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -274,20 +282,28 @@ void lv_obj_set_style_bg_grad_stop(struct _lv_obj_t * obj, lv_coord_t value, lv_
     lv_obj_set_local_style_prop(obj, LV_STYLE_BG_GRAD_STOP, v, selector);
 }
 
+void lv_obj_set_style_bg_main_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_MAIN_OPA, v, selector);
+}
+
+void lv_obj_set_style_bg_grad_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_GRAD_OPA, v, selector);
+}
+
 void lv_obj_set_style_bg_grad(struct _lv_obj_t * obj, const lv_grad_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_BG_GRAD, v, selector);
-}
-
-void lv_obj_set_style_bg_dither_mode(struct _lv_obj_t * obj, lv_dither_mode_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_DITHER_MODE, v, selector);
 }
 
 void lv_obj_set_style_bg_image_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
@@ -650,8 +666,7 @@ void lv_obj_set_style_opa_layered(struct _lv_obj_t * obj, lv_opa_t value, lv_sty
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
-                                       lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -691,8 +706,7 @@ void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_styl
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
 }
 
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
-                                 lv_style_selector_t selector)
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -764,8 +778,7 @@ void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_
     lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
 }
 
-void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value,
-                                            lv_style_selector_t selector)
+void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value

@@ -140,15 +140,25 @@ void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_Y = LV_STYLE_TRANSLATE_Y;
 
-void lv_style_set_transform_scale(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_scale_x(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SCALE, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SCALE_X, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE = LV_STYLE_TRANSFORM_SCALE;
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_X = LV_STYLE_TRANSFORM_SCALE_X;
+
+void lv_style_set_transform_scale_y(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SCALE_Y, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE_Y = LV_STYLE_TRANSFORM_SCALE_Y;
 
 void lv_style_set_transform_rotation(lv_style_t * style, lv_coord_t value)
 {
@@ -340,6 +350,26 @@ void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD_STOP = LV_STYLE_BG_GRAD_STOP;
 
+void lv_style_set_bg_main_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BG_MAIN_OPA, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_BG_MAIN_OPA = LV_STYLE_BG_MAIN_OPA;
+
+void lv_style_set_bg_grad_opa(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_BG_GRAD_OPA, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD_OPA = LV_STYLE_BG_GRAD_OPA;
+
 void lv_style_set_bg_grad(lv_style_t * style, const lv_grad_dsc_t * value)
 {
     lv_style_value_t v = {
@@ -349,16 +379,6 @@ void lv_style_set_bg_grad(lv_style_t * style, const lv_grad_dsc_t * value)
 }
 
 const lv_style_prop_t _lv_style_const_prop_id_BG_GRAD = LV_STYLE_BG_GRAD;
-
-void lv_style_set_bg_dither_mode(lv_style_t * style, lv_dither_mode_t value)
-{
-    lv_style_value_t v = {
-        .num = (int32_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_BG_DITHER_MODE, v);
-}
-
-const lv_style_prop_t _lv_style_const_prop_id_BG_DITHER_MODE = LV_STYLE_BG_DITHER_MODE;
 
 void lv_style_set_bg_image_src(lv_style_t * style, const void * value)
 {

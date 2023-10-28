@@ -147,6 +147,34 @@ ret_t str_append(str_t* str, const char* text) {
   return str_append_with_len(str, text, strlen(text));
 }
 
+ret_t str_append_uppercase(str_t* str, const char* text) {
+  ret_t ret = RET_OK;
+  const char* p = text;
+  return_value_if_fail(str != NULL && text != NULL, RET_BAD_PARAMS);
+
+  while (*p) {
+    ret = str_append_char(str, toupper(*p));
+    break_if_fail(ret == RET_OK);
+    p++;
+  }
+
+  return ret;
+}
+
+ret_t str_append_lowercase(str_t* str, const char* text) {
+  ret_t ret = RET_OK;
+  const char* p = text;
+  return_value_if_fail(str != NULL && text != NULL, RET_BAD_PARAMS);
+
+  while (*p) {
+    ret = str_append_char(str, tolower(*p));
+    break_if_fail(ret == RET_OK);
+    p++;
+  }
+
+  return ret;
+}
+
 ret_t str_append_more(str_t* str, const char* text, ...) {
   va_list va;
   const char* p = NULL;
@@ -1007,7 +1035,7 @@ ret_t str_decode_hex(str_t* str, void* data, uint32_t size) {
   char* p = NULL;
   char v[3] = {0, 0, 0};
   uint8_t* d = data;
-  uint8_t* dend = data + size;
+  uint8_t* dend = d + size;
   return_value_if_fail(str != NULL && data != NULL, RET_BAD_PARAMS);
 
   for (p = str->str; p < str->str + str->size && d < dend; p += 2) {

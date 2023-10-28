@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   tk_iostream.h
  * Author: AWTK Develop Team
  * Brief:  input/ouput stream interface
@@ -34,6 +34,8 @@ BEGIN_C_DECLS
 
 #define TK_STREAM_CMD_IFLUSH "iflush"
 #define TK_STREAM_CMD_OFLUSH "oflush"
+#define TK_ISTREAM_DEFAULT_TIMEOUT 3000
+#define TK_OSTREAM_DEFAULT_TIMEOUT 1000
 
 END_C_DECLS
 

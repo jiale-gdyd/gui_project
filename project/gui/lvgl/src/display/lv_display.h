@@ -34,6 +34,7 @@ struct _lv_obj_t;
 struct _lv_theme_t;
 struct _lv_display_t;
 typedef struct _lv_display_t lv_display_t;
+typedef struct _lv_display_t lv_disp_drv_t;
 
 typedef enum {
     LV_DISPLAY_ROTATION_0 = 0,

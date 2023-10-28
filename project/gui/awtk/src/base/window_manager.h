@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   window_manager.h
  * Author: AWTK Develop Team
  * Brief:  window manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,6 +59,7 @@ typedef ret_t (*window_manager_snap_prev_window_t)(widget_t* widget, widget_t* p
                                                    bitmap_t* img);
 typedef dialog_highlighter_t* (*window_manager_get_dialog_highlighter_t)(widget_t* widget);
 typedef ret_t (*window_manager_resize_t)(widget_t* widget, wh_t w, wh_t h);
+typedef ret_t (*window_manager_set_fullscreen_t)(widget_t* widget, bool_t fullscreen);
 
 typedef struct _window_manager_vtable_t {
   window_manager_back_t back;
@@ -84,6 +85,7 @@ typedef struct _window_manager_vtable_t {
   window_manager_snap_prev_window_t snap_prev_window;
   window_manager_get_dialog_highlighter_t get_dialog_highlighter;
   window_manager_resize_t resize;
+  window_manager_set_fullscreen_t set_fullscreen;
 } window_manager_vtable_t;
 
 /**
@@ -155,7 +157,7 @@ widget_t* window_manager_cast(widget_t* widget);
 /**
  * @method window_manager_set
  * 设置缺省的窗口管理器。
- * @param {window_manager_t*} widget 窗口管理器对象。
+ * @param {widget_t*} widget 窗口管理器对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -473,6 +475,17 @@ ret_t window_manager_end_wait_pointer_cursor(widget_t* widget);
 ret_t window_manager_resize(widget_t* widget, wh_t w, wh_t h);
 
 /**
+ * @method window_manager_set_fullscreen
+ * 设置原生窗口是否全屏。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 窗口管理器对象。
+ * @param {bool_t} fullscreen 是否全屏
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t window_manager_set_fullscreen(widget_t* widget, bool_t fullscreen);
+
+/**
  * @method window_manager_close_all
  * 关闭全部窗口。
  * @annotation ["scriptable"]
@@ -493,12 +506,22 @@ widget_t* window_manager_create(void);
 
 /**
  * @method window_manager_destroy
+ * 销毁window_manager。
+ * @param {widget_t*} widget window_manager对象。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t window_manager_destroy(widget_t* widget);
 
 /*helper for sub class*/
 /**
  * @method window_manager_init
+ * 初始化window_manager。
+ * @param {window_manager_t*} wm window_manager对象。
+ * @param {const widget_vtable_t*} wvt 控件基类虚表。
+ * @param {const window_manager_vtable_t*} vt window_manager虚表。
+ * 
+ * @return {widget_t*} 返回window_manager对象。
  */
 widget_t* window_manager_init(window_manager_t* wm, const widget_vtable_t* wvt,
                               const window_manager_vtable_t* vt);

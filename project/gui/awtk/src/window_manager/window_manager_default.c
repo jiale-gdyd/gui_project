@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  default window manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,14 +35,6 @@
 #include "base/dirty_rects.inc"
 #include "base/dialog_highlighter_factory.h"
 #include "window_manager/window_manager_default.h"
-
-#ifndef WITH_FAST_LCD_PORTRAIT
-#define WITH_FAST_LCD_PORTRAIT
-#endif
-
-#ifndef ENABLE_CURSOR
-#define ENABLE_CURSOR 1
-#endif
 
 static ret_t window_manager_animate_done(widget_t* widget);
 static ret_t window_manager_default_update_fps(widget_t* widget);
@@ -381,7 +373,7 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
       slist_foreach(&system_bar_top_rect_list, window_manager_default_snap_prev_window_system_bar_top_push_clip_rect, dialog_highlighter);
       slist_foreach(&system_bar_bottom_rect_list, window_manager_default_snap_prev_window_system_bar_bottom_push_clip_rect, dialog_highlighter);
     }
-    if (curr_highlight != NULL && *curr_highlight != '\0') {
+    if (curr_highlight != NULL) {
       dialog_highlighter_set_system_bar_alpha(dialog_highlighter, 0xFF - alpha);
       dialog_highlighter_set_win(dialog_highlighter, prev_win);
       /* 把没有遮罩的 system_bar 绘制到离线画布上 */
@@ -442,7 +434,7 @@ static ret_t window_manager_default_create_dialog_highlighter(widget_t* widget,
   }
 
   if (dialog_highlighter == NULL && widget_is_support_highlighter(curr_win) &&
-      curr_highlight != NULL) {
+      curr_highlight != NULL && *curr_highlight != '\0') {
     dialog_highlighter_factory_t* f = dialog_highlighter_factory();
     dialog_highlighter = dialog_highlighter_factory_create_highlighter(f, curr_highlight, curr_win);
 
@@ -1521,6 +1513,13 @@ static ret_t window_manager_default_layout_child(widget_t* widget, widget_t* win
   }
 }
 
+static ret_t window_manager_default_set_fullscreen(widget_t* widget, bool_t fullscreen) {
+  window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
+  return_value_if_fail(wm != NULL, RET_BAD_PARAMS);
+
+  return native_window_set_fullscreen(wm->native_window, fullscreen);
+}
+
 static ret_t window_manager_default_resize(widget_t* widget, wh_t w, wh_t h) {
   ret_t ret = RET_OK;
   rect_t r = rect_init(0, 0, w, h);
@@ -1776,7 +1775,8 @@ static window_manager_vtable_t s_window_manager_self_vtable = {
     .snap_curr_window = window_manager_default_snap_curr_window,
     .snap_prev_window = window_manager_default_snap_prev_window,
     .get_dialog_highlighter = window_manager_default_get_dialog_highlighter,
-    .resize = window_manager_default_resize};
+    .resize = window_manager_default_resize,
+    .set_fullscreen = window_manager_default_set_fullscreen};
 
 static const widget_vtable_t s_window_manager_vtable = {
     .size = sizeof(window_manager_t),

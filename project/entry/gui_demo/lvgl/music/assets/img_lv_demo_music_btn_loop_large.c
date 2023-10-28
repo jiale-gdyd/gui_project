@@ -137,7 +137,7 @@ const lv_image_dsc_t img_lv_demo_music_btn_loop = {
         .w           = 37,
         .h           = 36
     },
-    .data_size       = 1332 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 1332 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_loop_map
 };
 

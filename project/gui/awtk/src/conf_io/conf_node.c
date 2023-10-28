@@ -483,9 +483,27 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v) {
   return_value_if_fail(node->value_type != CONF_NODE_VALUE_NODE, RET_BAD_PARAMS);
 
   if (node->value_type == CONF_NODE_VALUE_STRING) {
+    if (v->type == VALUE_TYPE_STRING) {
+      const char* p = value_str(v);
+      if (node->value.str == p && p != NULL) {
+        return RET_OK;
+      }
+    }
     TKMEM_FREE(node->value.str);
-  }
-  if (node->value_type == CONF_NODE_VALUE_WSTRING) {
+  } else if (node->value_type == CONF_NODE_VALUE_SMALL_STR) {
+    if (v->type == VALUE_TYPE_STRING) {
+      const char* p = value_str(v);
+      if (node->value.small_str == p && p != NULL) {
+        return RET_OK;
+      }
+    }
+  } else if (node->value_type == CONF_NODE_VALUE_WSTRING) {
+    if (v->type == VALUE_TYPE_WSTRING) {
+      const wchar_t* p = value_wstr(v);
+      if (node->value.wstr == p && p != NULL) {
+        return RET_OK;
+      }
+    }
     TKMEM_FREE(node->value.wstr);
   }
 
@@ -567,7 +585,7 @@ ret_t conf_node_set_value(conf_node_t* node, const value_t* v) {
       const wchar_t* str = value_wstr(v);
       node->value_type = CONF_NODE_VALUE_WSTRING;
       if (str == NULL) {
-        node->value.str = NULL;
+        node->value.wstr = NULL;
       } else {
         node->value.wstr = wcsdup(str);
         return_value_if_fail(node->value.wstr != NULL, RET_OOM);
@@ -1103,7 +1121,7 @@ int32_t conf_node_get_child_value_int32(conf_node_t* node, const char* name, int
   value_t v;
   return_value_if_fail(node != NULL && name != NULL, defval);
 
-  if(conf_node_get_child_value(node, name, &v) == RET_OK) {
+  if (conf_node_get_child_value(node, name, &v) == RET_OK) {
     return value_int32(&v);
   } else {
     return defval;
@@ -1114,7 +1132,7 @@ bool_t conf_node_get_child_value_bool(conf_node_t* node, const char* name, bool_
   value_t v;
   return_value_if_fail(node != NULL && name != NULL, defval);
 
-  if(conf_node_get_child_value(node, name, &v) == RET_OK) {
+  if (conf_node_get_child_value(node, name, &v) == RET_OK) {
     return value_bool(&v);
   } else {
     return defval;
@@ -1125,7 +1143,7 @@ const char* conf_node_get_child_value_str(conf_node_t* node, const char* name, c
   value_t v;
   return_value_if_fail(node != NULL && name != NULL, defval);
 
-  if(conf_node_get_child_value(node, name, &v) == RET_OK) {
+  if (conf_node_get_child_value(node, name, &v) == RET_OK) {
     return value_str(&v);
   } else {
     return defval;

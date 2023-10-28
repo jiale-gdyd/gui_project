@@ -50,7 +50,7 @@ const lv_image_dsc_t img_lv_demo_music_list_border = {
         .w           = 479,
         .h           = 7
     },
-    .data_size       = 3353 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 3353 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_list_border_map
 };
 

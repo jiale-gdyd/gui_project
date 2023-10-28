@@ -353,12 +353,14 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
     /*Refresh the screen's layout if required*/
+    LV_PROFILER_BEGIN_TAG("layout");
     lv_obj_update_layout(disp_refr->act_scr);
     if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
     lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
+    LV_PROFILER_END_TAG("layout");
 
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
@@ -911,7 +913,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
             while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
-            layer_draw_dsc.zoom = lv_obj_get_style_transform_scale(obj, 0);
+            layer_draw_dsc.zoom_x = lv_obj_get_style_transform_scale_x(obj, 0);
+            layer_draw_dsc.zoom_y = lv_obj_get_style_transform_scale_y(obj, 0);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
             layer_draw_dsc.src = new_layer;

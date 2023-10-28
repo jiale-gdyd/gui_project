@@ -251,7 +251,7 @@ const lv_image_dsc_t img_lv_demo_music_wave_top = {
         .w           = 479,
         .h           = 74
     },
-    .data_size       = 35446 * LV_COLOR_DEPTH / 8,
+    //.data_size       = 35446 * LV_COLOR_DEPTH / 8,
     .data            = img_lv_demo_music_wave_top_map
 };
 

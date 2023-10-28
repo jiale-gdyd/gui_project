@@ -23,32 +23,30 @@ extern "C" {
 #include "../../src/indev/lv_indev.h"
 #endif
 
-/**
- * 函数名称: evdev_init
- * 功能描述: 输入事件设备初始化
- * 输入参数: 无
- * 输出参数: 无
- * 返回说明: 无
- */
+typedef struct {
+    /*Device*/
+    int fd;
+    /*Config*/
+    bool swap_axes;
+    int ver_min;
+    int hor_min;
+    int ver_max;
+    int hor_max;
+    /*State*/
+    int root_x;
+    int root_y;
+    int key;
+    lv_indev_state_t state;
+} evdev_device_t;
+
 void evdev_init(void);
 
-/**
- * 函数名称: evdev_set_file
- * 功能描述: 为evdev重新配置设备文件
- * 输入参数: dev_name --> 设置evdev设备文件名
- * 输出参数: 无
- * 返回说明: true: 设备文件设置完成。false: 当前系统不存在设备文件
- */
-bool evdev_set_file(char *dev_name);
-
-/**
- * 函数名称: evdev_read
- * 功能描述: 获取evdev的当前位置和状态
- * 输入参数: drv  --> 输入设备驱动
- * 输出参数: data --> 将evdev数据存储在这里
- * 返回说明: 无
- */
-void evdev_read(lv_indev_t *drv, lv_indev_data_t *data);
+void evdev_device_init(evdev_device_t *dsc);
+bool evdev_set_file(const char * dev_path);
+bool evdev_device_set_file(evdev_device_t * dsc, const char * dev_path);
+void evdev_device_set_swap_axes(evdev_device_t * dsc, bool swap_axes);
+void evdev_device_set_calibration(evdev_device_t * dsc, int hor_min, int ver_min, int hor_max, int ver_max);
+void evdev_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
 
 #endif
 

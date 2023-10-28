@@ -227,7 +227,7 @@ const lv_image_dsc_t img_lv_demo_music_slider_knob = {
         .w           = 66,
         .h           = 66
     },
-    .data_size       = 4356 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 4356 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_slider_knob_map
 };
 

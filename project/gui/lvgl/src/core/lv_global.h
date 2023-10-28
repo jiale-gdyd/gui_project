@@ -31,6 +31,7 @@ extern "C" {
 #include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
+#include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
@@ -170,18 +171,16 @@ typedef struct _lv_global_t {
     lv_profiler_builtin_ctx_t profiler_context;
 #endif
 
-#if LV_USE_MSG
-    bool msg_restart_notify;
-    unsigned int msg_recursion_counter;
-    lv_ll_t msg_subs_ll;
-#endif
-
 #if LV_USE_FILE_EXPLORER != 0
     lv_style_t fe_list_button_style;
 #endif
 
 #if LV_USE_SYSMON && LV_USE_PERF_MONITOR
-    void * sysmon_perf_info;
+    lv_sysmon_backend_data_t sysmon_perf;
+#endif
+
+#if LV_USE_SYSMON && LV_USE_MEM_MONITOR
+    lv_sysmon_backend_data_t sysmon_mem;
 #endif
 
 #if LV_USE_IME_PINYIN != 0

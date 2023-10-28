@@ -66,13 +66,13 @@ int gui_app_start_ex(size_t disp_width, size_t disp_height, int app_type, const 
     }
 #endif
 
+#ifndef TK_IS_PC
 #ifdef APP_LCD_ORIENTATION
-    if (system_info()->app_type != APP_SIMULATOR) {
 #if defined(APP_ENABLE_FAST_LCD_PORTRAIT)
-        tk_enable_fast_lcd_portrait(TRUE);
+    tk_enable_fast_lcd_portrait(TRUE);
 #endif
-        tk_set_lcd_orientation(APP_LCD_ORIENTATION);
-    }
+    tk_set_lcd_orientation(APP_LCD_ORIENTATION);
+#endif
 #endif
 
     system_info_set_default_font(system_info(), app_font);

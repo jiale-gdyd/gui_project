@@ -71,10 +71,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
                     draw_dsc->bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color_filtered(obj, part);
                     draw_dsc->bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, part);
                     draw_dsc->bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, part);
-                    draw_dsc->bg_grad.stops[0].opa = 0xFF;
-                    draw_dsc->bg_grad.stops[1].opa = 0xFF;
+                    draw_dsc->bg_grad.stops[0].opa = lv_obj_get_style_bg_main_opa(obj, part);
+                    draw_dsc->bg_grad.stops[1].opa = lv_obj_get_style_bg_grad_opa(obj, part);
                 }
-                draw_dsc->bg_grad.dither = lv_obj_get_style_bg_dither_mode(obj, part);
             }
         }
     }
@@ -187,7 +186,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     draw_dsc->rotation = 0;
-    draw_dsc->zoom = LV_SCALE_NONE;
+    draw_dsc->zoom_x = LV_SCALE_NONE;
+    draw_dsc->zoom_y = LV_SCALE_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 

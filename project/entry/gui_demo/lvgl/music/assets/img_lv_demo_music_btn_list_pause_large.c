@@ -344,7 +344,7 @@ const lv_image_dsc_t img_lv_demo_music_btn_list_pause = {
         .w           = 106,
         .h           = 105
     },
-    .data_size       = 11130 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    //.data_size       = 11130 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data            = img_lv_demo_music_btn_list_pause_map
 };
 

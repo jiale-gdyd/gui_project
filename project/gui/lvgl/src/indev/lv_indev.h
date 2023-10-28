@@ -30,6 +30,7 @@ struct _lv_group_t;
 struct _lv_indev_t;
 struct _lv_display_t;
 typedef struct _lv_indev_t lv_indev_t;
+typedef struct _lv_indev_t lv_indev_drv_t;
 
 /** Possible input device types*/
 typedef enum {
