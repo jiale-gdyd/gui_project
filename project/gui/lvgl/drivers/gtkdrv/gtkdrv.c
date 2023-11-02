@@ -54,8 +54,8 @@ static GdkPixbuf    *pixbuf;
 
 static unsigned char run_gtk;
 
-static lv_coord_t mouse_x;
-static lv_coord_t mouse_y;
+static int32_t mouse_x;
+static int32_t mouse_y;
 static lv_indev_state_t mouse_btn = LV_INDEV_STATE_RELEASED;
 static lv_key_t last_key;
 static lv_indev_state_t last_key_state;
@@ -140,8 +140,8 @@ uint32_t gtkdrv_tick_get(void)
  */
 void gtkdrv_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
-    lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
+    int32_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
+    int32_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
 
 
     /*Return if the area is out the screen*/

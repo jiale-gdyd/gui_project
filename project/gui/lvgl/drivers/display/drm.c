@@ -744,7 +744,7 @@ void drm_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, uint8_t * color
 #error LV_COLOR_DEPTH not supported
 #endif
 
-void drm_get_sizes(lv_coord_t *width, lv_coord_t *height, uint32_t *dpi)
+void drm_get_sizes(int32_t *width, int32_t *height, uint32_t *dpi)
 {
     if (width)
         *width = drm_dev.width;

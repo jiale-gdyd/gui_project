@@ -89,7 +89,7 @@ void sdl_init(void)
     lv_timer_create(sdl_event_handler, 1, NULL);
 }
 
-void sdl_disp_drv_init(lv_disp_drv_t * disp_drv, lv_coord_t hor_res, lv_coord_t ver_res)
+void sdl_disp_drv_init(lv_disp_drv_t * disp_drv, int32_t hor_res, int32_t ver_res)
 {
     monitor_t *m = lv_malloc(sizeof(monitor_t));
     window_create(m);
@@ -113,8 +113,8 @@ void sdl_disp_drv_init(lv_disp_drv_t * disp_drv, lv_coord_t hor_res, lv_coord_t 
  */
 void sdl_display_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    lv_coord_t hres = disp_drv->hor_res;
-    lv_coord_t vres = disp_drv->ver_res;
+    int32_t hres = disp_drv->hor_res;
+    int32_t vres = disp_drv->ver_res;
 
 //    printf("x1:%d,y1:%d,x2:%d,y2:%d\n", area->x1, area->y1, area->x2, area->y2);
 
@@ -144,8 +144,8 @@ void sdl_display_resize(lv_disp_t *disp, int width, int height)
     }
     SDL_Texture *texture = lv_draw_sdl_create_screen_texture(renderer, width, height);
     lv_disp_draw_buf_init(driver->draw_buf, texture, NULL, width * height);
-    driver->hor_res = (lv_coord_t) width;
-    driver->ver_res = (lv_coord_t) height;
+    driver->hor_res = (int32_t) width;
+    driver->ver_res = (int32_t) height;
     SDL_RendererInfo renderer_info;
     SDL_GetRendererInfo(renderer, &renderer_info);
     SDL_assert(renderer_info.flags & SDL_RENDERER_TARGETTEXTURE);

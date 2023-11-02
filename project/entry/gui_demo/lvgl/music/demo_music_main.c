@@ -75,7 +75,7 @@ static lv_timer_t *sec_counter_timer;
 static lv_timer_t *stop_start_anim_timer;
 
 static lv_obj_t *play_obj;
-static lv_coord_t start_anim_values[40];
+static int32_t start_anim_values[40];
 
 static uint32_t spectrum_len;
 static const uint16_t (*spectrum)[4];
@@ -88,7 +88,7 @@ static void _image_set_zoom_anim_cb(void * obj, int32_t zoom)
 
 static void _obj_set_x_anim_cb(void * obj, int32_t x)
 {
-    lv_obj_set_x((lv_obj_t *)obj, (lv_coord_t)x);
+    lv_obj_set_x((lv_obj_t *)obj, (int32_t)x);
 }
 
 lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
@@ -135,8 +135,8 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
 #endif
 
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
-    static const lv_coord_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t grid_rows[] = {
+    static const int32_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static int32_t grid_rows[] = {
         LV_DEMO_MUSIC_HANDLE_SIZE,      /* Spacing */
         0,                              /* Spectrum obj, set later */
         LV_GRID_CONTENT,                /* Title box */
@@ -160,8 +160,8 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 6, 1);
     lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 8, 1);
 #elif LV_DEMO_MUSIC_LANDSCAPE == 0
-    static const lv_coord_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_rows[] = {
+    static const int32_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {
         LV_DEMO_MUSIC_HANDLE_SIZE,      /* Spacing */
         LV_GRID_FR(1),                  /* Spacer */
         LV_GRID_CONTENT,                /* Title box */
@@ -190,8 +190,8 @@ lv_obj_t *_lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 8, 1);
     lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 10, 1);
 #else
-    static const lv_coord_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_rows[] = {
+    static const int32_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_rows[] = {
         LV_DEMO_MUSIC_HANDLE_SIZE,      /* Spacing */
         LV_GRID_FR(1),                  /* Spacer */
         LV_GRID_CONTENT,                /* Title box */
@@ -529,8 +529,8 @@ static lv_obj_t *create_ctrl_box(lv_obj_t *parent)
     lv_obj_set_style_pad_bottom(cont, 8, 0);
 #endif
 
-    static const lv_coord_t grid_col[] = {LV_GRID_FR(2), LV_GRID_FR(3), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
-    static const lv_coord_t grid_row[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_col[] = {LV_GRID_FR(2), LV_GRID_FR(3), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
+    static const int32_t grid_row[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(cont, grid_col, grid_row);
 
     LV_IMAGE_DECLARE(img_lv_demo_music_btn_loop);
@@ -770,11 +770,11 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         uint32_t i;
         uint16_t r[64];
 
-        lv_coord_t min_a = 5;
+        int32_t min_a = 5;
 #if LV_DEMO_MUSIC_LARGE == 0
-        lv_coord_t r_in = 1;
+        int32_t r_in = 1;
 #else
-        lv_coord_t r_in = 160;
+        int32_t r_in = 160;
 #endif
         r_in = (r_in * lv_image_get_zoom(album_image_obj)) >> 8;
         for (i = 0; i < BAR_CNT; i++) {
@@ -919,7 +919,7 @@ static void spectrum_anim_cb(void *a, int32_t v)
 
 static void start_anim_cb(void *a, int32_t v)
 {
-    lv_coord_t *av = a;
+    int32_t *av = a;
 
     *av = v;
     lv_obj_invalidate(spectrum_obj);
@@ -966,7 +966,7 @@ static lv_obj_t *album_image_create(lv_obj_t *parent)
 static void album_gesture_event_cb(lv_event_t *e)
 {
     LV_UNUSED(e);
-    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
     if (dir == LV_DIR_LEFT) {
         _lv_demo_music_album_next(true);
     }

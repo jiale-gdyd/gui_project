@@ -138,7 +138,6 @@
 
 #define LV_EXPORT_CONST_INT(int_value)      struct _silence_gcc_warning
 
-#define LV_USE_LARGE_COORD                  0
 #define LV_USE_FLOAT                        0
 
 #define LV_FONT_MONTSERRAT_8                1
@@ -311,6 +310,7 @@
 #define LV_USE_GIF                          1
 #define LV_USE_QRCODE                       1
 #define LV_USE_BARCODE                      1
+#define LV_BIN_DECODER_RAM_LOAD             0
 
 #define LV_USE_FREETYPE                     0
 #if LV_USE_FREETYPE

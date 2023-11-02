@@ -347,7 +347,7 @@ void ili9341_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * col
     int32_t y;
     uint8_t data[4];
     int32_t len = len = (act_x2 - act_x1 + 1) * 2;
-    lv_coord_t w = (area->x2 - area->x1) + 1;
+    int32_t w = (area->x2 - area->x1) + 1;
 
     /* window horizontal */
     ili9341_write(ILI9341_CMD_MODE, ILI9341_CASET);

@@ -876,15 +876,6 @@
     #endif
 #endif
 
-/*Extend the default -32k..32k coordinate range to -4M..4M by using int32_t for coordinates instead of int16_t*/
-#ifndef LV_USE_LARGE_COORD
-    #ifdef CONFIG_LV_USE_LARGE_COORD
-        #define LV_USE_LARGE_COORD CONFIG_LV_USE_LARGE_COORD
-    #else
-        #define LV_USE_LARGE_COORD 0
-    #endif
-#endif
-
 /* Use `float` as `lv_value_precise_t` */
 #ifndef LV_USE_FLOAT
     #ifdef CONFIG_LV_USE_FLOAT
@@ -2040,6 +2031,15 @@
         #define LV_USE_GIF CONFIG_LV_USE_GIF
     #else
         #define LV_USE_GIF 0
+    #endif
+#endif
+
+/*Decode bin images to RAM*/
+#ifndef LV_BIN_DECODER_RAM_LOAD
+    #ifdef CONFIG_LV_BIN_DECODER_RAM_LOAD
+        #define LV_BIN_DECODER_RAM_LOAD CONFIG_LV_BIN_DECODER_RAM_LOAD
+    #else
+        #define LV_BIN_DECODER_RAM_LOAD 0
     #endif
 #endif
 

@@ -27,9 +27,9 @@ typedef enum {
  * @param id   ID of the scenario to run. Element of `lv_demo_render_scene_t`
  * @param opa  set this opacity for each object
  */
-int lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa);
+int lv_demo_render(lvgl_demo_render_scene_t id, lv_opa_t opa);
 
-const char *lv_demo_render_get_scene_name(lv_demo_render_scene_t id);
+const char *lv_demo_render_get_scene_name(lvgl_demo_render_scene_t id);
 
 int lvgl_demo_render(int argc, char *argv[]);
 

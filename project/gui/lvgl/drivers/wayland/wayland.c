@@ -73,8 +73,8 @@ struct input
 {
     struct
     {
-        lv_coord_t x;
-        lv_coord_t y;
+        int32_t x;
+        int32_t y;
         lv_indev_state_t left_button;
         lv_indev_state_t right_button;
         lv_indev_state_t wheel_button;
@@ -89,8 +89,8 @@ struct input
 
     struct
     {
-        lv_coord_t x;
-        lv_coord_t y;
+        int32_t x;
+        int32_t y;
         lv_indev_state_t state;
     } touch;
 };
@@ -1279,7 +1279,7 @@ static void cache_apply_areas(struct window *window, void *dest, void *src, smm_
 {
     unsigned long offset;
     unsigned char start;
-    lv_coord_t y;
+    int32_t y;
     lv_area_t *dmg;
     lv_area_t *next_dmg;
     smm_buffer_t *next_buf = smm_next(src_buf);
@@ -1987,13 +1987,13 @@ static void _lv_wayland_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv
     int32_t y;
     void *buf_base;
     struct wl_buffer *wl_buf;
-    lv_coord_t src_width = (area->x2 - area->x1 + 1);
-    lv_coord_t src_height = (area->y2 - area->y1 + 1);
+    int32_t src_width = (area->x2 - area->x1 + 1);
+    int32_t src_height = (area->y2 - area->y1 + 1);
     struct window *window = disp_drv->user_data;
     smm_buffer_t *buf = window->body->pending_buffer;
 
-    const lv_coord_t hres = (disp_drv->rotated == 0) ? (disp_drv->hor_res) : (disp_drv->ver_res);
-    const lv_coord_t vres = (disp_drv->rotated == 0) ? (disp_drv->ver_res) : (disp_drv->hor_res);
+    const int32_t hres = (disp_drv->rotated == 0) ? (disp_drv->hor_res) : (disp_drv->ver_res);
+    const int32_t vres = (disp_drv->rotated == 0) ? (disp_drv->ver_res) : (disp_drv->hor_res);
 
     /* If window has been / is being closed, or is not visible, skip flush */
     if (window->closed || window->shall_close)
@@ -2406,7 +2406,7 @@ int lv_wayland_get_fd(void)
  * @param close_cb function to be called when the window gets closed by the user (optional)
  * @return new display backed by a Wayland window, or NULL on error
  */
-lv_disp_t * lv_wayland_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char *title,
+lv_disp_t * lv_wayland_create_window(int32_t hor_res, int32_t ver_res, char *title,
                                      lv_wayland_display_close_f_t close_cb)
 {
     lv_color_t * buf1 = NULL;

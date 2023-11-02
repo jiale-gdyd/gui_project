@@ -149,7 +149,7 @@ void fbdev_flush(lv_disp_t * drv, const lv_area_t * area, lv_color_t * color_p)
     int32_t act_x2 = area->x2 > (int32_t)vinfo.xres - 1 ? (int32_t)vinfo.xres - 1 : area->x2;
     int32_t act_y2 = area->y2 > (int32_t)vinfo.yres - 1 ? (int32_t)vinfo.yres - 1 : area->y2;
 
-    lv_coord_t w = (act_x2 - act_x1 + 1);
+    int32_t w = (act_x2 - act_x1 + 1);
     long int location = 0;
     long int byte_location = 0;
     unsigned char bit_location = 0;
@@ -165,7 +165,7 @@ void fbdev_flush(lv_disp_t * drv, const lv_area_t * area, lv_color_t * color_p)
         }
     } else if ((vinfo.bits_per_pixel == 24) && (LV_COLOR_DEPTH == 32)) {
         int32_t y;
-        lv_coord_t x;
+        int32_t x;
         uint8_t *pixel;
         uint8_t *fbp8 = (uint8_t *)fbp;
 
@@ -221,7 +221,7 @@ void fbdev_flush(lv_disp_t * drv, const lv_area_t * area, lv_color_t * color_p)
     lv_display_flush_ready(drv);
 }
 
-void fbdev_get_sizes(lv_coord_t *width, lv_coord_t *height, lv_coord_t *dpi)
+void fbdev_get_sizes(int32_t *width, int32_t *height, int32_t *dpi)
 {
     if (width) {
         *width = vinfo.xres;

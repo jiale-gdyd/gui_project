@@ -161,7 +161,7 @@ static void msgbox_event_cb(lv_event_t *e)
 
 static void ta_event_cb(lv_event_t *e)
 {
-    lv_indev_t *indev = lv_indev_get_act();
+    lv_indev_t *indev = lv_indev_active();
     if (indev == NULL) {
         return;
     }

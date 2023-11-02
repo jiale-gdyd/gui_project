@@ -48,7 +48,7 @@ extern "C" {
  */
 void sdl_init(void);
 
-void sdl_disp_drv_init(lv_disp_drv_t * disp_drv, lv_coord_t hor_res, lv_coord_t ver_res);
+void sdl_disp_drv_init(lv_disp_drv_t * disp_drv, int32_t hor_res, int32_t ver_res);
 
 /**
  * Flush a buffer to the marked area

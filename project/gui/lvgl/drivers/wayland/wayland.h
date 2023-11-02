@@ -32,7 +32,7 @@ void lv_wayland_deinit(void);
 
 int lv_wayland_get_fd(void);
 
-lv_disp_t *lv_wayland_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char *title, lv_wayland_display_close_f_t close_cb);
+lv_disp_t *lv_wayland_create_window(int32_t hor_res, int32_t ver_res, char *title, lv_wayland_display_close_f_t close_cb);
 void lv_wayland_close_window(lv_disp_t *disp);
 
 bool lv_wayland_window_is_open(lv_disp_t *disp);

@@ -88,8 +88,8 @@ static uint32_t wayland_time_till_next;
 
 static void wayland_handle_init(void)
 {
-    lv_coord_t hor_res = 640;
-    lv_coord_t ver_res = 480;
+    int32_t hor_res = 640;
+    int32_t ver_res = 480;
     wayland_disp = lv_wayland_create_window(hor_res, ver_res, "wayland", NULL);
 }
 #endif
@@ -113,7 +113,7 @@ int lvgl_demo_init(int argc, char *argv[])
 #if defined(CONFIG_WAYLAND_DISP_DRIVER)
     wayland_handle_init();
 #else
-    lv_coord_t width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
+    int32_t width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
 
 #if defined(CONFIG_DRM_DISP_DRIVER)
     drm_get_sizes(&width, &height, NULL);
