@@ -53,6 +53,8 @@ static void scroll_anim_y_cb(void * var, int32_t v);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void delete_timer_event_cb(lv_event_t * e);
 static void slideshow_anim_ready_cb(lv_anim_t * a_old);
+static void scale3_delete_event_cb(lv_event_t * e);
+static void tabview_delete_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -85,6 +87,16 @@ static const lv_font_t * font_normal;
 static uint32_t session_desktop = 1000;
 static uint32_t session_tablet = 1000;
 static uint32_t session_mobile = 1000;
+
+static lv_style_t scale3_section1_main_style;
+static lv_style_t scale3_section1_indicator_style;
+static lv_style_t scale3_section1_tick_style;
+static lv_style_t scale3_section2_main_style;
+static lv_style_t scale3_section2_indicator_style;
+static lv_style_t scale3_section2_tick_style;
+static lv_style_t scale3_section3_main_style;
+static lv_style_t scale3_section3_indicator_style;
+static lv_style_t scale3_section3_tick_style;
 
 /**********************
  *      MACROS
@@ -164,6 +176,7 @@ int lvgl_demo_widget(int argc, char *argv[])
     lv_style_set_radius(&style_bullet, LV_RADIUS_CIRCLE);
 
     tv = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, tab_h);
+    lv_obj_add_event(tv, tabview_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
 
@@ -773,16 +786,6 @@ static void analytics_create(lv_obj_t * parent)
     lv_scale_set_major_tick_length(scale3, 20);
     lv_scale_set_round_props(scale3, 225, 135);
 
-    static lv_style_t scale3_section1_main_style;
-    static lv_style_t scale3_section1_indicator_style;
-    static lv_style_t scale3_section1_tick_style;
-    static lv_style_t scale3_section2_main_style;
-    static lv_style_t scale3_section2_indicator_style;
-    static lv_style_t scale3_section2_tick_style;
-    static lv_style_t scale3_section3_main_style;
-    static lv_style_t scale3_section3_indicator_style;
-    static lv_style_t scale3_section3_tick_style;
-
     lv_style_init(&scale3_section1_main_style);
     lv_style_set_arc_width(&scale3_section1_main_style, 8);
     lv_style_set_arc_color(&scale3_section1_main_style, lv_palette_main(LV_PALETTE_RED));
@@ -818,6 +821,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_style_init(&scale3_section3_tick_style);
     lv_style_set_line_width(&scale3_section3_tick_style, 4);
     lv_style_set_line_color(&scale3_section3_tick_style, lv_palette_darken(LV_PALETTE_GREEN, 2));
+
+    lv_obj_add_event(scale3, scale3_delete_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_scale_section_t * section;
     section = lv_scale_add_section(scale3);
@@ -1667,4 +1672,33 @@ static void slideshow_anim_ready_cb(lv_anim_t * a_old)
     lv_anim_set_var(&a, tab);
     lv_anim_set_ready_cb(&a, slideshow_anim_ready_cb);
     lv_anim_start(&a);
+}
+
+static void scale3_delete_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if(code == LV_EVENT_DELETE) {
+        lv_style_reset(&scale3_section1_main_style);
+        lv_style_reset(&scale3_section1_indicator_style);
+        lv_style_reset(&scale3_section1_tick_style);
+        lv_style_reset(&scale3_section2_main_style);
+        lv_style_reset(&scale3_section2_indicator_style);
+        lv_style_reset(&scale3_section2_tick_style);
+        lv_style_reset(&scale3_section3_main_style);
+        lv_style_reset(&scale3_section3_indicator_style);
+        lv_style_reset(&scale3_section3_tick_style);
+    }
+}
+
+static void tabview_delete_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if(code == LV_EVENT_DELETE) {
+        lv_style_reset(&style_text_muted);
+        lv_style_reset(&style_title);
+        lv_style_reset(&style_icon);
+        lv_style_reset(&style_bullet);
+    }
 }
