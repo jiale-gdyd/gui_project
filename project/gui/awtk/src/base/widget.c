@@ -1512,8 +1512,9 @@ ret_t widget_calc_icon_text_rect(const rect_t* ir, int32_t font_size, float_t te
     }
     case ICON_AT_LEFT:
     default: {
-      *r_icon = rect_init(ir->x, ir->y, ir->h, ir->h);
-      *r_text = rect_init(ir->x + ir->h + spacer, ir->y, ir->w - ir->h - spacer, ir->h);
+      wh_t w = tk_min(ir->h, ir->w);
+      *r_icon = rect_init(ir->x, ir->y, w, ir->h);
+      *r_text = rect_init(ir->x + w + spacer, ir->y, ir->w - w - spacer, ir->h);
       break;
     }
   }
@@ -5267,4 +5268,51 @@ ret_t widget_dispatch_model_event(widget_t* widget, const char* name, const char
   WIDGET_FOR_EACH_CHILD_END();
 
   return RET_OK;
+}
+
+widget_t* widget_find_by_path(widget_t* widget, const char* path, bool_t recursive) {
+  bool_t is_first = TRUE;
+  tokenizer_t tokenizer;
+  widget_t* iter = widget;
+  tokenizer_t* t = NULL;
+  return_value_if_fail(widget != NULL && path != NULL, NULL);
+  if (strchr(path, '.') == NULL) {
+    const char* name = path;
+    if (tk_str_eq(name, STR_PROP_PARENT)) {
+      return widget->parent;
+    } else if (tk_str_eq(name, STR_PROP_SELF)) {
+      return widget;
+    } else if (tk_str_eq(name, STR_PROP_WINDOW)) {
+      return widget_get_window(widget);
+    } else if (tk_str_eq(name, STR_PROP_WINDOW_MANAGER)) {
+      return widget_get_window_manager(widget);
+    } else {
+      return widget_lookup(widget, name, recursive);
+    }
+  }
+  t = tokenizer_init(&tokenizer, path, strlen(path), ".");
+  return_value_if_fail(t != NULL, NULL);
+
+  while (tokenizer_has_more(t) && iter != NULL) {
+    const char* name = tokenizer_next(t);
+    if (is_first) {
+      if (tk_str_eq(name, STR_PROP_PARENT)) {
+        iter = widget->parent;
+      } else if (tk_str_eq(name, STR_PROP_SELF)) {
+        iter = widget;
+      } else if (tk_str_eq(name, STR_PROP_WINDOW)) {
+        iter = widget_get_window(widget);
+      } else if (tk_str_eq(name, STR_PROP_WINDOW_MANAGER)) {
+        iter = widget_get_window_manager(widget);
+      } else {
+        iter = widget_child(iter, name);
+      }
+      is_first = FALSE;
+    } else {
+      iter = widget_child(iter, name);
+    }
+  }
+  tokenizer_deinit(t);
+
+  return iter;
 }
