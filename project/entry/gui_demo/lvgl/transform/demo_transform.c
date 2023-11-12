@@ -1,5 +1,9 @@
 #include "demo_transform.h"
 
+#if LV_FONT_MONTSERRAT_18 == 0
+    #error "LV_FONT_MONTSERRAT_18 is required for lv_demo_transform. Enable it in lv_conf.h."
+#endif
+
 typedef struct {
     const void *image;
     const char *name;

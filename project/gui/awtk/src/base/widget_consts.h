@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   widget_consts.h
  * Author: AWTK Develop Team
  * Brief:  widget property names
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -560,12 +560,14 @@ BEGIN_C_DECLS
 /**
  * @const WIDGET_PROP_XOFFSET
  * X方向的偏移。（如果控件有继承 get_offset 函数指针的话，一定要和 get_offset 返回值保持一致，否则容易出现问题）
+ * 详情请看 docs/how_to_use_offset_in_custom_widget.md 
  */
 #define WIDGET_PROP_XOFFSET "xoffset"
 
 /**
  * @const WIDGET_PROP_YOFFSET
  * Y方向的偏移。（如果控件有继承 get_offset 函数指针的话，一定要和 get_offset 返回值保持一致，否则容易出现问题）
+ * 详情请看 docs/how_to_use_offset_in_custom_widget.md 
  */
 #define WIDGET_PROP_YOFFSET "yoffset"
 
@@ -1077,7 +1079,25 @@ BEGIN_C_DECLS
  * @const WIDGET_PROP_DIRTY_RECT
  * 控件脏矩形区域。
  */
-#define WIDGET_PROP_DIRTY_RECT  "dirty_rect"
+#define WIDGET_PROP_DIRTY_RECT "dirty_rect"
+
+/**
+ * @const WIDGET_PROP_SCREEN_SAVER_TIME
+ * 屏幕保护时间。
+ */
+#define WIDGET_PROP_SCREEN_SAVER_TIME "screen_saver_time"
+
+/**
+ * @const WIDGET_PROP_SHOW_FPS
+ * 是否显示FPS。
+ */
+#define WIDGET_PROP_SHOW_FPS "show_fps"
+
+/**
+ * @const WIDGET_PROP_MAX_FPS
+ * 最大FPS。
+ */
+#define WIDGET_PROP_MAX_FPS "max_fps"
 
 /**
  * @enum widget_type_t
@@ -1718,6 +1738,8 @@ typedef enum _window_closable_t {
 #define STR_PROP_SELF "self"
 #define STR_PROP_PARENT "parent"
 #define STR_PROP_WINDOW "window"
+#define STR_PROP_MAIN_WINDOW "main_window"
+#define STR_PROP_TOP_WINDOW "top_window"
 #define STR_PROP_WINDOW_MANAGER "window_manager"
 #define STR_PROP_MODEL "__model__"
 

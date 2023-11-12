@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  stb image loader
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,10 +30,6 @@
 #include "base/system_info.h"
 #include "image_loader/image_loader_stb.h"
 
-#ifndef WITH_FAST_LCD_PORTRAIT
-#define WITH_FAST_LCD_PORTRAIT
-#endif
-
 static uint8_t* convert_2_to_4(uint8_t* src, uint32_t w, uint32_t h) {
   uint32_t i = 0;
   uint8_t* s = src;
@@ -59,6 +55,31 @@ static uint8_t* convert_2_to_4(uint8_t* src, uint32_t w, uint32_t h) {
   return data;
 }
 
+static uint8_t* convert_1_to_4(uint8_t* src, uint32_t w, uint32_t h) {
+  uint32_t i = 0;
+  uint8_t* s = src;
+  uint8_t* d = NULL;
+  uint8_t* data = NULL;
+  uint32_t size = w * h;
+  return_value_if_fail(src != NULL, NULL);
+
+  data = TKMEM_ALLOC(size * 4);
+  return_value_if_fail(data != NULL, NULL);
+
+  d = data;
+  for (i = 0; i < size; i++) {
+    d[0] = s[0];
+    d[1] = s[0];
+    d[2] = s[0];
+    d[3] = 0xFF;
+
+    d += 4;
+    s += 1;
+  }
+
+  return data;
+}
+
 ret_t stb_load_image(int32_t subtype, const uint8_t* buff, uint32_t buff_size, bitmap_t* image,
                      bitmap_format_t transparent_bitmap_format,
                      bitmap_format_t opaque_bitmap_format, lcd_orientation_t o) {
@@ -77,6 +98,9 @@ ret_t stb_load_image(int32_t subtype, const uint8_t* buff, uint32_t buff_size, b
     if (n == 2) {
       n = 4;
       data = convert_2_to_4(stb_data, w, h);
+    } else if (n == 1) {
+      n = 4;
+      data = convert_1_to_4(stb_data, w, h);
     } else {
       data = stb_data;
     }

@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-extern const lv_obj_class_t lv_canvas_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 
 /*Data of canvas*/
 typedef struct {
@@ -81,7 +81,6 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
 /*=====================
  * Getter functions
  *====================*/
-
 
 lv_color32_t lv_canvas_get_px(lv_obj_t * obj, int32_t x, int32_t y);
 

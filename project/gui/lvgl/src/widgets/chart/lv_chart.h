@@ -22,11 +22,7 @@ extern "C" {
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
-#if LV_USE_LARGE_COORD
-#define LV_CHART_POINT_NONE (INT32_MAX)
-#else
-#define LV_CHART_POINT_NONE (INT16_MAX)
-#endif
+#define LV_CHART_POINT_NONE     (INT32_MAX)
 LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
 /**********************
@@ -49,7 +45,6 @@ typedef _lv_chart_type_t lv_chart_type_t;
 typedef uint8_t lv_chart_type_t;
 #endif /*DOXYGEN*/
 
-
 /**
  * Chart update mode for `lv_chart_set_next`
  */
@@ -63,7 +58,6 @@ typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
 #else
 typedef uint8_t lv_chart_update_mode_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Enumeration of the axis'
@@ -81,7 +75,6 @@ typedef _lv_chart_axis_t lv_chart_axis_t;
 #else
 typedef uint8_t lv_chart_axis_t;
 #endif /*DOXYGEN*/
-
 
 /**
  * Descriptor a chart series
@@ -107,7 +100,6 @@ typedef struct {
     uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
 
-
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
@@ -124,7 +116,7 @@ typedef struct {
     lv_chart_update_mode_t update_mode : 1;
 } lv_chart_t;
 
-extern const lv_obj_class_t lv_chart_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_chart_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -263,8 +255,6 @@ void lv_chart_set_x_start_point(lv_obj_t * obj, lv_chart_series_t * ser, uint32_
  * @return          the next series or NULL if there is no more.
  */
 lv_chart_series_t * lv_chart_get_series_next(const lv_obj_t * chart, const lv_chart_series_t * ser);
-
-
 
 /*=====================
  * Cursor

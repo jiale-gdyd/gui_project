@@ -48,6 +48,7 @@ typedef enum {
     LV_DRAW_TASK_TYPE_TRIANGLE,
     LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
     LV_DRAW_TASK_TYPE_MASK_BITMAP,
+    LV_DRAW_TASK_TYPE_VECTOR,
 } lv_draw_task_type_t;
 
 typedef enum {
@@ -116,9 +117,13 @@ typedef struct _lv_draw_unit_t {
      * A draw task should be assign only if the draw unit can draw it too
      * @param draw_unit     pointer to the draw unit
      * @param layer         pointer to a layer on which the draw task should be drawn
-     * @return              >=0:    The number of taken draw task
-     *                      -1:     There where no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
+     * @return              >=0:    The number of taken draw task:
+     *                                  0 means the task has not yet been completed.
+     *                                  1 means a new task has been accepted.
+     *                      -1:     The draw unit wanted to work on a task but couldn't do that
+     *                              due to some errors (e.g. out of memory).
+     *                              It signals that LVGL should call the dispatcher later again
+     *                              to let draw unit try to start the rendering again.
      */
     int32_t (*dispatch_cb)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 
@@ -129,8 +134,14 @@ typedef struct _lv_draw_unit_t {
      * @return
      */
     int32_t (*evaluate_cb)(struct _lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
-} lv_draw_unit_t;
 
+    /**
+     * Called to delete draw unit.
+     * @param draw_unit
+     * @return
+     */
+    int32_t (*delete_cb)(struct _lv_draw_unit_t * draw_unit);
+} lv_draw_unit_t;
 
 typedef struct _lv_layer_t  {
 
@@ -189,6 +200,8 @@ typedef struct {
  **********************/
 
 void lv_draw_init(void);
+
+void lv_draw_deinit(void);
 
 /**
  * Allocate a new draw unit with the given size and appends it to the list of draw units

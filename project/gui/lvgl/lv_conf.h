@@ -138,6 +138,8 @@
 
 #define LV_EXPORT_CONST_INT(int_value)      struct _silence_gcc_warning
 
+#define LV_ATTRIBUTE_EXTERN_DATA
+
 #define LV_USE_FLOAT                        0
 
 #define LV_FONT_MONTSERRAT_8                1
@@ -327,6 +329,10 @@
 #endif
 
 #define LV_USE_RLOTTIE                      1
+
+#define LV_USE_VECTOR_GRAPHIC               0
+#define LV_USE_THORVG_INTERNAL              0
+#define LV_USE_THORVG_EXTERNAL              0
 
 #define LV_USE_FFMPEG                       0
 #if LV_USE_FFMPEG

@@ -42,10 +42,9 @@ typedef struct {
 
 lv_indev_t * lv_sdl_mouse_create(void)
 {
-    lv_sdl_mouse_t * dsc = lv_malloc(sizeof(lv_sdl_mouse_t));
+    lv_sdl_mouse_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mouse_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_mouse_t));
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -74,7 +73,6 @@ static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
     data->point.y = dsc->last_y;
     data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
-
 
 void _lv_sdl_mouse_handler(SDL_Event * event)
 {

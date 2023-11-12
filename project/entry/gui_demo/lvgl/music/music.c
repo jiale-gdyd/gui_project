@@ -79,6 +79,10 @@ static const uint32_t time_list[] = {
     2 * 60 + 19,
 };
 
+#if LV_USE_PERF_MONITOR || LV_DEMO_MUSIC_AUTO_PLAY
+    #define sysmon_perf LV_GLOBAL_DEFAULT()->sysmon_perf
+#endif
+
 int lvgl_demo_music(int argc, char *argv[])
 {
     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x343247), 0);
@@ -214,7 +218,8 @@ static void auto_step_cb(lv_timer_t * t)
                 lv_obj_t *num = lv_label_create(bg);
                 lv_obj_set_style_text_font(num, font_large, 0);
 #if LV_USE_PERF_MONITOR
-                lv_label_set_text_fmt(num, "%" LV_PRIu32, lv_refr_get_fps_avg());
+                const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(&sysmon_perf.subject);
+                lv_label_set_text_fmt(num, "%" LV_PRIu32, info->calculated.cpu_avg_total);
 #endif
                 lv_obj_align(num, LV_ALIGN_TOP_MID, 0, 120);
 

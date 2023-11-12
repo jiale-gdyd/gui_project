@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   value.h
  * Author: AWTK Develop Team
  * Brief:  generic value type
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -179,6 +179,10 @@ int64_t value_int64(const value_t* v) {
     return v->value.u64;
   } else if (v->type == VALUE_TYPE_STRING) {
     return tk_atol(v->value.str);
+  } else if (v->type == VALUE_TYPE_UINT32) {
+    return (int64_t)value_uint32(v);
+  } else if (v->type == VALUE_TYPE_UINT64) {
+    return (int64_t)value_uint64(v);
   } else {
     return (int64_t)value_int(v);
   }
@@ -431,6 +435,16 @@ value_t* value_set_wstr(value_t* v, const wchar_t* value) {
 
   v->value.wstr = value;
   return value_init(v, VALUE_TYPE_WSTRING);
+}
+
+value_t* value_dup_wstr(value_t* v, const wchar_t* value) {
+  return_value_if_fail(v != NULL, NULL);
+
+  value_init(v, VALUE_TYPE_WSTRING);
+  v->value.wstr = tk_wstrdup(value);
+  v->free_handle = TRUE;
+
+  return v;
 }
 
 const char* value_str(const value_t* v) {
@@ -2307,35 +2321,33 @@ ret_t value_max(value_t* arr, uint32_t size, value_t* result) {
   return RET_OK;
 }
 
-static const char* s_type_names[] = {
-  [VALUE_TYPE_BOOL] = "bool",
-  [VALUE_TYPE_INT8] = "int8",
-  [VALUE_TYPE_INT16] = "int16",
-  [VALUE_TYPE_INT32] = "int32",
-  [VALUE_TYPE_INT64] = "int64",
-  [VALUE_TYPE_UINT8] = "uint8",
-  [VALUE_TYPE_UINT16] = "uint16",
-  [VALUE_TYPE_UINT32] = "uint32",
-  [VALUE_TYPE_UINT64] = "uint64",
-  [VALUE_TYPE_FLOAT] = "float",
-  [VALUE_TYPE_FLOAT32] = "float32",
-  [VALUE_TYPE_DOUBLE] = "double",
-  [VALUE_TYPE_STRING] = "char*",
-  [VALUE_TYPE_WSTRING] = "wchar_t*",
-  [VALUE_TYPE_POINTER] = "pointer",
-  [VALUE_TYPE_OBJECT] = "object",
-  [VALUE_TYPE_BINARY] = "binary",
-  [VALUE_TYPE_UBJSON] = "ubjson",
-  [VALUE_TYPE_ID] = "id",
-  [VALUE_TYPE_TOKEN] = "token",
-  [VALUE_TYPE_RECT] = "rect",
-  [VALUE_TYPE_FUNC] = "func",
-  [VALUE_TYPE_GRADIENT] = "gradient",
-  [VALUE_TYPE_FUNC_DEF] = "func_def",
-  [VALUE_TYPE_BITMAP] = "bitmap",
-  [VALUE_TYPE_SIZED_STRING] = "char(with size)*",
-  [VALUE_TYPE_POINTER_REF] = "pointer ref"
-};
+static const char* s_type_names[] = {[VALUE_TYPE_BOOL] = "bool",
+                                     [VALUE_TYPE_INT8] = "int8",
+                                     [VALUE_TYPE_INT16] = "int16",
+                                     [VALUE_TYPE_INT32] = "int32",
+                                     [VALUE_TYPE_INT64] = "int64",
+                                     [VALUE_TYPE_UINT8] = "uint8",
+                                     [VALUE_TYPE_UINT16] = "uint16",
+                                     [VALUE_TYPE_UINT32] = "uint32",
+                                     [VALUE_TYPE_UINT64] = "uint64",
+                                     [VALUE_TYPE_FLOAT] = "float",
+                                     [VALUE_TYPE_FLOAT32] = "float32",
+                                     [VALUE_TYPE_DOUBLE] = "double",
+                                     [VALUE_TYPE_STRING] = "char*",
+                                     [VALUE_TYPE_WSTRING] = "wchar_t*",
+                                     [VALUE_TYPE_POINTER] = "pointer",
+                                     [VALUE_TYPE_OBJECT] = "object",
+                                     [VALUE_TYPE_BINARY] = "binary",
+                                     [VALUE_TYPE_UBJSON] = "ubjson",
+                                     [VALUE_TYPE_ID] = "id",
+                                     [VALUE_TYPE_TOKEN] = "token",
+                                     [VALUE_TYPE_RECT] = "rect",
+                                     [VALUE_TYPE_FUNC] = "func",
+                                     [VALUE_TYPE_GRADIENT] = "gradient",
+                                     [VALUE_TYPE_FUNC_DEF] = "func_def",
+                                     [VALUE_TYPE_BITMAP] = "bitmap",
+                                     [VALUE_TYPE_SIZED_STRING] = "char(with size)*",
+                                     [VALUE_TYPE_POINTER_REF] = "pointer ref"};
 
 const char* value_type_name(value_type_t type) {
   return s_type_names[type];

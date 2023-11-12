@@ -12,3 +12,4 @@ obj-y += lv_draw_triangle.o
 obj-y += lv_draw.o
 obj-y += lv_image_buf.o
 obj-y += lv_image_decoder.o
+obj-y += lv_draw_vector.o

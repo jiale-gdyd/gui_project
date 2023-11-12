@@ -338,7 +338,7 @@ ret_t fs_test_file(fs_t* fs) {
   char buff[32];
   fs_file_t* fp = NULL;
   const char* filename = "./test.txt";
-  char path[MAX_PATH+1] = {0};
+  char path[MAX_PATH + 1] = {0};
 
   assert(fs_get_cwd(os_fs(), path) == RET_OK);
   assert(fs_get_exe(os_fs(), path) == RET_OK);
@@ -658,6 +658,53 @@ ret_t fs_copy_file(fs_t* fs, const char* src, const char* dst) {
   }
   fs_file_close(fdst);
 
+  return ret;
+}
+
+bool_t fs_file_equal(fs_t* fs, const char* src, const char* dst) {
+  int32_t slen = 0;
+  int32_t dlen = 0;
+  bool_t ret = FALSE;
+  fs_file_t* fsrc = NULL;
+  fs_file_t* fdst = NULL;
+  uint8_t sbuff[1024] = {0};
+  uint8_t dbuff[1024] = {0};
+  return_value_if_fail(fs != NULL && src != NULL && dst != NULL, FALSE);
+  return_value_if_fail(file_exist(src), FALSE);
+  return_value_if_fail(file_exist(dst), FALSE);
+  fdst = fs_open_file(fs, dst, "rb");
+  return_value_if_fail(fdst != NULL, FALSE);
+
+  fsrc = fs_open_file(fs, src, "rb");
+  if (fsrc != NULL) {
+    if (fs_file_size(fsrc) != fs_file_size(fdst)) {
+      goto end;
+    }
+
+    while (TRUE) {
+      slen = fs_file_read(fsrc, sbuff, sizeof(sbuff));
+      dlen = fs_file_read(fdst, dbuff, sizeof(dbuff));
+      if (slen != dlen) {
+        goto end;
+      }
+      if (memcmp(sbuff, dbuff, slen) != 0) {
+        goto end;
+      }
+
+      if (fs_file_eof(fsrc)) {
+        ret = TRUE;
+        break;
+      }
+    }
+  }
+end:
+  if (fsrc != NULL) {
+    fs_file_close(fsrc);
+  }
+
+  if (fdst != NULL) {
+    fs_file_close(fdst);
+  }
   return ret;
 }
 

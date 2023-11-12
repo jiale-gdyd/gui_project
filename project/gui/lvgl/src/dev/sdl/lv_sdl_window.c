@@ -78,10 +78,9 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         inited = true;
     }
 
-    lv_sdl_window_t * dsc = lv_malloc(sizeof(lv_sdl_window_t));
+    lv_sdl_window_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_window_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_window_t));
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
@@ -161,7 +160,6 @@ void lv_sdl_quit()
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {

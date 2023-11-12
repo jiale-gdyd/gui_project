@@ -81,7 +81,6 @@ typedef struct {
 
     /*Parts*/
     lv_style_t knob;
-    lv_style_t indic;
 
 #if LV_USE_ARC
     lv_style_t arc_indic;
@@ -138,7 +137,7 @@ typedef struct {
 #endif
 
 #if LV_USE_LIST
-    lv_style_t list_bg, list_btn, list_item_grow, list_label;
+    lv_style_t list_bg, list_btn, list_item_grow;
 #endif
 
 #if LV_USE_TABVIEW
@@ -179,7 +178,6 @@ typedef struct _my_theme_t {
 #endif
 } my_theme_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -197,7 +195,6 @@ static void style_init_reset(lv_style_t * style);
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
 
 static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
 {
@@ -634,7 +631,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_transform_width(&theme->styles.list_item_grow, PAD_DEF);
 #endif
 
-
 #if LV_USE_LED
     style_init_reset(&theme->styles.led);
     lv_style_set_bg_opa(&theme->styles.led, LV_OPA_COVER);
@@ -667,8 +663,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {
-        theme_def = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
-        lv_memzero(theme_def, sizeof(my_theme_t));
+        theme_def = lv_malloc_zeroed(sizeof(my_theme_t));
     }
 
     struct _my_theme_t * theme = theme_def;
@@ -715,7 +710,16 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
 
 void lv_theme_default_deinit(void)
 {
-    if(theme_def) {
+    struct _my_theme_t * theme = theme_def;
+    if(theme) {
+        if(theme->inited) {
+            lv_style_t * theme_styles = (lv_style_t *)(&(theme->styles));
+            uint32_t i;
+            for(i = 0; i < sizeof(my_theme_styles_t) / sizeof(lv_style_t); i++) {
+                lv_style_reset(theme_styles + i);
+            }
+
+        }
         lv_free(theme_def);
         theme_def = NULL;
     }
@@ -736,7 +740,6 @@ bool lv_theme_default_is_inited(void)
     if(theme == NULL) return false;
     return theme->inited;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
@@ -783,7 +786,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
             return;
         }
 #endif
-
 
 #if LV_USE_CALENDAR
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_calendar_class)) {
@@ -1022,7 +1024,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.knob, LV_PART_KNOB);
     }
 #endif
-
 
 #if LV_USE_SPINNER
     else if(lv_obj_check_type(obj, &lv_spinner_class)) {

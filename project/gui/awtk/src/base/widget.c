@@ -580,7 +580,6 @@ image_manager_t* widget_get_image_manager(widget_t* widget) {
   }
 }
 
-
 static ret_t widget_apply_tr_text_before_paint(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
   if (widget->tr_text != NULL) {
@@ -1182,7 +1181,23 @@ static widget_t* widget_lookup_child(widget_t* widget, const char* name) {
 }
 
 widget_t* widget_child(widget_t* widget, const char* path) {
-  return widget_lookup_child(widget, path);
+  return_value_if_fail(widget != NULL && path != NULL, NULL);
+  if (*path == '[' && path[strlen(path) - 1] == ']') {
+    int32_t index = tk_atoi(path + 1);
+
+    if (index < 0) {
+      index = widget_count_children(widget) - index;
+    }
+
+    if (index >= 0) {
+      return widget_get_child(widget, index);
+    } else {
+      log_debug("invalid index:%d\n", index);
+      return NULL;
+    }
+  } else {
+    return widget_lookup_child(widget, path);
+  }
 }
 
 widget_t* widget_get_focused_widget(widget_t* widget) {
@@ -1607,7 +1622,8 @@ ret_t widget_draw_icon_text(widget_t* widget, canvas_t* c, const char* icon, wst
 }
 
 ret_t widget_draw_image_with_region(widget_t* widget, canvas_t* c, bitmap_t* img,
-  const char* region, const rect_t* dst, image_draw_type_t draw_type) {
+                                    const char* region, const rect_t* dst,
+                                    image_draw_type_t draw_type) {
   rect_t src;
   return_value_if_fail(widget != NULL && img != NULL, RET_BAD_PARAMS);
   return_value_if_fail(c != NULL && region != NULL && dst != NULL, RET_BAD_PARAMS);
@@ -2026,9 +2042,9 @@ static ret_t fscript_info_prepare(fscript_info_t* info, event_t* evt) {
       tk_object_set_prop_object(obj, "model", e->model);
       break;
     }
-    case EVT_ANIM_ONCE : 
-    case EVT_ANIM_START : 
-    case EVT_ANIM_END : {
+    case EVT_ANIM_ONCE:
+    case EVT_ANIM_START:
+    case EVT_ANIM_END: {
       widget_animator_event_t* e = widget_animator_event_cast(evt);
       if (e != NULL) {
         widget_animator_t* animator = (widget_animator_t*)e->animator;
@@ -4033,7 +4049,7 @@ float_t widget_measure_text(widget_t* widget, const wchar_t* text) {
 }
 
 ret_t widget_load_image(widget_t* widget, const char* name, bitmap_t* bitmap) {
-  char real_name[MAX_PATH+1];
+  char real_name[MAX_PATH + 1];
   const char* region = NULL;
   image_manager_t* imm = widget_get_image_manager(widget);
 
@@ -4042,7 +4058,7 @@ ret_t widget_load_image(widget_t* widget, const char* name, bitmap_t* bitmap) {
 
   region = strrchr(name, '#');
   if (region != NULL) {
-    tk_strncpy(real_name, name, region-name);
+    tk_strncpy(real_name, name, region - name);
     name = real_name;
   }
 
@@ -4620,7 +4636,9 @@ ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* va
   const char* name = NULL;
   const char* p_state = NULL;
   ret_t ret = RET_NOT_FOUND;
-  return_value_if_fail(widget != NULL && state_and_name != NULL && *state_and_name != '\0' && value != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(
+      widget != NULL && state_and_name != NULL && *state_and_name != '\0' && value != NULL,
+      RET_BAD_PARAMS);
   memset(state, 0x0, sizeof(state));
 
   name = strchr(state_and_name, ':');
@@ -4636,11 +4654,13 @@ ret_t widget_get_style(widget_t* widget, const char* state_and_name, value_t* va
     name = name + 1;
   }
 
-  if (style_is_mutable(widget->astyle) || tk_str_eq(p_state, widget_get_prop_str(widget, WIDGET_PROP_STATE_FOR_STYLE, NULL))) {
+  if (style_is_mutable(widget->astyle) ||
+      tk_str_eq(p_state, widget_get_prop_str(widget, WIDGET_PROP_STATE_FOR_STYLE, NULL))) {
     ret = style_get(widget->astyle, p_state, name, value);
   }
   if (ret != RET_OK) {
-    const char* style_name = (widget->style != NULL && *widget->style != '\0') ? widget->style : TK_DEFAULT_STYLE;
+    const char* style_name =
+        (widget->style != NULL && *widget->style != '\0') ? widget->style : TK_DEFAULT_STYLE;
     const void* data = widget_get_const_style_data_for_state(widget, style_name, p_state);
     if (data == NULL && !tk_str_eq(p_state, WIDGET_STATE_NORMAL)) {
       data = widget_get_const_style_data_for_state(widget, style_name, WIDGET_STATE_NORMAL);
@@ -4742,7 +4762,7 @@ bool_t widget_is_normal_window(widget_t* widget) {
 
 bool_t widget_is_fullscreen_window(widget_t* widget) {
   return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
-  
+
   return widget->vt->is_window && widget_get_prop_bool(widget, WIDGET_PROP_FULLSCREEN, FALSE);
 }
 
@@ -4761,13 +4781,15 @@ bool_t widget_is_popup(widget_t* widget) {
 bool_t widget_is_support_highlighter(widget_t* widget) {
   return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
 
-  return widget->vt->is_window && (tk_str_eq(widget->vt->type, WIDGET_TYPE_POPUP) || tk_str_eq(widget->vt->type, WIDGET_TYPE_DIALOG));
+  return widget->vt->is_window && (tk_str_eq(widget->vt->type, WIDGET_TYPE_POPUP) ||
+                                   tk_str_eq(widget->vt->type, WIDGET_TYPE_DIALOG));
 }
 
 bool_t widget_has_highlighter(widget_t* widget) {
   return_value_if_fail(widget != NULL && widget->vt != NULL, FALSE);
 
-  return widget_is_support_highlighter(widget) && widget_get_prop_str(widget, WIDGET_PROP_HIGHLIGHT, NULL) != NULL;
+  return widget_is_support_highlighter(widget) &&
+         widget_get_prop_str(widget, WIDGET_PROP_HIGHLIGHT, NULL) != NULL;
 }
 
 bool_t widget_is_overlay(widget_t* widget) {
@@ -5284,6 +5306,10 @@ widget_t* widget_find_by_path(widget_t* widget, const char* path, bool_t recursi
       return widget;
     } else if (tk_str_eq(name, STR_PROP_WINDOW)) {
       return widget_get_window(widget);
+    } else if (tk_str_eq(name, STR_PROP_TOP_WINDOW)) {
+      return window_manager_get_top_window(window_manager());
+    } else if (tk_str_eq(name, STR_PROP_MAIN_WINDOW)) {
+      return window_manager_get_top_main_window(window_manager());
     } else if (tk_str_eq(name, STR_PROP_WINDOW_MANAGER)) {
       return widget_get_window_manager(widget);
     } else {
@@ -5302,14 +5328,26 @@ widget_t* widget_find_by_path(widget_t* widget, const char* path, bool_t recursi
         iter = widget;
       } else if (tk_str_eq(name, STR_PROP_WINDOW)) {
         iter = widget_get_window(widget);
+      } else if (tk_str_eq(name, STR_PROP_TOP_WINDOW)) {
+        iter = window_manager_get_top_window(window_manager());
+      } else if (tk_str_eq(name, STR_PROP_MAIN_WINDOW)) {
+        iter = window_manager_get_top_main_window(window_manager());
       } else if (tk_str_eq(name, STR_PROP_WINDOW_MANAGER)) {
         iter = widget_get_window_manager(widget);
       } else {
+        widget_t* save = iter;
         iter = widget_child(iter, name);
+        if (iter == NULL) {
+          iter = widget_lookup_by_type_child(save, name);
+        }
       }
       is_first = FALSE;
     } else {
+      widget_t* save = iter;
       iter = widget_child(iter, name);
+      if (iter == NULL) {
+        iter = widget_lookup_by_type_child(save, name);
+      }
     }
   }
   tokenizer_deinit(t);

@@ -9,7 +9,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -102,6 +101,10 @@ void lv_draw_vglite_init(void)
 #if LV_USE_OS
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 8 * 1024, draw_vglite_unit);
 #endif
+}
+
+void lv_draw_vglite_deinit(void)
+{
 }
 
 /**********************

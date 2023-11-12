@@ -59,6 +59,17 @@ void lv_bmp_init(void)
     lv_image_decoder_set_close_cb(dec, decoder_close);
 }
 
+void lv_bmp_deinit(void)
+{
+    lv_image_decoder_t * dec = NULL;
+    while((dec = lv_image_decoder_get_next(dec)) != NULL) {
+        if(dec->info_cb == decoder_info) {
+            lv_image_decoder_delete(dec);
+            break;
+        }
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -123,7 +134,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
     return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
-
 /**
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array
@@ -178,7 +188,6 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     return LV_RESULT_INVALID;    /*If not returned earlier then it failed*/
 }
 
-
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                     const lv_area_t * full_area, lv_area_t * decoded_area)
 {
@@ -196,7 +205,6 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y2++;
     }
 
-
     if(decoded_area->y1 > full_area->y2) {
         return LV_RESULT_INVALID;
     }
@@ -210,7 +218,6 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_OK;
     }
 }
-
 
 /**
  * Free the allocated resources

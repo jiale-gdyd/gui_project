@@ -97,7 +97,6 @@ typedef struct _lv_image_decoder_t {
     void * user_data;
 } lv_image_decoder_t;
 
-
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/
@@ -145,6 +144,11 @@ typedef struct _lv_image_decoder_dsc_t {
  * Initialize the image decoder module
  */
 void _lv_image_decoder_init(void);
+
+/**
+ * Deinitialize the image decoder module
+ */
+void _lv_image_decoder_deinit(void);
 
 /**
  * Get information about an image.

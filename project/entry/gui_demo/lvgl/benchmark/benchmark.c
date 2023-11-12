@@ -6,6 +6,14 @@
  *      TYPEDEFS
  **********************/
 
+#if LV_FONT_MONTSERRAT_14 == 0
+    #error "LV_FONT_MONTSERRAT_14 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
+#if LV_FONT_MONTSERRAT_24 == 0
+    #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
 typedef struct {
     const char * name;
     void (*create_cb)(void);

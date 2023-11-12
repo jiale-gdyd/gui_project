@@ -34,10 +34,6 @@
 #include "tkc/data_reader_factory.h"
 #include "tkc/data_writer_factory.h"
 
-#ifndef WITH_DATA_READER_WRITER
-#define WITH_DATA_READER_WRITER 1
-#endif
-
 #define IS_ADDRESS_ALIGN_4(addr) !((((size_t)(addr)) & 0x3) | 0x0)
 
 const char* tk_skip_to_num(const char* str) {
@@ -569,31 +565,7 @@ int tk_vsnprintf(char* str, size_t size, const char* format, va_list ap) {
 }
 
 ret_t filename_to_name_ex(const char* filename, char* str, uint32_t size, bool_t remove_extname) {
-  char* p = NULL;
-  const char* name = filename;
-  return_value_if_fail(filename != NULL && str != NULL, RET_BAD_PARAMS);
-
-  name = strrchr(filename, '/');
-  if (name == NULL) {
-    name = strrchr(filename, '\\');
-  }
-
-  if (name == NULL) {
-    name = filename;
-  } else {
-    name += 1;
-  }
-
-  tk_strncpy(str, name, size - 1);
-
-  if (remove_extname) {
-    p = strrchr(str, '.');
-    if (p != NULL) {
-      *p = '\0';
-    }
-  }
-
-  return RET_OK;
+  return path_basename_ex(filename, remove_extname, str, size);
 }
 
 ret_t filename_to_name(const char* filename, char* str, uint32_t size) {

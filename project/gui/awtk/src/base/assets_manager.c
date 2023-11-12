@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   assets_manager.h
  * Author: AWTK Develop Team
  * Brief:  asset manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -833,6 +833,67 @@ ret_t assets_manager_preload(assets_manager_t* am, asset_type_t type, const char
   return RET_OK;
 }
 
+static const char* asset_type_to_str(asset_type_t type) {
+  const char* str = NULL;
+  switch (type) {
+    case ASSET_TYPE_FONT: {
+      str = "font";
+      break;
+    }
+    case ASSET_TYPE_SCRIPT: {
+      str = "script";
+      break;
+    }
+    case ASSET_TYPE_FLOW: {
+      str = "flow";
+      break;
+    }
+    case ASSET_TYPE_STYLE: {
+      str = "style";
+      break;
+    }
+    case ASSET_TYPE_STRINGS: {
+      str = "strings";
+      break;
+    }
+    case ASSET_TYPE_IMAGE: {
+      str = "image";
+      break;
+    }
+    case ASSET_TYPE_UI: {
+      str = "ui";
+      break;
+    }
+    case ASSET_TYPE_XML: {
+      str = "xml";
+      break;
+    }
+    case ASSET_TYPE_DATA: {
+      str = "data";
+      break;
+    }
+    default: {
+      str = "unknown";
+      break;
+    }
+  }
+
+  return str;
+}
+
+ret_t assets_manager_dump(assets_manager_t* am, str_t* result) {
+  uint32_t i = 0;
+  return_value_if_fail(am != NULL && result != NULL, RET_BAD_PARAMS);
+
+  for (i = 0; i < am->assets.size; i++) {
+    asset_info_t* info = (asset_info_t*)darray_get(&(am->assets), i);
+    str_append_format(result, 1024, "%s: type=%s size=%u\n", asset_info_get_name(info),
+                      asset_type_to_str(info->type), info->size);
+  }
+
+  return RET_OK;
+}
+
 ret_t assets_manager_deinit(assets_manager_t* am) {
   return_value_if_fail(am != NULL, RET_BAD_PARAMS);
 
@@ -946,7 +1007,8 @@ assets_manager_t* assets_managers_ref(const char* name) {
 
     darray_push(s_assets_managers, am);
     assets_manager_set_res_root(am, res_root);
-    assets_manager_set_fallback_load_asset(am, (assets_manager_load_asset_t)assets_manager_load_asset_fallback_default, NULL);
+    assets_manager_set_fallback_load_asset(
+        am, (assets_manager_load_asset_t)assets_manager_load_asset_fallback_default, NULL);
   } else {
     am->refcount++;
   }

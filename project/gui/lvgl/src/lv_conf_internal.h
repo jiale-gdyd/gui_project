@@ -876,6 +876,15 @@
     #endif
 #endif
 
+/*Prefix all global extern data with this*/
+#ifndef LV_ATTRIBUTE_EXTERN_DATA
+    #ifdef CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+        #define LV_ATTRIBUTE_EXTERN_DATA CONFIG_LV_ATTRIBUTE_EXTERN_DATA
+    #else
+        #define LV_ATTRIBUTE_EXTERN_DATA
+    #endif
+#endif
+
 /* Use `float` as `lv_value_precise_t` */
 #ifndef LV_USE_FLOAT
     #ifdef CONFIG_LV_USE_FLOAT
@@ -2142,6 +2151,33 @@
         #define LV_USE_RLOTTIE CONFIG_LV_USE_RLOTTIE
     #else
         #define LV_USE_RLOTTIE 0
+    #endif
+#endif
+
+/*Enable Vector Graphic APIs*/
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_VECTOR_GRAPHIC  0
+    #endif
+#endif
+
+/* Enable ThorVG (vector graphics library) from the src/libs folder */
+#ifndef LV_USE_THORVG_INTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_INTERNAL
+        #define LV_USE_THORVG_INTERNAL CONFIG_LV_USE_THORVG_INTERNAL
+    #else
+        #define LV_USE_THORVG_INTERNAL 0
+    #endif
+#endif
+
+/* Enable ThorVG by assuming that its installed and linked to the project */
+#ifndef LV_USE_THORVG_EXTERNAL
+    #ifdef CONFIG_LV_USE_THORVG_EXTERNAL
+        #define LV_USE_THORVG_EXTERNAL CONFIG_LV_USE_THORVG_EXTERNAL
+    #else
+        #define LV_USE_THORVG_EXTERNAL 0
     #endif
 #endif
 

@@ -42,10 +42,9 @@ static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
 
 lv_indev_t * lv_sdl_keyboard_create(void)
 {
-    lv_sdl_keyboard_t * dsc = lv_malloc(sizeof(lv_sdl_keyboard_t));
+    lv_sdl_keyboard_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_keyboard_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_keyboard_t));
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -115,7 +114,6 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     if(indev == NULL) return;
     lv_sdl_keyboard_t * dsc = lv_indev_get_driver_data(indev);
 
-
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */
     switch(event->type) {
         case SDL_KEYDOWN: {                     /*Button press*/
@@ -140,7 +138,6 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
 
     }
 }
-
 
 /**
  * Convert a SDL key code to it's LV_KEY_* counterpart or return '\0' if it's not a control character.

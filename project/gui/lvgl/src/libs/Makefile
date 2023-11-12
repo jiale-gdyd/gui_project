@@ -11,3 +11,4 @@ obj-y += tjpgd/
 obj-y += tiny_ttf/
 obj-y += libpng/
 obj-y += libjpeg_turbo/
+obj-y += thorvg/

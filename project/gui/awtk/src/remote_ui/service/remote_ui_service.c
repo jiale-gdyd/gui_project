@@ -31,6 +31,7 @@
 #include "base/ui_loader.h"
 #include "base/dialog.h"
 #include "conf_io/conf_ubjson.h"
+#include "conf_io/conf_json.h"
 #include "tkc/object_default.h"
 #include "ui_loader/ui_serializer.h"
 #include "remote_ui/shared/remote_ui_types_def.h"
@@ -41,6 +42,7 @@
 
 static ret_t remote_ui_service_dispatch(remote_ui_service_t* ui);
 static ret_t remote_ui_service_destroy(remote_ui_service_t* ui);
+static ret_t remote_ui_service_set_language(remote_ui_service_t* ui, const char* language);
 
 tk_service_t* remote_ui_service_create(tk_iostream_t* io, void* args) {
   remote_ui_service_t* ui = NULL;
@@ -51,11 +53,10 @@ tk_service_t* remote_ui_service_create(tk_iostream_t* io, void* args) {
   ui = (remote_ui_service_t*)TKMEM_ZALLOC(remote_ui_service_t);
   return_value_if_fail(ui != NULL, NULL);
 
-  ui->io = io;
+  tk_service_init(&(ui->service), io);
   ui->service.dispatch = (tk_service_dispatch_t)remote_ui_service_dispatch;
   ui->service.destroy = (tk_service_destroy_t)remote_ui_service_destroy;
 
-  wbuffer_init_extendable(&(ui->wb));
   if (service_args != NULL && service_args->auth != NULL) {
     ui->auth = service_args->auth;
   }
@@ -63,90 +64,17 @@ tk_service_t* remote_ui_service_create(tk_iostream_t* io, void* args) {
   return (tk_service_t*)ui;
 }
 
-static ret_t remote_ui_service_send_resp(tk_iostream_t* io, uint32_t type, uint32_t data_type,
-                                         uint32_t resp_code, wbuffer_t* wb) {
-  int32_t ret = 0;
-  uint32_t size = 0;
-  const void* data = NULL;
-  remote_ui_msg_header_t header;
-  uint16_t crc_value = PPPINITFCS16;
-  uint32_t timeout = TK_OSTREAM_DEFAULT_TIMEOUT;
-
-  memset(&header, 0x00, sizeof(header));
-  return_value_if_fail(io != NULL && wb != NULL, RET_BAD_PARAMS);
-
-  data = wb->data;
-  size = wb->cursor;
-  if (size > 0) {
-    return_value_if_fail(data != NULL, RET_BAD_PARAMS);
-  }
-
-  header.type = type;
-  header.size = size;
-  header.data_type = data_type;
-  header.resp_code = resp_code;
-
-  crc_value = tk_crc16(crc_value, &header, sizeof(header));
-  if (data != NULL && size > 0) {
-    crc_value = tk_crc16(crc_value, data, size);
-  }
-
-  ret = tk_iostream_write_len(io, &header, sizeof(header), timeout);
-  return_value_if_fail(ret == sizeof(header), RET_IO);
-
-  if (size > 0) {
-    timeout = TK_OSTREAM_DEFAULT_TIMEOUT * (size / 10240) + TK_OSTREAM_DEFAULT_TIMEOUT;
-    ret = tk_iostream_write_len(io, data, size, timeout);
-    return_value_if_fail(ret == size, RET_IO);
-  }
-
-  ret = tk_iostream_write_len(io, &crc_value, sizeof(crc_value), TK_OSTREAM_DEFAULT_TIMEOUT);
-  return_value_if_fail(ret == sizeof(crc_value), RET_IO);
-
-  return RET_OK;
-}
-
-static ret_t remote_ui_service_read_req(tk_iostream_t* io, remote_ui_msg_header_t* header,
-                                        wbuffer_t* wb) {
-  int32_t ret = 0;
-  uint16_t crc_value = 0;
-  uint16_t real_crc_value = PPPINITFCS16;
-  return_value_if_fail(io != NULL && header != NULL && wb != NULL, RET_BAD_PARAMS);
-
-  wbuffer_rewind(wb);
-  ret = tk_iostream_read_len(io, header, sizeof(*header), TK_ISTREAM_DEFAULT_TIMEOUT);
-  if (ret == 0) {
-    return RET_IO;
-  }
-  return_value_if_fail(ret == sizeof(*header), RET_IO);
-
-  real_crc_value = tk_crc16(real_crc_value, header, sizeof(*header));
-  if (header->size > 0) {
-    return_value_if_fail(wbuffer_extend_capacity(wb, header->size) == RET_OK, RET_OOM);
-    ret = tk_iostream_read_len(io, wb->data, header->size, TK_ISTREAM_DEFAULT_TIMEOUT);
-    return_value_if_fail(ret == header->size, RET_IO);
-    real_crc_value = tk_crc16(real_crc_value, wb->data, header->size);
-  }
-
-  ret = tk_iostream_read_len(io, &crc_value, sizeof(crc_value), TK_ISTREAM_DEFAULT_TIMEOUT);
-  return_value_if_fail(ret == sizeof(crc_value), RET_IO);
-  return_value_if_fail(crc_value == real_crc_value, RET_CRC);
-
-  wb->cursor = header->size;
-
-  return header->resp_code;
-}
-
 static ubjson_writer_t* remote_ui_service_get_writer(remote_ui_service_t* ui) {
-  wbuffer_t* wb = &(ui->wb);
+  wbuffer_t* wb = &(ui->service.wb);
   ubjson_writer_t* writer = &(ui->writer);
 
   wb->cursor = 0;
   return ubjson_writer_init(writer, (ubjson_write_callback_t)wbuffer_write_binary, wb);
 }
 
-static ret_t remote_ui_service_login(remote_ui_service_t* ui, const char* username, const char* password) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+static ret_t remote_ui_service_login(remote_ui_service_t* ui, const char* username,
+                                     const char* password) {
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   if (ui->auth != NULL) {
     if (ui->auth((tk_service_t*)ui, username, password) == RET_OK) {
       ui->is_login = TRUE;
@@ -160,7 +88,7 @@ static ret_t remote_ui_service_login(remote_ui_service_t* ui, const char* userna
 }
 
 static ret_t remote_ui_service_logout(remote_ui_service_t* ui) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
 
   ui->is_login = FALSE;
 
@@ -170,7 +98,7 @@ static ret_t remote_ui_service_logout(remote_ui_service_t* ui) {
 static ret_t remote_ui_service_get_dev_info(remote_ui_service_t* ui, remote_ui_dev_info_t* info) {
   ret_t ret = RET_OK;
   widget_t* wm = window_manager();
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(info != NULL, RET_BAD_PARAMS);
 
   memset(info, 0x00, sizeof(*info));
@@ -180,112 +108,28 @@ static ret_t remote_ui_service_get_dev_info(remote_ui_service_t* ui, remote_ui_d
   return ret;
 }
 
-static ret_t remote_ui_service_reboot(remote_ui_service_t* ui, remote_ui_reboot_type_t reboot_type) {
+static ret_t remote_ui_service_reboot(remote_ui_service_t* ui,
+                                      remote_ui_reboot_type_t reboot_type) {
   /*TODO*/
   return RET_OK;
 }
 
-static ret_t remote_ui_service_upload_file(remote_ui_service_t* ui, const char* filename) {
-  int32_t len = 0;
-  ret_t ret = RET_OK;
-  fs_file_t* file = NULL;
-  wbuffer_t* wb = NULL;
-  remote_ui_msg_header_t header;
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
-
-  wb = &(ui->wb);
-  wbuffer_rewind(wb);
-  file = fs_open_file(os_fs(), filename, "wb+");
-  if (file != NULL) {
-    remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_UPLOAD_FILE_BEGIN, REMOTE_UI_DATA_TYPE_NONE,
-                                RET_OK, wb);
-  } else {
-    remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_UPLOAD_FILE_BEGIN, REMOTE_UI_DATA_TYPE_NONE,
-                                RET_FAIL, wb);
-  }
-  return_value_if_fail(file != NULL, RET_BAD_PARAMS);
-
-  memset(&header, 0x00, sizeof(header));
-  while ((ret = remote_ui_service_read_req(ui->io, &header, wb)) == RET_OK) {
-    if (header.type == REMOTE_UI_REQ_UPLOAD_FILE_DATA) {
-      len = fs_file_write(file, wb->data, wb->cursor);
-      ret = (len == wb->cursor) ? RET_OK : RET_FAIL;
-      remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_UPLOAD_FILE_DATA, REMOTE_UI_DATA_TYPE_NONE,
-                                  ret, wb);
-      break_if_fail(ret == RET_OK);
-    } else if (header.type == REMOTE_UI_REQ_UPLOAD_FILE_END) {
-      ret = RET_OK;
-      ret = remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_UPLOAD_FILE_END,
-                                        REMOTE_UI_DATA_TYPE_NONE, ret, wb);
-      break_if_fail(ret == RET_OK);
-      break;
-    } else {
-      assert(!"impossible");
-      ret = RET_FAIL;
-      remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_UPLOAD_FILE_END, REMOTE_UI_DATA_TYPE_NONE,
-                                  ret, wb);
-      break;
-    }
-  }
-  fs_file_close(file);
-
-  return RET_OK;
-}
-
-static ret_t remote_ui_service_download_file(remote_ui_service_t* ui, const char* filename) {
-  wbuffer_t wb;
-  int32_t len = 0;
-  ret_t ret = RET_OK;
-  fs_file_t* file = NULL;
-  uint8_t buff[4096] = {0};
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
-
-  wbuffer_init(&wb, buff, sizeof(buff));
-  file = fs_open_file(os_fs(), filename, "rb");
-  if (file != NULL) {
-    remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_DOWNLOAD_FILE_BEGIN,
-                                REMOTE_UI_DATA_TYPE_NONE, RET_OK, &wb);
-  } else {
-    remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_DOWNLOAD_FILE_BEGIN,
-                                REMOTE_UI_DATA_TYPE_NONE, RET_FAIL, &wb);
-  }
-  return_value_if_fail(file != NULL, RET_BAD_PARAMS);
-
-  while ((len = fs_file_read(file, buff, sizeof(buff))) > 0) {
-    wbuffer_init(&wb, buff, len);
-    wb.cursor = len;
-    ret = remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_DOWNLOAD_FILE_DATA,
-                                      REMOTE_UI_DATA_TYPE_BINARY, RET_OK, &wb);
-    break_if_fail(ret == RET_OK);
-  }
-
-  wbuffer_rewind(&wb);
-  ret = remote_ui_service_send_resp(ui->io, REMOTE_UI_RESP_DOWNLOAD_FILE_END,
-                                    REMOTE_UI_DATA_TYPE_NONE, ret, &wb);
-
-  fs_file_close(file);
-
-  return RET_OK;
-}
-
 static ret_t remote_ui_service_create_dir(remote_ui_service_t* ui, const char* path) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(path != NULL, RET_BAD_PARAMS);
 
   return fs_create_dir_r(os_fs(), path);
 }
 
 static ret_t remote_ui_service_remove_dir(remote_ui_service_t* ui, const char* path) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(path != NULL, RET_BAD_PARAMS);
 
   return fs_remove_dir_r(os_fs(), path);
 }
 
 static ret_t remote_ui_service_remove_file(remote_ui_service_t* ui, const char* filename) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
 
   return fs_remove_file(os_fs(), filename);
@@ -293,7 +137,7 @@ static ret_t remote_ui_service_remove_file(remote_ui_service_t* ui, const char* 
 
 static ret_t remote_ui_service_get_manifest(remote_ui_service_t* ui, str_t* result) {
   ret_t ret = RET_OK;
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(result != NULL, RET_BAD_PARAMS);
 
   str_set(result, "todo");
@@ -302,13 +146,35 @@ static ret_t remote_ui_service_get_manifest(remote_ui_service_t* ui, str_t* resu
   return ret;
 }
 
-static ret_t remote_ui_service_take_screen_shot(remote_ui_service_t* ui, const char* filename) {
+static widget_t* remote_ui_service_get_app_window(widget_t* widget) {
+  return_value_if_fail(widget != NULL, NULL);
+
+  WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
+  if (iter->visible && !widget_is_keyboard(iter) && !widget_is_always_on_top(iter)) {
+    return iter;
+  }
+  WIDGET_FOR_EACH_CHILD_END();
+
+  return NULL;
+}
+
+static widget_t* remote_ui_service_get_target_widget(remote_ui_service_t* ui, const char* target) {
+  widget_t* win = remote_ui_service_get_app_window(window_manager());
+  widget_t* widget = TK_STR_IS_EMPTY(target) ? win :  widget_find_by_path(win, target, TRUE);
+
+  return widget;
+}
+
+static ret_t remote_ui_service_take_snapshot(remote_ui_service_t* ui, const char* target, const char* filename) {
   ret_t ret = RET_OK;
   bitmap_t* image = NULL;
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
+  widget_t* widget = remote_ui_service_get_target_widget(ui, target);
 
-  image = widget_take_snapshot(window_manager());
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  image = widget_take_snapshot(widget);
   if (image != NULL) {
     ret = bitmap_save_png(image, filename);
   } else {
@@ -319,21 +185,43 @@ static ret_t remote_ui_service_take_screen_shot(remote_ui_service_t* ui, const c
 }
 
 static ret_t remote_ui_service_prepare_manifest(remote_ui_service_t* ui, const char* filename) {
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
 
   return file_write(filename, "TODO", 5);
 }
 
-static ret_t remote_ui_service_prepare_xml_source(remote_ui_service_t* ui, const char* filename) {
+static ret_t remote_ui_service_prepare_loaded_images_info(remote_ui_service_t* ui, const char* target, const char* filename) {
+  str_t result;
+  str_init(&result, 10000);
+  image_manager_dump(image_manager(), &result);
+  file_write(filename, result.str, result.size);
+  str_reset(&result);
+
+  return RET_OK;
+}
+
+static ret_t remote_ui_service_prepare_loaded_assets_info(remote_ui_service_t* ui, const char* target, const char* filename) {
+  str_t result;
+  str_init(&result, 10000);
+  assets_manager_dump(assets_manager(), &result);
+  file_write(filename, result.str, result.size);
+  str_reset(&result);
+  
+  return RET_OK;
+}
+
+static ret_t remote_ui_service_prepare_xml_source(remote_ui_service_t* ui, const char* target, const char* filename) {
   str_t str;
   ret_t ret = RET_OK;
-  widget_t* win = window_manager_get_top_window(window_manager());
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(filename != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   str_init(&str, 10000);
-  widget_to_xml(win, &str);
+  widget_to_xml(widget, &str);
   ret = file_write(filename, str.str, str.size);
   str_reset(&str);
 
@@ -347,10 +235,9 @@ static ret_t remote_ui_service_on_event_func(void* ctx, event_t* e) {
   return RET_OK;
 }
 
-
-static ret_t remote_ui_service_on_event(remote_ui_service_t* ui, const char* target, uint32_t event) {
-  widget_t* win = window_manager_get_top_window(window_manager());
-  widget_t* widget = widget_find_by_path(win, target, TRUE);
+static ret_t remote_ui_service_on_event(remote_ui_service_t* ui, const char* target,
+                                        uint32_t event) {
+  widget_t* widget = remote_ui_service_get_target_widget(ui, target);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   widget_on(widget, event, remote_ui_service_on_event_func, ui);
@@ -358,9 +245,9 @@ static ret_t remote_ui_service_on_event(remote_ui_service_t* ui, const char* tar
   return RET_OK;
 }
 
-static ret_t remote_ui_service_off_event(remote_ui_service_t* ui, const char* target, uint32_t event) {
-  widget_t* win = window_manager_get_top_window(window_manager());
-  widget_t* widget = widget_find_by_path(win, target, TRUE);
+static ret_t remote_ui_service_off_event(remote_ui_service_t* ui, const char* target,
+                                         uint32_t event) {
+  widget_t* widget = remote_ui_service_get_target_widget(ui, target);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   widget_off_by_func(widget, event, remote_ui_service_on_event_func, ui);
@@ -368,18 +255,19 @@ static ret_t remote_ui_service_off_event(remote_ui_service_t* ui, const char* ta
   return RET_OK;
 }
 
-static ret_t remote_ui_service_send_event(remote_ui_service_t* ui, const char* target, event_t* event) {
-  widget_t* win = window_manager_get_top_window(window_manager());
-  widget_t* widget = widget_find_by_path(win, target, TRUE);
+static ret_t remote_ui_service_send_event(remote_ui_service_t* ui, const char* target,
+                                          event_t* event) {
+  widget_t* widget = remote_ui_service_get_target_widget(ui, target);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  event->target = widget;
+  if (!widget_is_window_manager(widget) && !widget_is_window(widget)) {
+    return widget_dispatch_async(widget, event);
+  }
 
   switch (event->type) {
     case EVT_CLICK: {
-      event->type = EVT_POINTER_DOWN;
-      widget_on_pointer_down(widget, pointer_event_cast(event));
-
-      event->type = EVT_POINTER_UP;
-      return widget_on_pointer_up(widget, pointer_event_cast(event));
+      return widget_dispatch_async(widget, event);
     }
     case EVT_POINTER_DOWN: {
       return widget_on_pointer_down(widget, pointer_event_cast(event));
@@ -404,8 +292,9 @@ static ret_t remote_ui_service_send_event(remote_ui_service_t* ui, const char* t
   return RET_FAIL;
 }
 
-static ret_t remote_ui_service_open_dialog(remote_ui_service_t* ui, const char* type, const char* title,
-                                    const char* content, uint32_t duration) {
+static ret_t remote_ui_service_open_dialog(remote_ui_service_t* ui, const char* type,
+                                           const char* title, const char* content,
+                                           uint32_t duration) {
   if (tk_str_eq(type, REMOTE_UI_DIALOG_TYPE_CONFIRM)) {
     return dialog_confirm(title, content);
   } else if (tk_str_eq(type, REMOTE_UI_DIALOG_TYPE_INFO)) {
@@ -419,8 +308,37 @@ static ret_t remote_ui_service_open_dialog(remote_ui_service_t* ui, const char* 
   return RET_OK;
 }
 
-static ret_t remote_ui_service_open_window(remote_ui_service_t* ui, const char* name, const char* xml,
-                                    const char* init_json) {
+static ret_t widget_init_with_conf(widget_t* win, const char* widget_name, conf_node_t* node) {
+  char buff[64] = {0};
+  conf_node_t* iter = conf_node_get_first_child(node);
+  widget_t* widget = widget_find_by_path(win, widget_name, TRUE);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  while (iter != NULL) {
+    value_t v;
+    const char* name = conf_node_get_name(iter);
+    if (conf_node_get_value(iter, &v) == RET_OK) {
+      log_debug("%s.%s=%s\n", widget_name, name, value_str_ex(&v, buff, sizeof(buff)));
+      widget_set_prop(widget, name, &v);
+    }
+
+    iter = iter->next;
+  }
+  return RET_OK;
+}
+
+static ret_t window_init_with_conf(widget_t* widget, conf_doc_t* doc) {
+  conf_node_t* iter = conf_node_get_first_child(doc->root);
+  while (iter != NULL) {
+    const char* name = conf_node_get_name(iter);
+    widget_init_with_conf(widget, name, iter);
+    iter = iter->next;
+  }
+  return RET_OK;
+}
+
+static ret_t remote_ui_service_open_window(remote_ui_service_t* ui, const char* name,
+                                           const char* xml, const char* init_json) {
   widget_t* win = NULL;
   if (TK_STR_IS_NOT_EMPTY(xml)) {
     win = ui_loader_load_widget_from_xml(NULL, xml, strlen(xml));
@@ -431,7 +349,11 @@ static ret_t remote_ui_service_open_window(remote_ui_service_t* ui, const char* 
   return_value_if_fail(win != NULL, RET_BAD_PARAMS);
 
   if (init_json != NULL) {
-    /*TODO*/
+    conf_doc_t* doc = conf_doc_load_json(init_json, strlen(init_json));
+    if (doc != NULL) {
+      window_init_with_conf(win, doc);
+      conf_doc_destroy(doc);
+    }
   }
 
   return RET_OK;
@@ -456,32 +378,63 @@ static ret_t remote_ui_service_back_to_home(remote_ui_service_t* ui) {
   return RET_OK;
 }
 
-static ret_t remote_ui_service_set_prop(remote_ui_service_t* ui, const char* target, const char* name,
-                                 const value_t* value) {
-  widget_t* win = window_manager_get_top_window(window_manager());
-  widget_t* widget = widget_find_by_path(win, target, TRUE);
-  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+static ret_t remote_ui_service_set_prop(remote_ui_service_t* ui, const char* target,
+                                        const char* name, const value_t* value) {
+  if (tk_str_eq(target, REMOTE_UI_TARGET_GLOBAL)) {
+    if (tk_str_eq(name, REMOTE_UI_PROP_THEME)) {
+      return widget_set_theme(window_manager(), value_str(value));
+    } else if (tk_str_eq(name, REMOTE_UI_PROP_LANGUAGE)) {
+      return remote_ui_service_set_language(ui, value_str(value));
+    } else {
+      return RET_NOT_FOUND;
+    }
+  } else {
+    widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+    return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
-  return widget_set_prop(widget, name, value);
+    return widget_set_prop(widget, name, value);
+  }
 }
 
-static ret_t remote_ui_service_get_prop(remote_ui_service_t* ui, const char* target, const char* name,
-                                 value_t* value) {
-  widget_t* win = window_manager_get_top_window(window_manager());
-  widget_t* widget = widget_find_by_path(win, target, TRUE);
-  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+static ret_t remote_ui_service_get_prop(remote_ui_service_t* ui, const char* target,
+                                        const char* name, value_t* value) {
+  char buff[128] = {0};
+  if (tk_str_eq(target, REMOTE_UI_TARGET_GLOBAL)) {
+    if (tk_str_eq(name, REMOTE_UI_PROP_THEME)) {
+      value_set_str(value, widget_get_theme_name(window_manager()));
+      return RET_OK;
+    } else if (tk_str_eq(name, REMOTE_UI_PROP_LANGUAGE)) {
+      locale_info_t* info = widget_get_locale_info(window_manager());
+      tk_snprintf(buff, sizeof(buff)-1, "%s_%s", info->language, info->country);
+      value_dup_str(value, buff);
+      return RET_OK;
+    } else {
+      return RET_NOT_FOUND;
+    }
+  } else {
+    widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+    return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
-  return widget_get_prop(widget, name, value);
+    return widget_get_prop(widget, name, value);
+  }
 }
 
-static ret_t remote_ui_service_set_theme(remote_ui_service_t* ui, const char* theme) {
-  return widget_set_theme(window_manager(), theme);
-}
-
-static ret_t remote_ui_service_exec_script(remote_ui_service_t* ui, const char* script, value_t* v) {
+static ret_t remote_ui_service_exec_script(remote_ui_service_t* ui, const char* script,
+                                           value_t* v) {
+  ret_t ret = RET_FAIL;                                           
   tk_object_t* obj = object_default_create();
-  ret_t ret = fscript_eval(obj, script, v);
-  TK_OBJECT_UNREF(obj);
+
+  if (obj != NULL) {
+    widget_t* wm = window_manager();
+    widget_t* win = remote_ui_service_get_app_window(wm);
+
+    tk_object_set_prop_pointer(obj, STR_PROP_SELF, win);
+    tk_object_set_prop_pointer(obj, STR_PROP_WINDOW, win);
+    tk_object_set_prop_pointer(obj, STR_PROP_WINDOW_MANAGER, wm);
+
+    ret = fscript_eval(obj, script, v);
+    TK_OBJECT_UNREF(obj);
+  }
 
   return ret;
 }
@@ -490,7 +443,7 @@ static ret_t remote_ui_service_set_language(remote_ui_service_t* ui, const char*
   const char* p = NULL;
   char lang[TK_NAME_LEN + 1] = {0};
   char country[TK_NAME_LEN + 1] = {0};
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(language != NULL, RET_BAD_PARAMS);
 
   p = strchr(language, '_');
@@ -520,162 +473,160 @@ static ret_t remote_ui_dev_info_write(ubjson_writer_t* writer, remote_ui_dev_inf
   return RET_OK;
 }
 
-static ret_t remote_ui_service_dispatch_impl(remote_ui_service_t* ui, remote_ui_msg_header_t* req,
+static ret_t remote_ui_service_dispatch_impl(remote_ui_service_t* ui, tk_msg_header_t* req,
                                              wbuffer_t* wb) {
   value_t v;
   char buff[1024] = {0};
-  ret_t ret = RET_FAIL;
   tk_object_t* obj = NULL;
   ubjson_writer_t* writer = NULL;
-  remote_ui_msg_header_t resp;
+  tk_msg_header_t resp;
   char local_file[MAX_PATH + 1] = {0};
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
   return_value_if_fail(req != NULL && wb != NULL, RET_BAD_PARAMS);
 
   memset(&resp, 0x00, sizeof(resp));
-  if (req->data_type == REMOTE_UI_DATA_TYPE_UBJSON) {
+  if (req->data_type == MSG_DATA_TYPE_UBJSON) {
     obj = conf_ubjson_load_from_buff(wb->data, wb->cursor, FALSE);
   }
 
+  resp.type = req->type;
   switch (req->type) {
-    case REMOTE_UI_REQ_LOGIN: {
+    case MSG_CODE_LOGIN: {
       const char* username = tk_object_get_prop_str(obj, "username");
       const char* password = tk_object_get_prop_str(obj, "password");
       resp.resp_code = remote_ui_service_login(ui, username, password);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_LOGIN;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_LOGOUT: {
+    case MSG_CODE_LOGOUT: {
       resp.resp_code = remote_ui_service_logout(ui);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_LOGOUT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_GET_DEV_INFO: {
+    case REMOTE_UI_GET_DEV_INFO: {
       remote_ui_dev_info_t info;
       memset(&info, 0x00, sizeof(info));
       resp.resp_code = remote_ui_service_get_dev_info(ui, &info);
-      resp.data_type = REMOTE_UI_DATA_TYPE_UBJSON;
-      resp.type = REMOTE_UI_RESP_GET_DEV_INFO;
+      resp.data_type = MSG_DATA_TYPE_UBJSON;
       writer = remote_ui_service_get_writer(ui);
-      ret = remote_ui_dev_info_write(writer, &info);
+      remote_ui_dev_info_write(writer, &info);
       break;
     }
-    case REMOTE_UI_REQ_REBOOT: {
+    case REMOTE_UI_REBOOT: {
       rbuffer_t rb;
       uint32_t reboot_type = REMOTE_UI_REBOOT_DEFAULT;
       rbuffer_init(&rb, wb->data, wb->cursor);
-     
+
       rbuffer_read_uint32(&rb, &reboot_type);
       resp.resp_code = remote_ui_service_reboot(ui, reboot_type);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_REBOOT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_UPLOAD_FILE_BEGIN: {
+    case MSG_CODE_UPLOAD_FILE_BEGIN: {
       const char* filename = (const char*)(wb->data);
       filename = path_prepend_app_root(local_file, filename);
-      resp.resp_code = remote_ui_service_upload_file(ui, filename);
+      resp.resp_code = tk_service_upload_file(&(ui->service), filename);
       return RET_OK;
       break;
     }
-    case REMOTE_UI_REQ_DOWNLOAD_FILE_BEGIN: {
+    case MSG_CODE_DOWNLOAD_FILE_BEGIN: {
       const char* filename = (const char*)(wb->data);
 
-      if (tk_str_eq(filename, REMOTE_UI_FILE_SCREEN_SHOT)) {
-        filename = path_prepend_temp_path(local_file, filename);
-        resp.resp_code = remote_ui_service_take_screen_shot(ui, filename);
+      if (tk_str_start_with(filename, REMOTE_UI_FILE_SNAPSHOT)) {
+        const char* target = filename + strlen(REMOTE_UI_FILE_SNAPSHOT) + 1;
+        filename = path_prepend_temp_path(local_file, "shot.png");
+        resp.resp_code = remote_ui_service_take_snapshot(ui, target, filename);
       } else if (tk_str_eq(filename, REMOTE_UI_FILE_MANIFEST)) {
-        filename = path_prepend_temp_path(local_file, filename);
+        filename = path_prepend_temp_path(local_file, "manifest.txt");
         resp.resp_code = remote_ui_service_prepare_manifest(ui, filename);
-      } else if (tk_str_eq(filename, REMOTE_UI_FILE_XML_SOURCE)) {
-        filename = path_prepend_temp_path(local_file, filename);
-        resp.resp_code = remote_ui_service_prepare_xml_source(ui, filename);
+      } else if (tk_str_start_with(filename, REMOTE_UI_FILE_XML_SOURCE)) {
+        const char* target = filename + strlen(REMOTE_UI_FILE_XML_SOURCE) + 1;
+        filename = path_prepend_temp_path(local_file, "source.xml");
+        resp.resp_code = remote_ui_service_prepare_xml_source(ui, target, filename);
+      } else if (tk_str_start_with(filename, REMOTE_UI_FILE_LOADED_IMAGES_INFO)) {
+        const char* target = filename + strlen(REMOTE_UI_FILE_LOADED_IMAGES_INFO) + 1;
+        filename = path_prepend_temp_path(local_file, "loaded_images_info.txt");
+        resp.resp_code = remote_ui_service_prepare_loaded_images_info(ui, target, filename);
+      } else if (tk_str_start_with(filename, REMOTE_UI_FILE_LOADED_ASSETS_INFO)) {
+        const char* target = filename + strlen(REMOTE_UI_FILE_LOADED_ASSETS_INFO) + 1;
+        filename = path_prepend_temp_path(local_file, "loaded_images_info.txt");
+        resp.resp_code = remote_ui_service_prepare_loaded_assets_info(ui, target, filename);
       } else {
         filename = path_prepend_app_root(local_file, filename);
       }
 
-      resp.resp_code = remote_ui_service_download_file(ui, filename);
+      resp.resp_code = tk_service_download_file(&(ui->service), filename);
       return RET_OK;
     }
-    case REMOTE_UI_REQ_CREATE_DIR: {
+    case REMOTE_UI_CREATE_DIR: {
       const char* filename = (const char*)(wb->data);
       filename = path_prepend_app_root(local_file, filename);
 
       resp.resp_code = remote_ui_service_create_dir(ui, filename);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_CREATE_DIR;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_REMOVE_DIR: {
+    case REMOTE_UI_REMOVE_DIR: {
       const char* filename = (const char*)(wb->data);
       filename = path_prepend_app_root(local_file, filename);
 
       resp.resp_code = remote_ui_service_remove_dir(ui, filename);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_REMOVE_DIR;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_REMOVE_FILE: {
+    case REMOTE_UI_REMOVE_FILE: {
       const char* filename = (const char*)(wb->data);
       filename = path_prepend_app_root(local_file, filename);
       resp.resp_code = remote_ui_service_remove_file(ui, filename);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_REMOVE_FILE;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_OPEN_WINDOW: {
+    case REMOTE_UI_OPEN_WINDOW: {
       const char* name = tk_object_get_prop_str(obj, REMOTE_UI_KEY_NAME);
       const char* xml = tk_object_get_prop_str(obj, REMOTE_UI_KEY_XML);
       const char* init_json = tk_object_get_prop_str(obj, REMOTE_UI_KEY_INIT);
       resp.resp_code = remote_ui_service_open_window(ui, name, xml, init_json);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_OPEN_WINDOW;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_OPEN_DIALOG: {
+    case REMOTE_UI_OPEN_DIALOG: {
       const char* type = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TYPE);
       const char* title = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TITLE);
       const char* content = tk_object_get_prop_str(obj, REMOTE_UI_KEY_CONTENT);
       uint32_t duration = tk_object_get_prop_uint32(obj, REMOTE_UI_KEY_DURATION, 3000);
 
       resp.resp_code = remote_ui_service_open_dialog(ui, type, title, content, duration);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_OPEN_WINDOW;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_BACK_TO_PREV: {
+    case REMOTE_UI_BACK_TO_PREV: {
       resp.resp_code = remote_ui_service_back_to_prev(ui);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_BACK_TO_PREV;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_BACK_TO_HOME: {
+    case REMOTE_UI_BACK_TO_HOME: {
       resp.resp_code = remote_ui_service_back_to_home(ui);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_BACK_TO_HOME;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_CLOSE_WINDOW: {
+    case REMOTE_UI_CLOSE_WINDOW: {
       const char* name = (const char*)(wb->data);
       resp.resp_code = remote_ui_service_close_window(ui, name);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_CLOSE_WINDOW;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_SET_PROP: {
+    case REMOTE_UI_SET_PROP: {
       value_t v;
       const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
       const char* name = tk_object_get_prop_str(obj, REMOTE_UI_KEY_NAME);
@@ -685,70 +636,52 @@ static ret_t remote_ui_service_dispatch_impl(remote_ui_service_t* ui, remote_ui_
       } else {
         resp.resp_code = RET_FAIL;
       }
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_GET_PROP: {
+    case REMOTE_UI_GET_PROP: {
       const char* str = NULL;
       const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
       const char* name = tk_object_get_prop_str(obj, REMOTE_UI_KEY_NAME);
 
       value_set_int(&v, 0);
       resp.resp_code = remote_ui_service_get_prop(ui, target, name, &v);
-      resp.data_type = REMOTE_UI_DATA_TYPE_STRING;
+      resp.data_type = MSG_DATA_TYPE_STRING;
       str = value_str_ex(&v, buff, sizeof(buff));
       wbuffer_rewind(wb);
       wbuffer_write_string(wb, str);
+      value_reset(&v);
       break;
     }
-    case REMOTE_UI_REQ_SET_LANGUAGE: {
-      const char* language = (const char*)(wb->data);
-      resp.resp_code = remote_ui_service_set_language(ui, language);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_SET_LANGUAGE;
-      wbuffer_rewind(wb);
-      break;
-    }
-    case REMOTE_UI_REQ_SET_THEME: {
-      const char* theme = (const char*)(wb->data);
-      resp.resp_code = remote_ui_service_set_theme(ui, theme);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_SET_THEME;
-      wbuffer_rewind(wb);
-      break;
-    }
-    case REMOTE_UI_REQ_EXEC_FSCRIPT: {
+    case REMOTE_UI_EXEC_FSCRIPT: {
       const char* script = (const char*)(wb->data);
 
       value_set_int(&v, 0);
       resp.resp_code = remote_ui_service_exec_script(ui, script, &v);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_EXEC_FSCRIPT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       wbuffer_write_string(wb, value_str_ex(&v, buff, sizeof(buff)));
 
       break;
     }
-    case REMOTE_UI_REQ_ON_EVENT: {
+    case REMOTE_UI_ON_EVENT: {
       const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
       uint32_t event_type = tk_object_get_prop_int(obj, REMOTE_UI_KEY_EVENT, 0);
       resp.resp_code = remote_ui_service_on_event(ui, target, event_type);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_ON_EVENT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_OFF_EVENT: {
+    case REMOTE_UI_OFF_EVENT: {
       const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
       uint32_t event_type = tk_object_get_prop_int(obj, REMOTE_UI_KEY_EVENT, 0);
       resp.resp_code = remote_ui_service_off_event(ui, target, event_type);
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_OFF_EVENT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
-    case REMOTE_UI_REQ_SEND_EVENT: {
+    case REMOTE_UI_SEND_EVENT: {
       event_t* e = NULL;
       const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
       uint32_t event_type = tk_object_get_prop_int(obj, REMOTE_UI_KEY_EVENT, 0);
@@ -779,37 +712,94 @@ static ret_t remote_ui_service_dispatch_impl(remote_ui_service_t* ui, remote_ui_
       } else {
         resp.resp_code = RET_FAIL;
       }
-      resp.data_type = REMOTE_UI_DATA_TYPE_NONE;
-      resp.type = REMOTE_UI_RESP_SEND_EVENT;
+      resp.data_type = MSG_DATA_TYPE_NONE;
+      wbuffer_rewind(wb);
+      break;
+    }
+    case REMOTE_UI_MOVE_WIDGET: {
+      const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
+      int x = tk_object_get_prop_int(obj, REMOTE_UI_KEY_X, 0);
+      int y = tk_object_get_prop_int(obj, REMOTE_UI_KEY_Y, 0);
+      widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+      if (widget != NULL) {
+        resp.resp_code = widget_move(widget, x, y);
+      } else {
+        resp.resp_code = RET_NOT_FOUND;
+      }
+
+      resp.data_type = MSG_DATA_TYPE_NONE;
+      wbuffer_rewind(wb);
+      break;
+    }
+    case REMOTE_UI_RESIZE_WIDGET: {
+      const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
+      int w = tk_object_get_prop_int(obj, REMOTE_UI_KEY_W, 0);
+      int h = tk_object_get_prop_int(obj, REMOTE_UI_KEY_H, 0);
+      widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+      if (widget != NULL) {
+        resp.resp_code = widget_resize(widget, w, h);
+      } else {
+        resp.resp_code = RET_NOT_FOUND;
+      }
+      resp.data_type = MSG_DATA_TYPE_NONE;
+      wbuffer_rewind(wb);
+      break;
+    }
+    case REMOTE_UI_DESTROY_WIDGET: {
+      const char* target = (const char*)(wb->data);
+      widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+      if (widget != NULL) {
+        resp.resp_code = widget_destroy(widget);
+      } else {
+        resp.resp_code = RET_NOT_FOUND;
+      }
+      resp.data_type = MSG_DATA_TYPE_NONE;
+      wbuffer_rewind(wb);
+      break;
+    }
+    case REMOTE_UI_CREATE_WIDGET: {
+      const char* target = tk_object_get_prop_str(obj, REMOTE_UI_KEY_TARGET);
+      const char* xml = tk_object_get_prop_str(obj, REMOTE_UI_KEY_XML);
+      widget_t* widget = remote_ui_service_get_target_widget(ui, target);
+      if (widget != NULL) {
+        widget_t* new_widget = ui_loader_load_widget_from_xml(widget, xml, strlen(xml));
+        if (new_widget != NULL) {
+          resp.resp_code = RET_OK;
+        } else {
+          resp.resp_code = RET_FAIL;
+        }
+      } else {
+        resp.resp_code = RET_NOT_FOUND;
+      }
+      resp.data_type = MSG_DATA_TYPE_NONE;
       wbuffer_rewind(wb);
       break;
     }
     default: {
-      ret = RET_NOT_IMPL;
+      resp.resp_code = RET_NOT_IMPL;
       break;
     }
   }
   TK_OBJECT_UNREF(obj);
 
-  return remote_ui_service_send_resp(ui->io, resp.type, resp.data_type, resp.resp_code, wb);
+  return tk_service_send_resp(&(ui->service), resp.type, resp.data_type, resp.resp_code, wb);
 }
 
 static ret_t remote_ui_service_dispatch(remote_ui_service_t* ui) {
   ret_t ret = RET_OK;
-  remote_ui_msg_header_t header;
-  return_value_if_fail(ui != NULL && ui->io != NULL, RET_BAD_PARAMS);
+  tk_msg_header_t header;
+  return_value_if_fail(ui != NULL && ui->service.io != NULL, RET_BAD_PARAMS);
 
   memset(&header, 0x00, sizeof(header));
-  ret = remote_ui_service_read_req(ui->io, &header, &(ui->wb));
+  ret = tk_service_read_req(&(ui->service), &header, &(ui->service.wb));
   return_value_if_fail(ret == RET_OK, ret);
 
-  return remote_ui_service_dispatch_impl(ui, &header, &(ui->wb));
+  return remote_ui_service_dispatch_impl(ui, &header, &(ui->service.wb));
 }
 
 static ret_t remote_ui_service_destroy(remote_ui_service_t* ui) {
   return_value_if_fail(ui != NULL, RET_BAD_PARAMS);
 
-  wbuffer_deinit(&(ui->wb));
   TKMEM_FREE(ui);
 
   return RET_OK;

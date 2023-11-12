@@ -142,7 +142,7 @@ tk_object_t* debugger_get_local(debugger_t* debugger, uint32_t frame_index) {
   return_value_if_fail(debugger != NULL && debugger->vt != NULL, NULL);
   return_value_if_fail(debugger->vt->get_local != NULL, NULL);
 
-  return debugger->vt->get_local(debugger, frame_index); 
+  return debugger->vt->get_local(debugger, frame_index);
 }
 
 tk_object_t* debugger_get_self(debugger_t* debugger) {
@@ -159,12 +159,11 @@ tk_object_t* debugger_get_global(debugger_t* debugger) {
   return debugger->vt->get_global(debugger);
 }
 
-ret_t debugger_get_callstack(debugger_t* debugger, binary_data_t* callstack) {
-  return_value_if_fail(debugger != NULL && debugger->vt != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(debugger->vt->get_callstack != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(callstack != NULL, RET_BAD_PARAMS);
+tk_object_t* debugger_get_callstack(debugger_t* debugger) {
+  return_value_if_fail(debugger != NULL && debugger->vt != NULL, NULL);
+  return_value_if_fail(debugger->vt->get_callstack != NULL, NULL);
 
-  return debugger->vt->get_callstack(debugger, callstack);
+  return debugger->vt->get_callstack(debugger);
 }
 
 ret_t debugger_clear_break_points(debugger_t* debugger) {
@@ -257,8 +256,8 @@ tk_object_t* debugger_get_threads(debugger_t* debugger) {
   return debugger->vt->get_threads(debugger);
 }
 
-ret_t debugger_launch_app(debugger_t* debugger, const char* program, const char* work_dir,
-                                       int argc, char* argv[]) {
+ret_t debugger_launch_app(debugger_t* debugger, const char* program, const char* work_dir, int argc,
+                          char* argv[]) {
   return_value_if_fail(debugger != NULL && debugger->vt != NULL, RET_BAD_PARAMS);
   return_value_if_fail(debugger->vt->launch_app != NULL, RET_BAD_PARAMS);
   return_value_if_fail(program != NULL, RET_BAD_PARAMS);
@@ -273,10 +272,10 @@ ret_t debugger_set_break_point_ex(debugger_t* debugger, const char* position) {
 
   if (debugger->vt->set_break_point_ex != NULL) {
     return debugger->vt->set_break_point_ex(debugger, position);
-  } else if(debugger->vt->set_break_point != NULL) {
+  } else if (debugger->vt->set_break_point != NULL) {
     const char* p = strchr(position, ':');
-    if(p != NULL) {
-      return debugger->vt->set_break_point(debugger, tk_atoi(p+1));
+    if (p != NULL) {
+      return debugger->vt->set_break_point(debugger, tk_atoi(p + 1));
     }
     return RET_NOT_IMPL;
   } else {
@@ -290,10 +289,10 @@ ret_t debugger_remove_break_point_ex(debugger_t* debugger, const char* position)
 
   if (debugger->vt->remove_break_point_ex != NULL) {
     return debugger->vt->remove_break_point_ex(debugger, position);
-  } else if(debugger->vt->remove_break_point != NULL) {
+  } else if (debugger->vt->remove_break_point != NULL) {
     const char* p = strchr(position, ':');
-    if(p != NULL) {
-      return debugger->vt->remove_break_point(debugger, tk_atoi(p+1));
+    if (p != NULL) {
+      return debugger->vt->remove_break_point(debugger, tk_atoi(p + 1));
     } else {
       return debugger->vt->remove_break_point(debugger, tk_atoi(position));
     }
@@ -319,10 +318,29 @@ ret_t debugger_set_current_frame(debugger_t* debugger, uint32_t frame_index) {
   return_value_if_fail(debugger != NULL && debugger->vt != NULL, RET_BAD_PARAMS);
 
   debugger->current_frame_index = frame_index;
-  if(debugger->vt->set_current_frame != NULL) {
+  if (debugger->vt->set_current_frame != NULL) {
     return debugger->vt->set_current_frame(debugger, frame_index);
   } else {
     return RET_OK;
+  }
+}
+
+uint64_t debugger_get_current_thread_id(debugger_t* debugger) {
+  return_value_if_fail(debugger != NULL && debugger->vt != NULL, 0);
+  if (debugger->vt->get_current_thread_id != NULL) {
+    return debugger->vt->get_current_thread_id(debugger);
+  } else {
+    return 0;
+  }
+}
+
+ret_t debugger_set_current_thread_id(debugger_t* debugger, uint64_t thread_id) {
+  return_value_if_fail(debugger != NULL && debugger->vt != NULL, RET_BAD_PARAMS);
+
+  if (debugger->vt->set_current_thread_id != NULL) {
+    return debugger->vt->set_current_thread_id(debugger, thread_id);
+  } else {
+    return RET_NOT_IMPL;
   }
 }
 

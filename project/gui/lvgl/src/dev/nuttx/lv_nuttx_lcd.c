@@ -114,7 +114,6 @@ static int32_t align_round_up(int32_t v, uint16_t align)
     return (v + align - 1) & ~(align - 1);
 }
 
-
 static void rounder_cb(lv_event_t * e)
 {
     lv_nuttx_lcd_t * lcd = lv_event_get_user_data(e);
@@ -151,13 +150,12 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
 {
     lv_color_t * draw_buf = NULL;
     lv_color_t * draw_buf_2 = NULL;
-    lv_nuttx_lcd_t * lcd = lv_malloc(sizeof(lv_nuttx_lcd_t));
+    lv_nuttx_lcd_t * lcd = lv_malloc_zeroed(sizeof(lv_nuttx_lcd_t));
     LV_ASSERT_MALLOC(lcd);
     if(lcd == NULL) {
         LV_LOG_ERROR("lv_nuttx_lcd_t malloc failed");
         return NULL;
     }
-    lv_memzero(lcd, sizeof(lv_nuttx_lcd_t));
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {

@@ -46,7 +46,6 @@ static bool button_is_inactive(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_click_trig(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_popover(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_checkable(lv_buttonmatrix_ctrl_t ctrl_bits);
-static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits);
 static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
 static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map);
@@ -478,7 +477,6 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                 if(btnm->one_check) make_one_button_checked(obj, btnm->btn_id_sel);
             }
 
-
             if((button_is_click_trig(btnm->ctrl_bits[btnm->btn_id_sel]) == true ||
                 button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == true) &&
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
@@ -750,10 +748,6 @@ static void draw_main(lv_event_t * e)
 
         draw_rect_dsc_act.base.id1 = btn_i;
 
-        bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
-        if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
-        else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
-
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
             draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
@@ -907,10 +901,6 @@ static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits)
     return ctrl_bits & LV_BUTTONMATRIX_CTRL_CHECKED;
 }
 
-static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
-{
-    return ctrl_bits & LV_BUTTONMATRIX_CTRL_RECOLOR;
-}
 /**
  * Gives the button id of a button under a given point
  * @param obj pointer to a button matrix object

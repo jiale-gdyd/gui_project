@@ -82,6 +82,10 @@ void lv_draw_sw_mask_init(void)
     lv_mutex_init(&circle_cache_mutex);
 }
 
+void lv_draw_sw_mask_deinit(void)
+{
+    lv_mutex_delete(&circle_cache_mutex);
+}
 
 LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, int32_t abs_x,
                                                                   int32_t abs_y,
@@ -379,9 +383,8 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
 
     /*There is no unused entry. Allocate one temporarily*/
     if(!entry) {
-        entry = lv_malloc(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
+        entry = lv_malloc_zeroed(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         LV_ASSERT_MALLOC(entry);
-        lv_memzero(entry, sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         entry->life = -1;
     }
     else {
@@ -895,8 +898,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_angle(lv_opa_t *
     }
 }
 
-
-
 LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, int32_t abs_x,
                                                                        int32_t abs_y, int32_t len,
                                                                        lv_draw_sw_mask_radius_param_t * p)
@@ -1152,8 +1153,7 @@ static void circ_calc_aa4(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radi
     }
 
     const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(int32_t);
-    int32_t * cir_x = lv_malloc(cir_xy_size);
-    lv_memset(cir_x, 0, cir_xy_size);
+    int32_t * cir_x = lv_malloc_zeroed(cir_xy_size);
     int32_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
@@ -1286,7 +1286,6 @@ static lv_opa_t * get_next_line(_lv_draw_sw_mask_radius_circle_dsc_t * c, int32_
     return &c->cir_opa[c->opa_start_on_y[y]];
 }
 
-
 LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
     if(mask_new >= LV_OPA_MAX) return mask_act;
@@ -1294,6 +1293,5 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 
     return LV_UDIV255(mask_act * mask_new);
 }
-
 
 #endif /*LV_DRAW_SW_COMPLEX*/

@@ -75,7 +75,6 @@ typedef struct _lv_cache_entry_t {
     void * user_data;
 } lv_cache_entry_t;
 
-
 /**
  * Add a new entry to the cache with the given size.
  * It won't allocate any buffers just free enough space to be a new entry
@@ -151,6 +150,11 @@ typedef struct {
  * Initialize the cache module
  */
 void _lv_cache_init(void);
+
+/**
+ * Deinitialize the cache module
+ */
+void _lv_cache_deinit(void);
 
 /**
  * Set new cache manager

@@ -39,9 +39,8 @@ extern "C" {
 
 enum _lv_text_flag_t {
     LV_TEXT_FLAG_NONE    = 0x00,
-    LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
-    LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
-    LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
+    LV_TEXT_FLAG_EXPAND  = 0x01, /**< Ignore max-width to avoid automatic word wrapping*/
+    LV_TEXT_FLAG_FIT     = 0x02, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
 };
 
 #ifdef DOXYGEN
@@ -49,7 +48,6 @@ typedef _lv_text_flag_t lv_text_flag_t;
 #else
 typedef uint8_t lv_text_flag_t;
 #endif /*DOXYGEN*/
-
 
 /** Label align policy*/
 enum _lv_text_align_t {
@@ -64,7 +62,6 @@ typedef _lv_text_align_t lv_text_align_t;
 #else
 typedef uint8_t lv_text_align_t;
 #endif /*DOXYGEN*/
-
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -169,7 +166,6 @@ static inline bool _lv_text_is_break_char(uint32_t letter)
 
     return ret;
 }
-
 
 /**
  * Test if char is break char or not (a text can broken here or not)

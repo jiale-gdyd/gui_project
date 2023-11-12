@@ -22,3 +22,4 @@ obj-y += lv_text.o
 obj-y += lv_utils.o
 obj-y += lv_profiler_builtin.o
 obj-y += lv_palette.o
+obj-y += lv_array.o

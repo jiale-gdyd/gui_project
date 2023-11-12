@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   image_manager.h
  * Author: AWTK Develop Team
  * Brief:  image manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,8 +40,7 @@ typedef struct _bitmap_header_t {
   uint8_t data[4];
 } bitmap_header_t;
 
-typedef ret_t (*image_manager_get_bitmap_t)(void* ctx, const char* name,
-                                            bitmap_t* image);
+typedef ret_t (*image_manager_get_bitmap_t)(void* ctx, const char* name, bitmap_t* image);
 
 /**
  * @class image_manager_t
@@ -127,7 +126,7 @@ ret_t image_manager_set_max_mem_size_of_cached_images(image_manager_t* imm, uint
  *
  * @annotation ["scriptable"]
  * @param {image_manager_t*} imm 图片管理器对象。
- * @param {char*} name 图片名称。
+ * @param {const char*} name 图片名称。
  * @param {bitmap_t*} image 用于返回图片。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
@@ -153,7 +152,7 @@ ret_t image_manager_set_fallback_get_bitmap(image_manager_t* imm,
  * 预加载指定的图片。
  * @annotation ["scriptable"]
  * @param {image_manager_t*} imm 图片管理器对象。
- * @param {char*} name 图片名称。
+ * @param {const char*} name 图片名称。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -231,16 +230,26 @@ ret_t image_manager_set_assets_manager(image_manager_t* imm, assets_manager_t* a
 /**
  * @method image_manager_deinit
  * 析构图片管理器。
- * @param {image_manager_t*} imm 图片管理器对象。
+ * @param {image_manager_t*} im 图片管理器对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t image_manager_deinit(image_manager_t* im);
 
 /**
+ * @method image_manager_dump
+ * 输出图片管理器的信息。
+ * @param {image_manager_t*} im 图片管理器对象。
+ * @param {str_t*} result 用于返回图片管理器的信息。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t image_manager_dump(image_manager_t* im, str_t* result);
+
+/**
  * @method image_manager_destroy
  * 析构并释放图片管理器。
- * @param {image_manager_t*} imm 图片管理器对象。
+ * @param {image_manager_t*} im 图片管理器对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

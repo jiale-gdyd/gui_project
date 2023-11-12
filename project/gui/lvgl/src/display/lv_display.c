@@ -72,16 +72,16 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
-    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
+    disp->layer_head = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(disp->layer_head);
     if(disp->layer_head == NULL) return NULL;
-    lv_memzero(disp->layer_head, sizeof(lv_layer_t));
 
     if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
     disp->layer_head->buf_area.x1 = 0;
     disp->layer_head->buf_area.y1 = 0;
     disp->layer_head->buf_area.x2 = hor_res - 1;
     disp->layer_head->buf_area.y2 = ver_res - 1;
+    disp->layer_head->buf_stride = lv_draw_buf_width_to_stride(hor_res, LV_COLOR_FORMAT_NATIVE);
     disp->layer_head->color_format = disp->color_format;
 
     disp->inv_en_cnt = 1;
@@ -134,7 +134,6 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 
     return disp;
 }
-
 
 void lv_display_remove(lv_display_t * disp)
 {
@@ -398,7 +397,6 @@ void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb
     disp->flush_cb = flush_cb;
 }
 
-
 void lv_display_set_flush_wait_cb(lv_display_t * disp, lv_display_flush_wait_cb_t wait_cb)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -439,7 +437,6 @@ bool lv_display_get_antialiasing(lv_display_t * disp)
 
     return disp->antialiasing;
 }
-
 
 LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
@@ -565,7 +562,6 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
     lv_obj_remove_local_style_prop(lv_screen_active(), LV_STYLE_OPA, 0);
 
-
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
 
@@ -687,7 +683,6 @@ uint32_t lv_display_get_event_count(lv_display_t * disp)
     LV_ASSERT_NULL(disp);
     return lv_event_get_count(&disp->event_list);
 }
-
 
 lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 {

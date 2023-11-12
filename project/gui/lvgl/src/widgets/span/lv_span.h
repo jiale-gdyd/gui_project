@@ -52,7 +52,6 @@ typedef _lv_span_mode_t lv_span_mode_t;
 typedef uint32_t lv_span_mode_t;
 #endif /*DOXYGEN*/
 
-
 typedef struct {
     char * txt;             /* a pointer to display text */
     lv_obj_t * spangroup;   /* a pointer to spangroup */
@@ -73,7 +72,7 @@ typedef struct {
     uint32_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
 } lv_spangroup_t;
 
-extern const lv_obj_class_t lv_spangroup_class;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -238,7 +237,6 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 
  */
 int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width);
-
 
 /*=====================
  * Other functions

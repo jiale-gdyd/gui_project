@@ -14,3 +14,4 @@ obj-y += lv_draw_sw_mask.o
 obj-y += lv_draw_sw_transform.o
 obj-y += lv_draw_sw_triangle.o
 obj-y += lv_draw_sw.o
+obj-y += lv_draw_sw_vector.o

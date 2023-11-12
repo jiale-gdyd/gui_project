@@ -37,6 +37,7 @@ extern "C" {
 #define LV_OS_FREERTOS      2
 #define LV_OS_CMSIS_RTOS2   3
 #define LV_OS_RTTHREAD      4
+#define LV_OS_WINDOWS       5
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -47,6 +48,7 @@ extern "C" {
 #define LV_DRAW_SW_ASM_NONE         0
 #define LV_DRAW_SW_ASM_NEON         1
 #define LV_DRAW_SW_ASM_MVE          2
+#define LV_STDLIB_RTTHREAD          3
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
 /**********************

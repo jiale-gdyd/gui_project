@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   assets_manager.h
  * Author: AWTK Develop Team
  * Brief:  asset manager
  *
- * Copyright (c) 2018 - 2022  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2023  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,7 @@
 #ifndef TK_ASSETS_MANAGER_H
 #define TK_ASSETS_MANAGER_H
 
+#include "tkc/str.h"
 #include "tkc/darray.h"
 #include "tkc/emitter.h"
 #include "tkc/asset_info.h"
@@ -219,7 +220,7 @@ ret_t assets_manager_add_data(assets_manager_t* am, const char* name, uint16_t t
  * @annotation ["scriptable"]
  * @param {assets_manager_t*} am asset manager对象。
  * @param {asset_type_t} type 资源的类型。
- * @param {char*} name 资源的名称。
+ * @param {const char*} name 资源的名称。
  *
  * @return {const asset_info_t*} 返回资源。
  */
@@ -232,7 +233,7 @@ const asset_info_t* assets_manager_ref(assets_manager_t* am, asset_type_t type, 
  * @param {assets_manager_t*} am asset manager对象。
  * @param {asset_type_t} type 资源的类型。
  * @param {uint16_t} subtype 资源的子类型。
- * @param {char*} name 资源的名称。
+ * @param {const char*} name 资源的名称。
  *
  * @return {const asset_info_t*} 返回资源。
  */
@@ -244,7 +245,7 @@ const asset_info_t* assets_manager_ref_ex(assets_manager_t* am, asset_type_t typ
  * 释放指定的资源。
  * @annotation ["scriptable"]
  * @param {assets_manager_t*} am asset manager对象。
- * @param {asset_info_t*} info 资源。
+ * @param {const asset_info_t*} info 资源。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -256,7 +257,7 @@ ret_t assets_manager_unref(assets_manager_t* am, const asset_info_t* info);
  * @param {assets_manager_t*} am asset manager对象。
  * @param {asset_type_t} type 资源的类型。
  * @param {uint16_t} subtype 资源的子类型。
- * @param {char*} name 资源的名称。
+ * @param {const char*} name 资源的名称。
  *
  * @return {const asset_info_t*} 返回资源。
  */
@@ -281,7 +282,7 @@ asset_info_t* assets_manager_load(assets_manager_t* am, asset_type_t type, const
  * @param {assets_manager_t*} am asset manager对象。
  * @param {asset_type_t} type 资源的类型。
  * @param {uint16_t} subtype 资源的子类型。
- * @param {char*} name 资源的名称。
+ * @param {const char*} name 资源的名称。
  *
  * @return {asset_info_t*} 返回资源。
  */
@@ -294,7 +295,7 @@ asset_info_t* assets_manager_load_ex(assets_manager_t* am, asset_type_t type, ui
  * 备注：内部使用的，不建议用户自行调用。
  * @param {assets_manager_t*} am asset manager对象。
  * @param {asset_type_t} type 资源的类型。
- * @param {char*} name 资源的名称。
+ * @param {const char*} name 资源的名称。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -383,6 +384,16 @@ ret_t assets_manager_clear_cache_ex(assets_manager_t* am, asset_type_t type, con
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t assets_manager_clear_all(assets_manager_t* am);
+
+/**
+ * @method assets_manager_dump
+ * 输出资源管理器的信息。
+ * @param {assets_manager_t*} am asset manager对象。
+ * @param {str_t*} result 输出的字符串。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t assets_manager_dump(assets_manager_t* am, str_t* result);
 
 /**
  * @method assets_manager_deinit

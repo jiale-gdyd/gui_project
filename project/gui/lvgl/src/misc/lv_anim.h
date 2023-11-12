@@ -174,6 +174,11 @@ typedef struct _lv_anim_t {
 void _lv_anim_core_init(void);
 
 /**
+ * Deinit. the animation module
+ */
+void _lv_anim_core_deinit(void);
+
+/**
  * Initialize an animation variable.
  * E.g.:
  * lv_anim_t a;
@@ -382,7 +387,6 @@ static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t 
     para->y1 = y1;
     para->y2 = y2;
 }
-
 
 /**
  * Create an animation

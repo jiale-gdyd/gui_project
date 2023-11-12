@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-
 /*********************
  *      INCLUDES
  *********************/
@@ -155,7 +154,6 @@ typedef struct {
     _lv_draw_sw_mask_radius_circle_dsc_t * circle;
 } lv_draw_sw_mask_radius_param_t;
 
-
 typedef struct {
     /*The first element must be the common descriptor*/
     _lv_draw_sw_mask_common_dsc_t dsc;
@@ -170,7 +168,6 @@ typedef struct {
 
 } lv_draw_sw_mask_fade_param_t;
 
-
 typedef struct _lv_draw_sw_mask_map_param_t {
     /*The first element must be the common descriptor*/
     _lv_draw_sw_mask_common_dsc_t dsc;
@@ -181,12 +178,13 @@ typedef struct _lv_draw_sw_mask_map_param_t {
     } cfg;
 } lv_draw_sw_mask_map_param_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 void lv_draw_sw_mask_init(void);
+
+void lv_draw_sw_mask_deinit(void);
 
 //! @cond Doxygen_Suppress
 

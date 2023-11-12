@@ -50,10 +50,26 @@ void lv_draw_init(void)
 #endif
 }
 
+void lv_draw_deinit(void)
+{
+#if LV_USE_OS
+    lv_thread_sync_delete(&_draw_info.sync);
+#endif
+
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        lv_draw_unit_t * cur_unit = u;
+        u = u->next;
+
+        if(cur_unit->delete_cb) cur_unit->delete_cb(cur_unit);
+        lv_free(cur_unit);
+    }
+    _draw_info.unit_head = NULL;
+}
+
 void * lv_draw_create_unit(size_t size)
 {
-    lv_draw_unit_t * new_unit = lv_malloc(size);
-    lv_memzero(new_unit, size);
+    lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
 
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
@@ -64,8 +80,7 @@ void * lv_draw_create_unit(size_t size)
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_PROFILER_BEGIN;
-    lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
-    lv_memzero(new_task, sizeof(*new_task));
+    lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
 
     new_task->area = *coords;
     new_task->clip_area = layer->clip_area;
@@ -85,7 +100,6 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     LV_PROFILER_END;
     return new_task;
 }
-
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
@@ -132,17 +146,17 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 void lv_draw_dispatch(void)
 {
     LV_PROFILER_BEGIN;
-    bool one_taken = false;
+    bool render_running = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
-            bool ret = lv_draw_dispatch_layer(disp, layer);
-            if(ret) one_taken = true;
+            if(lv_draw_dispatch_layer(disp, layer))
+                render_running = true;
             layer = layer->next;
         }
 
-        if(!one_taken) {
+        if(!render_running) {
             lv_draw_dispatch_request();
         }
         disp = lv_display_get_next(disp);
@@ -208,7 +222,7 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
         t = t_next;
     }
 
-    bool one_taken = false;
+    bool render_running = false;
 
     /*This layer is ready, enable blending its buffer*/
     if(layer->parent && layer->all_tasks_added && layer->draw_task_head == NULL) {
@@ -246,17 +260,13 @@ bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
             lv_draw_unit_t * u = _draw_info.unit_head;
             while(u) {
                 int32_t taken_cnt = u->dispatch_cb(u, layer);
-                if(taken_cnt < 0) {
-                    break;
-                }
-                if(taken_cnt > 0) one_taken = true;
+                if(taken_cnt >= 0) render_running = true;
                 u = u->next;
             }
         }
     }
 
-    return one_taken;
-
+    return render_running;
 }
 
 void lv_draw_dispatch_wait_for_request(void)
@@ -313,14 +323,14 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     lv_display_t * disp = _lv_refr_get_disp_refreshing();
-    lv_layer_t * new_layer = lv_malloc(sizeof(lv_layer_t));
+    lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;
-    lv_memzero(new_layer, sizeof(lv_layer_t));
 
     new_layer->parent = parent_layer;
     new_layer->clip_area = *area;
     new_layer->buf_area = *area;
+    new_layer->buf_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), color_format);
     new_layer->color_format = color_format;
 
     if(disp->layer_head) {
@@ -337,11 +347,12 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
+    int32_t w = lv_area_get_width(&layer->buf_area);
+    uint32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
+
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     if(layer->buf == NULL) {
-        int32_t w = lv_area_get_width(&layer->buf_area);
         int32_t h = lv_area_get_height(&layer->buf_area);
-        int32_t stride = lv_draw_buf_width_to_stride(w, layer->color_format);
         uint32_t layer_size_byte = h * stride;
         layer->buf_unaligned = lv_draw_buf_malloc(layer_size_byte, layer->color_format);
 
@@ -356,7 +367,6 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         _draw_info.used_memory_for_layers_kb += kb;
         LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
 
-
         if(lv_color_format_has_alpha(layer->color_format)) {
             lv_area_t a;
             a.x1 = 0;
@@ -367,13 +377,16 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         }
     }
 
+    /*Set the stride also for static allocated buffers as well as for new dynamically allocated*/
+    layer->buf_stride = stride;
+
+    /*Make sure the buffer address is aligned in case of already allocated buffers*/
     return lv_draw_buf_align(layer->buf, layer->color_format);
 }
 
 void * lv_draw_layer_go_to_xy(lv_layer_t * layer, int32_t x, int32_t y)
 {
-    uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
-    return lv_draw_buf_go_to_xy(layer->buf, stride, layer->color_format, x, y);
+    return lv_draw_buf_go_to_xy(layer->buf, layer->buf_stride, layer->color_format, x, y);
 
 }
 
@@ -407,4 +420,3 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 
     return true;
 }
-

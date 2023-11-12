@@ -13,6 +13,7 @@
 #include "../../misc/lv_area.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_color.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -53,7 +54,6 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
 static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                              int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
-
 
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -108,7 +108,6 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
     tr_dsc.cosma = tr_dsc.cosma >> (LV_TRIGO_SHIFT - 10);
     tr_dsc.pivot_x_256 = tr_dsc.pivot.x * 256;
     tr_dsc.pivot_y_256 = tr_dsc.pivot.y * 256;
-
 
     int32_t dest_w = lv_area_get_width(dest_area);
     int32_t dest_h = lv_area_get_height(dest_area);
@@ -289,14 +288,9 @@ static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, 
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 dest_c32[x].alpha = (a * (0xFF - ys_fract)) >> 8;
             }
-            else {
-                dest_c32[x].alpha = 0x00;
-            }
         }
     }
 }
-
-#include "../../stdlib/lv_string.h"
 
 static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -385,9 +379,6 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 dest_c32[x].alpha = (dest_c32[x].alpha * (0x7F - ys_fract)) >> 7;
             }
-            else {
-                dest_c32[x].alpha = 0x00;
-            }
         }
     }
 }
@@ -444,7 +435,6 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
         src_tmp_u16 += (ys_int * src_stride) + xs_int;
         cbuf[x] = src_tmp_u16[0];
 
-
         if(aa &&
            xs_int + x_next >= 0 &&
            xs_int + x_next <= src_w - 1 &&
@@ -495,9 +485,6 @@ static void transform_rgb565a8(const uint8_t * src, int32_t src_w, int32_t src_h
             }
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 abuf[x] = (a * (0xFF - ys_fract)) >> 8;
-            }
-            else {
-                abuf[x] = 0x00;
             }
         }
     }
@@ -573,13 +560,9 @@ static void transform_a8(const uint8_t * src, int32_t src_w, int32_t src_h, int3
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
                 abuf[x] = (src_tmp[0] * (0xFF - ys_fract)) >> 8;
             }
-            else {
-                abuf[x] = 0x00;
-            }
         }
     }
 }
-
 
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
